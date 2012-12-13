@@ -77,7 +77,7 @@ class MainHandler(BaseHandler):
         '''
         current_viewers = simplejson.loads(memcache.get('current_viewers') or '{}')
         if not self.current_user.id in current_viewers:
-          current_viewers[token] = self.current_user.id
+          current_viewers[self.current_user.id] = token
           memcache.set('current_viewers', simplejson.dumps(current_viewers))
 
         template_data['current_viewers'] = simplejson.dumps(current_viewers)
@@ -100,7 +100,7 @@ class MainHandler(BaseHandler):
 
         # Grab sessions for current_users (that we care about)
         viewer_sessions = []
-        for token, uid in current_viewers.iteritems():
+        for uid in current_viewers:
           user_sessions = UserSession.get_by_user(User.get_by_key_name(uid))
           for s in user_sessions:
             viewer_sessions.append(s.toJson())
@@ -152,11 +152,9 @@ class WebChannelDisconnectedHandler(BaseHandler):
     del web_channels[clientId]
     memcache.set('web_channels', simplejson.dumps(web_channels))
 
-    current_users = simplejson.loads(memcache.get('current_viewers') or '{}')
-    if current_users and clientId in current_users:
-      uid = current_users[clientId]
-      user = User.get_by_key_name(uid)
-      logging.info(uid)
+    current_viewers = simplejson.loads(memcache.get('current_viewers') or '{}')
+    if clientId in current_viewers:
+      user = User.get_by_key_name(clientId)
 
       # End the user session
       user_sessions = UserSession.get_by_user(user)
@@ -164,8 +162,8 @@ class WebChannelDisconnectedHandler(BaseHandler):
         user_sessions[0].tune_out = datetime.datetime.now()
         user_sessions[0].put()
 
-      del user_sessions[clientId]
-      memcache.set('current_viewers', simplejson.dumps(current_users))
+      del current_viewers[clientId]
+      memcache.set('current_viewers', simplejson.dumps(current_viewers))
 
 #--------------------------------------
 # CHANNEL HELPERS

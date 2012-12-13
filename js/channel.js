@@ -233,16 +233,18 @@ brkn.Channel.prototype.addViewer = function(user, tuneIn, opt_tuneOut) {
 		goog.dom.appendChild(this.viewersEl_, userEl);
 		this.viewers_[user.id] = userEl;
 	}
-	var lineEl = soy.renderAsElement(brkn.channel.line, {
-		user: user
-	});
-	goog.dom.appendChild(userEl, lineEl);
-	var tuneInTime = Math.max(tuneIn.getTime(), this.minTime_.getTime());
-	var programsWidth = goog.style.getSize(this.programsEl_).width;
-	var offset = (tuneInTime - this.minTime_.getTime())/(this.timeline_ * 1000) * programsWidth;
-	goog.style.setWidth(lineEl,
-			((opt_tuneOut ? opt_tuneOut.getTime() : goog.now()) - tuneInTime)/(this.timeline_ * 10) + '%');
-	goog.style.setPosition(lineEl, offset);
+	if (!opt_tuneOut || (opt_tuneOut && opt_tuneOut.getTime() > this.minTime_.getTime())) {
+		var lineEl = soy.renderAsElement(brkn.channel.line, {
+			user: user
+		});
+		goog.dom.appendChild(userEl, lineEl);
+		var tuneInTime = Math.max(tuneIn.getTime(), this.minTime_.getTime());
+		var programsWidth = goog.style.getSize(this.programsEl_).width;
+		var offset = (tuneInTime - this.minTime_.getTime())/(this.timeline_ * 1000) * programsWidth;
+		goog.style.setWidth(lineEl,
+				((opt_tuneOut ? opt_tuneOut.getTime() : goog.now()) - tuneInTime)/(this.timeline_ * 10) + '%');
+		goog.style.setPosition(lineEl, offset);
+	}
 };
 
 
