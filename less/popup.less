@@ -1,0 +1,158 @@
+div#popup {
+	width: 260px;
+	min-height: 55px;
+	background: rgba(255,255,255,.9);
+	border: 1px solid #ccc;
+	border-radius: 3px;
+	box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.3);
+	z-index: 999;
+  position: absolute;
+  
+	&&.left::after {
+		content: "";
+		position: absolute;
+		top: 50%;
+		left: -10px;
+		border-width: 7px 10px 7px 0;
+		border-style: solid;
+		border-color: transparent rgba(255, 255, 255, .9);
+		display: block;
+		width: 0;
+		margin-top: -7px;
+	}
+	
+	div.select-program {
+	  margin-top: 20px;
+	  div.select-header {
+	    position: absolute;
+	    top: 0;
+	    left: 0;
+	    width: 100%;
+	    height: 20px;
+	    text-align: center;
+	    background: -webkit-gradient(linear, 0% 0%, 0% 100%,
+		    from(rgba(45, 52, 70, .55)),to(rgba(45, 52, 70, .8)));
+			border-top: 1px solid #ccc;
+			color: #FEFEFE;
+			text-shadow: 1px 1px black;
+			font-size: 12px;
+			line-height: 20px;
+			margin-top: -2px;
+			border-top-left-radius: 4px;
+			border-top-right-radius: 4px;
+	  }
+	  div.select-content {
+	    width: 260px;
+	    overflow: hidden;
+	    div.page {
+	      width: 520px;
+	      position: relative;
+	    }
+		  input[type=text] {
+		    width: 244px;
+		    margin-top: 4px;
+		    margin-left: 4px;
+		    border: 1px solid #ccc;
+				box-shadow: none;
+				font-size: 12px;
+				font-weight: normal;
+				line-height: 15px;
+				color: #555;
+				margin-bottom: 6px;
+				resize: none;
+				padding: 3px;
+				height: 16px;
+				-webkit-border-radius: 2px;
+				-moz-border-radius: 2px;
+				border-radius: 2px;
+				outline: none;
+		  }
+		  div.page2 {
+		    position: absolute;
+		    left: 260px;
+		    width: 260px;
+		    top: 0;
+		  }
+	  }
+	  div.confirm-media {
+	    position: relative;
+	    img {
+	      height: 25px;
+	      position: absolute;
+				left: 3px;
+				top: 3px;
+				border-radius: 3px;
+	    }
+	    div.title {
+	      position: absolute;
+	      left: 41px;
+	      top: 10px;
+	      font-size: 12px;
+	      width: 180px;
+	      white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+	    }
+	    div.button {
+	      position: absolute;
+	      right: 3px;
+	      top: 4px;
+	      width: 30px;
+	      color: #181818;
+	      text-shadow: none;
+	    }
+	  }
+	}
+  
+  div.share-record {
+    position: relative;
+    
+    div.mosaic {
+      position: absolute;
+      left: 5px;
+      top: 5px;
+      img {
+        width: 70px;
+        height: 70px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+      }
+    }
+    div.buttons {
+      position: absolute;
+      left: 82px;
+      top: 5px;
+      > iframe {
+        margin-top: 2px;
+      }
+      .fb_edge_widget_with_comment {
+        position: absolute;
+        overflow: hidden;
+      }
+      span {
+        width: 115px !important;
+      }
+    }
+    div.url {
+      position: absolute;
+      left: 82px;
+      top: 35px;
+      font-size: 12px;
+      color: #2d3446;
+      input {
+        font-size: 11px;
+        border: 1px solid #ccc;
+        width: 164px;
+        height: 16px;
+        margin: 2px 0 0 0;
+        &:focus {
+          outline: none;
+        }
+      }
+    }
+  }
+}
+
+.btn {
+  height: 25px !important;
+}

@@ -1,0 +1,66 @@
+{namespace brkn.popup}
+
+/**
+ * The base dom for the popup
+ */
+{template .base}
+  <div class="popup" id="popup" style="visibility: hidden; display: none;">
+    <div class="content"></div>
+    <div id="tailarrow"></div>
+  </div>
+{/template}
+
+
+/**
+ * Select a program
+ */
+{template .selectProgram}
+  <div class="select-program">
+    <div class="select-header">Suggest a Program</div>
+    <div class="select-content">
+      <div class="page">
+	    	<input type="text" class="program-input" placeholder="paste a youtube link"/>
+	    	<div class="page2">
+	    	</div>
+	   </div>
+    </div>
+  </div>
+{/template}
+
+
+/**
+ * Select a program
+ * @param title
+ * @param thumb
+ */
+{template .confirmMedia}
+  <div class="confirm-media">
+    <img src="{$thumb}" />
+    <div class="title">{$title}</div>
+    <div class="dark button">Yes</div>
+  </div>
+{/template}
+
+
+/**
+ * Share a full record
+ * @param id
+ */
+{template .shareRecord}
+  <div class="share-record">
+    <div class="mosaic">
+      <img src="/mosaic/{$id}" />
+    </div>
+    <div class="buttons">
+    	<iframe allowtransparency="true" frameborder="0" scrolling="no"
+        src="https://platform.twitter.com/widgets/tweet_button.html?count=none"
+        style="width:61px; height:20px;"></iframe>
+    	<fb:like href="http://brkn.tv/record/7q" send="true"
+    	  width="100" show_faces="false"></fb:like>
+    </div>
+    <div class="url">
+      Link<br/>
+      <input type="text" disabled="disabled" value="http://brkn.tv/record/{$id}" />
+    </div>
+  </div>
+{/template}

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:fb="http://ogp.me/ns/fb#">
+  <head>
+    <meta charset="utf-8">
+    <title>Broken.tv</title>
+
+    <link rel="stylesheet/less" type="text/css" href="/less/main.less">
+  
+		<script src="/_ah/channel/jsapi" type="text/javascript" ></script>
+		<script src="/static/js/raphael-min.js" type="text/javascript"></script>
+		<script src="/static/js/less-1.1.5.min.js" type="text/javascript"></script>
+		<script>
+			// Re-namespace to avoid closure conflict.
+			var appengine = goog.appengine; 
+		</script>
+		<script src="{{ js_location }}"></script>
+		<script><!--
+	    // Load Youtube
+			var tag = document.createElement('script');
+			tag.src = "http://www.youtube.com/player_api";
+			var firstScriptTag = document.getElementsByTagName('script')[0];
+			firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+		</script>
+  </head>
+  <body>
+		<!--  <fb:login-button autologoutlink="true" scope="email, user_likes"></fb:login-button>  -->
+		<div id="stage" class="stage">
+		  <div id="ytplayer">
+      </div>
+		</div>
+		<div id="guide" class="guide">
+		  <div id="channels" class="channels"></div>
+		  <div class="header" id="header">
+		    <div class="times">
+		      <div id="ticker" class="ticker"></div>
+		    </div>
+		  </div>
+		</div>
+		<div id="controller" class="controller">
+		  <div id="guide-toggle" class="guide-toggle dark button">B</div>
+		  <div class="controls">
+		    <div class="restart dark button"></div>
+		    <div class="pause dark button"></div>
+		    <div class="go-live dark button"></div>
+		  </div>
+		  {% if not current_user %}
+		    <fb:login-button style="position: absolute; right: 100px;" autologoutlink="true" perms="email, user_likes"></fb:login-button>
+		  {% endif %}
+		  <div class="comment dark button"></div>
+		</div>
+    <div id="fb-root"></div>
+		 
+	  <script><!--
+		  var channelToken = '{{ token }}';
+		  var channels = JSON.parse('{{ channels|safe }}');
+		  var programs = JSON.parse('{{ programs|safe }}');
+		  var currentUser = JSON.parse('{{ current_user|safe }}' || '{}');
+		  var currentViewers = JSON.parse('{{ current_viewers|safe }}' || '[]');
+		  var viewerSessions = JSON.parse('{{ viewer_sessions|safe }}' || '[]');
+		  var ytLoaded = false;
+		  var fbLoaded = false;
+		  function onYouTubePlayerAPIReady() {
+		    ytLoaded = true;
+		    if (fbLoaded) {
+		    	brkn.Main.init(fbLoaded, channelToken, channels, programs, currentUser, viewerSessions);
+		    }
+		  }
+	    window.fbAsyncInit = function() {
+	      FB.init({appId: '{{ facebook_app_id }}', status: true, cookie: true,
+	               xfbml: true, oauth: true});
+	    };
+	    window.fbAsyncInit = function() {
+	      FB.init({
+	        appId      : '{{ facebook_app_id }}', // App ID
+	        channelUrl : '//localhost:8011/static/channel.html', // Channel File
+	        status     : true, // check login status
+	        cookie     : true, // enable cookies to allow the server to access the session
+	        xfbml      : true  // parse XFBML
+	      });
+	      FB.getLoginStatus(function(response) {
+		      fbLoaded = response;
+		      if (ytLoaded) {
+		        brkn.Main.init(response, channelToken, channels, programs, currentUser, viewerSessions);
+		      }
+	      });
+	    };
+	 		// Load the SDK Asynchronously
+	    (function(d){
+	       var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+	       if (d.getElementById(id)) {return;}
+	       js = d.createElement('script'); js.id = id; js.async = true;
+	       js.src = "//connect.facebook.net/en_US/all.js";
+	       ref.parentNode.insertBefore(js, ref);
+	     }(document));
+    </script>
+  </body>
+</html>

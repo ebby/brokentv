@@ -1,0 +1,236 @@
+ @name-width: 145px;
+
+div#guide {
+  position: absolute;
+  bottom: 40px;
+  height: 0px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, .95);
+  width: 100%;
+  color: #ccc;
+  -webkit-transition: height .5s ease;
+       -moz-transition: height .5s ease;
+            transition: height .5s ease;
+  
+  &.toggled {
+    height: 230px;
+  }
+  div.header {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    border-bottom: 1px solid #ccc;
+    font-size: 10px;
+    background: -webkit-gradient(linear, 0% 0%, 0% 100%,
+		    from(rgba(45, 52, 70, .55)),to(rgba(45, 52, 70, .8)));
+		border-top: 1px solid #ccc;
+		-webkit-box-shadow: inset 0 -3px 7px -3px rgba(0,0,0,0.2), 0 0 5px 1px rgba(0, 0, 0, .6);
+		   -moz-box-shadow: inset 0 -3px 7px -3px rgba(0,0,0,0.2), 0 0 5px 1px rgba(0, 0, 0, .6);
+			  		box-shadow: inset 0 -3px 7px -3px rgba(0,0,0,0.2), 0 0 5px 1px rgba(0, 0, 0, .6);
+    div.name {
+      width: 10%;
+      min-width: 60px;
+      border-right: 1px solid #ccc;
+      text-align: center;
+      padding: 5px 0;
+      display: inline-block;
+    }
+    div.times {
+      display: inline-block;
+      width: 100%;
+      white-space: nowrap;
+      margin-left: @name-width;
+      div.time {
+        display: inline-block;
+        padding: 5px 0;
+      }
+    }
+    div.ticker {
+      position: absolute;
+      background: url(/static/img/ticker.png) no-repeat;
+      width: 16px;
+      height: 26px;
+      background-size: 100%;
+      -webkit-transition: left 1s;
+	       -moz-transition: left 1s;
+	            transition: left 1s;
+    }
+  }
+  div.channels {
+    position: absolute;
+    padding-top: 25px;
+    width: 100%;
+    height: 210px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    font-size: 12px;
+    div.channel {
+      border-bottom: 1px solid #ccc;
+      position: relative;
+      div.name {
+        width: @name-width;
+        text-align: center;
+        display: inline-block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        vertical-align: top;
+        background: rgba(0, 0, 0, .9);
+        margin-right: 1px solid #888;
+        box-shadow: 1px 0 3px rgba(0, 0, 0, .8);
+        z-index: 0;
+        span {
+          position: relative;
+          top: 20px;
+        }
+        div.suggest-program {
+	       padding: 5px 0; 
+	       display: inline-block;
+	       position: absolute;
+	       left: 5px;
+	       top: 10px;
+	      }
+      }
+      div.add-program {
+        display: inline-block;
+        width: 25px;
+        font-size: 16px;
+      }
+      div.programming {
+        display: inline-block;
+        position: relative;
+        vertical-align: top;
+        width: 100%;
+      }
+      div.programs-container {
+        height: 40px;
+      }
+      div.programs {
+        display: inline-block;
+        white-space: nowrap;
+        width: 100%;
+        height: 40px;
+        min-width: 540px;
+        position: relative;
+        vertical-align: top;
+        margin-bottom: 4px;
+        margin-left: 10px;
+        div.program {
+          display: inline-block;
+          position: absolute;
+					white-space: normal;
+					overflow: hidden;
+					border-right: 1px solid #CCC;
+					vertical-align: middle;
+					height: 100%;
+					color: #999;
+					box-shadow: inset -2px -2px 2px 0px white;
+					text-shadow: 1px 1px 1px white;
+					z-index: 0;
+					&&:first-child {
+					  border-left: 1px solid #CCC;
+					}
+					div.info {
+					  display: inline-block;
+					  position: absolute;
+					}
+					img {
+					  height: 25px;
+					  border-radius: 3px;
+					  position: absolute;
+						left: 5px;
+						top: 5px;
+					}
+					div.title {
+					  margin-left: 43px;
+						margin-top: 5px;
+						height: 40px;
+						overflow: hidden;
+					}
+	        &.current {
+	          background: rgba(255, 255, 255, .3);
+	        }
+        }
+      }
+      div.graph {
+        display: inline-block;
+	      width: 100%;
+	      position: relative;
+	      svg {
+	        top: 5px;
+	      }
+      }
+    	div.viewers {
+	      width: 100%;
+	      position: absolute;
+	      bottom: 10px;
+	      -webkit-transition: height .3s;
+			     -moz-transition: height .3s;
+			          transition: height .3s;
+	      div.viewer {
+	        position: relative;
+	        margin-left: 6px;
+	        height: 25px;
+	        -webkit-transition: width 1s;
+			       -moz-transition: width 1s;
+			            transition: width 1s;
+	        div.line {
+	          position: absolute;
+	          height: 4px;
+	        	background: #ccc;
+	        	top: 11px;
+	        	width: 100%;
+	        	box-shadow: 0px 1px 1px 0px rgba(255, 255, 255, .6);
+	          &::before {
+		          content: '';
+		          position: absolute;
+		          right: -10px;
+		          top: -5px;
+		          width: 13px;
+		          height: 13px;
+		          border-radius: 10px;
+		          background: #ccc;
+		          box-shadow: 0px 1px 1px 0px rgba(255, 255, 255, .6);
+		        }
+		        &::after {
+		          content: '';
+		          position: absolute;
+		          right: -6px;
+		          top: -1px;
+		          width: 5px;
+		          height: 5px;
+		          border-radius: 10px;
+		          background: white;
+		        }
+		        div.pic {
+		          background: #ccc;
+							width: 25px;
+							height: 25px;
+							border-radius: 10px;
+							left: -5px;
+							top: -10px;
+							box-shadow: 0px 1px 1px 0px rgba(255, 255, 255, .6);
+							position: absolute;
+							img {
+			          width: 21px;
+			          height: 20px;
+			          margin-left: 2px;
+			          margin-top: 2px;
+			          border-radius: 10px;
+			        }
+		        }
+	        }
+	        div.username {
+	          position: absolute;
+	          left: 10px;
+	          top: 3px;
+	        }
+	      }
+	    }
+	  }
+	  .current div.name {
+        background: rgba(255, 255, 255, .97) !important;
+        color: #181818;
+      }
+  }
+}

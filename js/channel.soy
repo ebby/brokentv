@@ -1,0 +1,41 @@
+{namespace brkn.channel}
+
+/** 
+ * @param name
+ */
+{template .main}
+	<div class="channel">
+	  <div class="programs-container">
+			<div class="programs"></div>
+ 	  </div>
+ 	  <div class="graph"></div>
+		<div class="viewers"></div>
+		<div class="name">
+	    <span>{$name}</span>
+	  	<div class="suggest-program">
+	    	<div class="add-program button dark">+</div>
+	    </div>
+	  </div>
+	</div>
+{/template}
+
+/**
+ * @param program
+ */
+{template .program}
+  <div class="info">
+	  <img src="{$program.media.thumbnail}">
+	  <div class="title">{$program.media.name}</div>
+  </div>
+{/template}
+
+/**
+ * @param user
+ */
+{template .line}
+  <div class="line">
+    <div class="pic">
+	    <img src="{$user.picture}">
+	  </div>
+  </div>
+{/template}
