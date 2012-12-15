@@ -36,6 +36,10 @@
 		    </div>
 		  </div>
 		</div>
+		<div id="sidebar" class="sidebar"><!--
+      <div class="toolbar" id="toolbar"></div>
+      --><div class="info"></div>
+    </div>
 		<div id="controller" class="controller">
 		  <div id="guide-toggle" class="guide-toggle dark button">B</div>
 		  <div class="controls">
@@ -46,7 +50,7 @@
 		  {% if not current_user %}
 		    <fb:login-button style="position: absolute; right: 100px;" autologoutlink="true" perms="email, user_likes"></fb:login-button>
 		  {% endif %}
-		  <div class="comment dark button"></div>
+		  <div id="sidebar-toggle" class="sidebar-toggle dark button"></div>
 		</div>
     <div id="fb-root"></div>
 		 

@@ -106,7 +106,7 @@ brkn.Channel.prototype.createDom = function() {
 /** @inheritDoc */
 brkn.Channel.prototype.enterDocument = function() {
   goog.base(this, 'enterDocument');
-  
+
   this.programsEl_ = goog.dom.getElementByClass('programs', this.getElement());
   this.viewersEl_ = goog.dom.getElementByClass('viewers', this.getElement());
   this.nameEl_ = goog.dom.getElementByClass('name', this.getElement());
@@ -142,9 +142,7 @@ brkn.Channel.prototype.enterDocument = function() {
   	}
   }
   
-  goog.array.forEachRight(this.getModel().viewerSessions, function(session) {
-  	this.addViewer(session.user, session.tuneIn, session.tuneOut);
-  }, this);
+  goog.array.forEachRight(this.getModel().viewerSessions, this.addViewer, this);
   
   this.addChild(this.addProgram_);
 	this.addProgram_.decorate(goog.dom.getElementByClass('add-program'));
@@ -156,8 +154,10 @@ brkn.Channel.prototype.enterDocument = function() {
 		.listen(goog.dom.getElementByClass('name', this.getElement()),
 				goog.events.EventType.CLICK,
 				goog.bind(function() {
-					brkn.model.Channels.getInstance().publish(brkn.model.Channels.Action.CHANGE_CHANNEL,
-							this.getModel());
+				  if (this.getModel().id != brkn.model.Channels.getInstance().currentChannel.id) {
+				    brkn.model.Channels.getInstance().publish(brkn.model.Channels.Action.CHANGE_CHANNEL,
+				        this.getModel());
+				  }
 				}, this))
 		.listen(brkn.model.Clock.getInstance().clock,
 				goog.Timer.TICK,
@@ -213,36 +213,35 @@ brkn.Channel.prototype.addProgram = function(program, opt_duration) {
 			this.getModel().currentProgram && this.getModel().currentProgram.id == program.id);
 	var programsWidth = goog.style.getSize(this.programsEl_).width;
 	var width = program.media.duration/this.timeline_ * programsWidth;
-	goog.style.setWidth(programEl, width - 4);
+	goog.style.setWidth(programEl, width);
 	var offset = (program.time.getTime() - this.minTime_.getTime())/(this.timeline_ * 1000) *
 			programsWidth;
 	goog.style.setPosition(programEl, offset);
 	goog.dom.appendChild(this.programsEl_, programEl);
+	goog.dom.classes.enable(programEl, 'clipped', width < 120);
 };
 
 
 /**
- * @param {brkn.model.User} user The user to display
- * @param {goog.date.DateTime} tuneIn The tune-in time
- * @param {?goog.date.DateTime=} opt_tuneOut The tune-out time
+ * @param {brkn.model.Session} session The session to display
  */
-brkn.Channel.prototype.addViewer = function(user, tuneIn, opt_tuneOut) {
-	var userEl = this.viewers_[user.id];
+brkn.Channel.prototype.addViewer = function(session) {
+	var userEl = this.viewers_[session.user.id];
 	if (!userEl) {
 		userEl = goog.dom.createDom('div', 'viewer');
 		goog.dom.appendChild(this.viewersEl_, userEl);
-		this.viewers_[user.id] = userEl;
+		this.viewers_[session.user.id] = userEl;
 	}
-	if (!opt_tuneOut || (opt_tuneOut && opt_tuneOut.getTime() > this.minTime_.getTime())) {
+	if (!session.tuneOut || session.tuneOut.getTime() > this.minTime_.getTime()) {
 		var lineEl = soy.renderAsElement(brkn.channel.line, {
-			user: user
+			user: session.user
 		});
 		goog.dom.appendChild(userEl, lineEl);
-		var tuneInTime = Math.max(tuneIn.getTime(), this.minTime_.getTime());
+		var tuneInTime = Math.max(session.tuneIn.getTime(), this.minTime_.getTime());
 		var programsWidth = goog.style.getSize(this.programsEl_).width;
 		var offset = (tuneInTime - this.minTime_.getTime())/(this.timeline_ * 1000) * programsWidth;
-		goog.style.setWidth(lineEl,
-				((opt_tuneOut ? opt_tuneOut.getTime() : goog.now()) - tuneInTime)/(this.timeline_ * 10) + '%');
+		goog.style.setWidth(lineEl, ((session.tuneOut ? session.tuneOut.getTime() :
+		    goog.now()) - tuneInTime)/(this.timeline_ * 10) + '%');
 		goog.style.setPosition(lineEl, offset);
 	}
 };
@@ -291,7 +290,8 @@ brkn.Channel.prototype.onSelectProgram_ = function(e) {
 brkn.Channel.prototype.update = function() {
 	// Update path
   this.constructPath();
-	
+
+  // Update viewers
 	goog.object.forEach(this.getModel().viewerSessions, function(session) {
 		if (!session.tuneOut) {
 			var tuneInTime = Math.max(session.tuneIn.getTime(), this.startTime_.getTime());

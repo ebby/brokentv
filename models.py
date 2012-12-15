@@ -196,9 +196,13 @@ class Media(db.Model):
   def get(cls, id):
     media = Media.get_by_key_name(id)
     if not media:
-      response = urlfetch.fetch(Media.YOUTUBE_DATA % id)
-      if response.status_code == 200:
-        media = Media.add_from_json(simplejson.loads(response.content))
+      tries = 0
+      while (tries < 4):
+        response = urlfetch.fetch(Media.YOUTUBE_DATA % id)
+        tries += 1
+        if response.status_code == 200:
+          media = Media.add_from_json(simplejson.loads(response.content))
+          break
     return media
 
   @classmethod
@@ -237,13 +241,14 @@ class Program(db.Model):
   @classmethod
   def add_program(cls, channel, id):
     media = Media.get(id)
-    program = Program(media=media,
-                      channel=channel,
-                      time=channel.get_next_time())
-    program.put()
-    channel.programming.append(str(program.key().id()))
-    channel.put()
-    return program
+    if media:
+      program = Program(media=media,
+                        channel=channel,
+                        time=channel.get_next_time())
+      program.put()
+      channel.programming.append(str(program.key().id()))
+      channel.put()
+      return program
 
   def toJson(self, fetch_channel=True):
     json = {}

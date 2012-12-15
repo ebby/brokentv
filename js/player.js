@@ -49,14 +49,30 @@ brkn.Player.prototype.enterDocument = function() {
 	  });
   
   this.getHandler()
-      .listen(window, 'resize', function() {
-  		  var playerEl = goog.dom.getElement('ytplayer');
-  		  goog.style.setHeight(playerEl, goog.dom.getViewportSize().height - 40);
-  		  goog.style.setWidth(playerEl, goog.dom.getViewportSize().width);
-  		});
+      .listen(window, 'resize', this.resize);
   
   brkn.model.Channels.getInstance().subscribe(brkn.model.Channels.Action.CHANGE_CHANNEL,
 			this.changeChannel, this);
+  brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_SIDEBAR,
+      function(show) {
+        this.resize(show);
+      }, this);
+  brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_GUIDE,
+      function(show) {
+        this.resize(undefined, show);
+      }, this);
+};
+
+
+/**
+ * Resize
+ */
+brkn.Player.prototype.resize = function(opt_showSidebar, opt_showGuide) {
+  var playerEl = goog.dom.getElement('ytplayer');
+  var guideHeight = goog.dom.classes.has(goog.dom.getElement('guide'), 'toggled') ? 230 : 0;
+  var sidebarWidth = goog.dom.classes.has(goog.dom.getElement('sidebar'), 'toggled')  ? 300 : 0;
+  goog.style.setHeight(playerEl, goog.dom.getViewportSize().height - guideHeight - 40);
+  goog.style.setWidth(playerEl, goog.dom.getViewportSize().width - sidebarWidth); 
 };
 
 

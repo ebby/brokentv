@@ -22,5 +22,6 @@ goog.addSingletonGetter(brkn.model.Controller);
 brkn.model.Controller.Actions = {
 	PLAY: 'play',
 	FINISHED: 'finished',
-	TOGGLE_GUIDE: 'toggle-guide'
+	TOGGLE_GUIDE: 'toggle-guide',
+	TOGGLE_SIDEBAR: 'toggle-sidebar'
 };

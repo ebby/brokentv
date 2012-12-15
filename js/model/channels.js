@@ -72,12 +72,13 @@ brkn.model.Channels.prototype.loadViewersFromJson = function(viewerSessions) {
 			goog.bind(function(session) {
 				var u = brkn.model.Users.getInstance().get_or_add(session['user']);
 				users.add(u);
-				var channel = this.channelMap[session['channel_id']]
-				channel.viewerSessions.push({
-						user: u,
-						tuneIn: goog.date.fromIsoString(session['tune_in'] + 'Z'),
-						tuneOut: session['tune_out'] ? goog.date.fromIsoString(session['tune_out'] + 'Z') : null
-				});
+				var channel = this.channelMap[session['channel_id']];
+				var tuneIn = goog.date.fromIsoString(session['tune_in'] + 'Z');
+				var tuneOut = session['tune_out'] ?
+				    goog.date.fromIsoString(session['tune_out'] + 'Z') : null;
+				var newSession = new brkn.model.Session(u, channel, tuneIn, tuneOut);
+				u.currentSession = newSession;
+				channel.viewerSessions.push(newSession);
 			}, this));
 };
 

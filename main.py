@@ -122,17 +122,17 @@ class ProgramHandler(BaseHandler):
 class ChangeChannelHandler(BaseHandler):
     def post(self):
       channel_id = self.request.get('channel')
-      current_viewers = simplejson.loads(memcache.get('current_viewers') or '{}')
-      last_channel_id = current_viewers[self.current_user.id]['channel_id'] \
-          if current_viewers[self.current_user.id] else None
-      time = datetime.datetime.now().isoformat()
-      current_viewers[self.current_user.id] = {
-        'channel_id': channel_id,
-        'start_time': time,
-        'user': self.current_user.toJson()
-      }
-      memcache.set('current_viewers', simplejson.dumps(current_viewers))
-      broadcastViewerChange(self.current_user, last_channel_id, channel_id, time);
+      channel = Channel.get_by_id(int(channel_id))
+
+      # Add latest User Session, possibly end last session, possibly continue last session.
+      user_sessions = UserSession.get_by_user(self.current_user)
+      if len(user_sessions):
+        last_channel_id = user_sessions[0].channel.key().id()
+        user_sessions[0].tune_out = datetime.datetime.now()
+        user_sessions[0].put()
+
+      session = UserSession.new(self.current_user, channel)
+      broadcastViewerChange(self.current_user, last_channel_id, channel_id, session.tune_in.isoformat());
 
 #--------------------------------------
 # CHANNEL HANDLERS

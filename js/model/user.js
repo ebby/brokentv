@@ -4,6 +4,7 @@ goog.require('goog.pubsub.PubSub');
 
 
 
+
 /**
  * @param {Object} user User object
  * @constructor
@@ -23,6 +24,12 @@ brkn.model.User = function(user) {
 	 * @private
 	 */
 	this.name = user.name;
+	
+	/**
+   * @type {brkn.model.Session}
+   * @private
+   */
+  this.currentSession;
 	
 	/**
 	 * @type {string}

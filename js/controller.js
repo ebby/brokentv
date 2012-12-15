@@ -23,7 +23,13 @@ brkn.Controller = function() {
 	this.guideToggle_ = new goog.ui.CustomButton('Guide');
 	this.guideToggle_.setSupportedState(goog.ui.Component.State.CHECKED,
 			true);
-	this.guideToggle_.setChecked(true);
+
+	/**
+   * @type {goog.ui.CustomButton}
+   */
+  this.sidebarToggle_ = new goog.ui.CustomButton('Sidebar');
+  this.sidebarToggle_.setSupportedState(goog.ui.Component.State.CHECKED,
+      true);
 };
 goog.inherits(brkn.Controller, goog.ui.Component);
 
@@ -34,6 +40,9 @@ brkn.Controller.prototype.enterDocument = function() {
 
 	this.addChild(this.guideToggle_);
 	this.guideToggle_.decorate(goog.dom.getElement('guide-toggle'));
+	
+	this.addChild(this.sidebarToggle_);
+  this.sidebarToggle_.decorate(goog.dom.getElement('sidebar-toggle'));
 
   this.getHandler()
   		.listen(this.guideToggle_,
@@ -43,5 +52,13 @@ brkn.Controller.prototype.enterDocument = function() {
   	  			brkn.model.Controller.getInstance().publish(
   	  					brkn.model.Controller.Actions.TOGGLE_GUIDE,
   	  					this.guideToggle_.isChecked());
-  	  		}, this));
+  	  		}, this))
+  	  .listen(this.sidebarToggle_,
+  	      goog.ui.Component.EventType.ACTION,
+  	      goog.bind(function(e) {
+  	        e.stopPropagation();
+  	        brkn.model.Controller.getInstance().publish(
+  	            brkn.model.Controller.Actions.TOGGLE_SIDEBAR,
+  	            this.sidebarToggle_.isChecked());
+  	      }, this));
 };

@@ -4,6 +4,7 @@ goog.require('brkn.Guide');
 goog.require('brkn.Controller');
 goog.require('brkn.Player');
 goog.require('brkn.Popup');
+goog.require('brkn.Sidebar');
 goog.require('brkn.model.BrowserChannel');
 goog.require('brkn.model.Channels');
 goog.require('brkn.model.Clock');
@@ -38,6 +39,11 @@ brkn.Main = function(channelToken) {
 	this.guide_ = new brkn.Guide();
 	
 	/**
+   * @type {brkn.Sidebar}
+   */
+  this.sidebar_ = new brkn.Sidebar();
+	
+	/**
 	 * @type {brkn.Player}
 	 */
 	this.player_ = new brkn.Player();
@@ -58,6 +64,7 @@ brkn.Main.prototype.decorateInternal = function(element) {
   
   this.controller_.decorate(goog.dom.getElement('controller'));
   this.guide_.decorate(goog.dom.getElement('guide'));
+  this.sidebar_.decorate(goog.dom.getElement('sidebar'));
   this.player_.decorate(goog.dom.getElement('stage'));
 
   this.popup_ = new brkn.Popup();
@@ -85,8 +92,6 @@ brkn.Main.init = function(response, channelToken, channels, programs,
 	if (!goog.object.isEmpty(currentUser)) { brkn.model.Users.getInstance().setCurrentUser(currentUser); }
 	brkn.model.Channels.getInstance().loadFromJson(channels, currentUser['current_channel']);
 	brkn.model.Programs.getInstance().loadFromJson(programs);
-	window.console.log(viewerSessions);
-	window.console.log(currentUser);
 	brkn.model.Channels.getInstance().loadViewersFromJson(viewerSessions);
 	brkn.model.Clock.getInstance().init();
 	

@@ -2,6 +2,7 @@ goog.provide('brkn.model.Channel');
 goog.provide('brkn.model.Channel.Action');
 
 goog.require('brkn.model.Program');
+goog.require('brkn.model.Session');
 
 goog.require('goog.pubsub.PubSub');
 
@@ -40,14 +41,13 @@ brkn.model.Channel = function(channel) {
 	this.currentProgram = channel['current_program'] && new brkn.model.Program(channel['current_program']);
 	
 	/**
-	 * @type {Array.<Object>}
+	 * @type {Array.<brkn.model.Session>}
 	 * @private
 	 */
 	this.viewerSessions = [];
 	
 	this.subscribe(brkn.model.Channel.Action.ADD_PROGRAM, this.addProgram, this);
 	this.subscribe(brkn.model.Channel.Action.ADD_VIEWER, this.addViewer, this);
-	this.subscribe(brkn.model.Channel.Action.REMOVE_VIEWER, this.removeViewer, this);
 };
 goog.inherits(brkn.model.Channel, goog.pubsub.PubSub);
 
@@ -67,20 +67,10 @@ brkn.model.Channel.prototype.addProgram = function(program) {
 
 
 /**
- * @param {brkn.model.User} user The User
- * @param {goog.date.DateTime} tuneIn Tunein time
+ * @param {brkn.model.Session} session The session
  */
-brkn.model.Channel.prototype.addViewer = function(user, tuneIn) {
-	//this.viewers[user.id] = tuneIn;
-};
-
-
-/**
- * @param {brkn.model.User} user The User
- * @param {goog.date.DateTime} tuneOut Tunein time
- */
-brkn.model.Channel.prototype.removeViewer = function(user, tuneOut) {
-	//goog.object.remove(this.viewers, user.id);
+brkn.model.Channel.prototype.addViewer = function(session) {
+	this.viewerSessions.push(session);
 };
 
 
