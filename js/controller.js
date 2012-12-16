@@ -45,6 +45,7 @@ brkn.Controller.prototype.enterDocument = function() {
   this.sidebarToggle_.decorate(goog.dom.getElement('sidebar-toggle'));
 
   this.getHandler()
+      .listen(window, 'resize', goog.bind(this.resize, this))
   		.listen(this.guideToggle_,
   				goog.ui.Component.EventType.ACTION,
   				goog.bind(function(e) {
@@ -52,6 +53,7 @@ brkn.Controller.prototype.enterDocument = function() {
   	  			brkn.model.Controller.getInstance().publish(
   	  					brkn.model.Controller.Actions.TOGGLE_GUIDE,
   	  					this.guideToggle_.isChecked());
+  	  			this.resize();
   	  		}, this))
   	  .listen(this.sidebarToggle_,
   	      goog.ui.Component.EventType.ACTION,
@@ -60,5 +62,17 @@ brkn.Controller.prototype.enterDocument = function() {
   	        brkn.model.Controller.getInstance().publish(
   	            brkn.model.Controller.Actions.TOGGLE_SIDEBAR,
   	            this.sidebarToggle_.isChecked());
+  	        this.resize();
   	      }, this));
+  
+  this.resize();
+};
+
+
+/**
+ * Resize
+ */
+brkn.Controller.prototype.resize = function() {
+  goog.style.setWidth(this.getElement(), goog.dom.getViewportSize().width -
+      (this.sidebarToggle_.isChecked() ? 300 : 0)); 
 };

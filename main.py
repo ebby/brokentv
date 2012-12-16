@@ -118,20 +118,40 @@ class ProgramHandler(BaseHandler):
       channel = Channel.get_by_id(int(self.request.get('channel')))
       program = Program.add_program(channel, self.request.get('youtube_id'))
       self.response.out.write(simplejson.dumps(program.toJson(False)))
+      
+class SeenHandler(BaseHandler):
+    def get(self, id):
+      media = Media.get_by_id(int(id))
+      self.response.out.write(simplejson.dumps(media.seen_by()))
+    def post(self):
+      media = Media.get_by_id(int(self.request.get('id')))
+      media.seen_by(self.current_user)
+      self.response.out.write('')
 
 class ChangeChannelHandler(BaseHandler):
     def post(self):
       channel_id = self.request.get('channel')
       channel = Channel.get_by_id(int(channel_id))
 
-      # Add latest User Session, possibly end last session, possibly continue last session.
       user_sessions = UserSession.get_by_user(self.current_user)
       if len(user_sessions):
         last_channel_id = user_sessions[0].channel.key().id()
-        user_sessions[0].tune_out = datetime.datetime.now()
-        user_sessions[0].put()
+        if (datetime.datetime.now() - user_sessions[0].tune_in).seconds < 30:
+          if len(user_sessions) > 1 and user_sessions[1].channel == channel:
+            # If they switched to another channel, then switched back.
+            session = user_sessions[1]
+            session.tune_out = None
+            session.put()
+          else:
+            session = user_sessions[0]
+            session.tune_in = datetime.datetime.now()
+            session.channel = channel
+            session.put()
+        else:
+          user_sessions[0].tune_out = datetime.datetime.now()
+          user_sessions[0].put()
+          session = UserSession.new(self.current_user, channel)
 
-      session = UserSession.new(self.current_user, channel)
       broadcastViewerChange(self.current_user, last_channel_id, channel_id, session.tune_in.isoformat());
 
 #--------------------------------------
@@ -191,6 +211,8 @@ app = webapp2.WSGIApplication([
     # RPCs
     ('/_addprogram', ProgramHandler),
     ('/_changechannel', ChangeChannelHandler),
+    ('/_seen', SeenHandler),
+    ('/_seen/(.*)', SeenHandler),
 
     ('/', MainHandler)],
   debug=True,

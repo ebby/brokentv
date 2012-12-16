@@ -36,10 +36,6 @@
 		    </div>
 		  </div>
 		</div>
-		<div id="sidebar" class="sidebar"><!--
-      <div class="toolbar" id="toolbar"></div>
-      --><div class="info"></div>
-    </div>
 		<div id="controller" class="controller">
 		  <div id="guide-toggle" class="guide-toggle dark button">B</div>
 		  <div class="controls">
@@ -52,6 +48,21 @@
 		  {% endif %}
 		  <div id="sidebar-toggle" class="sidebar-toggle dark button"></div>
 		</div>
+		<div id="sidebar" class="sidebar">
+		  <div class="channels"></div>
+		  <div class="time-context"></div>
+      <div class="content"></div>
+      <div class="comment-input">
+        <div id="comment-controls" class="comment-controls">
+          <div class="comment-button" id="tweet-toggle">tweet</div>
+          <div class="comment-button" id="fb-toggle">post</div>
+          <div class="comment-button" id="add-comment">add</div>
+        </div>
+        <div class="input-holder">
+	        <textarea id="comment-textarea" rows="1" placeholder="Add to the conversation..."></textarea>
+	      </div>
+	    </div>
+    </div>
     <div id="fb-root"></div>
 		 
 	  <script><!--

@@ -11,7 +11,13 @@ goog.require('goog.pubsub.PubSub');
  */
 brkn.model.Media = function(media) {
 	goog.base(this);
-	
+
+	/**
+   * @type {string}
+   * @private
+   */
+  this.id = media.id;
+
 	/**
 	 * @type {string}
 	 * @private
@@ -28,19 +34,25 @@ brkn.model.Media = function(media) {
 	 * @type {string}
 	 * @private
 	 */
-	this.id = media.id;
+	this.hostId = media['host_id'];
 
 	/**
 	 * @type {number}
 	 * @private
 	 */
 	this.duration = media.duration;
+	
+	/**
+   * @type {string}
+   * @private
+   */
+  this.description = media.description;
 
 	/**
 	 * @type {string}
 	 * @private
 	 */
-	this.thumbnail = goog.ui.media.YoutubeModel.getThumbnailUrl(this.id);
+	this.thumbnail = goog.ui.media.YoutubeModel.getThumbnailUrl(this.hostId);
 };
 goog.inherits(brkn.model.Media, goog.pubsub.PubSub);
 

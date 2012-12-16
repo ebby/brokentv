@@ -24,17 +24,24 @@ goog.inherits(brkn.Player, goog.ui.Component);
 brkn.Player.prototype.player_;
 
 
+/**
+ * @type {brkn.model.Program}
+ * @private
+ */
+brkn.Player.prototype.currentProgram_;
+
+
 /** @inheritDoc */
 brkn.Player.prototype.enterDocument = function() {
   goog.base(this, 'enterDocument');
 
   var currentChannel = brkn.model.Channels.getInstance().currentChannel;
-  var program = currentChannel && currentChannel.getCurrentProgram();
-  var seek = program ? (goog.now() - program.time.getTime())/1000 : 0;
+  this.currentProgram_ = currentChannel && currentChannel.getCurrentProgram();
+  var seek = this.currentProgram_ ? (goog.now() - this.currentProgram_.time.getTime())/1000 : 0;
   this.player_ = new YT.Player('ytplayer', {
     height: goog.dom.getViewportSize().height - 40,
     width: goog.dom.getViewportSize().width,
-    videoId: program ? program.media.id : '',
+    videoId: this.currentProgram_ ? this.currentProgram_.media.hostId : '',
     playerVars: {
   	  'autoplay': 1,
   	  'controls': 0,
@@ -82,8 +89,9 @@ brkn.Player.prototype.resize = function(opt_showSidebar, opt_showGuide) {
 brkn.Player.prototype.changeChannel = function(channel) {
 	var program = channel.getCurrentProgram();
 	if (program) {
+	  this.currentProgram_ = program;
 		var seek = (goog.now() - program.time.getTime())/1000;
-		this.player_.loadVideoById(program.media.id, seek);
+		this.player_.loadVideoById(program.media.hostId, seek);
 	}
 };
 
@@ -93,9 +101,14 @@ brkn.Player.prototype.changeChannel = function(channel) {
  */
 brkn.Player.prototype.playerStateChange_ = function(event) {
 	if (event.data == YT.PlayerState.ENDED) {
+//	  goog.net.XhrIo.send(
+//	      '/_seen',
+//	      goog.functions.NULL(),
+//	      'POST',
+//	      'id=' + this.currentProgram_.media.id);
 		var nextProgram = brkn.model.Channels.getInstance().currentChannel.getNextProgram();
 		if (nextProgram) {
-			this.player_.loadVideoById(nextProgram.media.id);
+			this.player_.loadVideoById(nextProgram.media.hostId);
 		}
 	}
 };

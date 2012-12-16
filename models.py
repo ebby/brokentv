@@ -171,7 +171,7 @@ class UserSession(db.Model):
 
   @classmethod
   def get_by_user(cls, user):
-    return UserSession.all().filter('user =', user).order('-tune_in').fetch(5)
+    return UserSession.all().filter('user =', user).order('tune_in').fetch(5)
 
   def toJson(self):
     json = {}
@@ -191,6 +191,7 @@ class Media(db.Model):
   host = db.StringProperty(default='youtube')
   duration = db.FloatProperty()
   description = db.TextProperty()
+  seen = db.StringListProperty(default=[])
 
   @classmethod
   def get(cls, id):
@@ -211,7 +212,8 @@ class Media(db.Model):
     entries = entries if isinstance(entries, types.ListType) else [entries]
     medias = []
     for entry in entries:
-      media = cls(type=MediaType.VIDEO,
+      media = cls(key_name=entry['title']['$t'],
+                  type=MediaType.VIDEO,
                   id=entry['media$group']['yt$videoid']['$t'],
                   name=entry['title']['$t'],
                   duration=float(entry['media$group']['yt$duration']['seconds']),
@@ -220,12 +222,22 @@ class Media(db.Model):
       medias.append(media)
     return medias if len(medias) > 1 else medias[0]
 
+  def seen_by(self, user=None):
+    if user and not user.id in self.seen:
+      self.seen.append(user.id)
+      self.put()
+      return None
+    else:
+      return [User.get_by_key_name(uid).toJson() for uid in self.seen]
+
   def toJson(self):
     json = {}
+    json['id'] = self.key().id()
     json['name'] = self.name
-    json['id'] = self.id
+    json['host_id'] = self.id
     json['host'] = self.host
     json['duration'] = self.duration
+    json['description'] = self.description.replace("\n", r" ")
     return json
 
 class Program(db.Model):
