@@ -17,7 +17,7 @@ class Programming():
         if response.status_code == 200:
           medias = Media.add_from_json(simplejson.loads(response.content)['feed'])
           for media in medias:
-            Program.add_program(channel, media.id)
+            Program.add_program(channel, media.key().id())
             
   @classmethod
   def clear(cls):
@@ -25,7 +25,7 @@ class Programming():
     for c in channels:
       c.programming = []
       c.put()
-    for model in ['Program']:
+    for model in ['Program', 'Media']:
       try:
         while True:
           q = db.GqlQuery("SELECT __key__ FROM " + model)

@@ -82,6 +82,7 @@ class MainHandler(BaseHandler):
 
         template_data['current_viewers'] = simplejson.dumps(current_viewers)
         current_channel = Channel.all().get()
+        assert current_channel != None, 'NO CHANNELS IN DATABASE'
 
         # Add latest User Session, possibly end last session, possibly continue last session.
         user_sessions = UserSession.get_by_user(self.current_user)
@@ -118,6 +119,25 @@ class ProgramHandler(BaseHandler):
       channel = Channel.get_by_id(int(self.request.get('channel')))
       program = Program.add_program(channel, self.request.get('youtube_id'))
       self.response.out.write(simplejson.dumps(program.toJson(False)))
+      
+class CommentHandler(BaseHandler):
+    def get(self, id):
+      media = Media.get_by_id(int(id))
+      comments = Comment.get_by_media(media)
+      return self.response.out.write(simplejson.dumps([c.toJson() for c in comments]))
+    def post(self):
+      media = Media.get_by_id(int(self.request.get('media_id')))
+      text = self.request.get('text')
+      if media and text:
+        c = Comment(media=media,
+                    user=self.current_user,
+                    text=text)
+
+        parent_id = self.request.get('parent_id')
+        if parent_id:
+          c.parent = Comment.get_by_id(int(parent_id))
+        c.put()
+        broadcastNewComment(c);
       
 class SeenHandler(BaseHandler):
     def get(self, id):
@@ -199,6 +219,14 @@ def broadcastViewerChange(user, last_channel_id, channel_id, time):
   channels = simplejson.loads(memcache.get('web_channels') or '{}')
   for client in channels.iterkeys():
     channel.send_message(client, simplejson.dumps(response))
+    
+def broadcastNewComment(comment):
+  response = {}
+  response['type'] = 'new_comment'
+  response['comment'] = comment.toJson()
+  channels = simplejson.loads(memcache.get('web_channels') or '{}')
+  for client in channels.iterkeys():
+    channel.send_message(client, simplejson.dumps(response))
 
 #--------------------------------------
 # APPLICATION INIT
@@ -211,6 +239,8 @@ app = webapp2.WSGIApplication([
     # RPCs
     ('/_addprogram', ProgramHandler),
     ('/_changechannel', ChangeChannelHandler),
+    ('/_comment', CommentHandler),
+    ('/_comment/(.*)', CommentHandler),
     ('/_seen', SeenHandler),
     ('/_seen/(.*)', SeenHandler),
 

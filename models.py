@@ -187,7 +187,7 @@ class Media(db.Model):
 
   type = db.IntegerProperty(default=0)
   name = db.StringProperty()
-  id = db.StringProperty()
+  host_id = db.StringProperty()
   host = db.StringProperty(default='youtube')
   duration = db.FloatProperty()
   description = db.TextProperty()
@@ -195,7 +195,7 @@ class Media(db.Model):
 
   @classmethod
   def get(cls, id):
-    media = Media.get_by_key_name(id)
+    media = Media.get_by_id(id)
     if not media:
       tries = 0
       while (tries < 4):
@@ -212,9 +212,8 @@ class Media(db.Model):
     entries = entries if isinstance(entries, types.ListType) else [entries]
     medias = []
     for entry in entries:
-      media = cls(key_name=entry['title']['$t'],
-                  type=MediaType.VIDEO,
-                  id=entry['media$group']['yt$videoid']['$t'],
+      media = cls(type=MediaType.VIDEO,
+                  host_id=entry['media$group']['yt$videoid']['$t'],
                   name=entry['title']['$t'],
                   duration=float(entry['media$group']['yt$duration']['seconds']),
                   description=entry['media$group']['media$description']['$t'])
@@ -232,13 +231,59 @@ class Media(db.Model):
 
   def toJson(self):
     json = {}
+    logging.info(str(self.key().id()))
     json['id'] = self.key().id()
     json['name'] = self.name
-    json['host_id'] = self.id
+    json['host_id'] = self.host_id
     json['host'] = self.host
     json['duration'] = self.duration
     json['description'] = self.description.replace("\n", r" ")
     return json
+
+class Publisher(db.Model):
+  YOUTUBE_USER = 'https://gdata.youtube.com/feeds/api/users/%s/uploads'
+  
+  name = db.StringProperty()
+  host = db.StringProperty(default=MediaHost.YOUTUBE)
+  host_id = db.StringProperty()
+
+  def get_medias(self):
+    return PublisherMedia.all().filter('publisher=', self)
+  
+  def fetch(self):
+    if self.host == MediaHost.YOUTUBE:
+      tries = 0
+      while (tries < 4):
+        response = urlfetch.fetch(Publisher.YOUTUBE_USER % id)
+        tries += 1
+        if response.status_code == 200:
+          logging.info(response)
+          break
+      
+
+class PublisherMedia(db.Model):
+  publisher = db.ReferenceProperty(Publisher)
+  media = db.ReferenceProperty(Media)
+
+class Collection(db.Model):
+  name = db.StringProperty()
+  publisher = db.ReferenceProperty(Publisher)
+  keywords = db.StringListProperty(default=[])
+  hashtags = db.StringListProperty(default=[])
+  # Add related links
+  
+  def get_medias(self):
+    return CollectionMedia.all().filter('publisher=', self)
+  
+class CollectionMedia(db.Model):
+  collection = db.ReferenceProperty(Collection)
+  media = db.ReferenceProperty(Media)
+  
+class CollectionOfCollections(db.Model):
+   parent_collection = db.ReferenceProperty(Collection, collection_name='parent_collection')
+   child_collection = db.ReferenceProperty(Collection, collection_name='child_collection')
+  
+
 
 class Program(db.Model):
   media = db.ReferenceProperty(Media)
@@ -269,5 +314,27 @@ class Program(db.Model):
     json['time'] = self.time.isoformat() if self.time else None
     json['channel'] = self.channel.toJson() if fetch_channel else {'id': self.channel.key().id()}
     return json
+  
+class Comment(db.Model):
+  media = db.ReferenceProperty(Media)
+  user = db.ReferenceProperty(User)
+  parent_comment = db.SelfReferenceProperty()
+  text = db.StringProperty()
+  time = db.DateTimeProperty(auto_now_add=True)
+
+  @classmethod
+  def get_by_media(cls, media):
+    return Comment.all().filter('media =', media).order('time').fetch(100)
+  
+  def toJson(self):
+    json = {}
+    json['id'] = self.key().id()
+    json['media'] = self.media.toJson()
+    json['parent_comment_id'] = self.parent_comment.key().id() if self.parent_comment else None
+    json['user'] = self.user.toJson()
+    json['text'] = self.text
+    json['time'] = self.time.isoformat()
+    return json
+  
 
 

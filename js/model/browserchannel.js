@@ -1,6 +1,7 @@
 goog.provide('brkn.model.BrowserChannel');
 
 goog.require('brkn.model.Channels');
+goog.require('brkn.model.Medias');
 goog.require('brkn.model.Users');
 
 goog.require('goog.pubsub.PubSub');
@@ -47,6 +48,7 @@ brkn.model.BrowserChannel.prototype.init = function(token) {
  */
 brkn.model.BrowserChannel.prototype.onMessage_ = function(rawMessage) {
 	var message = goog.json.parse(rawMessage.data);
+	window.console.log(message);
 	switch(message.type) {
 	  case 'viewer_change':
 	    var user = brkn.model.Users.getInstance().get_or_add(message['user']);
@@ -58,5 +60,11 @@ brkn.model.BrowserChannel.prototype.onMessage_ = function(rawMessage) {
 	    //last_channel.publish(brkn.model.Channel.Action.REMOVE_VIEWER, user.currentSession, time);
 	    channel.publish(brkn.model.Channel.Action.ADD_VIEWER, session);
 	    break;
+	  case 'new_comment':
+	    var comment = new brkn.model.Comment(message['comment']);
+	    var media = brkn.model.Medias.getInstance().getOrAdd(message['comment']['media']);
+	    if (media) {
+	      media.publish(brkn.model.Media.Actions.ADD_COMMENT, comment);
+	    }
 	}
 };

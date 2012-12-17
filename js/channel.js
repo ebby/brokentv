@@ -213,7 +213,7 @@ brkn.Channel.prototype.addProgram = function(program, opt_duration) {
 			this.getModel().currentProgram && this.getModel().currentProgram.id == program.id);
 	var programsWidth = goog.style.getSize(this.programsEl_).width;
 	var width = program.media.duration/this.timeline_ * programsWidth;
-	goog.style.setWidth(programEl, width);
+	goog.style.setWidth(programEl, width - (width < 120 ? 1 : 0));
 	var offset = (program.time.getTime() - this.minTime_.getTime())/(this.timeline_ * 1000) *
 			programsWidth;
 	goog.style.setPosition(programEl, offset);

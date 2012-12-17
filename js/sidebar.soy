@@ -23,8 +23,13 @@
         <div class="timestamp">2 days ago</div>
       </div>
     </div>
+    <div class="comments-holder">
+      <div class="label">Conversation</div>
+      <div class="comments"></div>
+    </div>
   </div>
 {/template}
+
 
 /**
  * @param user
@@ -32,5 +37,20 @@
 {template .viewer}
   <div class="viewer">
     <img src="{$user.picture}">
+  </div>
+{/template}
+
+
+/**
+ * @param comment
+ */
+{template .comment}
+  <div class="comment">
+    <img src="{$comment.user.picture}"/>
+    <div class="text">
+      <a href="#">{$comment.user.name}</a>{sp}
+      {$comment.text}
+    </div>
+    <div class="timestamp">2 days ago</div>
   </div>
 {/template}

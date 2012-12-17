@@ -1,6 +1,7 @@
 goog.provide('brkn.model.Program');
 
 goog.require('brkn.model.Media');
+goog.require('brkn.model.Medias');
 
 goog.require('goog.date.DateTime');
 goog.require('goog.pubsub.PubSub');
@@ -26,6 +27,8 @@ brkn.model.Program = function(program) {
 	 * @private
 	 */
 	this.media = new brkn.model.Media(program.media);
+	brkn.model.Medias.getInstance().add(this.media);
+	
 
 	/**
 	 * @type {goog.date.DateTime}

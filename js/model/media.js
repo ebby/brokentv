@@ -53,6 +53,29 @@ brkn.model.Media = function(media) {
 	 * @private
 	 */
 	this.thumbnail = goog.ui.media.YoutubeModel.getThumbnailUrl(this.hostId);
+	
+	/**
+   * @type {Array.<brkn.model.Comment>}
+   * @private
+   */
+  this.comments = [];
+  
+  this.subscribe(brkn.model.Media.Actions.ADD_COMMENT, this.addComment, this);
 };
 goog.inherits(brkn.model.Media, goog.pubsub.PubSub);
 
+
+/**
+ * @enum {string}
+ */
+brkn.model.Media.Actions = {
+  ADD_COMMENT: 'add-comment'
+};
+
+
+/**
+ * @param {brkn.model.Comment} comment
+ */
+brkn.model.Media.prototype.addComment = function(comment) {
+  this.comments.push(comment);  
+};
