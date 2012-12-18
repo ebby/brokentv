@@ -38,6 +38,7 @@ from google.appengine.ext.webapp import util
 
 from basehandler import BaseHandler
 from models import *
+from model import *
 
 jinja_environment = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))

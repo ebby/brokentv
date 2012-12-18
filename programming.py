@@ -1,9 +1,13 @@
 import simplejson
 import urllib
+import gdata.youtube
+import gdata.youtube.service
+import gdata.alt.appengine
 
 from google.appengine.api import urlfetch
 
 from models import *
+from model import *
 
 class Programming():
   YOUTUBE_FEED = 'https://gdata.youtube.com/feeds/api/standardfeeds/US/%s_%s?v=2&alt=json&time=today'
@@ -13,11 +17,13 @@ class Programming():
     channels = Channel.all().fetch(100)
     for channel in channels:
       for keyword in channel.keywords:
-        response = urlfetch.fetch(Programming.YOUTUBE_FEED % ('most_popular', keyword))
-        if response.status_code == 200:
-          medias = Media.add_from_json(simplejson.loads(response.content)['feed'])
-          for media in medias:
-            Program.add_program(channel, media.key().id())
+        yt_service = gdata.youtube.service.YouTubeService()
+        gdata.alt.appengine.run_on_appengine(yt_service)
+        uri = Programming.YOUTUBE_FEED % ('most_popular', keyword)
+        feed = yt_service.GetRecentlyFeaturedVideoFeed()
+        medias = Media.add_from_entry(feed.entry)
+        for media in medias:
+          Program.add_program(channel, media.key().id())
             
   @classmethod
   def clear(cls):
@@ -25,7 +31,7 @@ class Programming():
     for c in channels:
       c.programming = []
       c.put()
-    for model in ['Program', 'Media']:
+    for model in ['PublisherMedia','Program', 'Media']:
       try:
         while True:
           q = db.GqlQuery("SELECT __key__ FROM " + model)

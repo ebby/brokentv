@@ -1,9 +1,14 @@
 import constants
 import datetime
+import gdata.youtube
+import gdata.youtube.service
+import gdata.alt.appengine
+import iso8601
 import logging
 import simplejson
 import urllib
 import types
+import re
 
 from google.appengine.api import urlfetch
 from google.appengine.ext import db
@@ -189,8 +194,10 @@ class Media(db.Model):
   name = db.StringProperty()
   host_id = db.StringProperty()
   host = db.StringProperty(default='youtube')
+  published = db.DateTimeProperty()
   duration = db.FloatProperty()
   description = db.TextProperty()
+  category = db.StringProperty()
   seen = db.StringListProperty(default=[])
 
   @classmethod
@@ -205,6 +212,30 @@ class Media(db.Model):
           media = Media.add_from_json(simplejson.loads(response.content))
           break
     return media
+  
+  @classmethod
+  def add_from_entry(cls, entries):
+    medias = []
+    for entry in entries:
+      id = re.match('.+/(.*)$', entry.id.text).group(1)
+      media = Media.get_by_key_name(MediaHost.YOUTUBE + id)
+      if not media:
+        name = unicode(entry.media.title.text, errors='replace')
+        desc = entry.media.description.text
+        desc = unicode(desc, errors='replace') if desc else None
+        category = entry.media.category[0].text
+        category = unicode(category, errors='replace') if category else None
+        media = cls(key_name=(MediaHost.YOUTUBE + id),
+                    type=MediaType.VIDEO,
+                    host_id=id,
+                    name=name,
+                    published=iso8601.parse_date(entry.published.text),
+                    duration=float(entry.media.duration.seconds),
+                    description=desc,
+                    category=category)
+      media.put()
+      medias.append(media)
+    return medias if len(medias) > 1 else medias[0] if len(medias) else None
 
   @classmethod
   def add_from_json(cls, json):
@@ -231,7 +262,6 @@ class Media(db.Model):
 
   def toJson(self):
     json = {}
-    logging.info(str(self.key().id()))
     json['id'] = self.key().id()
     json['name'] = self.name
     json['host_id'] = self.host_id
@@ -241,29 +271,58 @@ class Media(db.Model):
     return json
 
 class Publisher(db.Model):
-  YOUTUBE_USER = 'https://gdata.youtube.com/feeds/api/users/%s/uploads'
+  YOUTUBE_USER = 'https://gdata.youtube.com/feeds/api/users/%s/uploads?alt=json'
   
   name = db.StringProperty()
   host = db.StringProperty(default=MediaHost.YOUTUBE)
   host_id = db.StringProperty()
+  last_fetch = db.DateTimeProperty()
 
   def get_medias(self):
     return PublisherMedia.all().filter('publisher=', self)
   
-  def fetch(self):
+  def fetch(self, categories=None):
     if self.host == MediaHost.YOUTUBE:
-      tries = 0
-      while (tries < 4):
-        response = urlfetch.fetch(Publisher.YOUTUBE_USER % id)
-        tries += 1
-        if response.status_code == 200:
-          logging.info(response)
+      yt_service = gdata.youtube.service.YouTubeService()
+      gdata.alt.appengine.run_on_appengine(yt_service)
+      query = gdata.youtube.service.YouTubeVideoQuery()
+      query.author = self.host_id
+      if categories:
+        query.categories = categories
+      query.orderby = 'published'
+      query.max_results = 50
+      offset = 1
+      while offset <= 1000:
+        query.start_index = offset
+        feed = yt_service.YouTubeQuery(query)
+        if len(feed.entry) == 0:
           break
-      
+        medias = Media.add_from_entry(feed.entry)
+        for media in medias:
+          PublisherMedia.add(publisher=self, media=media)
+
+        last_media = medias[-1] if isinstance(medias, list) else medias
+        if self.last_fetch and last_media.published \
+            and last_media.published.replace(tzinfo=None) < self.last_fetch:
+          # We fetched all the latest media
+          logging.info('UP TO DATE')
+          break
+        offset += len(medias)
+
+    self.last_fetch = datetime.datetime.now()
+    self.put()    
 
 class PublisherMedia(db.Model):
   publisher = db.ReferenceProperty(Publisher)
   media = db.ReferenceProperty(Media)
+  
+  @classmethod
+  def add(cls, publisher, media):
+    publisher_media = PublisherMedia.all().filter('media =', media).get()
+    if not publisher_media:
+      publisher_media = PublisherMedia(publisher=publisher, media=media)
+      publisher_media.put()
+    return publisher_media
 
 class Collection(db.Model):
   name = db.StringProperty()
