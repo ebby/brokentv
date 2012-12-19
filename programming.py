@@ -3,14 +3,54 @@ import urllib
 import gdata.youtube
 import gdata.youtube.service
 import gdata.alt.appengine
+import inits
 
 from google.appengine.api import urlfetch
 
-from models import *
 from model import *
 
 class Programming():
   YOUTUBE_FEED = 'https://gdata.youtube.com/feeds/api/standardfeeds/US/%s_%s?v=2&alt=json&time=today'
+
+  def __init__(self):
+    self.channels = {}
+    self.publishers = {}
+    self.collections = []
+    
+    for name, properties in inits.CHANNELS.iteritems():
+      channel = Channel.all().filter('name=', name).get()
+      if not channel:
+        channel = Channel(name=name, keywords=properties['keywords'])
+        channel.put()
+      self.channels[name] = channel
+    
+    for name, properties in inits.PUBLISHERS.iteritems():
+      publisher = Publisher.all().filter('name=', name).get()
+      if not publisher:
+        publisher = Publisher(name=name, host_id=properties['youtube'])
+        publisher.put()
+      self.publishers[publisher.name] = publisher
+    
+    for name, properties in inits.COLLECTIONS.iteritems():
+      collection = Collection.all().filter('name=', name).get()
+      if not collection:
+        collection = Collection(name=name, keywords=properties['keywords'])
+        collection.put()
+        for publisher in properties['publishers']:
+          collection_publisher = CollectionPublisher(collection=collection,
+                                                     publisher=self.publishers[publisher])
+          collection_publisher.put()
+        for channel in properties['channels']:
+          collection_channel = CollectionChannel(collection=collection,
+                                                   channel=self.channels[channel])
+          collection_channel.put()
+      medias = collection.fetch()
+      for channel in collection.get_channels():
+        for media in medias:
+          if (datetime.datetime.now() - media.published).days < 2:
+            Program.add_program(channel, media)
+          else:
+            break
 
   @classmethod
   def add_youtube_feeds(cls):

@@ -52,7 +52,7 @@ brkn.model.Media = function(media) {
 	 * @type {string}
 	 * @private
 	 */
-	this.thumbnail = goog.ui.media.YoutubeModel.getThumbnailUrl(this.hostId);
+	this.thumbnail = 'http://i.ytimg.com/vi/' + this.hostId + '/0.jpg';
 	
 	/**
    * @type {Array.<brkn.model.Comment>}

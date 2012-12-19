@@ -40,6 +40,11 @@ brkn.Controller.prototype.enterDocument = function() {
 
 	this.addChild(this.guideToggle_);
 	this.guideToggle_.decorate(goog.dom.getElement('guide-toggle'));
+	this.guideToggle_.setChecked(true);
+	goog.Timer.callOnce(goog.bind(function() {
+	  this.guideToggle_.setChecked(false);
+	  this.toggleGuide_();
+	}, this), 10000);
 	
 	this.addChild(this.sidebarToggle_);
   this.sidebarToggle_.decorate(goog.dom.getElement('sidebar-toggle'));
@@ -48,13 +53,7 @@ brkn.Controller.prototype.enterDocument = function() {
       .listen(window, 'resize', goog.bind(this.resize, this))
   		.listen(this.guideToggle_,
   				goog.ui.Component.EventType.ACTION,
-  				goog.bind(function(e) {
-  	  			e.stopPropagation();
-  	  			brkn.model.Controller.getInstance().publish(
-  	  					brkn.model.Controller.Actions.TOGGLE_GUIDE,
-  	  					this.guideToggle_.isChecked());
-  	  			this.resize();
-  	  		}, this))
+  				goog.bind(this.toggleGuide_, this))
   	  .listen(this.sidebarToggle_,
   	      goog.ui.Component.EventType.ACTION,
   	      goog.bind(function(e) {
@@ -65,6 +64,17 @@ brkn.Controller.prototype.enterDocument = function() {
   	        this.resize();
   	      }, this));
   
+  this.resize();
+};
+
+
+/**
+ * @private 
+ */
+brkn.Controller.prototype.toggleGuide_ = function() {
+  brkn.model.Controller.getInstance().publish(
+      brkn.model.Controller.Actions.TOGGLE_GUIDE,
+      this.guideToggle_.isChecked());
   this.resize();
 };
 

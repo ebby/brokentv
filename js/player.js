@@ -68,13 +68,15 @@ brkn.Player.prototype.enterDocument = function() {
       function(show) {
         this.resize(undefined, show);
       }, this);
+  
+  this.resize();
 };
 
 
 /**
  * Resize
  */
-brkn.Player.prototype.resize = function(opt_showSidebar, opt_showGuide) {
+brkn.Player.prototype.resize = function() {
   var playerEl = goog.dom.getElement('ytplayer');
   var guideHeight = goog.dom.classes.has(goog.dom.getElement('guide'), 'toggled') ? 230 : 0;
   var sidebarWidth = goog.dom.classes.has(goog.dom.getElement('sidebar'), 'toggled')  ? 300 : 0;

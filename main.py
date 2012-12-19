@@ -27,7 +27,7 @@ import simplejson
 import urllib
 import jinja2
 
-from google.appengine.api import channel
+from google.appengine.api import channel as webchannel
 from google.appengine.api import images
 from google.appengine.api import memcache
 from google.appengine.api import urlfetch
@@ -37,7 +37,6 @@ from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp import util
 
 from basehandler import BaseHandler
-from models import *
 from model import *
 
 jinja_environment = jinja2.Environment(
@@ -61,7 +60,7 @@ class MainHandler(BaseHandler):
         .replace('"', r'\"')
 
       if self.current_user:
-        token = channel.create_channel(self.current_user.id)
+        token = webchannel.create_channel(self.current_user.id)
         template_data['token'] = token
 
         client = memcache.Client()
@@ -104,8 +103,8 @@ class MainHandler(BaseHandler):
         viewer_sessions = []
         for uid in current_viewers:
           user_sessions = UserSession.get_by_user(User.get_by_key_name(uid))
-          for s in user_sessions:
-            viewer_sessions.append(s.toJson())
+          if len(user_sessions):
+            viewer_sessions.append(user_sessions[0].toJson())
         template_data['viewer_sessions'] = simplejson.dumps(viewer_sessions)
 
         current_user = self.current_user.toJson()
@@ -123,11 +122,11 @@ class ProgramHandler(BaseHandler):
       
 class CommentHandler(BaseHandler):
     def get(self, id):
-      media = Media.get_by_id(int(id))
+      media = Media.get_by_key_name(id)
       comments = Comment.get_by_media(media)
       return self.response.out.write(simplejson.dumps([c.toJson() for c in comments]))
     def post(self):
-      media = Media.get_by_id(int(self.request.get('media_id')))
+      media = Media.get_by_key_name(self.request.get('media_id'))
       text = self.request.get('text')
       if media and text:
         c = Comment(media=media,
@@ -142,10 +141,10 @@ class CommentHandler(BaseHandler):
       
 class SeenHandler(BaseHandler):
     def get(self, id):
-      media = Media.get_by_id(int(id))
+      media = Media.get_by_key_name(id)
       self.response.out.write(simplejson.dumps(media.seen_by()))
     def post(self):
-      media = Media.get_by_id(int(self.request.get('id')))
+      media = Media.get_by_key_name(self.request.get('id'))
       media.seen_by(self.current_user)
       self.response.out.write('')
 
@@ -219,7 +218,7 @@ def broadcastViewerChange(user, last_channel_id, channel_id, time):
   response['time'] = time
   channels = simplejson.loads(memcache.get('web_channels') or '{}')
   for client in channels.iterkeys():
-    channel.send_message(client, simplejson.dumps(response))
+    webchannel.send_message(client, simplejson.dumps(response))
     
 def broadcastNewComment(comment):
   response = {}
@@ -227,7 +226,7 @@ def broadcastNewComment(comment):
   response['comment'] = comment.toJson()
   channels = simplejson.loads(memcache.get('web_channels') or '{}')
   for client in channels.iterkeys():
-    channel.send_message(client, simplejson.dumps(response))
+    webchannel.send_message(client, simplejson.dumps(response))
 
 #--------------------------------------
 # APPLICATION INIT

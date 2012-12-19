@@ -184,7 +184,7 @@ brkn.Sidebar.prototype.showMedia = function(media) {
     media: media
   });
   
-  this.currentMedia_.subscribe(brkn.model.Media.Actions.ADD_COMMENT, this.addComment_, this);
+  media.subscribe(brkn.model.Media.Actions.ADD_COMMENT, this.addComment_, this);
   
   var viewersEl = goog.dom.getElementByClass('viewers', this.getElement());
   this.commentsEl_ = goog.dom.getElementByClass('comments', this.getElement());
@@ -241,7 +241,6 @@ brkn.Sidebar.prototype.addComment_ = function(comment) {
  */
 brkn.Sidebar.prototype.resize = function(opt_extra) {
   var extra = opt_extra || 0;
-  window.console.log(extra);
   goog.style.setHeight(this.commentsEl_, goog.dom.getViewportSize().height -
       goog.style.getPosition(this.commentsEl_.parentElement).y - 120 - extra);
 

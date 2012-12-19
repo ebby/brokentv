@@ -126,7 +126,7 @@ brkn.Channel.prototype.enterDocument = function() {
   }
   var raphael = Raphael(this.graphEl_, '100%', 60);
   //var c = graph.path("M0,0").attr({fill: "none", "stroke-width": 1, "stroke-linecap": "round"});
-  this.graph_ = raphael.path("M0,0").attr({stroke: "none", opacity: .3, fill: Raphael.getColor(1)});
+  this.graph_ = raphael.path("M0,0").attr({stroke: "none", opacity: .9, fill: 'black'/*Raphael.getColor(1)*/});
   //c.attr({path: path, stroke: Raphael.getColor(1)});
   
   var programs = this.getModel().programming;
@@ -209,6 +209,14 @@ brkn.Channel.prototype.addProgram = function(program, opt_duration) {
 	soy.renderElement(programEl, brkn.channel.program, {
 		program: program
 	});
+	
+	// Position image
+	var img = goog.dom.getElementByClass('thumb', programEl);
+	img.onload = function() {
+	  img.style.marginTop = -goog.style.getSize(img).height/2 + 'px';
+	  img.style.marginLeft = -goog.style.getSize(img).width/2 + 'px';
+	};
+	
 	goog.dom.classes.enable(programEl, 'current',
 			this.getModel().currentProgram && this.getModel().currentProgram.id == program.id);
 	var programsWidth = goog.style.getSize(this.programsEl_).width;
@@ -219,6 +227,7 @@ brkn.Channel.prototype.addProgram = function(program, opt_duration) {
 	goog.style.setPosition(programEl, offset);
 	goog.dom.appendChild(this.programsEl_, programEl);
 	goog.dom.classes.enable(programEl, 'clipped', width < 120);
+	goog.dom.classes.enable(programEl, 'stretched', goog.style.getSize(img).height > 360);
 };
 
 

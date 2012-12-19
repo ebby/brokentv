@@ -4,7 +4,7 @@ import facebook
 
 from webapp2_extras import sessions
 
-from models import *
+from model import *
 
 class BaseHandler(webapp2.RequestHandler):
     """Provides access to the active Facebook user in self.current_user

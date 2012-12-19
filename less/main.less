@@ -5,6 +5,14 @@
 @import "popup.less";
 @import "sidebar.less";
 
+.transition (@style, @speed, @rest) {
+  -webkit-transition: @arguments;
+     -moz-transition: @arguments;
+       -o-transition: @arguments;
+      -ms-transition: @arguments;
+          transition: @arguments;
+}
+
 @font-face {
 	font-family: 'MuseoSans';
 	src: url('/static/webfonts/235CED_0_0.eot');
