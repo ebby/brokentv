@@ -25,10 +25,8 @@ div#sidebar {
     border-bottom: 2px solid #AAA;
     box-shadow: 0 2px 3px 1px rgba(0, 0, 0, 0.4), inset 4px 2px 6px -3px rgba(0, 0, 0, 0.7),
         0 0 0 1px #181818;
-    margin-bottom: 10px;
     z-index: 20;
     &.back {
-      margin-bottom: 0;
       ul.tabs {
         display: none;
       }
@@ -61,7 +59,7 @@ div#sidebar {
         font-size: 15px;
         color: #7d7d7d;
         text-shadow: 1px 1px 1px white;
-        .transition(all, .5s, ease);
+        .transition(all, .3s, ease);
       }
       div.back-button {
         width: 0;
@@ -72,7 +70,7 @@ div#sidebar {
         top: 6px;
         border: 1px solid #ccc;
         border-radius: 3px;
-        .transition(all, .5s, ease);
+        .transition(all, .3s, ease);
         &:after, &:before {
           right: 100%;
           border: solid transparent;
@@ -140,7 +138,7 @@ div#sidebar {
     div.arrow {
       position: absolute;
       top: 40px;
-      .transition(all, .5s, ease);
+      .transition(all, .3s, ease);
       &:after, &:before {
         top: 100%;
         border: solid transparent;
@@ -170,15 +168,25 @@ div#sidebar {
     position: relative;
     div.screen {
       position: absolute;
+      width: 100%;
+      top: 0;
+      right: -300px;
+      overflow: hidden;
+      .transition(all, .3s, ease);
+    }
+    div.slide {
+      position: absolute;
       width: 0;
       top: 0;
       overflow: hidden;
-      .transition(width, .5s, ease);
+      .transition(all, .3s, ease);
     }
     .current {
       width: 100% !important;
+      right: 0 !important;
     }
     div.info {
+      margin-top: 5px;
       img.thumb {
         height: 70px;
         border-radius: 3px;
@@ -202,10 +210,10 @@ div#sidebar {
         text-shadow: 1px 1px 1px #181818;
         font-size: 13px;
         height: 100px;
-        width: 200px;
+        width: 180px;
       }
       div.description {
-        width: 295px;
+        width: 280px;
         font-size: 10px;
         height: 38px;
         overflow: hidden;
@@ -327,7 +335,6 @@ div#sidebar {
       }
     }
     div.admin {
-      margin-top: -9px;
       div.search {
         background: #f5f5f5;
         width: 100%;

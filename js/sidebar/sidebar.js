@@ -144,8 +144,11 @@ brkn.Sidebar.prototype.enterDocument = function() {
             goog.dom.classes.remove(this.currentTab_, 'selected');
             this.currentTab_ = tab;
             goog.dom.classes.add(tab, 'selected');
-            this.navigate(goog.dom.classes.has(tab, 'info')
-                ? this.info_.getElement() : this.admin_.getElement(), undefined, undefined, true);
+            if (goog.dom.classes.has(tab, 'info')) {
+              this.shiftScreen(this.info_.getElement(), true);
+            } else {
+              this.shiftScreen(this.admin_.getElement());
+            }
             goog.style.setPosition(goog.dom.getElementByClass('arrow', this.toolbar_),
                 goog.style.getSize(tab).width/2 + goog.style.getPosition(tab).x);
           }, this));
@@ -162,34 +165,93 @@ brkn.Sidebar.prototype.enterDocument = function() {
 
 /**
  * @param {Element} to The to element
+ * @param {?boolean=} opt_left Animate left
+ */
+brkn.Sidebar.prototype.shiftScreen = function(to, opt_left) {
+  if (to == this.currentScreen_) {
+    return;
+  }
+
+  if (opt_left) {
+    goog.style.setStyle(this.currentScreen_, {
+      'left': '',
+      'right': ''
+    });
+    goog.style.setStyle(to, {
+      'right': '',
+      'left': ''
+    });
+    goog.dom.classes.remove(this.currentScreen_, 'current');
+    goog.dom.classes.add(to, 'current');
+    this.currentScreen_ = to;
+    this.lastScreen_ = null;
+  } else {
+    goog.style.setStyle(this.currentScreen_, {
+      'left': '-300px',
+      'right': ''
+    });
+    goog.style.setStyle(to, {
+      'right': 0,
+      'left': ''
+    }); 
+    this.lastScreen_ = this.currentScreen_;
+    this.currentScreen_ = to;
+    goog.dom.classes.remove(this.lastScreen_, 'current');
+    goog.dom.classes.add(this.currentScreen_, 'current');
+  }
+};
+  
+
+/**
+ * @param {Element} to The to element
  * @param {?boolean=} opt_back Back
  * @param {?string=} opt_title Title of the navigated section
- * @param {?boolean=} opt_invert Invert animation direction
  */
-brkn.Sidebar.prototype.navigate = function(to, opt_back, opt_title, opt_invert) {
+brkn.Sidebar.prototype.navigate = function(to, opt_back, opt_title) {
   if (to == this.currentScreen_) {
     return;
   }
   
+  var isScreen = goog.dom.classes.has(this.currentScreen_, 'screen');
   if (this.lastScreen_ != to) {
-    goog.dom.classes.enable(this.toolbar_, 'back', !!opt_back);
     goog.style.setStyle(this.currentScreen_, {
-      'left': opt_invert ? '' : 0,
-      'right': opt_invert ? 0 : ''
+      'left': isScreen ? 0 : '',
+      'right': '',
+      'width': isScreen ? 0 : ''
     });
     goog.style.setStyle(to, {
-      'right': opt_invert ? '' : 0,
-      'left': opt_invert ? 0 : ''
-    }); 
+      'right': 0,
+      'left': ''
+    });
+    this.lastScreen_ = this.currentScreen_;
+    this.currentScreen_ = to;
+    goog.dom.classes.remove(this.lastScreen_, 'current');
+    goog.dom.classes.add(this.currentScreen_, 'current');
+  } else {
+    goog.style.setStyle(this.currentScreen_, {
+      'left': '',
+      'right': 0
+    });
+    goog.style.setStyle(to, {
+      'right': '',
+      'left': 0,
+      'width': ''
+    });
+    goog.dom.classes.remove(this.currentScreen_, 'current');
+    goog.dom.classes.add(to, 'current');
+    this.currentScreen_ = to;
+    this.lastScreen_ = null;
   }
+  
+//  this.lastScreen_ = this.currentScreen_;
+//  this.currentScreen_ = to;
 
-  this.lastScreen_ = this.currentScreen_;
-  this.currentScreen_ = to;
+  goog.dom.classes.enable(this.toolbar_, 'back', !!opt_back);
 
   if (opt_title) {
     goog.dom.setTextContent(goog.dom.getElementByClass('back-title', this.toolbar_), opt_title);
   }
 
-  goog.dom.classes.remove(this.lastScreen_, 'current');
-  goog.dom.classes.add(this.currentScreen_, 'current');
+//  goog.dom.classes.remove(this.lastScreen_, 'current');
+//  goog.dom.classes.add(this.currentScreen_, 'current');
 };
