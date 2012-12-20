@@ -50,7 +50,7 @@ class Media(db.Model):
                     published=iso8601.parse_date(entry.published.text),
                     duration=float(entry.media.duration.seconds),
                     description=desc,
-                    host_views=int(entry.statistics.viewCount),
+                    host_views=int(entry.statistics.view_count),
                     category=category)
       media.put()
       medias.append(media)
@@ -92,5 +92,6 @@ class Media(db.Model):
     json['host_id'] = self.host_id
     json['host'] = self.host
     json['duration'] = self.duration
+    json['published'] = self.published.isoformat()
     json['description'] = self.description.replace("\n", r" ") if self.description else None
     return json

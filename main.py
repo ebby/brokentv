@@ -173,6 +173,22 @@ class ChangeChannelHandler(BaseHandler):
           session = UserSession.new(self.current_user, channel)
 
       broadcastViewerChange(self.current_user, last_channel_id, channel_id, session.tune_in.isoformat());
+      
+#--------------------------------------
+# ADMIN HANDLERS
+#--------------------------------------
+
+class AdminCollectionsHandler(BaseHandler):
+  def get(self, channel_id=None):
+    channel = Channel.get_by_id(int(channel_id))
+    collections = CollectionChannel.get_collections(channel)
+    self.response.out.write(simplejson.dumps([c.toJson() for c in collections]))
+
+
+class AdminCollectionsMediaHandler(BaseHandler):
+  def get(self, col_id=None):
+    col = Collection.get_by_id(int(col_id))
+    self.response.out.write(simplejson.dumps([c.toJson() for c in col.get_medias(20)]))
 
 #--------------------------------------
 # CHANNEL HANDLERS
@@ -243,6 +259,10 @@ app = webapp2.WSGIApplication([
     ('/_comment/(.*)', CommentHandler),
     ('/_seen', SeenHandler),
     ('/_seen/(.*)', SeenHandler),
+    
+    # Admin
+    ('/admin/_collections/(.*)', AdminCollectionsHandler),
+    ('/admin/_media/collection/(.*)', AdminCollectionsMediaHandler),
 
     ('/', MainHandler)],
   debug=True,

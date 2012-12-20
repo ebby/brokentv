@@ -30,8 +30,15 @@ class Collection(db.Model):
   def get_channels(self):
     return CollectionChannel.get_channels(self)
   
-  def get_medias(self):
-    return CollectionMedia.all().filter('collection =', self)
+  def get_medias(self, limit, offset=0):
+    return [c_m.media for c_m in CollectionMedia.all().filter('collection =', self).fetch(limit)]
+  
+  def toJson(self):
+    json = {}
+    json['id'] = self.key().id()
+    json['name'] = self.name
+    #json['medias'] = [c_m.media.toJson() for c_m in self.get_medias(100)]
+    return json
 
 
 '''
@@ -65,12 +72,20 @@ class CollectionMedia(db.Model):
 # Channels that may play from this collection
 class CollectionChannel(db.Model):
   collection = db.ReferenceProperty(Collection)
-  media = db.ReferenceProperty(Media)
+  channel = db.ReferenceProperty(Channel)
   
   @classmethod
   def get_channels(cls, collection):
-    collection_channels = CollectionChannel.all().filter('collection=', collection).fetch(100);
+    collection_channels = CollectionChannel.all().filter('collection =', collection).fetch(100);
     return [c_c.channel for c_c in collection_channels]
+  
+  @classmethod
+  def get_collections(cls, channel):
+    cols = {}
+    collection_channels = CollectionChannel.all().filter('channel =', channel).fetch(100);
+    for c_c in collection_channels:
+      cols[c_c.collection.key().id()] = c_c.collection
+    return [x for x in cols.itervalues()]
   
   @classmethod
   def add(cls, collection, channel):
@@ -83,3 +98,4 @@ class CollectionChannel(db.Model):
 class CollectionOfCollections(db.Model):
    parent_collection = db.ReferenceProperty(Collection, collection_name='parent_collection')
    child_collection = db.ReferenceProperty(Collection, collection_name='child_collection')
+  

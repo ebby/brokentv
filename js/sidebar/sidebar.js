@@ -1,18 +1,16 @@
 goog.provide('brkn.Sidebar');
 
 goog.require('soy');
-goog.require('brkn.model.Clock');
-goog.require('brkn.model.Comment');
 goog.require('brkn.model.Controller');
+goog.require('brkn.model.Sidebar');
 goog.require('brkn.sidebar');
+goog.require('brkn.sidebar.Admin');
+goog.require('brkn.sidebar.CommentInput');
+goog.require('brkn.sidebar.Info');
 
-goog.require('goog.events.KeyHandler.EventType');
 goog.require('goog.fx.dom.Scroll');
 goog.require('goog.ui.Component');
 goog.require('goog.ui.Component.EventType');
-goog.require('goog.ui.CustomButton');
-goog.require('goog.ui.Textarea');
-goog.require('goog.ui.Textarea.EventType');
 
 
 
@@ -23,49 +21,28 @@ goog.require('goog.ui.Textarea.EventType');
 brkn.Sidebar = function() {
   goog.base(this);
   
-  /**
-   * @type {goog.ui.Textarea}
-   * @private
-   */
-  this.commentInput_ = new goog.ui.Textarea('Add to the conversation.');
+  
+  this.isAdmin_ = true;
   
   /**
-   * @type {goog.ui.CustomButton}
+   * @type {brkn.sidebar.Admin}
    * @private
    */
-  this.tweetToggle_ = new goog.ui.CustomButton('tweet');
-  this.tweetToggle_.setSupportedState(goog.ui.Component.State.CHECKED,
-      true);
+  this.admin_ = new brkn.sidebar.Admin();
   
   /**
-   * @type {goog.ui.CustomButton}
+   * @type {brkn.sidebar.Info}
    * @private
    */
-  this.fbToggle_ = new goog.ui.CustomButton('post');
-  this.fbToggle_.setSupportedState(goog.ui.Component.State.CHECKED,
-      true);
+  this.info_;
   
   /**
-   * @type {goog.ui.CustomButton}
+   * @type {brkn.sidebar.CommentInput}
    * @private
    */
-  this.addCommentButton_ = new goog.ui.CustomButton('add');
+  this.commentInput_ = new brkn.sidebar.CommentInput();
 };
 goog.inherits(brkn.Sidebar, goog.ui.Component);
-
-
-/**
- * @type {number}
- * @constant
- */
-brkn.Sidebar.COMMENT_CONTROLS_HEIGHT = 27;
-
-
-/**
- * @type {number}
- * @constant
- */
-brkn.Sidebar.INPUT_HEIGHT = 22;
 
 
 /**
@@ -79,176 +56,140 @@ brkn.Sidebar.prototype.currentMedia_;
  * @type {Element}
  * @private
  */
-brkn.Sidebar.prototype.timeContext_;
+brkn.Sidebar.prototype.lastScreen_;
 
 
 /**
  * @type {Element}
  * @private
  */
-brkn.Sidebar.prototype.commentsEl_;
+brkn.Sidebar.prototype.currentScreen_;
+
+/**
+ * @type {Element}
+ * @private
+ */
+brkn.Sidebar.prototype.currentTab_;
 
 
 /** @inheritDoc */
 brkn.Sidebar.prototype.enterDocument = function() {
   goog.base(this, 'enterDocument');
   
-  this.contentEl_ = goog.dom.getElementByClass('content', this.getElement());
-  this.commentInput_.decorate(goog.dom.getElement('comment-textarea'));
-  this.commentInput_.setMaxHeight(70);
-  var keyHandler = new goog.events.KeyHandler(this.commentInput_.getKeyEventTarget());
-   
-  var commentControls = goog.dom.getElement('comment-controls');
+  this.currentMedia_ = brkn.model.Channels.getInstance().currentChannel.getCurrentProgram().media;
+
+  var contentEl = goog.dom.getElement('sidebar-content');
+  this.admin_.decorate(goog.dom.getElement('admin'));
+  this.info_ = new brkn.sidebar.Info(this.currentMedia_);
+  this.info_.decorate(goog.dom.getElement('info'));
+  this.commentInput_.decorate(goog.dom.getElementByClass('comment-input', this.getElement()));
   
-  this.addChild(this.tweetToggle_);
-  this.tweetToggle_.decorate(goog.dom.getElement('tweet-toggle'));
+  goog.dom.classes.add(this.info_.getElement(), 'current');
+  this.currentScreen_ = this.info_.getElement();
   
-  this.addChild(this.fbToggle_);
-  this.fbToggle_.decorate(goog.dom.getElement('fb-toggle'));
+  this.toolbar_ = goog.dom.getElement('toolbar');
+  this.tabs_ = goog.dom.getElementByClass('tabs', this.getElement());
+  this.currentTab_ = goog.dom.getElementByClass('tab', this.tabs_);
   
-  this.addChild(this.addCommentButton_);
-  this.addCommentButton_.decorate(goog.dom.getElement('add-comment'));
-  this.addCommentButton_.setEnabled(false);
-  
+  if (this.isAdmin_) {
+    goog.dom.appendChild(this.tabs_, soy.renderAsElement(brkn.sidebar.tab,
+        {name: 'Admin', className: 'admine'}));
+    goog.style.setPosition(goog.dom.getElementByClass('arrow', this.toolbar_),
+        goog.style.getSize(this.currentTab_).width/2 + goog.style.getPosition(this.currentTab_).x);
+  }
+
   this.getHandler()
-      .listen(window, 'resize', goog.partial(goog.Timer.callOnce, goog.bind(this.resize, this)))
-      .listen(this.commentInput_.getElement(),
+      .listen(window, 'resize',
+          goog.partial(goog.Timer.callOnce, goog.bind(this.info_.resize, this)))
+      .listen(this.commentInput_,
           goog.events.EventType.FOCUS,
           goog.bind(function(e) {
-            goog.style.setPosition(commentControls, 0, -brkn.Sidebar.COMMENT_CONTROLS_HEIGHT);
-            this.resize(brkn.Sidebar.COMMENT_CONTROLS_HEIGHT);
+            this.info_.resize(brkn.sidebar.CommentInput.COMMENT_CONTROLS_HEIGHT);
+          }, this))
+      .listen(this.commentInput_,
+          'add',
+          goog.bind(function(e) {
+            goog.net.XhrIo.send(
+                '/_comment',
+                e.callback,
+                'POST',
+                'media_id=' + this.currentMedia_.id + '&text=' + e.text);
+          }, this))
+      .listen(this.commentInput_,
+          'resize',
+          goog.bind(function(e) {
+            this.info_.resize(brkn.sidebar.CommentInput.COMMENT_CONTROLS_HEIGHT +
+                (e.target.height_ - brkn.sidebar.CommentInput.INPUT_HEIGHT))
           }, this))
       .listen(this.getElement(),
           goog.events.EventType.CLICK,
           goog.bind(function(e) {
             if (!goog.dom.getAncestorByClass(e.target, 'comment-input') &&
                 !this.commentInput_.getValue()) {
-              goog.style.setPosition(commentControls, 0, 0);
-              this.resize();
+              goog.dom.classes.remove(goog.dom.getElement('comment-textarea'), 'focused');
+              this.commentInput_.collapse();
+              this.info_.resize();
             }
           }, this))
-      .listen(keyHandler,
-          goog.events.KeyHandler.EventType.KEY,
-          goog.bind(function(e) {
-            this.addCommentButton_.setEnabled(this.commentInput_.getValue());
-            if (e.keyCode == '13') {
-              e.preventDefault();
-              e.stopPropagation();
-              this.addCommentButton_.setActive(this.commentInput_.getValue());
-              this.onAddComment_(e);
-            }
+      .listen(goog.dom.getElementByClass('back-button', this.toolbar_),
+          goog.events.EventType.CLICK,
+          goog.bind(function() {
+            goog.dom.classes.remove(this.toolbar_, 'back');
+            this.navigate(this.lastScreen_);
           }, this))
-       .listen(this.commentInput_,
-           goog.ui.Textarea.EventType.RESIZE,
+      .listen(this.tabs_,
+          goog.events.EventType.CLICK,
           goog.bind(function(e) {
-            this.resize(brkn.Sidebar.COMMENT_CONTROLS_HEIGHT +
-                (e.target.height_ - brkn.Sidebar.INPUT_HEIGHT))
-          }, this))
-      .listen(this.addCommentButton_,
-          goog.ui.Component.EventType.ACTION,
-          goog.bind(this.onAddComment_, this));
+            var tab = goog.dom.getAncestorByClass(e.target, 'tab');
+            goog.dom.classes.remove(this.currentTab_, 'selected');
+            this.currentTab_ = tab;
+            goog.dom.classes.add(tab, 'selected');
+            this.navigate(goog.dom.classes.has(tab, 'info')
+                ? this.info_.getElement() : this.admin_.getElement(), undefined, undefined, true);
+            goog.style.setPosition(goog.dom.getElementByClass('arrow', this.toolbar_),
+                goog.style.getSize(tab).width/2 + goog.style.getPosition(tab).x);
+          }, this));
   
   brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_SIDEBAR,
       function(show) {
         goog.dom.classes.enable(this.getElement(), 'toggled', show);
       }, this);
   
-  this.currentMedia_ = brkn.model.Channels.getInstance().currentChannel.getCurrentProgram().media;
-  this.showMedia(this.currentMedia_);
+  brkn.model.Sidebar.getInstance().subscribe(brkn.model.Sidebar.Actions.NAVIGATE,
+      this.navigate, this);
 };
 
+
 /**
- * @param {Event} e
+ * @param {Element} to The to element
+ * @param {?boolean=} opt_back Back
+ * @param {?string=} opt_title Title of the navigated section
+ * @param {?boolean=} opt_invert Invert animation direction
  */
-brkn.Sidebar.prototype.onAddComment_ = function(e) {
-  if (this.commentInput_.getValue()) {
-    this.commentInput_.setActive(false);
-    this.commentInput_.setEnabled(false);
-    goog.net.XhrIo.send(
-        '/_comment',
-        goog.bind(function() {
-          this.commentInput_.setValue('');
-          this.commentInput_.setEnabled(true);
-          this.commentInput_.setFocused(true);
-        }, this),
-        'POST',
-        'media_id=' + this.currentMedia_.id + '&text=' + this.commentInput_.getValue());
+brkn.Sidebar.prototype.navigate = function(to, opt_back, opt_title, opt_invert) {
+  if (to == this.currentScreen_) {
+    return;
   }
-};
-
-/**
- * @param {brkn.model.Media} media 
- */
-brkn.Sidebar.prototype.showMedia = function(media) {
-  soy.renderElement(this.contentEl_, brkn.sidebar.info, {
-    media: media
-  });
   
-  media.subscribe(brkn.model.Media.Actions.ADD_COMMENT, this.addComment_, this);
-  
-  var viewersEl = goog.dom.getElementByClass('viewers', this.getElement());
-  this.commentsEl_ = goog.dom.getElementByClass('comments', this.getElement());
+  if (this.lastScreen_ != to) {
+    goog.dom.classes.enable(this.toolbar_, 'back', !!opt_back);
+    goog.style.setStyle(this.currentScreen_, {
+      'left': opt_invert ? '' : 0,
+      'right': opt_invert ? 0 : ''
+    });
+    goog.style.setStyle(to, {
+      'right': opt_invert ? '' : 0,
+      'left': opt_invert ? 0 : ''
+    }); 
+  }
 
-  goog.net.XhrIo.send(
-      '/_seen',
-      goog.bind(function() {
-        
-        goog.net.XhrIo.send('/_seen/' + media.id, goog.bind(function(e) {
-          var seen = /** @type {Array.<Object>} */ goog.json.parse(e.target.getResponse());
-          goog.style.showElement(viewersEl, seen.length);
-          goog.array.forEach(seen, function(viewer) {
-            var viewerEl = soy.renderAsElement(brkn.sidebar.viewer, {
-              user: brkn.model.Users.getInstance().get_or_add(viewer)
-            })
-            goog.dom.appendChild(viewersEl, viewerEl);
-          }, this);
-          this.resize();
-        }, this));
-        
-        
-        
-      }, this),
-      'POST',
-      'id=' + media.id);
+  this.lastScreen_ = this.currentScreen_;
+  this.currentScreen_ = to;
 
-  goog.net.XhrIo.send('/_comment/' + media.id, goog.bind(function(e) {
-      var comments = /** @type {Array.<Object>} */ goog.json.parse(e.target.getResponse());
-      goog.style.showElement(this.commentsEl_, comments.length);
-      goog.array.forEach(comments, function(comment) {
-        var c = new brkn.model.Comment(comment);
-        this.addComment_(c);
-      }, this);
-      this.resize();
-    }, this));
-};
+  if (opt_title) {
+    goog.dom.setTextContent(goog.dom.getElementByClass('back-title', this.toolbar_), opt_title);
+  }
 
-
-/**
- * @param {brkn.model.Comment} comment
- * @private
- */
-brkn.Sidebar.prototype.addComment_ = function(comment) {
-  var commentEl = soy.renderAsElement(brkn.sidebar.comment, {
-    comment: comment
-  });
-  goog.dom.appendChild(this.commentsEl_, commentEl);
-  this.resize(this.commentInput_.isFocused() ? brkn.Sidebar.COMMENT_CONTROLS_HEIGHT : 0);
-};
-
-
-/**
- * @param {?number=} opt_extra Extra space to subtract
- */
-brkn.Sidebar.prototype.resize = function(opt_extra) {
-  var extra = opt_extra || 0;
-  goog.style.setHeight(this.commentsEl_, goog.dom.getViewportSize().height -
-      goog.style.getPosition(this.commentsEl_.parentElement).y - 120 - extra);
-
-  // Give the comment div a second/2 to resize, then scroll to bottom.
-  goog.Timer.callOnce(goog.bind(function() {
-    var scrollAnim = new goog.fx.dom.Scroll(this.commentsEl_,
-        [this.commentsEl_.scrollLeft, this.commentsEl_.scrollTop],
-        [this.commentsEl_.scrollLeft, this.commentsEl_.scrollHeight], 300);
-    scrollAnim.play();
-  }, this), opt_extra ? 0 : 100);
+  goog.dom.classes.remove(this.lastScreen_, 'current');
+  goog.dom.classes.add(this.currentScreen_, 'current');
 };

@@ -47,6 +47,12 @@ brkn.model.Media = function(media) {
    * @private
    */
   this.description = media.description;
+  
+  /**
+   * @type {goog.date.DateTime}
+   * @private
+   */
+  this.published = goog.date.fromIsoString(media['published'] + 'Z');
 
 	/**
 	 * @type {string}

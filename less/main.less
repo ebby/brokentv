@@ -13,6 +13,13 @@
           transition: @arguments;
 }
 
+.alternate () {
+  animation-direction:alternate;
+  -moz-animation-direction:alternate; /* Firefox */
+  -webkit-animation-direction:alternate; /* Safari and Chrome */
+  -o-animation-direction:alternate; /* Opera */
+}
+
 @font-face {
 	font-family: 'MuseoSans';
 	src: url('/static/webfonts/235CED_0_0.eot');

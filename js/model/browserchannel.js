@@ -1,6 +1,7 @@
 goog.provide('brkn.model.BrowserChannel');
 
 goog.require('brkn.model.Channels');
+goog.require('brkn.model.Comment');
 goog.require('brkn.model.Medias');
 goog.require('brkn.model.Users');
 

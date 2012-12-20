@@ -54,3 +54,70 @@
     <div class="timestamp">2 days ago</div>
   </div>
 {/template}
+
+
+/**
+ * @param media
+ * @param published
+ */
+{template .media}
+  <div class="media">
+    <img src="{$media.thumbnail}" class="thumb">
+    <div class="title">{$media.name}</div>
+    <div class="published">{$published}</div>
+  </div>
+{/template}
+
+
+/**
+ * @param name
+ * @param className
+ */
+{template .tab}
+  <li class="tab{sp}{$className}">
+    <div class="label">{$name}</div>
+  </li>
+{/template}
+
+
+/**
+ */
+{template .admin}
+  <div class="admin">
+    <div class="search">
+      <input type="text" />
+    </div>
+    <div class="results">
+    </div>
+    <div class="section">
+      <div class="label">Collections</div>
+      <div class="collections"></div>
+    </div>
+    <div class="section">
+      <div class="label">Stories</div>
+      <div class="stories"></div>
+    </div>
+  </div>
+{/template}
+
+
+/**
+ * @param collection
+ */
+{template .collection}
+  <div class="collection">
+    <div class="title">{$collection.name}</div>
+  </div>
+{/template}
+
+
+/**
+ * @param media
+ */
+{template .adminMedia}
+  <div class="admin-media">
+    <img src="{$media.thumbnail}" class="thumb">
+    <div class="title">{$media.name}</div>
+    <div class="description">{$media.description}</div>
+  </div>
+{/template}

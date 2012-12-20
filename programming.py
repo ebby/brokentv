@@ -63,7 +63,7 @@ class Programming():
         feed = yt_service.GetRecentlyFeaturedVideoFeed()
         medias = Media.add_from_entry(feed.entry)
         for media in medias:
-          Program.add_program(channel, media.key().id())
+          Program.add_program(channel, media)
             
   @classmethod
   def clear(cls):

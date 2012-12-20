@@ -48,26 +48,37 @@
 		  {% endif %}
 		  <div id="sidebar-toggle" class="sidebar-toggle dark button"></div>
 		</div>
-		<div id="sidebar" class="sidebar">
-		  <div class="toolbar">
-		    <div class="tab selected">
-		      <div class="label">Now Playing</div>
-		    </div>
-		    <div class="tab">
-		      <div class="label">Starred</div>
-		    </div>
-		  </div>
-      <div class="content"></div>
-      <div class="comment-input">
-        <div id="comment-controls" class="comment-controls">
-          <div class="comment-button" id="tweet-toggle">tweet</div>
-          <div class="comment-button" id="fb-toggle">post</div>
-          <div class="comment-button" id="add-comment">add</div>
+		<div id="sidebar">
+		  <div id="toolbar">
+		    <div class="back">
+          <div class="back-button"><div>Back</div></div>
+          <div class="back-title"></div>
         </div>
-        <div class="input-holder">
-	        <textarea id="comment-textarea" rows="1" placeholder="Add to the conversation..."></textarea>
+		    <ul class="tabs">
+			    <li class="tab info selected">
+			      <div class="label">Now Playing</div>
+			    </li>
+			    <li class="tab starred">
+			      <div class="label">Starred</div>
+			    </li>
+			  </ul>
+			  <div class="arrow"></div>
+		  </div>
+      <div id="sidebar-content">
+        <div id="info" class="screen info"></div>
+        <div id="admin" class="screen admin"></div>
+        <div id="media-list" class="screen media-list"></div>
+        <div class="comment-input">
+	        <div id="comment-controls" class="comment-controls">
+	          <div class="comment-button" id="tweet-toggle">tweet</div>
+	          <div class="comment-button" id="fb-toggle">post</div>
+	          <div class="comment-button" id="add-comment">add</div>
+	        </div>
+	        <div class="input-holder">
+	          <textarea id="comment-textarea" rows="1" placeholder="Add to the conversation..."></textarea>
+	        </div>
 	      </div>
-	    </div>
+      </div>
     </div>
     <div id="fb-root"></div>
 		 
