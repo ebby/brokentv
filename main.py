@@ -190,6 +190,21 @@ class AdminCollectionsMediaHandler(BaseHandler):
     col = Collection.get_by_id(int(col_id))
     self.response.out.write(simplejson.dumps([c.toJson() for c in col.get_medias(20)]))
 
+class AdminAddProgramHandler(BaseHandler):
+    def post(self):
+      channel = Channel.get_by_id(int(self.request.get('channel')))
+      media = Media.get_by_key_name(self.request.get('media'))
+      program = Program.add_program(channel, media)
+      self.response.out.write(simplejson.dumps(program.toJson(False)))
+
+class AdminRemoveProgramHandler(BaseHandler):
+    def post(self):
+      program = Program.get_by_id(int(self.request.get('program')))
+      channel = program.channel;
+      effected = program.remove()
+      logging.info(len(effected))
+      broadcastProgramChanges(channel, effected)
+
 #--------------------------------------
 # CHANNEL HANDLERS
 #--------------------------------------
@@ -243,6 +258,15 @@ def broadcastNewComment(comment):
   channels = simplejson.loads(memcache.get('web_channels') or '{}')
   for client in channels.iterkeys():
     webchannel.send_message(client, simplejson.dumps(response))
+    
+def broadcastProgramChanges(channel, programs):
+  response = {}
+  response['type'] = 'update_programs'
+  response['channel_id'] = channel.key().id()
+  response['programs'] = [p.toJson(False) for p in programs]
+  channels = simplejson.loads(memcache.get('web_channels') or '{}')
+  for client in channels.iterkeys():
+    webchannel.send_message(client, simplejson.dumps(response))
 
 #--------------------------------------
 # APPLICATION INIT
@@ -263,6 +287,8 @@ app = webapp2.WSGIApplication([
     # Admin
     ('/admin/_collections/(.*)', AdminCollectionsHandler),
     ('/admin/_media/collection/(.*)', AdminCollectionsMediaHandler),
+    ('/admin/_addprogram', AdminAddProgramHandler),
+    ('/admin/_removeprogram', AdminRemoveProgramHandler),
 
     ('/', MainHandler)],
   debug=True,

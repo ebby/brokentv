@@ -4,7 +4,6 @@ from media import Media
 
 class Channel(db.Model):
   name = db.StringProperty()
-  programming = db.StringListProperty()
   current_program = db.IntegerProperty()
   keywords = db.StringListProperty()
 
@@ -13,12 +12,14 @@ class Channel(db.Model):
     return Channel.all().fetch(100)
 
   def get_programming(self):
-    return Program.all().filter('channel =', self).fetch(limit=100)
+    channel_programs = ChannelProgram.all().filter('channel =', self).order('-time').fetch(limit=100)
+    return [c_p.program for c_p in channel_programs]
 
   def get_next_time(self):
     next_time = datetime.datetime.utcnow()
-    if len(self.programming):
-      last_program = Program.get_by_id(int(self.programming[-1]))
+    programming = self.get_programming()
+    if len(programming):
+      last_program = programming[0]
       next_time = last_program.time + datetime.timedelta(seconds=last_program.media.duration)
     return max(datetime.datetime.utcnow(), next_time)
 
@@ -47,10 +48,21 @@ class Program(db.Model):
                         channel=channel,
                         time=channel.get_next_time())
       program.put()
-      channel.programming.append(str(program.key().id()))
-      channel.put()
+      
+      channelProgram = ChannelProgram(channel=channel, program=program, time=program.time)
+      channelProgram.put()
       return program
 
+  def remove(self):
+    effected = Program.all().filter('channel =', self.channel).filter('time >', self.time) \
+        .order('time').fetch(100);
+    for program in effected:
+      program.time = program.time - datetime.timedelta(seconds=self.media.duration)
+      program.put()
+    c_p = ChannelProgram.all().filter('program =', self).get()
+    self.delete()
+    c_p.delete()
+    return effected
   def toJson(self, fetch_channel=True):
     json = {}
     json['id'] = self.key().id()
@@ -58,3 +70,8 @@ class Program(db.Model):
     json['time'] = self.time.isoformat() if self.time else None
     json['channel'] = self.channel.toJson() if fetch_channel else {'id': self.channel.key().id()}
     return json
+
+class ChannelProgram(db.Model):
+  channel = db.ReferenceProperty(Channel, collection_name='channelPrograms')
+  program = db.ReferenceProperty(Program, collection_name='channelPrograms')
+  time = db.DateTimeProperty()

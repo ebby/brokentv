@@ -42,6 +42,12 @@ brkn.sidebar.MediaList.prototype.decorateInternal = function(el) {
           media.published.getYear() + ' ' + media.published.toUsTimeString()
     });
     goog.dom.appendChild(this.getElement(), mediaEl);
+    this.getHandler().listen(mediaEl,
+        goog.events.EventType.CLICK,
+        goog.bind(function() {
+          var channel = brkn.model.Channels.getInstance().currentChannel;
+          this.onAddProgram_(channel, media);
+        }, this));
   }, this);
   this.resize();
 };
@@ -60,4 +66,22 @@ brkn.sidebar.MediaList.prototype.enterDocument = function() {
 
 brkn.sidebar.MediaList.prototype.resize = function() {
   goog.style.setHeight(this.getElement(), goog.dom.getViewportSize().height - 60);
+};
+
+
+/**
+ * @param {brkn.model.Channel} channel The channel
+ * @param {brkn.model.Media} media 
+ * @private
+ */
+brkn.sidebar.MediaList.prototype.onAddProgram_ = function(channel, media) {
+  goog.net.XhrIo.send(
+    '/admin/_addprogram',
+    goog.bind(function(e) {
+      var response = goog.json.parse(e.target.getResponse());
+      var newProgram = new brkn.model.Program(response);
+      channel.publish(brkn.model.Channel.Action.ADD_PROGRAM, newProgram);
+    }, this),
+    'POST',
+    'channel=' + channel.id +'&media=' + media.id);
 };

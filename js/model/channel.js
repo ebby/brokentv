@@ -33,6 +33,12 @@ brkn.model.Channel = function(channel) {
 	 * @private
 	 */
 	this.programming = [];
+	
+	/**
+   * @type {Object.<string, brkn.model.Program>}
+   * @private
+   */
+  this.programMap_ = {};
 
 	/**
 	 * @type {brkn.model.Program}
@@ -48,6 +54,7 @@ brkn.model.Channel = function(channel) {
 	
 	this.subscribe(brkn.model.Channel.Action.ADD_PROGRAM, this.addProgram, this);
 	this.subscribe(brkn.model.Channel.Action.ADD_VIEWER, this.addViewer, this);
+	this.subscribe(brkn.model.Channel.Action.UPDATE_PROGRAM, this.updateProgram, this);
 };
 goog.inherits(brkn.model.Channel, goog.pubsub.PubSub);
 
@@ -63,6 +70,7 @@ brkn.model.Channel.prototype.currentProgramIndex;
  */
 brkn.model.Channel.prototype.addProgram = function(program) {
 	this.programming.push(program);
+	this.programMap_[program.id] = program;
 };
 
 
@@ -71,6 +79,15 @@ brkn.model.Channel.prototype.addProgram = function(program) {
  */
 brkn.model.Channel.prototype.addViewer = function(session) {
 	this.viewerSessions.push(session);
+};
+
+
+/**
+ * @param {Object} program The program object
+ */
+brkn.model.Channel.prototype.updateProgram = function(program) {
+  var p = goog.object.get(this.programMap_, program.id)
+  p.updateTime(program.time);
 };
 
 
@@ -131,6 +148,7 @@ brkn.model.Channel.prototype.getNextProgram = function() {
 brkn.model.Channel.Action = {
 	ADD_PROGRAM: 'add-program',
 	ADD_VIEWER: 'add-viewer',
-	REMOVE_VIEWER: 'remove-viewer'
+	REMOVE_VIEWER: 'remove-viewer',
+	UPDATE_PROGRAM: 'update-program'
 };
 

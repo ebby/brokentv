@@ -99,8 +99,6 @@ brkn.Sidebar.prototype.enterDocument = function() {
   }
 
   this.getHandler()
-      .listen(window, 'resize',
-          goog.partial(goog.Timer.callOnce, goog.bind(this.info_.resize, this)))
       .listen(this.commentInput_,
           goog.events.EventType.FOCUS,
           goog.bind(function(e) {

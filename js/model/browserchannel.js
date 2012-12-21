@@ -67,5 +67,12 @@ brkn.model.BrowserChannel.prototype.onMessage_ = function(rawMessage) {
 	    if (media) {
 	      media.publish(brkn.model.Media.Actions.ADD_COMMENT, comment);
 	    }
+	    break;
+	  case 'update_programs':
+	    var programs = message['programs'];
+	    var channel = brkn.model.Channels.getInstance().get(message['channel_id']);
+	    goog.array.forEach(programs, function(program) {
+	      channel.publish(brkn.model.Channel.Action.UPDATE_PROGRAM, program);
+	    }, this);
 	}
 };

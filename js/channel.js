@@ -27,6 +27,12 @@ brkn.Channel = function(model, timeline, startTime, startTimeOffset, minTime) {
 	this.setModel(model);
 	
 	/**
+   * @type {boolean}
+   * @private
+   */
+  this.isAdmin_ = true;
+	
+	/**
 	 * @type {number}
 	 * @private
 	 */
@@ -62,6 +68,12 @@ brkn.Channel = function(model, timeline, startTime, startTimeOffset, minTime) {
 	 * @private
 	 */
 	this.viewers_ = {};
+	
+	/**
+   * @type {Object.<string, Element>}
+   * @private
+   */
+  this.programs_ = {};
 };
 goog.inherits(brkn.Channel, goog.ui.Component);
 
@@ -126,7 +138,7 @@ brkn.Channel.prototype.enterDocument = function() {
   }
   var raphael = Raphael(this.graphEl_, '100%', 60);
   //var c = graph.path("M0,0").attr({fill: "none", "stroke-width": 1, "stroke-linecap": "round"});
-  this.graph_ = raphael.path("M0,0").attr({stroke: "none", opacity: .9, fill: 'black'/*Raphael.getColor(1)*/});
+  this.graph_ = raphael.path("M0,0").attr({stroke: "none", opacity: .7, fill: 'white'/*Raphael.getColor(1)*/});
   //c.attr({path: path, stroke: Raphael.getColor(1)});
   
   var programs = this.getModel().programming;
@@ -136,7 +148,7 @@ brkn.Channel.prototype.enterDocument = function() {
   		// This program is in progress
   		var remaining = (programs[i].media.duration * 1000 +
   				programs[i].time.getTime() - this.startTime_.getTime()) / 1000;
-  		this.addProgram(programs[i], remaining);
+  		this.addProgram(programs[i]);
   	} else if (programs[i].time.getTime() > this.startTime_.getTime()) {
   		this.addProgram(programs[i]);
   	}
@@ -166,6 +178,7 @@ brkn.Channel.prototype.enterDocument = function() {
 	this.getModel().subscribe(brkn.model.Channel.Action.ADD_PROGRAM, this.addProgram, this);
 	this.getModel().subscribe(brkn.model.Channel.Action.ADD_VIEWER, this.addViewer, this);
 	this.getModel().subscribe(brkn.model.Channel.Action.REMOVE_VIEWER, this.removeViewer, this);
+	this.getModel().subscribe(brkn.model.Channel.Action.UPDATE_PROGRAM, this.updateProgram, this);
 
 	this.update(); // Refresh UI
 };
@@ -201,21 +214,18 @@ brkn.Channel.prototype.constructPath = function() {
 
 /**
  * @param {brkn.model.Program} program The program to add
- * @param {?number=} opt_duration A manual duration for programs in progress
  */
-brkn.Channel.prototype.addProgram = function(program, opt_duration) {
-	var duration = opt_duration || program.media.duration;
+brkn.Channel.prototype.addProgram = function(program) {
 	var programEl = goog.dom.createDom('div', 'program');
+	var showAdmin = this.isAdmin_ && program.time.getTime() > goog.now();
 	soy.renderElement(programEl, brkn.channel.program, {
-		program: program
+		program: program,
+		admin: showAdmin
 	});
-	
+	this.programs_[program.id] = programEl;
+
 	// Position image
 	var img = goog.dom.getElementByClass('thumb', programEl);
-	img.onload = function() {
-	  img.style.marginTop = -goog.style.getSize(img).height/2 + 'px';
-	  img.style.marginLeft = -goog.style.getSize(img).width/2 + 'px';
-	};
 	
 	goog.dom.classes.enable(programEl, 'current',
 			this.getModel().currentProgram && this.getModel().currentProgram.id == program.id);
@@ -226,8 +236,57 @@ brkn.Channel.prototype.addProgram = function(program, opt_duration) {
 			programsWidth;
 	goog.style.setPosition(programEl, offset);
 	goog.dom.appendChild(this.programsEl_, programEl);
-	goog.dom.classes.enable(programEl, 'clipped', width < 120);
+	var clipped = width < 120;
+	goog.dom.classes.enable(programEl, 'clipped', clipped);
 	goog.dom.classes.enable(programEl, 'stretched', goog.style.getSize(img).height > 360);
+	
+	this.getHandler().listen(img,
+	    goog.events.EventType.LOAD,
+	    function() {
+	      goog.style.showElement(img, true);
+	      goog.Timer.callOnce(function() {
+	        if (clipped) {
+	          goog.style.setWidth(img, 200);
+	        } else if (goog.style.getSize(img).height < goog.style.getSize(programEl).height) {
+	          goog.dom.classes.add(img, 'fix-height');
+	        }
+	        // Center the cropped picture.
+	        img.style.marginTop = -goog.style.getSize(img).height/2 + 'px';
+	        img.style.marginLeft = -goog.style.getSize(img).width/2 + 'px';
+	      });
+	    });
+	if (showAdmin) {
+	  this.getHandler().listen(goog.dom.getElementByClass('remove', programEl),
+	      goog.events.EventType.CLICK,
+	      goog.bind(this.onRemoveProgram_, this, program, programEl));
+	}
+};
+
+
+/**
+ * @param {brkn.model.Program} program The program to add
+ */
+brkn.Channel.prototype.updateProgram = function(program) {
+  var programEl = this.programs_[program.id];
+  var programsWidth = goog.style.getSize(this.programsEl_).width;
+  var offset = (goog.date.fromIsoString(program.time + 'Z').getTime() - this.minTime_.getTime())/
+      (this.timeline_ * 1000) * programsWidth;
+  goog.style.setPosition(programEl, offset);
+};
+
+
+/**
+ * @param {brkn.model.Program} program
+ * @param {Element} programEl 
+ * @private
+ */
+brkn.Channel.prototype.onRemoveProgram_ = function(program, programEl) {
+  goog.dom.removeNode(programEl);
+  goog.net.XhrIo.send(
+    '/admin/_removeprogram',
+    undefined,
+    'POST',
+    'program=' + program.id);
 };
 
 

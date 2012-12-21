@@ -35,7 +35,7 @@ brkn.model.Programs.prototype.loadFromJson = function(programs) {
 	goog.array.forEach((/** @type {Array.<Object>} */ programs),
 			goog.bind(function(program) {
 				var p = new brkn.model.Program(program);
-				brkn.model.Channels.getInstance().channelMap[program.channel.id].programming.push(p);
+				brkn.model.Channels.getInstance().channelMap[program.channel.id].addProgram(p);
 			}, this));
 };
 

@@ -31,7 +31,9 @@ class Collection(db.Model):
     return CollectionChannel.get_channels(self)
   
   def get_medias(self, limit, offset=0):
-    return [c_m.media for c_m in CollectionMedia.all().filter('collection =', self).fetch(limit)]
+    col_medias = CollectionMedia.all().filter('collection =', self).order('-published') \
+        .fetch(limit=limit, offset=offset)
+    return [c_m.media for c_m in col_medias]
   
   def toJson(self):
     json = {}
@@ -58,14 +60,15 @@ class CollectionPublisher(db.Model):
     
 # Media in this collection
 class CollectionMedia(db.Model):
-  collection = db.ReferenceProperty(Collection)
-  media = db.ReferenceProperty(Media)
+  collection = db.ReferenceProperty(Collection, collection_name='collectionMedias')
+  media = db.ReferenceProperty(Media, collection_name='collectionMedias')
+  published = db.DateTimeProperty() # For sorted queries
   
   @classmethod
   def add(cls, collection, media):
     collection_media = CollectionMedia.all().filter('media =', media).get()
     if not collection_media:
-      collection_media = CollectionMedia(collection=collection, media=media)
+      collection_media = CollectionMedia(collection=collection, media=media, published=media.published)
       collection_media.put()
     return collection_media
 

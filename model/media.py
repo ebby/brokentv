@@ -50,7 +50,7 @@ class Media(db.Model):
                     published=iso8601.parse_date(entry.published.text),
                     duration=float(entry.media.duration.seconds),
                     description=desc,
-                    host_views=int(entry.statistics.view_count),
+                    host_views=int(entry.statistics.view_count) if entry.statistics else None,
                     category=category)
       media.put()
       medias.append(media)

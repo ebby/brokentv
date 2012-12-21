@@ -44,9 +44,9 @@ class Programming():
           collection_channel = CollectionChannel(collection=collection,
                                                    channel=self.channels[channel])
           collection_channel.put()
-      medias = collection.fetch()
+      collection.fetch()
       for channel in collection.get_channels():
-        for media in medias:
+        for media in collection.get_medias(100):
           if (datetime.datetime.now() - media.published).days < 2:
             Program.add_program(channel, media)
           else:
@@ -71,7 +71,7 @@ class Programming():
     for c in channels:
       c.programming = []
       c.put()
-    for model in ['PublisherMedia','Program', 'Media']:
+    for model in ['PublisherMedia','CollectionMedia','Program', 'Media']:
       try:
         while True:
           q = db.GqlQuery("SELECT __key__ FROM " + model)

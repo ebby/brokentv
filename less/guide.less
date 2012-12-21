@@ -135,9 +135,7 @@ div#guide {
 					box-shadow: inset -2px -2px 2px 0px white;
 					text-shadow: 1px 1px 1px white;
 					z-index: 0;
-					-webkit-transition: width .3s;
-             -moz-transition: width .3s;
-                  transition: width .3s;
+					.transition(all, .3s, ease);
 					&.clipped:hover {
 					  z-index: 50;
 					  width: 200px !important;
@@ -150,8 +148,9 @@ div#guide {
             top: 100%;
           }
 					&:hover img {
-					 .transition(-webkit-filter, .5s, ease);					
+					 .transition(all, .3s, ease);					
             -webkit-filter: none;
+            opacity: 1;
           }
 					&:last-child {
 					  border-right: 1px solid #CCC;
@@ -160,17 +159,19 @@ div#guide {
 					  display: inline-block;
 					}
 					img {
-					  min-width: 100%;
-					  min-height: 110px;
+					  width: 100%;
 					  height: auto;
-					  width: auto;
 					  border-radius: 3px;
 					  position: absolute;
 						opacity: .8;
 						top: 50%;
 						left: 50%;
 						margin-top: -20px;
-						-webkit-filter: blur(1px) grayscale(100%);
+						-webkit-filter: blur(1px);
+						&.fix-height {
+						  height: 100%;
+              width: auto;
+						}
 					}
 					div.title {
 					  left: 5px;
@@ -183,6 +184,16 @@ div#guide {
 					}
 	        &.current {
 	          background: rgba(255, 255, 255, .3);
+	        }
+	        div.remove {
+	          position: absolute;
+	          background: url(/static/img/11-x.png) no-repeat;
+            background-size: 100%;
+	          top: 5px;
+	          right: 5px;
+	          width: 10px;
+	          height: 10px;
+	          font-size: 12px;
 	        }
         }
       }

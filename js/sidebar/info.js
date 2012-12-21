@@ -99,6 +99,9 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
       }, this);
       this.resize();
     }, this));
+  
+  this.getHandler().listen(window, 'resize',
+      goog.partial(goog.Timer.callOnce, goog.bind(this.resize, this)))
 };
 
 
@@ -121,8 +124,10 @@ brkn.sidebar.Info.prototype.addComment_ = function(comment) {
  */
 brkn.sidebar.Info.prototype.resize = function(opt_extra) {
   var extra = opt_extra || 0;
-  goog.style.setHeight(this.commentsEl_, goog.dom.getViewportSize().height -
-      goog.style.getPosition(this.commentsEl_.parentElement).y - 120 - extra);
+  if (this.commentsEl_) {
+    goog.style.setHeight(this.commentsEl_, goog.dom.getViewportSize().height -
+        goog.style.getPosition(this.commentsEl_.parentElement).y - 120 - extra);
+  }
 
   // Give the comment div a second/2 to resize, then scroll to bottom.
   goog.Timer.callOnce(goog.bind(function() {

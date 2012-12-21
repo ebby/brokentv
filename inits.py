@@ -25,7 +25,12 @@ PUBLISHERS = {
 COLLECTIONS = {
   'Top News Stories': {
     'keywords': ['News'],
-    'publishers': ['The New York Times', 'Associated Press', 'ABC News', 'The Weather Channel', 'CNN', 'Vice'],
+    'publishers': ['The New York Times'],
+                  # 'Associated Press',
+                  # 'ABC News',
+                  # 'The Weather Channel',
+                  # 'CNN',
+                  # 'Vice'],
     'channels': ['News']
   }
 }

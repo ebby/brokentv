@@ -38,3 +38,11 @@ brkn.model.Program = function(program) {
 };
 goog.inherits(brkn.model.Program, goog.pubsub.PubSub);
 
+
+/**
+ * @param {string} isoTime
+ */
+brkn.model.Program.prototype.updateTime = function(isoTime) {
+  this.time = goog.date.fromIsoString(isoTime + 'Z');
+};
+

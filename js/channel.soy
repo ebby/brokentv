@@ -21,11 +21,15 @@
 
 /**
  * @param program
+ * @param admin
  */
 {template .program}
   <div class="info">
-	  <img class="thumb" src="{$program.media.thumbnail}">
+	  <img class="thumb" src="{$program.media.thumbnail}" style="display: none">
 	  <div class="title">{$program.media.name}</div>
+	  {if $admin}
+	    <div class="remove"></div>
+	  {/if}
   </div>
 {/template}
 
