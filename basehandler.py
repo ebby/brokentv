@@ -16,7 +16,7 @@ class BaseHandler(webapp2.RequestHandler):
     """
     @property
     def current_user(self):
-        if self.session.get("user"):
+        if self.session.get("user") and User.get_by_key_name(self.session.get("user")['id']):
             # User is logged in
             return User.get_by_key_name(self.session.get("user")['id'])
         else:

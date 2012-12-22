@@ -4,13 +4,22 @@
 @import "player.less";
 @import "popup.less";
 @import "sidebar.less";
+@import "login.less";
 
-.transition (@style, @speed, @rest) {
+.transition (@style, @speed, ...) {
   -webkit-transition: @arguments;
      -moz-transition: @arguments;
        -o-transition: @arguments;
       -ms-transition: @arguments;
           transition: @arguments;
+}
+
+.transform (...) {
+  transform:@arguments;
+  -ms-transform:@arguments;
+  -moz-transform:@arguments;
+  -webkit-transform:@arguments;
+  -o-transform:@arguments;
 }
 
 .alternate () {

@@ -10,12 +10,21 @@ class Publisher(db.Model):
   host_id = db.StringProperty()
   last_fetch = db.DateTimeProperty()
 
-#  def get_medias(self):
-#    return PublisherMedia.all().filter('publisher =', self)
-  
+  def get_medias(self, limit, offset=0):
+    # add .order('-published')
+    pub_medias = PublisherMedia.all().filter('publisher =', self) \
+        .fetch(limit=limit, offset=offset)
+    return [p_m.media for p_m in pub_medias]
+
   def get_media_by_category(self, category):
     self.fetch([category])
     return PublisherMedia.get_medias(self, category)
+  
+  def toJson(self):
+    json = {}
+    json['id'] = self.key().id()
+    json['name'] = self.name
+    return json
   
   def fetch(self, categories=None):
     if self.host == MediaHost.YOUTUBE:
@@ -28,7 +37,7 @@ class Publisher(db.Model):
       query.orderby = 'published'
       query.max_results = 50
       offset = 1
-      while offset <= 100:
+      while offset <= 1:
         query.start_index = offset
         feed = yt_service.YouTubeQuery(query)
         if len(feed.entry) == 0:
@@ -46,17 +55,19 @@ class Publisher(db.Model):
         offset += len(medias)
 
     self.last_fetch = datetime.datetime.now()
-    self.put()    
+    self.put()
 
 class PublisherMedia(db.Model):
-  publisher = db.ReferenceProperty(Publisher)
-  media = db.ReferenceProperty(Media)
+  publisher = db.ReferenceProperty(Publisher, collection_name='publisherMedias')
+  media = db.ReferenceProperty(Media, collection_name='publisherMedias')
+  published = db.DateTimeProperty()
   
   @classmethod
   def add(cls, publisher, media):
     publisher_media = PublisherMedia.all().filter('media =', media).get()
     if not publisher_media:
       publisher_media = PublisherMedia(publisher=publisher, media=media)
+      publisher_media.published = media.published
       publisher_media.put()
     return publisher_media
   

@@ -86,7 +86,7 @@ div#guide {
         background: rgba(0, 0, 0, .8);
         margin-right: 1px solid #888;
         box-shadow: 1px 0 3px rgba(0, 0, 0, .8);
-        z-index: 0;
+        z-index: 1;
         span {
           position: relative;
           top: 20px;
@@ -134,7 +134,7 @@ div#guide {
 					color: #999;
 					box-shadow: inset -2px -2px 2px 0px white;
 					text-shadow: 1px 1px 1px white;
-					z-index: 0;
+					z-index: 1;
 					.transition(all, .3s, ease);
 					&.clipped:hover {
 					  z-index: 50;
@@ -143,14 +143,20 @@ div#guide {
 					  box-shadow: 3px -1px 4px -3px rgba(0, 0, 0, 0.3);
 					  padding-right: 3px;
 					}
-					&.stretched:hover img {
-					 .transition(top, 4s, ease);
-            top: 100%;
-          }
 					&:hover img {
-					 .transition(all, .3s, ease);					
+					 -webkit-transition: opacity .6s ease, top 4s ease-out, left 4s ease-out;
+              -moz-transition: opacity .6s ease, top 4s ease-out, left 4s ease-out;
+                -o-transition: opacity .6s ease, top 4s ease-out, left 4s ease-out;
+               -ms-transition: opacity .6s ease, top 4s ease-out, left 4s ease-out;
+                   transition: opacity .6s ease, top 4s ease-out, left 4s ease-out;
             -webkit-filter: none;
             opacity: 1;
+          }
+          &:hover img.pan-left {
+            left: 0%;
+          }
+          &:hover img.pan-top {
+            top: 100%
           }
 					&:last-child {
 					  border-right: 1px solid #CCC;
@@ -161,12 +167,12 @@ div#guide {
 					img {
 					  width: 100%;
 					  height: auto;
-					  border-radius: 3px;
 					  position: absolute;
 						opacity: .8;
 						top: 50%;
 						left: 50%;
 						margin-top: -20px;
+						z-index: -10;
 						-webkit-filter: blur(1px);
 						&.fix-height {
 						  height: 100%;
@@ -201,6 +207,8 @@ div#guide {
         display: inline-block;
 	      width: 100%;
 	      position: relative;
+	      pointer-events: none;
+	      z-index: 1;
 	      svg {
 	        top: 5px;
 	      }

@@ -35,6 +35,9 @@ goog.inherits(brkn.sidebar.MediaList, goog.ui.Component);
 brkn.sidebar.MediaList.prototype.decorateInternal = function(el) {
   goog.base(this, 'decorateInternal', el);
   
+  el.innerHTML = '';
+  el.scrollTop = 0;
+  
   goog.array.forEach(this.mediaList_, function(media) {
     var mediaEl = soy.renderAsElement(brkn.sidebar.media, {
       media: media,

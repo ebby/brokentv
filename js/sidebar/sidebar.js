@@ -71,6 +71,12 @@ brkn.Sidebar.prototype.currentScreen_;
  */
 brkn.Sidebar.prototype.currentTab_;
 
+/**
+ * @type {Element}
+ * @private
+ */
+brkn.Sidebar.prototype.mediaListEl_;
+
 
 /** @inheritDoc */
 brkn.Sidebar.prototype.enterDocument = function() {
@@ -79,6 +85,7 @@ brkn.Sidebar.prototype.enterDocument = function() {
   this.currentMedia_ = brkn.model.Channels.getInstance().currentChannel.getCurrentProgram().media;
 
   var contentEl = goog.dom.getElement('sidebar-content');
+  this.mediaListEl_ = goog.dom.getElement('media-list');
   this.admin_.decorate(goog.dom.getElement('admin'));
   this.info_ = new brkn.sidebar.Info(this.currentMedia_);
   this.info_.decorate(goog.dom.getElement('info'));
@@ -158,6 +165,8 @@ brkn.Sidebar.prototype.enterDocument = function() {
   
   brkn.model.Sidebar.getInstance().subscribe(brkn.model.Sidebar.Actions.NAVIGATE,
       this.navigate, this);
+  brkn.model.Sidebar.getInstance().subscribe(brkn.model.Sidebar.Actions.MEDIA_LIST,
+      this.showMediaList, this);
 };
 
 
@@ -252,4 +261,16 @@ brkn.Sidebar.prototype.navigate = function(to, opt_back, opt_title) {
 
 //  goog.dom.classes.remove(this.lastScreen_, 'current');
 //  goog.dom.classes.add(this.currentScreen_, 'current');
+};
+
+
+/**
+ * @param {Array.<brkn.model.Media>} medias
+ * @param {string} name
+ */
+brkn.Sidebar.prototype.showMediaList = function(medias, name) {
+  var mediaList = new brkn.sidebar.MediaList(medias);
+  mediaList.decorate(this.mediaListEl_);
+  brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NAVIGATE,
+      this.mediaListEl_, true, name);
 };

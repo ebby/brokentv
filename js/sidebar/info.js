@@ -100,8 +100,25 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
       this.resize();
     }, this));
   
-  this.getHandler().listen(window, 'resize',
-      goog.partial(goog.Timer.callOnce, goog.bind(this.resize, this)))
+  this.getHandler()
+      .listen(window,
+          'resize',
+          goog.partial(goog.Timer.callOnce, goog.bind(this.resize, this)))
+      .listen(goog.dom.getElementByClass('publisher', this.getElement()),
+          goog.events.EventType.CLICK,
+          goog.bind(function() {
+            goog.net.XhrIo.send(
+                '/admin/_media/publisher/' + this.media_.publisher.id,
+                goog.bind(function(e) {
+                  var medias = /** @type {Array.<Object>} */ goog.json.parse(e.target.getResponse());
+                  medias = goog.array.map(medias, function(m) {
+                    return new brkn.model.Media(m);
+                  });
+                  brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.MEDIA_LIST,
+                      medias, this.media_.publisher.name);
+                }, this));
+          }, this));
+      
 };
 
 

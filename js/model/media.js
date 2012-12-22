@@ -49,6 +49,12 @@ brkn.model.Media = function(media) {
   this.description = media.description;
   
   /**
+   * @type {Object}
+   * @private
+   */
+  this.publisher = media['publisher'];
+  
+  /**
    * @type {goog.date.DateTime}
    * @private
    */

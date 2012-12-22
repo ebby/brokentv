@@ -178,17 +178,22 @@ class ChangeChannelHandler(BaseHandler):
 # ADMIN HANDLERS
 #--------------------------------------
 
-class AdminCollectionsHandler(BaseHandler):
+class CollectionsHandler(BaseHandler):
   def get(self, channel_id=None):
     channel = Channel.get_by_id(int(channel_id))
     collections = CollectionChannel.get_collections(channel)
     self.response.out.write(simplejson.dumps([c.toJson() for c in collections]))
 
 
-class AdminCollectionsMediaHandler(BaseHandler):
+class CollectionsMediaHandler(BaseHandler):
   def get(self, col_id=None):
     col = Collection.get_by_id(int(col_id))
-    self.response.out.write(simplejson.dumps([c.toJson() for c in col.get_medias(20)]))
+    self.response.out.write(simplejson.dumps([m.toJson() for m in col.get_medias(20)]))
+    
+class PublisherMediaHandler(BaseHandler):
+  def get(self, pub_id=None):
+    pub = Publisher.get_by_id(int(pub_id))
+    self.response.out.write(simplejson.dumps([m.toJson() for m in pub.get_medias(20)]))
 
 class AdminAddProgramHandler(BaseHandler):
     def post(self):
@@ -285,8 +290,9 @@ app = webapp2.WSGIApplication([
     ('/_seen/(.*)', SeenHandler),
     
     # Admin
-    ('/admin/_collections/(.*)', AdminCollectionsHandler),
-    ('/admin/_media/collection/(.*)', AdminCollectionsMediaHandler),
+    ('/admin/_collections/(.*)', CollectionsHandler),
+    ('/admin/_media/collection/(.*)', CollectionsMediaHandler),
+    ('/admin/_media/publisher/(.*)', PublisherMediaHandler),
     ('/admin/_addprogram', AdminAddProgramHandler),
     ('/admin/_removeprogram', AdminRemoveProgramHandler),
 

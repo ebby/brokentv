@@ -41,10 +41,10 @@ brkn.Controller.prototype.enterDocument = function() {
 	this.addChild(this.guideToggle_);
 	this.guideToggle_.decorate(goog.dom.getElement('guide-toggle'));
 	this.guideToggle_.setChecked(true);
-	goog.Timer.callOnce(goog.bind(function() {
-	  this.guideToggle_.setChecked(false);
-	  this.toggleGuide_();
-	}, this), 10000);
+//	goog.Timer.callOnce(goog.bind(function() {
+//	  this.guideToggle_.setChecked(false);
+//	  this.toggleGuide_();
+//	}, this), 10000);
 	
 	this.addChild(this.sidebarToggle_);
   this.sidebarToggle_.decorate(goog.dom.getElement('sidebar-toggle'));

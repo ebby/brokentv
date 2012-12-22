@@ -10,6 +10,8 @@ goog.require('brkn.model.Channels');
 goog.require('brkn.model.Clock');
 goog.require('brkn.model.Programs');
 
+goog.require('goog.fx.easing');
+goog.require('goog.fx.dom.FadeOutAndHide');
 goog.require('goog.ui.Component');
 goog.require('goog.ui.media.YoutubeModel');
 
@@ -99,4 +101,32 @@ brkn.Main.init = function(response, channelToken, channels, programs,
 	main.decorate(document.body);
 };
 
+
+brkn.Main.login = function() {
+  var oken = goog.dom.getElement('oken');
+  var fbLogin = goog.dom.getElement('fb-login');
+  var loginPage = goog.dom.getElement('login');
+  
+  goog.events.listen(oken, goog.events.EventType.CLICK, function() {
+    goog.dom.classes.add(oken, 'animate');
+    goog.style.showElement(fbLogin, true);
+    goog.Timer.callOnce(goog.partial(goog.dom.classes.add, fbLogin, 'show'), 300);
+  });
+  
+  goog.events.listen(fbLogin, goog.events.EventType.CLICK, function() {
+    goog.dom.classes.add(fbLogin, 'disabled');
+    FB.login(function(response) {
+      if (response.authResponse) {
+        // connected
+        goog.dom.classes.add(oken, 'swing');
+        goog.dom.classes.remove(fbLogin, 'show');
+        var fadeOut = new goog.fx.dom.FadeOutAndHide(loginPage, 4000, goog.fx.easing.easeIn);
+        fadeOut.play();
+      }
+    });
+  });
+  
+};
+
 goog.exportSymbol('brkn.Main.init', brkn.Main.init);
+goog.exportSymbol('brkn.Main.login', brkn.Main.login);

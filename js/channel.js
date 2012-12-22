@@ -238,21 +238,28 @@ brkn.Channel.prototype.addProgram = function(program) {
 	goog.dom.appendChild(this.programsEl_, programEl);
 	var clipped = width < 120;
 	goog.dom.classes.enable(programEl, 'clipped', clipped);
-	goog.dom.classes.enable(programEl, 'stretched', goog.style.getSize(img).height > 360);
 	
 	this.getHandler().listen(img,
 	    goog.events.EventType.LOAD,
 	    function() {
 	      goog.style.showElement(img, true);
 	      goog.Timer.callOnce(function() {
+	        if (goog.style.getSize(img).height < goog.style.getSize(programEl).height) {
+            goog.dom.classes.add(img, 'fix-height');
+          }
+	        
+	        if (goog.style.getSize(img).width > 2*goog.style.getSize(programEl).width) {
+            goog.dom.classes.add(img, 'pan-left');
+          } else if (goog.style.getSize(img).height > 2*goog.style.getSize(programEl).height) {
+            goog.dom.classes.add(img, 'pan-top');
+          }
 	        if (clipped) {
 	          goog.style.setWidth(img, 200);
-	        } else if (goog.style.getSize(img).height < goog.style.getSize(programEl).height) {
-	          goog.dom.classes.add(img, 'fix-height');
 	        }
 	        // Center the cropped picture.
 	        img.style.marginTop = -goog.style.getSize(img).height/2 + 'px';
 	        img.style.marginLeft = -goog.style.getSize(img).width/2 + 'px';
+	        goog.dom.classes.enable(programEl, 'stretched', goog.style.getSize(img).height > 360);
 	      });
 	    });
 	if (showAdmin) {

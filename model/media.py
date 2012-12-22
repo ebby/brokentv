@@ -89,6 +89,7 @@ class Media(db.Model):
     json = {}
     json['id'] = self.key().name()
     json['name'] = self.name
+    json['publisher'] = self.publisherMedias.get().publisher.toJson() if self.publisherMedias.get() else ''
     json['host_id'] = self.host_id
     json['host'] = self.host
     json['duration'] = self.duration
