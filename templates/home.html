@@ -77,8 +77,6 @@
 	      </div>
       </div>
     </div>
-
-    {% if not current_user %}
     <div id="login">
       <div class="logo">
         <div id="oken"></div>
@@ -86,8 +84,8 @@
           Login with Facebook
         </div>
       </div>
+      <div class="broken-media-production"></div>
     </div>
-    {% endif %}
     <div id="fb-root"></div>
 		 
 	  <script><!--
@@ -102,7 +100,7 @@
 		  function onYouTubePlayerAPIReady() {
 		    ytLoaded = true;
 		    if (fbLoaded) {
-		    	brkn.Main.init(fbLoaded, channelToken, channels, programs, currentUser, viewerSessions);
+		    	brkn.Main.init(channelToken, channels, programs, currentUser, viewerSessions);
 		    }
 		  }
 	    window.fbAsyncInit = function() {
@@ -118,10 +116,19 @@
 	        xfbml      : true  // parse XFBML
 	      });
 	      FB.getLoginStatus(function(response) {
-		      fbLoaded = response;
-		      if (ytLoaded) {
-		        brkn.Main.init(response, channelToken, channels, programs, currentUser, viewerSessions);
-		      }
+		      
+		      if (response.status === 'connected') {
+		        fbLoaded = response;
+		        if (ytLoaded) {
+		          brkn.Main.init(response, channelToken, channels, programs, currentUser, viewerSessions);
+		        }
+			    } else if (response.status === 'not_authorized') {
+			        // not_authorized
+			        brkn.Main.notAuthorized();
+			    } else {
+			        // not_logged_in
+			        brkn.Main.login();
+			    }
 	      });
 	    };
 	 		// Load the SDK Asynchronously
@@ -132,8 +139,6 @@
 	       js.src = "//connect.facebook.net/en_US/all.js";
 	       ref.parentNode.insertBefore(js, ref);
 	     }(document));
-
-	     brkn.Main.login();
     </script>
   </body>
 </html>

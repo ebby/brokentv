@@ -114,6 +114,59 @@ class MainHandler(BaseHandler):
       path = os.path.join(os.path.dirname(__file__), 'templates/home.html')
       self.response.out.write(template.render(path, template_data))
 
+def get_session(current_user):
+  data = {}
+
+  channels = Channel.get_all();
+  data['channels'] = [c.toJson() for c in channels]
+  data['programs'] = [c.toJson(False) for c in Program.get_current_programs()]
+ 
+  token = webchannel.create_channel(current_user.id)
+  data['token'] = token
+
+  client = memcache.Client()
+  current_viewers = simplejson.loads(memcache.get('current_viewers') or '{}')
+  if not current_user.id in current_viewers:
+    current_viewers[current_user.id] = token
+    memcache.set('current_viewers', simplejson.dumps(current_viewers))
+
+  data['current_viewers'] = current_viewers
+  current_channel = Channel.all().get()
+  assert current_channel != None, 'NO CHANNELS IN DATABASE'
+
+  # Add latest User Session, possibly end last session, possibly continue last session.
+  user_sessions = UserSession.get_by_user(current_user)
+  if len(user_sessions):
+    current_channel = Channel.get_by_id(int(user_sessions[0].channel.key().id()))
+
+  if len(user_sessions) and not user_sessions[0].tune_out:
+    user_sessions[0].tune_out = user_sessions[0].tune_in + datetime.timedelta(seconds=180)
+    user_sessions[0].put()
+
+  if len(user_sessions) and user_sessions[0].tune_out and (datetime.datetime.now() - user_sessions[0].tune_out).seconds < 180:
+    user_sessions[0].tune_out = None
+    user_sessions[0].put()
+  else:
+    UserSession.new(current_user, current_channel)
+
+  # Grab sessions for current_users (that we care about)
+  viewer_sessions = []
+  for uid in current_viewers:
+    user_sessions = UserSession.get_by_user(User.get_by_key_name(uid))
+    if len(user_sessions):
+      viewer_sessions.append(user_sessions[0].toJson())
+  data['viewer_sessions'] = viewer_sessions
+
+  user_obj = current_user.toJson()
+  user_obj['current_channel'] = current_channel.key().id()
+  data['current_user'] = user_obj
+  return data
+
+class SessionHandler(BaseHandler):
+    def post(self):
+      data = get_session(self.current_user)
+      self.response.out.write(simplejson.dumps(data))
+
 class ProgramHandler(BaseHandler):
     def post(self):
       channel = Channel.get_by_id(int(self.request.get('channel')))
@@ -288,7 +341,8 @@ app = webapp2.WSGIApplication([
     ('/_comment/(.*)', CommentHandler),
     ('/_seen', SeenHandler),
     ('/_seen/(.*)', SeenHandler),
-    
+    ('/_session', SessionHandler),
+
     # Admin
     ('/admin/_collections/(.*)', CollectionsHandler),
     ('/admin/_media/collection/(.*)', CollectionsMediaHandler),

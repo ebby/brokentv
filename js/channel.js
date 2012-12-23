@@ -248,11 +248,12 @@ brkn.Channel.prototype.addProgram = function(program) {
             goog.dom.classes.add(img, 'fix-height');
           }
 	        
-	        if (goog.style.getSize(img).width > 2*goog.style.getSize(programEl).width) {
+	        if (goog.style.getSize(img).width > 2*goog.style.getSize(programEl).width && !clipped) {
             goog.dom.classes.add(img, 'pan-left');
           } else if (goog.style.getSize(img).height > 2*goog.style.getSize(programEl).height) {
             goog.dom.classes.add(img, 'pan-top');
           }
+
 	        if (clipped) {
 	          goog.style.setWidth(img, 200);
 	        }

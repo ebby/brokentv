@@ -91,6 +91,10 @@ brkn.Main.prototype.enterDocument = function() {
  */
 brkn.Main.init = function(response, channelToken, channels, programs,
 		currentUser, viewerSessions) {
+  
+  var fadeOut = new goog.fx.dom.FadeOutAndHide(goog.dom.getElement('login'), 2000, goog.fx.easing.easeIn);
+  fadeOut.play();
+  
 	if (!goog.object.isEmpty(currentUser)) { brkn.model.Users.getInstance().setCurrentUser(currentUser); }
 	brkn.model.Channels.getInstance().loadFromJson(channels, currentUser['current_channel']);
 	brkn.model.Programs.getInstance().loadFromJson(programs);
@@ -107,6 +111,10 @@ brkn.Main.login = function() {
   var fbLogin = goog.dom.getElement('fb-login');
   var loginPage = goog.dom.getElement('login');
   
+  goog.events.listen(window, goog.events.EventType.RESIZE, function () {
+    //goog.loginPage
+  });
+  
   goog.events.listen(oken, goog.events.EventType.CLICK, function() {
     goog.dom.classes.add(oken, 'animate');
     goog.style.showElement(fbLogin, true);
@@ -118,15 +126,38 @@ brkn.Main.login = function() {
     FB.login(function(response) {
       if (response.authResponse) {
         // connected
+        brkn.Main.getSession(response);
         goog.dom.classes.add(oken, 'swing');
         goog.dom.classes.remove(fbLogin, 'show');
-        var fadeOut = new goog.fx.dom.FadeOutAndHide(loginPage, 4000, goog.fx.easing.easeIn);
-        fadeOut.play();
+      } else {
+        // not_authorized
+        brkn.Main.notAuthorized();
       }
     });
   });
-  
+};
+
+brkn.Main.getSession = function(response) {
+  goog.net.XhrIo.send('/_session',
+      function(e) {
+        var data = goog.json.parse(e.target.getResponse());
+        brkn.Main.init(response, data['token'], data['channels'], data['programs'],
+            data['current_user'], data['viewer_sessions']);
+      }, 'POST');
+}
+
+brkn.Main.notAuthorized = function() {
+  var oken = goog.dom.getElement('oken');
+  var fbLogin = goog.dom.getElement('fb-login');
+  var loginPage = goog.dom.getElement('login');
+
+  goog.dom.classes.add(oken, 'animate');
+  goog.dom.classes.add(fbLogin, 'disabled');
+  goog.style.showElement(fbLogin, true);
+  goog.dom.classes.add(fbLogin, 'show');
+  goog.dom.setTextContent(fbLogin, 'We\'ll keep you posted');
 };
 
 goog.exportSymbol('brkn.Main.init', brkn.Main.init);
 goog.exportSymbol('brkn.Main.login', brkn.Main.login);
+goog.exportSymbol('brkn.Main.notAuthorized', brkn.Main.notAuthorized);
