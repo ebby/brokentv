@@ -19,24 +19,38 @@ PUBLISHERS = {
   },
   'Ora TV': {
     'youtube': 'oratvnetwork'
-  }                    
+  },
+  'Cool Hunting': {
+    'youtube': 'coolhunting'
+  },
+  'TED': {
+    'youtube': 'tedtalksdirector'
+  }                      
 }
 
 COLLECTIONS = {
   'Top News Stories': {
     'keywords': ['News'],
-    'publishers': ['The New York Times'],
-                  # 'Associated Press',
-                  # 'ABC News',
-                  # 'The Weather Channel',
-                  # 'CNN',
-                  # 'Vice'],
-    'channels': ['News']
+    'publishers': ['The New York Times',
+                   'Associated Press',
+                   'ABC News',
+                   'The Weather Channel',
+                   'CNN',
+                   'Vice'],
+    'channels': ['Broken News']
+  },
+  'Creative Arts': {
+    'keywords': ['Entertainment'],
+    'publishers': ['Cool Hunting'],
+    'channels': ['Creators Intl.']
   }
 }
 
 CHANNELS = {
-  'News': {
+  'Broken News': {
     'keywords': ['News']
+  },
+  'Creatives Intl.': {
+    'keywords': ['Entertainment']                   
   }
 }

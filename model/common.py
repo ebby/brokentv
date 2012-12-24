@@ -13,6 +13,11 @@ import re
 from google.appengine.api import urlfetch
 from google.appengine.ext import db
 
+class AccessLevel:
+  WAITLIST = 0
+  USER = 1
+  ADMIN = 2
+
 class Privacy:
   PRIVATE = 0
   PUBLIC = 1

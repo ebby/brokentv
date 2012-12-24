@@ -1,18 +1,15 @@
 from common import *
 
+
 class User(db.Model):
     id = db.StringProperty()
-    show_signup = db.BooleanProperty(default=True)
+    access_level = db.IntegerProperty(default=AccessLevel.WAITLIST)
     created = db.DateTimeProperty(auto_now_add=True)
     updated = db.DateTimeProperty(auto_now=True)
     name = db.StringProperty(required=True)
     profile_url = db.StringProperty()
-    photo_url = db.StringProperty()
+    email = db.StringProperty()
     access_token = db.StringProperty()
-    followers = db.StringListProperty(default=[])
-    following = db.StringListProperty(default=[])
-    friends = db.StringListProperty(default=[])
-    home = db.StringProperty()
     location = db.StringProperty()
 
     def to_session(self):
@@ -104,6 +101,5 @@ class User(db.Model):
       json['id'] = self.id
       json['name'] = self.name
       json['profile_url'] = self.profile_url
-      json['photo_url'] = self.photo_url
       json['location'] = self.location
       return json

@@ -5,6 +5,7 @@ goog.require('brkn.Controller');
 goog.require('brkn.Player');
 goog.require('brkn.Popup');
 goog.require('brkn.Sidebar');
+goog.require('brkn.main');
 goog.require('brkn.model.BrowserChannel');
 goog.require('brkn.model.Channels');
 goog.require('brkn.model.Clock');
@@ -64,12 +65,8 @@ brkn.Main.prototype.popup_;
 brkn.Main.prototype.decorateInternal = function(element) {
   goog.base(this, 'decorateInternal', element);
   
-  this.controller_.decorate(goog.dom.getElement('controller'));
-  this.guide_.decorate(goog.dom.getElement('guide'));
-  this.sidebar_.decorate(goog.dom.getElement('sidebar'));
-  this.player_.decorate(goog.dom.getElement('stage'));
-
-  this.popup_ = new brkn.Popup();
+  var mainEl = soy.renderAsElement(brkn.main.main);
+  goog.dom.insertChildAt(element, mainEl, 0);
 };
 
 
@@ -77,7 +74,12 @@ brkn.Main.prototype.decorateInternal = function(element) {
 brkn.Main.prototype.enterDocument = function() {
   goog.base(this, 'enterDocument');
   
-  
+  this.controller_.decorate(goog.dom.getElement('controller'));
+  this.guide_.decorate(goog.dom.getElement('guide'));
+  this.sidebar_.decorate(goog.dom.getElement('sidebar'));
+  this.player_.decorate(goog.dom.getElement('stage'));
+
+  this.popup_ = new brkn.Popup();
 };
 
 
@@ -106,43 +108,61 @@ brkn.Main.init = function(response, channelToken, channels, programs,
 };
 
 
+brkn.Main.auth = function() {  
+  FB.getLoginStatus(function(response) {
+    if (response.status === 'connected') {
+      brkn.Main.getSessionAndInit(response);
+    } else {
+      // not_logged_in
+      brkn.Main.login();
+    }
+  });
+};
+
+
 brkn.Main.login = function() {
   var oken = goog.dom.getElement('oken');
   var fbLogin = goog.dom.getElement('fb-login');
   var loginPage = goog.dom.getElement('login');
   
-  goog.events.listen(window, goog.events.EventType.RESIZE, function () {
-    //goog.loginPage
-  });
-  
-  goog.events.listen(oken, goog.events.EventType.CLICK, function() {
+  goog.Timer.callOnce(function() {
     goog.dom.classes.add(oken, 'animate');
     goog.style.showElement(fbLogin, true);
-    goog.Timer.callOnce(goog.partial(goog.dom.classes.add, fbLogin, 'show'), 300);
-  });
+    goog.Timer.callOnce(goog.partial(goog.dom.classes.add, fbLogin, 'show'), 400);
+  }, 100);
   
   goog.events.listen(fbLogin, goog.events.EventType.CLICK, function() {
     goog.dom.classes.add(fbLogin, 'disabled');
     FB.login(function(response) {
       if (response.authResponse) {
         // connected
-        brkn.Main.getSession(response);
-        goog.dom.classes.add(oken, 'swing');
-        goog.dom.classes.remove(fbLogin, 'show');
+        brkn.Main.getSessionAndInit(response);
       } else {
         // not_authorized
-        brkn.Main.notAuthorized();
+        //brkn.Main.notAuthorized();
+        goog.dom.classes.remove(fbLogin, 'disabled');
       }
-    });
+    }, {scope: 'email'});
   });
 };
 
-brkn.Main.getSession = function(response) {
+
+brkn.Main.getSessionAndInit = function(response) {
+  var fbLogin = goog.dom.getElement('fb-login');
+  
   goog.net.XhrIo.send('/_session',
       function(e) {
-        var data = goog.json.parse(e.target.getResponse());
-        brkn.Main.init(response, data['token'], data['channels'], data['programs'],
-            data['current_user'], data['viewer_sessions']);
+        if (e.target.getStatus() == 200) {
+          var oken = goog.dom.getElement('oken');
+          goog.dom.classes.add(oken, 'swing');
+          goog.dom.classes.remove(fbLogin, 'show');
+
+          var data = e.target.getResponseJson();
+          brkn.Main.init(response, data['token'], data['channels'], data['programs'],
+              data['current_user'], data['viewer_sessions']);
+        } else {
+          brkn.Main.notAuthorized();
+        }
       }, 'POST');
 }
 
@@ -158,6 +178,4 @@ brkn.Main.notAuthorized = function() {
   goog.dom.setTextContent(fbLogin, 'We\'ll keep you posted');
 };
 
-goog.exportSymbol('brkn.Main.init', brkn.Main.init);
-goog.exportSymbol('brkn.Main.login', brkn.Main.login);
-goog.exportSymbol('brkn.Main.notAuthorized', brkn.Main.notAuthorized);
+goog.exportSymbol('brkn.Main.auth', brkn.Main.auth);

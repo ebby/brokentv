@@ -18,21 +18,21 @@ class Programming():
     self.collections = []
     
     for name, properties in inits.CHANNELS.iteritems():
-      channel = Channel.all().filter('name=', name).get()
+      channel = Channel.all().filter('name =', name).get()
       if not channel:
         channel = Channel(name=name, keywords=properties['keywords'])
         channel.put()
       self.channels[name] = channel
     
     for name, properties in inits.PUBLISHERS.iteritems():
-      publisher = Publisher.all().filter('name=', name).get()
+      publisher = Publisher.all().filter('name =', name).get()
       if not publisher:
         publisher = Publisher(name=name, host_id=properties['youtube'])
         publisher.put()
       self.publishers[publisher.name] = publisher
     
     for name, properties in inits.COLLECTIONS.iteritems():
-      collection = Collection.all().filter('name=', name).get()
+      collection = Collection.all().filter('name =', name).get()
       if not collection:
         collection = Collection(name=name, keywords=properties['keywords'])
         collection.put()
@@ -41,6 +41,8 @@ class Programming():
                                                      publisher=self.publishers[publisher])
           collection_publisher.put()
         for channel in properties['channels']:
+          logging.info(channel)
+          logging.info(self.channels[channel])
           collection_channel = CollectionChannel(collection=collection,
                                                    channel=self.channels[channel])
           collection_channel.put()
@@ -49,8 +51,6 @@ class Programming():
         for media in collection.get_medias(100):
           if (datetime.datetime.now() - media.published).days < 2:
             Program.add_program(channel, media)
-          else:
-            break
 
   @classmethod
   def add_youtube_feeds(cls):

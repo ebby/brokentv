@@ -1,0 +1,62 @@
+{namespace brkn.main}
+
+/**
+ * Tucked away here for security 
+ */
+{template .main}
+<div class="main">
+  <div id="stage" class="stage">
+    <div id="ytplayer">
+    </div>
+  </div>
+  <div id="guide" class="guide toggled">
+    <div id="channels" class="channels"></div>
+    <div class="header" id="header">
+      <div class="times">
+        <div id="ticker" class="ticker"></div>
+      </div>
+    </div>
+  </div>
+  <div id="controller" class="controller">
+    <div id="guide-toggle" class="guide-toggle dark button">Guide</div>
+    <div class="controls">
+      <div class="restart dark button"></div>
+      <div class="pause dark button"></div>
+      <div class="go-live dark button"></div>
+    </div>
+    <div id="sidebar-toggle" class="sidebar-toggle dark button"></div>
+  </div>
+  <div id="sidebar">
+    <div id="toolbar">
+      <div class="back">
+        <div class="back-button"><div>Back</div></div>
+        <div class="back-title"></div>
+      </div>
+      <ul class="tabs">
+        <li class="tab info selected">
+          <div class="label">Now Playing</div>
+        </li>
+        <li class="tab starred">
+          <div class="label">Starred</div>
+        </li>
+      </ul>
+      <div class="arrow"></div>
+    </div>
+    <div id="sidebar-content">
+      <div id="info" class="screen info"></div>
+      <div id="admin" class="screen admin"></div>
+      <div id="media-list" class="slide media-list"></div>
+      <div class="comment-input">
+        <div id="comment-controls" class="comment-controls">
+          <div class="comment-button" id="tweet-toggle">tweet</div>
+          <div class="comment-button" id="fb-toggle">post</div>
+          <div class="comment-button" id="add-comment">add</div>
+        </div>
+        <div class="input-holder">
+          <textarea id="comment-textarea" rows="1" placeholder="Add to the conversation..."></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{/template}

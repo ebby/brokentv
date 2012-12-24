@@ -75,6 +75,7 @@ div#guide {
     div.channel {
       border-bottom: 1px solid #ccc;
       position: relative;
+      background: #dedede;
       div.name {
         width: @name-width;
         text-align: center;
@@ -111,7 +112,7 @@ div#guide {
         width: 100%;
       }
       div.programs-container {
-        height: 40px;
+        height: 60px;
       }
       div.programs {
         display: inline-block;
@@ -123,6 +124,7 @@ div#guide {
         vertical-align: top;
         margin-bottom: 4px;
         margin-left: 10px;
+        margin-top: 6px;
         div.program {
           display: inline-block;
           position: absolute;
@@ -132,16 +134,15 @@ div#guide {
 					vertical-align: middle;
 					height: 100%;
 					color: #999;
-					box-shadow: inset -2px -2px 2px 0px white;
 					text-shadow: 1px 1px 1px white;
 					z-index: 1;
+					border-radius: 3px;
+					box-shadow: inset 0px 0px 1px 1px rgba(0, 0, 0, .3);
+          border: 1px solid whiteSmoke;
 					.transition(all, .3s, ease);
 					&.clipped:hover {
-					  z-index: 50;
+					  z-index: 3;
 					  width: 200px !important;
-					  background: rgba(255, 255, 255, .95);
-					  box-shadow: 3px -1px 4px -3px rgba(0, 0, 0, 0.3);
-					  padding-right: 3px;
 					}
 					&:hover img {
 					 -webkit-transition: opacity .6s ease, top 4s ease-out, left 4s ease-out;
@@ -149,7 +150,7 @@ div#guide {
                 -o-transition: opacity .6s ease, top 4s ease-out, left 4s ease-out;
                -ms-transition: opacity .6s ease, top 4s ease-out, left 4s ease-out;
                    transition: opacity .6s ease, top 4s ease-out, left 4s ease-out;
-            -webkit-filter: none;
+            -webkit-filter: none !important;
             opacity: 1;
           }
           &:hover img.pan-left {
@@ -158,35 +159,50 @@ div#guide {
           &:hover img.pan-top {
             top: 100%
           }
+          &:hover div.title {
+            display: block !important;
+          }
 					&:last-child {
 					  border-right: 1px solid #CCC;
 					}
 					div.info {
 					  display: inline-block;
+					  width: 100%;
+					  /*box-shadow: inset 0px 15px 30px -1px rgba(0, 0, 0, .9);*/
 					}
 					img {
 					  width: 100%;
 					  height: auto;
 					  position: absolute;
-						opacity: .8;
+						opacity: .2;
 						top: 50%;
 						left: 50%;
 						margin-top: -20px;
 						z-index: -10;
-						-webkit-filter: blur(1px);
+						-webkit-filter: blur(1px) grayscale();
 						&.fix-height {
-						  height: 100%;
+						  height: 140%;
               width: auto;
 						}
 					}
 					div.title {
 					  left: 5px;
 						top: 5px;
-						color: #f5f5f5;
-						text-shadow: 1px 1px 1px #181818;
+            color: #5d5d5d;
+            text-shadow: 1px 1px 1px white;
 						height: 40px;
-						font-size: 13px;
+						font-size: 14px;
 						position: absolute;
+						white-space: nowrap;
+						overflow: hidden;
+						margin-right: 25px;
+						&.marquee {
+						  .transition(margin-left, 10s, linear);
+						}
+					}
+					&:hover div.title {
+					  color: #f5f5f5;
+            text-shadow: 0px 0px 4px black;
 					}
 	        &.current {
 	          background: rgba(255, 255, 255, .3);
@@ -201,6 +217,15 @@ div#guide {
 	          height: 10px;
 	          font-size: 12px;
 	        }
+	        div.border {
+	          position: absolute;
+	          width: 98%;
+	          height: 98%;
+	          left: -1%;
+	          top: -1%;
+	          border-radius: 16px;
+	          border: 8px solid #f5f5f5;
+	        }
         }
       }
       div.graph {
@@ -209,6 +234,7 @@ div#guide {
 	      position: relative;
 	      pointer-events: none;
 	      z-index: 1;
+	      margin-bottom: 1px;
 	      svg {
 	        top: 5px;
 	      }
@@ -217,6 +243,7 @@ div#guide {
 	      width: 100%;
 	      position: absolute;
 	      bottom: 10px;
+	      z-index: 1;
 	      -webkit-transition: height .3s;
 			     -moz-transition: height .3s;
 			          transition: height .3s;
@@ -237,18 +264,18 @@ div#guide {
 	          &::before {
 		          content: '';
 		          position: absolute;
-		          right: -10px;
+		          right: -7px;
 		          top: -5px;
 		          width: 13px;
 		          height: 13px;
 		          border-radius: 10px;
-		          background: #ccc;
+		          background: inherit;
 		          box-shadow: 0px 1px 1px 0px rgba(255, 255, 255, .6);
 		        }
 		        &::after {
 		          content: '';
 		          position: absolute;
-		          right: -6px;
+		          right: -3px;
 		          top: -1px;
 		          width: 5px;
 		          height: 5px;
@@ -256,7 +283,7 @@ div#guide {
 		          background: white;
 		        }
 		        div.pic {
-		          background: #ccc;
+		          background: inherit;
 							width: 25px;
 							height: 25px;
 							border-radius: 10px;
@@ -287,5 +314,11 @@ div#guide {
       border-top: 1px solid white;
       border-bottom: 1px solid white;
     }
+  }
+  .current div.program, div.program:hover {
+    opacity: 1 !important;
+  }
+  .current div.program img {
+    -webkit-filter: blur(1px) !important;
   }
 }

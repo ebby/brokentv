@@ -17,7 +17,7 @@ class UserSession(db.Model):
 
   @classmethod
   def get_by_user(cls, user):
-    return UserSession.all().filter('user =', user).order('tune_in').fetch(5)
+    return UserSession.all().filter('user =', user).order('-tune_in').fetch(5)
 
   def toJson(self):
     json = {}
