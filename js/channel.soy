@@ -11,7 +11,7 @@
  	  <div class="graph"></div>
 		<div class="viewers"></div>
 		<div class="name">
-	    <span>{$name}</span>
+	    <div class="text">{$name}</div>
 	  	<div class="suggest-program">
 	    	<div class="add-program button dark">+</div>
 	    </div>
@@ -26,6 +26,7 @@
 {template .program}
   <div class="info">
 	  <img class="thumb" src="{$program.media.thumbnail}" style="display: none">
+	  <div class="progress"></div>
 	  <div class="title">{$program.media.name}</div>
 	  {if $admin}
 	    <div class="remove"></div>

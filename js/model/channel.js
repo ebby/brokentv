@@ -75,6 +75,14 @@ brkn.model.Channel.prototype.addProgram = function(program) {
 
 
 /**
+ * @param {string} id
+ */
+brkn.model.Channel.prototype.getProgram = function(id) {
+  return this.programMap_[id];
+};
+
+
+/**
  * @param {brkn.model.Session} session The session
  */
 brkn.model.Channel.prototype.addViewer = function(session) {

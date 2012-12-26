@@ -30,6 +30,13 @@ brkn.Controller = function() {
   this.sidebarToggle_ = new goog.ui.CustomButton('Sidebar');
   this.sidebarToggle_.setSupportedState(goog.ui.Component.State.CHECKED,
       true);
+  
+  /**
+   * @type {goog.ui.CustomButton}
+   */
+  this.adminToggle_ = new goog.ui.CustomButton('Admin');
+  this.adminToggle_.setSupportedState(goog.ui.Component.State.CHECKED,
+      true);
 };
 goog.inherits(brkn.Controller, goog.ui.Component);
 
@@ -48,6 +55,11 @@ brkn.Controller.prototype.enterDocument = function() {
 	
 	this.addChild(this.sidebarToggle_);
   this.sidebarToggle_.decorate(goog.dom.getElement('sidebar-toggle'));
+  
+  this.addChild(this.adminToggle_);
+  this.adminToggle_.decorate(goog.dom.getElement('admin-toggle'));
+  goog.style.showElement(this.adminToggle_.getElement(),
+      brkn.model.Users.getInstance().currentUser.accessLevel == brkn.model.User.AccessLevel.ADMIN);
 
   this.getHandler()
       .listen(window, 'resize', goog.bind(this.resize, this))
@@ -62,7 +74,22 @@ brkn.Controller.prototype.enterDocument = function() {
   	            brkn.model.Controller.Actions.TOGGLE_SIDEBAR,
   	            this.sidebarToggle_.isChecked());
   	        this.resize();
-  	      }, this));
+  	      }, this))
+  	  .listen(this.adminToggle_,
+          goog.ui.Component.EventType.ACTION,
+          goog.bind(function(e) {
+            e.stopPropagation();
+            brkn.model.Controller.getInstance().publish(
+                brkn.model.Controller.Actions.TOGGLE_ADMIN,
+                this.adminToggle_.isChecked());
+            this.resize();
+          }, this));
+  
+  brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_SIDEBAR,
+      function(show) {
+        this.sidebarToggle_.setChecked(show);
+        this.resize();
+      }, this);
   
   this.resize();
 };

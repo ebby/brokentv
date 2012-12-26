@@ -3,6 +3,7 @@ goog.provide('brkn.sidebar.Info');
 goog.require('soy');
 goog.require('brkn.model.Comment');
 goog.require('brkn.sidebar');
+goog.require('brkn.sidebar.CommentInput');
 
 goog.require('goog.events.KeyHandler.EventType');
 goog.require('goog.fx.dom.Scroll');
@@ -21,12 +22,27 @@ goog.require('goog.ui.Textarea.EventType');
  */
 brkn.sidebar.Info = function(media) {
   goog.base(this);
-  
+
+  this.setModel(media);
+
   /**
    * @type {brkn.model.Media}
    * @private
    */
   this.media_ = media;
+
+  /**
+   * @type {brkn.sidebar.CommentInput}
+   * @private
+   */
+  this.commentInput_ = new brkn.sidebar.CommentInput();
+  
+  /**
+   * @type {goog.ui.CustomButton}
+   */
+  this.starToggle_ = new goog.ui.CustomButton('Star');
+  this.starToggle_.setSupportedState(goog.ui.Component.State.CHECKED,
+      true);
 };
 goog.inherits(brkn.sidebar.Info, goog.ui.Component);
 
@@ -66,33 +82,25 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
   
   var viewersEl = goog.dom.getElementByClass('viewers', this.getElement());
   this.commentsEl_ = goog.dom.getElementByClass('comments', this.getElement());
+  this.commentInput_.render(this.getElement());
+  this.starToggle_.decorate(goog.dom.getElementByClass('star', this.getElement()));
 
-  goog.net.XhrIo.send(
-      '/_seen',
-      goog.bind(function() {
-        
-        goog.net.XhrIo.send('/_seen/' + this.media_.id, goog.bind(function(e) {
-          var seen = /** @type {Array.<Object>} */ goog.json.parse(e.target.getResponse());
-          goog.style.showElement(viewersEl, seen.length);
-          goog.array.forEach(seen, function(viewer) {
-            var viewerEl = soy.renderAsElement(brkn.sidebar.viewer, {
-              user: brkn.model.Users.getInstance().get_or_add(viewer)
-            })
-            goog.dom.appendChild(viewersEl, viewerEl);
-          }, this);
-          this.resize();
-          
-        }, this));
-        
-        
-        
-      }, this),
-      'POST',
-      'id=' + this.media_.id);
+  goog.net.XhrIo.send('/_seen/' + this.media_.id, goog.bind(function(e) {
+    var seen = /** @type {Array.<Object>} */ goog.json.parse(e.target.getResponse());
+    goog.style.showElement(viewersEl, seen.length);
+    goog.array.forEach(seen, function(viewer) {
+      var viewerEl = soy.renderAsElement(brkn.sidebar.viewer, {
+        user: brkn.model.Users.getInstance().get_or_add(viewer)
+      })
+      goog.dom.appendChild(viewersEl, viewerEl);
+    }, this);
+    this.resize();
+    
+  }, this));
 
   goog.net.XhrIo.send('/_comment/' + this.media_.id, goog.bind(function(e) {
       var comments = /** @type {Array.<Object>} */ goog.json.parse(e.target.getResponse());
-      goog.style.showElement(this.commentsEl_, comments.length);
+      goog.style.showElement(goog.dom.getParentElement(this.commentsEl_), comments.length);
       goog.array.forEach(comments, function(comment) {
         var c = new brkn.model.Comment(comment);
         this.addComment_(c);
@@ -117,6 +125,41 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
                   brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.MEDIA_LIST,
                       medias, this.media_.publisher.name);
                 }, this));
+          }, this))
+      .listen(this.starToggle_, goog.ui.Component.EventType.ACTION, goog.bind(function() {
+            goog.net.XhrIo.send('/_star', undefined, 'POST', 'media_id=' + this.media_.id +
+                (!this.starToggle_.isChecked() ? '&delete=1' : ''));
+            //this.starToggle_.setChecked(true);
+          }, this))
+      .listen(this.commentInput_,
+          'add',
+          goog.bind(function(e) {
+            goog.net.XhrIo.send(
+                '/_comment',
+                e.callback,
+                'POST',
+                'media_id=' + this.media_.id + '&text=' + e.text);
+          }, this))
+      .listen(this.commentInput_,
+          goog.events.EventType.FOCUS,
+          goog.bind(function(e) {
+            this.resize(brkn.sidebar.CommentInput.COMMENT_CONTROLS_HEIGHT);
+          }, this))
+      .listen(this.commentInput_,
+          'resize',
+          goog.bind(function(e) {
+            this.resize(brkn.sidebar.CommentInput.COMMENT_CONTROLS_HEIGHT +
+                (e.target.height_ - brkn.sidebar.CommentInput.INPUT_HEIGHT))
+          }, this))
+      .listen(window,
+          goog.events.EventType.CLICK,
+          goog.bind(function(e) {
+            if (!goog.dom.getAncestorByClass(e.target, 'comment-input') &&
+                !this.commentInput_.getValue()) {
+              this.commentInput_.setFocused(false);
+              this.commentInput_.collapse();
+              this.resize();
+            }
           }, this));
       
 };
@@ -131,10 +174,11 @@ brkn.sidebar.Info.prototype.addComment_ = function(comment) {
     comment: comment
   });
   goog.dom.appendChild(this.commentsEl_, commentEl);
-  this.resize(goog.dom.classes.has(goog.dom.getElement('comment-textarea'), 'focused')
+  this.resize(this.commentInput_.isFocused()
       ? brkn.sidebar.CommentInput.COMMENT_CONTROLS_HEIGHT : 0);
-  goog.style.showElement(this.commentsEl_, true);
+  goog.style.showElement(goog.dom.getParentElement(this.commentsEl_), true);
 };
+
 
 /**
  * @param {?number=} opt_extra Extra space to subtract
@@ -143,7 +187,7 @@ brkn.sidebar.Info.prototype.resize = function(opt_extra) {
   var extra = opt_extra || 0;
   if (this.commentsEl_) {
     goog.style.setHeight(this.commentsEl_, goog.dom.getViewportSize().height -
-        goog.style.getPosition(this.commentsEl_.parentElement).y - 120 - extra);
+        goog.style.getPosition(this.commentsEl_.parentElement).y - 100 - extra);
   }
 
   // Give the comment div a second/2 to resize, then scroll to bottom.

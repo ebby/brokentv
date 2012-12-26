@@ -23,6 +23,12 @@ class Privacy:
   PUBLIC = 1
   FRIENDS = 2
 
+class ActivityType:
+  COMMENT = 'comment'
+  SESSION = 'session'
+  STARRED = 'starred'
+  WATCHED = 'watched' # Streamed media by selection
+
 class MediaType:
   VIDEO = 0
   PICTURE = 1

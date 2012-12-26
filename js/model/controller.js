@@ -23,5 +23,6 @@ brkn.model.Controller.Actions = {
 	PLAY: 'play',
 	FINISHED: 'finished',
 	TOGGLE_GUIDE: 'toggle-guide',
-	TOGGLE_SIDEBAR: 'toggle-sidebar'
+	TOGGLE_SIDEBAR: 'toggle-sidebar',
+	TOGGLE_ADMIN: 'toggle-admin'
 };

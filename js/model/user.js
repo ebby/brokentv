@@ -15,26 +15,51 @@ brkn.model.User = function(user) {
 
 	/**
 	 * @type {number}
-	 * @private
 	 */
 	this.id = user.id;
 	
 	/**
 	 * @type {string}
-	 * @private
 	 */
 	this.name = user.name;
 	
 	/**
    * @type {brkn.model.Session}
-   * @private
    */
   this.currentSession;
 	
 	/**
 	 * @type {string}
-	 * @private
 	 */
 	this.picture = goog.string.subs('https://graph.facebook.com/%s/picture', this.id);
+	
+	/**
+	 * Path color
+	 * @type {string}
+	 */
+	this.color = Raphael.getColor();
+	
+	/**
+   * @type {number}
+   */
+  this.accessLevel = user['access_level'];	
 };
 goog.inherits(brkn.model.User, goog.pubsub.PubSub);
+
+
+/**
+ * @return {boolean}
+ */
+brkn.model.User.prototype.isAdmin = function() {
+  return this.accessLevel == brkn.model.User.AccessLevel.ADMIN;
+};
+
+
+/**
+ * @enum {number}
+ */
+brkn.model.User.AccessLevel = {
+  WAITLIST: 0,
+  USER: 1,
+  ADMIN: 2
+};

@@ -1,5 +1,6 @@
 from common import *
 
+from user import User
 from media import Media
 from publisher import Publisher
 from channel import Channel
@@ -9,20 +10,26 @@ class Collection(db.Model):
   name = db.StringProperty()
   keywords = db.StringListProperty(default=[])
   hashtags = db.StringListProperty(default=[])
+  owner = db.ReferenceProperty(User)
   # Add related links
   
   def fetch(self):
     publishers = self.get_publishers()
     medias = []
-    logging.info(len(publishers))
     for publisher in publishers:
-      logging.info(publisher.name)
       publisher_medias = publisher.get_media_by_category(self.keywords[0])
       for media in publisher_medias:
         CollectionMedia.add(self, media)
         medias.append(media)
     return medias
     
+  def add_media(self, media):
+    CollectionMedia.add(self, media)
+    
+  def remove_media(self, media):
+    col_media = CollectionMedia.all().filter('media =', media).get()
+    if col_media:
+      col_media.delete()
     
   def get_publishers(self):
     return CollectionPublisher.get_publishers(self)
@@ -70,6 +77,7 @@ class CollectionMedia(db.Model):
     if not collection_media:
       collection_media = CollectionMedia(collection=collection, media=media, published=media.published)
       collection_media.put()
+    logging.info(collection_media)
     return collection_media
 
 # Channels that may play from this collection

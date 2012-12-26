@@ -21,5 +21,7 @@ goog.addSingletonGetter(brkn.model.Sidebar);
  */
 brkn.model.Sidebar.Actions = {
   NAVIGATE: 'navigate',
-  MEDIA_LIST: 'media-list'
+  MEDIA_INFO: 'media-info',
+  MEDIA_LIST: 'media-list',
+  PROFILE: 'profile'
 };

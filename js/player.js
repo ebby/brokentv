@@ -58,7 +58,7 @@ brkn.Player.prototype.enterDocument = function() {
   this.getHandler()
       .listen(window, 'resize', this.resize);
   
-  brkn.model.Channels.getInstance().subscribe(brkn.model.Channels.Action.CHANGE_CHANNEL,
+  brkn.model.Channels.getInstance().subscribe(brkn.model.Channels.Actions.CHANGE_CHANNEL,
 			this.changeChannel, this);
   brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_SIDEBAR,
       function(show) {
@@ -103,13 +103,15 @@ brkn.Player.prototype.changeChannel = function(channel) {
  */
 brkn.Player.prototype.playerStateChange_ = function(event) {
 	if (event.data == YT.PlayerState.ENDED) {
-//	  goog.net.XhrIo.send(
-//	      '/_seen',
-//	      goog.functions.NULL(),
-//	      'POST',
-//	      'id=' + this.currentProgram_.media.id);
+	  goog.net.XhrIo.send(
+	      '/_seen',
+	      goog.functions.NULL(),
+	      'POST',
+	      'media_id=' + this.currentProgram_.media.id +
+	      '&session_id=' + brkn.model.Users.getInstance().currentUser.currentSession.id);
 		var nextProgram = brkn.model.Channels.getInstance().currentChannel.getNextProgram();
 		if (nextProgram) {
+		  brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.NEXT_PROGRAM, nextProgram);
 			this.player_.loadVideoById(nextProgram.media.hostId);
 		}
 	}

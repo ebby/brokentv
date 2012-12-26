@@ -48,9 +48,9 @@ class Programming():
           collection_channel.put()
       collection.fetch()
       for channel in collection.get_channels():
-        for media in collection.get_medias(100):
-          if (datetime.datetime.now() - media.published).days < 2:
-            Program.add_program(channel, media)
+        for media in collection.get_medias(25):
+          #if (datetime.datetime.now() - media.published).days < 100:
+          Program.add_program(channel, media)
 
   @classmethod
   def add_youtube_feeds(cls):
@@ -71,7 +71,7 @@ class Programming():
     for c in channels:
       c.programming = []
       c.put()
-    for model in ['PublisherMedia','CollectionMedia','Program', 'Media']:
+    for model in ['Program', 'ChannelProgram']:
       try:
         while True:
           q = db.GqlQuery("SELECT __key__ FROM " + model)

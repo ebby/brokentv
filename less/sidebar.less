@@ -11,11 +11,24 @@ div#sidebar {
       0 0 0 1px #181818;
   overflow: hidden;
   color: #ccc;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
   -webkit-transition: right .5s ease;
      -moz-transition: right .5s ease;
           transition: right .5s ease;
   &.toggled {
     right: 0px;
+  }
+  @import "stream.less";
+  @import "info.less";
+  @import "admin.less";
+  
+  &.admin {
+    div.admin {
+      display: block !important;
+    }
+    li.tab.admin {
+      display: table-cell !important;
+    }
   }
   div#toolbar {
     width: 100%;
@@ -36,7 +49,7 @@ div#sidebar {
       div.back {
         display: block;
         div.back-title {
-          width: 100%;
+          width: 140px;
           opacity: 1;
         }
         div.back-button {
@@ -59,6 +72,9 @@ div#sidebar {
         font-size: 15px;
         color: #7d7d7d;
         text-shadow: 1px 1px 1px white;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
         .transition(all, .3s, ease);
       }
       div.back-button {
@@ -70,6 +86,7 @@ div#sidebar {
         top: 6px;
         border: 1px solid #ccc;
         border-radius: 3px;
+        cursor: pointer;
         .transition(all, .3s, ease);
         &:after, &:before {
           right: 100%;
@@ -83,16 +100,16 @@ div#sidebar {
         &:after {
           border-color: rgba(245, 245, 245, 0);
           border-right-color: #f5f5f5;
-          border-width: 13px;
+          border-width: 12px;
           top: 50%;
-          margin-top: -14px;
+          margin-top: -12px;
         }
         &:before {
           border-color: rgba(204, 204, 204, 0);
           border-right-color: #ccc;
           border-width: 14px;
           top: 50%;
-          margin-top: -15px;
+          margin-top: -14px;
         }
         div {
           font-size: 12px;
@@ -119,7 +136,9 @@ div#sidebar {
         display: table-cell;
         vertical-align: middle;
         cursor: pointer;
-        
+        &.admin {
+          display: none;
+        }
         &:last-child {
           border-right: none;
         }
@@ -165,11 +184,16 @@ div#sidebar {
     }
   }
   div#sidebar-content {
-    position: relative;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
     div.screen {
       position: absolute;
       width: 100%;
-      top: 0;
+      height: 100%;
+      top: 45px;
       right: -300px;
       overflow: hidden;
       .transition(all, .3s, ease);
@@ -177,7 +201,8 @@ div#sidebar {
     div.slide {
       position: absolute;
       width: 0;
-      top: 0;
+      height: 100%;
+      top: 35px;
       overflow: hidden;
       .transition(all, .3s, ease);
     }
@@ -185,220 +210,9 @@ div#sidebar {
       width: 100% !important;
       right: 0 !important;
     }
-    div.info {
-      margin-top: 5px;
-      div.publisher {
-        position: relative;
-        left: 10px;
-        top: 10px;
-        div.name {
-          a {
-            color: #f5f5f5;
-          }
-          font-size: 12px;
-        }
-      }
-      img.thumb {
-        height: 70px;
-        border-radius: 3px;
-        position: absolute;
-        box-shadow: 0 0 3px 0 rgba(0, 0, 0, .5);
-        border: 1px solid #f5f5f5;
-        left: 10px;
-        top: 30px;
-      }
-      div.label {
-        font-size: 11px;
-        color: #f5f5f5;
-        margin-bottom: 7px;
-      }
-      div.title {
-        position: relative;
-        left: 110px;
-        top: 30px;
-        padding-right: 10px;
-        color: whiteSmoke;
-        text-shadow: 1px 1px 1px #181818;
-        font-size: 13px;
-        height: 100px;
-        width: 180px;
-      }
-      div.description {
-        width: 280px;
-        font-size: 10px;
-        height: 38px;
-        overflow: hidden;
-        position: relative;
-        left: 5px;
-        margin-right: 5px;
-        padding: 0 5px;
-        border-bottom: 1px solid rgba(0, 0, 0, .3);
-      }
-      div.viewers {
-        position: relative;
-        top: 10px;
-        left: 9px;
-        padding-right: 9px;
-        width: 280px;
-        div.viewer {
-          background: #ccc;
-          width: 25px;
-          height: 24px;
-          border-radius: 10px;
-          box-shadow: 0px 1px 1px 0px rgba(255, 255, 255, .6);
-          display: inline-block;
-          margin-left: 9px;
-          img {
-            width: 21px;
-            height: 20px;
-            margin-left: 2px;
-            margin-top: 2px;
-            border-radius: 10px;
-          }
-        }
-      }
-      div.tweets {
-        position: relative;
-        top: 20px;
-        margin-right: 20px;
-        width: 280px;
-        left: 10px;
-        div.tweet {
-          position: relative;
-          width: 99%;
-          border-radius: 3px;
-          background: rgba(255, 255, 255, 0.2);
-          border: 1px solid #888;
-          padding-bottom: 20px;
-          overflow: hidden;
-          img {
-            width: 28px;
-            height: 28px;
-            left: 4px;
-            top: 4px;
-            position: absolute;
-          }
-          div.text {
-            a {
-              color: #f5f5f5;
-            }
-            position: relative;
-            left: 37px;
-            top: 3px;
-            font-size: 13px;
-            width: 240px;
-          }
-          div.timestamp {
-            position: absolute;
-            bottom: 3px;
-            right: 5px;
-            font-size: 10px;
-            color: #bbb;
-          }
-        }
-      }
-      div.comments-holder {
-        position: relative;
-        top: 35px;
-        left: 10px;
-        margin-right: 20px;
-        width: 280px;
-        div.comments {
-          overflow-x: scroll;
-          -webkit-transition: height .5s ease;
-             -moz-transition: height .5s ease;
-                  transition: height .5s ease;
-        }
-        div.comment {
-          position: relative;
-          width: 99%;
-          border-radius: 3px;
-          background: rgba(255, 255, 255, 0.2);
-          border: 1px solid #888;
-          padding-bottom: 20px;
-          overflow: hidden;
-          margin-bottom: 5px;
-          img {
-            width: 28px;
-            height: 28px;
-            left: 4px;
-            top: 4px;
-            position: absolute;
-          }
-          div.text {
-            a {
-              color: #f5f5f5;
-            }
-            position: relative;
-            left: 37px;
-            top: 3px;
-            font-size: 13px;
-            width: 240px;
-          }
-          div.timestamp {
-            position: absolute;
-            bottom: 3px;
-            right: 5px;
-            font-size: 10px;
-            color: #bbb;
-          }
-        }
-      }
-    }
-    div.admin {
-      div.search {
-        background: #f5f5f5;
-        width: 100%;
-        height: 100%;
-        input[type=text] {
-          height: auto;
-          border-radius: 3px;
-          width: 280px;
-          font-size: 13px;
-          min-height: 16px;
-          outline: none;
-          border: 1px solid #CCC;
-          resize: none;
-          margin-left: 10px;
-          margin-top: 7px;
-          margin-bottom: 5px;
-        }
-      }
-      div.label {
-        font-size: 11px;
-        color: #f5f5f5;
-        margin-bottom: 7px;
-      }
-      div.section {
-        position: relative;
-        margin: 10px;
-      } 
-      div.collections {
-        div.collection {
-          position: relative;
-          width: 99%;
-          border-radius: 3px;
-          background: -webkit-gradient(linear, 0% 0%, 0% 100%,
-              from(rgba(153, 153, 153, 0.9)), to(rgba(99, 99, 99, 0.9)));
-          border: 1px solid #888;
-          padding-bottom: 20px;
-          overflow: hidden;
-          margin-bottom: 5px;
-          font-size: 13px;
-          div.title {
-            position: relative;
-            left: 5px;
-            top: 5px;
-            font-size: 13px;
-            width: 240px;
-          }
-        }
-      }
-    }
-    div#media-list {
+    div.media-list {
       overflow-y: scroll;
-      padding: 10px 0;
-
+      padding: 15px 0;
       div.media {
         position: relative;
         width: 280px;
@@ -448,12 +262,12 @@ div#sidebar {
     opacity: 0;
     width: 100%;
     min-height: 31px;
-    position: fixed;
-    bottom: 0;
+    position: absolute;
+    bottom: 54px;
     border-top: 2px solid #ccc;
     box-shadow: 0 -2px 3px 1px rgba(0, 0, 0, 0.4), inset 4px -2px 6px -3px rgba(0, 0, 0, 0.7),
         0 0 0 1px #181818;
-    .transition(all, .1s, ease);
+    .transition(all, .5s, ease);
     div.comment-controls {
       width: 100%;
       height: 24px;
@@ -525,7 +339,10 @@ div#sidebar {
       }
     }
   }
-  div.info.current ~ div.comment-input {
+  div.slide div.comment-input {
+      bottom: 44px;
+    }
+  div.info.current div.comment-input {
     visibility: visible;
     opacity: 1;
   }

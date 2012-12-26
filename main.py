@@ -44,7 +44,7 @@ jinja_environment = jinja2.Environment(
 
 
 class MainHandler(BaseHandler):
-    def get(self, id=None):
+    def get(self):
       template_data = {}
       template_data['js_location'] = constants.JS_SOURCE
       if not constants.DEVELOPMENT:
@@ -53,6 +53,7 @@ class MainHandler(BaseHandler):
       template_data['facebook_app_id'] = constants.FACEBOOK_APP_ID;
       path = os.path.join(os.path.dirname(__file__), 'templates/home.html')
       self.response.out.write(template.render(path, template_data))
+
 
 def get_session(current_user):
   data = {}
@@ -125,14 +126,7 @@ class CommentHandler(BaseHandler):
       media = Media.get_by_key_name(self.request.get('media_id'))
       text = self.request.get('text')
       if media and text:
-        c = Comment(media=media,
-                    user=self.current_user,
-                    text=text)
-
-        parent_id = self.request.get('parent_id')
-        if parent_id:
-          c.parent = Comment.get_by_id(int(parent_id))
-        c.put()
+        c = Comment.add(media, self.current_user, text, self.request.get('parent_id'))
         broadcastNewComment(c);
       
 class SeenHandler(BaseHandler):
@@ -140,10 +134,21 @@ class SeenHandler(BaseHandler):
       media = Media.get_by_key_name(id)
       self.response.out.write(simplejson.dumps(media.seen_by()))
     def post(self):
-      media = Media.get_by_key_name(self.request.get('id'))
-      media.seen_by(self.current_user)
-      self.response.out.write('')
-
+      media = Media.get_by_key_name(self.request.get('media_id'))
+      session = UserSession.get_by_id(int(self.request.get('session_id')))
+      if session and media:
+        session.add_media(media)
+      if media:
+       media.seen_by(self.current_user)
+       
+class ActivityHandler(BaseHandler):
+    def get(self, uid=None):
+      user = self.current_user
+      if uid:
+        user = user.get_by_key_name(uid)
+      activities = UserActivity.get_for_user(user)
+      return self.response.out.write(simplejson.dumps([a.toJson() for a in activities]))
+      
 class ChangeChannelHandler(BaseHandler):
     def post(self):
       channel_id = self.request.get('channel')
@@ -164,22 +169,16 @@ class ChangeChannelHandler(BaseHandler):
             session.channel = channel
             session.put()
         else:
-          user_sessions[0].tune_out = datetime.datetime.now()
-          user_sessions[0].put()
+          user_sessions[0].end_session()
           session = UserSession.new(self.current_user, channel)
 
       broadcastViewerChange(self.current_user, last_channel_id, channel_id, session.tune_in.isoformat());
-      
-#--------------------------------------
-# ADMIN HANDLERS
-#--------------------------------------
 
 class CollectionsHandler(BaseHandler):
   def get(self, channel_id=None):
     channel = Channel.get_by_id(int(channel_id))
     collections = CollectionChannel.get_collections(channel)
     self.response.out.write(simplejson.dumps([c.toJson() for c in collections]))
-
 
 class CollectionsMediaHandler(BaseHandler):
   def get(self, col_id=None):
@@ -190,6 +189,26 @@ class PublisherMediaHandler(BaseHandler):
   def get(self, pub_id=None):
     pub = Publisher.get_by_id(int(pub_id))
     self.response.out.write(simplejson.dumps([m.toJson() for m in pub.get_medias(20)]))
+
+class StarHandler(BaseHandler):
+  def get(self, uid=None):
+    if not uid:
+      uid = self.current_user.id
+    col = Collection.get_by_key_name(uid)
+    self.response.out.write(simplejson.dumps([m.toJson() for m in col.get_medias(20)]))
+  def post(self):
+    media = Media.get_by_key_name(self.request.get('media_id'))
+    collection = Collection.get_or_insert(self.current_user.id, user=self.current_user, name='Starred')
+    if self.request.get('delete'):
+      collection.remove_media(media)
+    else:
+      collection.add_media(media)
+      UserActivity.add_starred(self.current_user, media)
+    # Broadcast?
+
+#--------------------------------------
+# ADMIN HANDLERS
+#--------------------------------------
 
 class AdminAddProgramHandler(BaseHandler):
     def post(self):
@@ -231,8 +250,7 @@ class WebChannelDisconnectedHandler(BaseHandler):
       # End the user session
       user_sessions = UserSession.get_by_user(user)
       if len(user_sessions) and not user_sessions[0].tune_out:
-        user_sessions[0].tune_out = datetime.datetime.now()
-        user_sessions[0].put()
+        user_sessions[0].end_session()
 
       del current_viewers[clientId]
       memcache.set('current_viewers', simplejson.dumps(current_viewers))
@@ -279,12 +297,16 @@ app = webapp2.WSGIApplication([
     ('/_ah/channel/disconnected/', WebChannelDisconnectedHandler),
     # RPCs
     ('/_addprogram', ProgramHandler),
+    ('/_activity', ActivityHandler),
+    ('/_activity/(.*)', ActivityHandler),
     ('/_changechannel', ChangeChannelHandler),
     ('/_comment', CommentHandler),
     ('/_comment/(.*)', CommentHandler),
     ('/_seen', SeenHandler),
     ('/_seen/(.*)', SeenHandler),
     ('/_session', SessionHandler),
+    ('/_star', StarHandler),
+    ('/_star/(.*)', StarHandler),
 
     # Admin
     ('/admin/_collections/(.*)', CollectionsHandler),

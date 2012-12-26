@@ -169,14 +169,19 @@ div#guide div.channels div.channel div.name {
   top: 0;
   left: 0;
   vertical-align: top;
-  background: rgba(0, 0, 0, 0.8);
+  background: black;
+  opacity: .8;
   margin-right: 1px solid #888;
   box-shadow: 1px 0 3px rgba(0, 0, 0, 0.8);
   z-index: 1;
 }
-div#guide div.channels div.channel div.name span {
+div#guide div.channels div.channel div.name div.text {
   position: relative;
-  top: 20px;
+  top: 50%;
+  line-height: 0;
+  color: whiteSmoke;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
+  font-size: 15px;
 }
 div#guide div.channels div.channel div.name div.suggest-program {
   padding: 5px 0;
@@ -189,6 +194,7 @@ div#guide div.channels div.channel div.add-program {
   display: inline-block;
   width: 25px;
   font-size: 16px;
+  display: none;
 }
 div#guide div.channels div.channel div.programming {
   display: inline-block;
@@ -274,7 +280,7 @@ div#guide div.channels div.channel div.programs div.program img {
   -webkit-filter: blur(1px) grayscale();
 }
 div#guide div.channels div.channel div.programs div.program img.fix-height {
-  height: 140%;
+  height: 150%;
   width: auto;
 }
 div#guide div.channels div.channel div.programs div.program div.title {
@@ -361,7 +367,7 @@ div#guide div.channels div.channel div.viewers div.viewer div.line {
 div#guide div.channels div.channel div.viewers div.viewer div.line::before {
   content: '';
   position: absolute;
-  right: -7px;
+  left: -7px;
   top: -5px;
   width: 13px;
   height: 13px;
@@ -372,7 +378,7 @@ div#guide div.channels div.channel div.viewers div.viewer div.line::before {
 div#guide div.channels div.channel div.viewers div.viewer div.line::after {
   content: '';
   position: absolute;
-  right: -3px;
+  left: -3px;
   top: -1px;
   width: 5px;
   height: 5px;
@@ -384,7 +390,7 @@ div#guide div.channels div.channel div.viewers div.viewer div.line div.pic {
   width: 25px;
   height: 25px;
   border-radius: 10px;
-  left: -5px;
+  right: -12px;
   top: -10px;
   box-shadow: 0px 1px 1px 0px rgba(255, 255, 255, 0.6);
   position: absolute;
@@ -402,10 +408,9 @@ div#guide div.channels div.channel div.viewers div.viewer div.username {
   top: 3px;
 }
 div#guide div.channels .current div.name {
-  background: rgba(218, 218, 218, 0.9) !important;
-  color: #181818;
-  border-top: 1px solid white;
-  border-bottom: 1px solid white;
+  background: #181818 !important;
+  box-shadow: 1px 0 3px rgba(0, 0, 0, 0.8), -3px 0px 3px 3px rgba(105, 105, 105, 0.8) !important;
+  z-index: 2 !important;
 }
 div#guide .current div.program,
 div#guide div.program:hover {
@@ -612,7 +617,7 @@ div#sidebar div#toolbar.back div.back {
   display: block;
 }
 div#sidebar div#toolbar.back div.back div.back-title {
-  width: 100%;
+  width: 140px;
   opacity: 1;
 }
 div#sidebar div#toolbar.back div.back div.back-button {
@@ -634,6 +639,9 @@ div#sidebar div#toolbar div.back div.back-title {
   font-size: 15px;
   color: #7d7d7d;
   text-shadow: 1px 1px 1px white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   -webkit-transition: all 0.3s ease;
   -moz-transition: all 0.3s ease;
   -o-transition: all 0.3s ease;
@@ -649,6 +657,7 @@ div#sidebar div#toolbar div.back div.back-button {
   top: 6px;
   border: 1px solid #ccc;
   border-radius: 3px;
+  cursor: pointer;
   -webkit-transition: all 0.3s ease;
   -moz-transition: all 0.3s ease;
   -o-transition: all 0.3s ease;
@@ -668,16 +677,16 @@ div#sidebar div#toolbar div.back div.back-button:before {
 div#sidebar div#toolbar div.back div.back-button:after {
   border-color: rgba(245, 245, 245, 0);
   border-right-color: #f5f5f5;
-  border-width: 13px;
+  border-width: 12px;
   top: 50%;
-  margin-top: -14px;
+  margin-top: -12px;
 }
 div#sidebar div#toolbar div.back div.back-button:before {
   border-color: rgba(204, 204, 204, 0);
   border-right-color: #ccc;
   border-width: 14px;
   top: 50%;
-  margin-top: -15px;
+  margin-top: -14px;
 }
 div#sidebar div#toolbar div.back div.back-button div {
   font-size: 12px;
@@ -747,12 +756,17 @@ div#sidebar div#toolbar div.arrow:before {
   margin-left: -13px;
 }
 div#sidebar div#sidebar-content {
-  position: relative;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
 }
 div#sidebar div#sidebar-content div.screen {
   position: absolute;
   width: 100%;
-  top: 0;
+  height: 100%;
+  top: 45px;
   right: -300px;
   overflow: hidden;
   -webkit-transition: all 0.3s ease;
@@ -764,7 +778,8 @@ div#sidebar div#sidebar-content div.screen {
 div#sidebar div#sidebar-content div.slide {
   position: absolute;
   width: 0;
-  top: 0;
+  height: 100%;
+  top: 35px;
   overflow: hidden;
   -webkit-transition: all 0.3s ease;
   -moz-transition: all 0.3s ease;
@@ -777,7 +792,7 @@ div#sidebar div#sidebar-content .current {
   right: 0 !important;
 }
 div#sidebar div#sidebar-content div.info {
-  margin-top: 5px;
+  margin-top: 10px;
 }
 div#sidebar div#sidebar-content div.info div.publisher {
   position: relative;
@@ -789,13 +804,14 @@ div#sidebar div#sidebar-content div.info div.publisher div.name {
 }
 div#sidebar div#sidebar-content div.info div.publisher div.name a {
   color: #f5f5f5;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
 }
 div#sidebar div#sidebar-content div.info img.thumb {
   height: 70px;
-  border-radius: 3px;
+  border-radius: 6px;
   position: absolute;
-  box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.5);
-  border: 1px solid #f5f5f5;
+  box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.5), 0 0 1px 1px rgba(255, 255, 255, 0.9);
+  border: 0px solid whiteSmoke;
   left: 10px;
   top: 30px;
 }
@@ -803,17 +819,39 @@ div#sidebar div#sidebar-content div.info div.label {
   font-size: 11px;
   color: #f5f5f5;
   margin-bottom: 7px;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
 }
 div#sidebar div#sidebar-content div.info div.title {
   position: relative;
   left: 110px;
-  top: 30px;
+  top: 15px;
   padding-right: 10px;
   color: whiteSmoke;
-  text-shadow: 1px 1px 1px #181818;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
   font-size: 13px;
   height: 100px;
   width: 180px;
+}
+div#sidebar div#sidebar-content div.info div.options {
+  position: absolute;
+  top: 50px;
+  left: 110px;
+}
+div#sidebar div#sidebar-content div.info div.options div.play {
+  background: url(/static/img/16-play@2x.png);
+  background-size: 100%;
+  width: 30px;
+  height: 30px;
+}
+div#sidebar div#sidebar-content div.info div.options div.star {
+  background: url(/static/img/28-star@2x.png);
+  background-size: 100%;
+  width: 30px;
+  height: 30px;
+}
+div#sidebar div#sidebar-content div.info div.options div.share {
+  width: 30px;
+  height: 30px;
 }
 div#sidebar div#sidebar-content div.info div.description {
   width: 280px;
@@ -825,6 +863,7 @@ div#sidebar div#sidebar-content div.info div.description {
   margin-right: 5px;
   padding: 0 5px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
 }
 div#sidebar div#sidebar-content div.info div.viewers {
   position: relative;
@@ -936,10 +975,13 @@ div#sidebar div#sidebar-content div.info div.comments-holder div.comment div.tim
   font-size: 10px;
   color: #bbb;
 }
+div#sidebar div#sidebar-content div.admin {
+  margin-top: -2px;
+}
 div#sidebar div#sidebar-content div.admin div.search {
   background: #f5f5f5;
   width: 100%;
-  height: 100%;
+  height: 35px;
 }
 div#sidebar div#sidebar-content div.admin div.search input[type=text] {
   height: auto;
@@ -983,7 +1025,8 @@ div#sidebar div#sidebar-content div.admin div.collections div.collection div.tit
 }
 div#sidebar div#sidebar-content div#media-list {
   overflow-y: scroll;
-  padding: 10px 0;
+  padding: 15px 0;
+  margin-top: 10px;
 }
 div#sidebar div#sidebar-content div#media-list div.media {
   position: relative;
@@ -1032,15 +1075,15 @@ div#sidebar div.comment-input {
   opacity: 0;
   width: 100%;
   min-height: 31px;
-  position: fixed;
-  bottom: 0;
+  position: absolute;
+  bottom: 54px;
   border-top: 2px solid #ccc;
   box-shadow: 0 -2px 3px 1px rgba(0, 0, 0, 0.4), inset 4px -2px 6px -3px rgba(0, 0, 0, 0.7), 0 0 0 1px #181818;
-  -webkit-transition: all 0.1s ease;
-  -moz-transition: all 0.1s ease;
-  -o-transition: all 0.1s ease;
-  -ms-transition: all 0.1s ease;
-  transition: all 0.1s ease;
+  -webkit-transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  -ms-transition: all 0.5s ease;
+  transition: all 0.5s ease;
 }
 div#sidebar div.comment-input div.comment-controls {
   width: 100%;
@@ -1113,7 +1156,10 @@ div#sidebar div.comment-input div.input-holder textarea {
   margin-top: 7px;
   margin-bottom: 5px;
 }
-div#sidebar div.info.current ~ div.comment-input {
+div#sidebar div.slide div.comment-input {
+  bottom: 44px;
+}
+div#sidebar div.info.current div.comment-input {
   visibility: visible;
   opacity: 1;
 }

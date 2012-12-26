@@ -24,6 +24,7 @@
       <div class="pause dark button"></div>
       <div class="go-live dark button"></div>
     </div>
+    <div id="admin-toggle" class="admin-toggle dark button" style="display: none"></div>
     <div id="sidebar-toggle" class="sidebar-toggle dark button"></div>
   </div>
   <div id="sidebar">
@@ -36,6 +37,9 @@
         <li class="tab info selected">
           <div class="label">Now Playing</div>
         </li>
+        <li class="tab stream">
+          <div class="label">Stream</div>
+        </li>
         <li class="tab starred">
           <div class="label">Starred</div>
         </li>
@@ -44,18 +48,12 @@
     </div>
     <div id="sidebar-content">
       <div id="info" class="screen info"></div>
+      <div id="stream" class="screen stream"></div>
+      <div id="starred" class="screen media-list"></div>
       <div id="admin" class="screen admin"></div>
       <div id="media-list" class="slide media-list"></div>
-      <div class="comment-input">
-        <div id="comment-controls" class="comment-controls">
-          <div class="comment-button" id="tweet-toggle">tweet</div>
-          <div class="comment-button" id="fb-toggle">post</div>
-          <div class="comment-button" id="add-comment">add</div>
-        </div>
-        <div class="input-holder">
-          <textarea id="comment-textarea" rows="1" placeholder="Add to the conversation..."></textarea>
-        </div>
-      </div>
+      <div id="media-info" class="slide info"></div>
+      <div id="profile" class="slide profile"></div>
     </div>
   </div>
 </div>

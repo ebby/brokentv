@@ -11,6 +11,11 @@
     </div>
     <img src="{$media.thumbnail}" class="thumb">
     <div class="title">{$media.name}</div>
+    <div class="options">
+      <div class="button play"></div>
+      <div class="button star"></div>
+      <div class="button share"></div>
+    </div>
     <div class="description">{$media.description}</div>
     <div class="viewers" style="display: none">
       <div class="label">Seen by</div>
@@ -60,6 +65,22 @@
 
 
 /**
+ */
+{template .commentInput}
+  <div class="comment-input">
+    <div class="comment-controls">
+      <div class="comment-button tweet-toggle">tweet</div>
+      <div class="comment-button fb-toggle">post</div>
+      <div class="comment-button add-comment">add</div>
+    </div>
+    <div class="input-holder">
+      <textarea class="comment-textarea" rows="1" placeholder="Add to the conversation..."></textarea>
+    </div>
+  </div>
+{/template}
+
+
+/**
  * @param media
  * @param published
  */
@@ -68,6 +89,61 @@
     <img src="{$media.thumbnail}" class="thumb">
     <div class="title">{$media.name}</div>
     <div class="published">{$published}</div>
+  </div>
+{/template}
+
+
+/**
+ * @param activity
+ * @param channel
+ * @param user
+ * @param time
+ */
+{template .sessionActivity}
+  <div class="activity">
+    <div class="picture" style="background:{$user.color}">
+      <img src="{$user.picture}"/>
+    </div>
+    <div class="text">
+      <a class="user" href="#">{$user.name}</a>{sp}
+      {if $activity.session.tune_out}watched{else}is watching{/if}
+      {sp}<a href="#">{$channel.name}</a>
+      <div class="timestamp">{$time}</div>
+    </div>
+    <div class="medias"></div>
+  </div>
+{/template}
+
+
+/**
+ * @param activity
+ * @param user
+ * @param time
+ */
+{template .commentActivity}
+  <div class="activity">
+    <div class="picture" style="background:{$user.color}">
+      <img src="{$user.picture}"/>
+    </div>
+    <div class="text">
+      <a class="user" href="#">{$user.name}</a>{sp}
+      "{$activity.comment.text}"
+      <div class="timestamp">{$time}</div>
+    </div>
+    <div class="medias"></div>
+  </div>
+{/template}
+
+
+/**
+ * @param media
+ */
+{template .mediaPreview}
+  <div class="media">
+    <div class="preview">
+      <img class="thumb" src="{$media.thumbnail}">
+      <div class="title">{$media.name}</div>
+    </div>
   </div>
 {/template}
 
@@ -110,6 +186,14 @@
 {template .collection}
   <div class="collection">
     <div class="title">{$collection.name}</div>
+  </div>
+{/template}
+
+
+/**
+ */
+{template .profile}
+  <div class="stream">
   </div>
 {/template}
 

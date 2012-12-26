@@ -169,9 +169,14 @@ brkn.Guide.prototype.enterDocument = function() {
           }
         }, this));
 
-  brkn.model.Channels.getInstance().subscribe(brkn.model.Channels.Action.CHANGE_CHANNEL,
+  brkn.model.Channels.getInstance().subscribe(brkn.model.Channels.Actions.CHANGE_CHANNEL,
       this.changeChannel, this);
+  brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_ADMIN,
+      function(show) {
+        goog.dom.classes.enable(this.getElement(), 'admin', show);
+      }, this);
 };
+
 
 /**
  * Gets the pixel offset for a certain time in the channels element.

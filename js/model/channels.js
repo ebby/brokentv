@@ -1,5 +1,5 @@
 goog.provide('brkn.model.Channels');
-goog.provide('brkn.model.Action');
+goog.provide('brkn.model.Actions');
 
 
 goog.require('brkn.model.Channel');
@@ -28,7 +28,7 @@ brkn.model.Channels = function() {
 	 */
 	this.channelMap = {};
 	
-	this.subscribe(brkn.model.Channels.Action.CHANGE_CHANNEL, this.changeChannel, this);
+	this.subscribe(brkn.model.Channels.Actions.CHANGE_CHANNEL, this.changeChannel, this);
 };
 goog.inherits(brkn.model.Channels, goog.pubsub.PubSub);
 goog.addSingletonGetter(brkn.model.Channels);
@@ -76,7 +76,7 @@ brkn.model.Channels.prototype.loadViewersFromJson = function(viewerSessions) {
 				var tuneIn = goog.date.fromIsoString(session['tune_in'] + 'Z');
 				var tuneOut = session['tune_out'] ?
 				    goog.date.fromIsoString(session['tune_out'] + 'Z') : null;
-				var newSession = new brkn.model.Session(u, channel, tuneIn, tuneOut);
+				var newSession = new brkn.model.Session(session['id'], u, channel, tuneIn, tuneOut);
 				u.currentSession = newSession;
 				channel.viewerSessions.push(newSession);
 			}, this));
@@ -87,14 +87,17 @@ brkn.model.Channels.prototype.loadViewersFromJson = function(viewerSessions) {
  * @param {brkn.model.Channel} channel New channel
  */
 brkn.model.Channels.prototype.changeChannel = function(channel) {
-	this.currentChannel = channel;
-	goog.net.XhrIo.send('/_changechannel', goog.functions.NULL(), 'POST', 'channel=' + channel.id);
+  if (channel) {
+    this.currentChannel = channel;
+    goog.net.XhrIo.send('/_changechannel', goog.functions.NULL(), 'POST', 'channel=' + channel.id);
+  }
 };
 
 
 /**
  * @enum {string}
  */
-brkn.model.Channels.Action = {
-	CHANGE_CHANNEL: 'change-channel'
+brkn.model.Channels.Actions = {
+	CHANGE_CHANNEL: 'change-channel',
+	NEXT_PROGRAM: 'next-program'
 };

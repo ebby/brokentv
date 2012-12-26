@@ -38,5 +38,8 @@ YT.PlayerState.ENDED;
 
 var Raphael;
 
-Raphael.getColor = function(id) {};
+/**
+ * @param {?number=} opt_brightness
+ */
+Raphael.getColor = function(opt_brightness) {};
 

@@ -74,30 +74,38 @@ brkn.sidebar.CommentInput.prototype.commentControls_;
 
 
 /** @inheritDoc */
+brkn.sidebar.CommentInput.prototype.createDom = function() {
+  var el = soy.renderAsElement(brkn.sidebar.commentInput);
+  this.setElementInternal(el);
+};
+
+
+/** @inheritDoc */
 brkn.sidebar.CommentInput.prototype.enterDocument = function() {
   goog.base(this, 'enterDocument');
   
-  this.commentInput_.decorate(goog.dom.getElement('comment-textarea'));
+  this.commentInput_.decorate(goog.dom.getElementByClass('comment-textarea', this.getElement()));
   this.commentInput_.setMaxHeight(70);
   var keyHandler = new goog.events.KeyHandler(this.commentInput_.getKeyEventTarget());
    
-  this.commentControls_ = goog.dom.getElement('comment-controls');
+  this.commentControls_ = goog.dom.getElementByClass('comment-controls', this.getElement());
   
   this.addChild(this.tweetToggle_);
-  this.tweetToggle_.decorate(goog.dom.getElement('tweet-toggle'));
+  this.tweetToggle_.decorate(goog.dom.getElementByClass('tweet-toggle', this.getElement()));
   
   this.addChild(this.fbToggle_);
-  this.fbToggle_.decorate(goog.dom.getElement('fb-toggle'));
+  this.fbToggle_.decorate(goog.dom.getElementByClass('fb-toggle', this.getElement()));
   
   this.addChild(this.addCommentButton_);
-  this.addCommentButton_.decorate(goog.dom.getElement('add-comment'));
+  this.addCommentButton_.decorate(goog.dom.getElementByClass('add-comment', this.getElement()));
   this.addCommentButton_.setEnabled(false);
   
   this.getHandler()
       .listen(this.commentInput_.getElement(),
           goog.events.EventType.FOCUS,
           goog.bind(function(e) {
-            goog.style.setPosition(this.commentControls_, 0, -brkn.sidebar.CommentInput.COMMENT_CONTROLS_HEIGHT);
+            goog.style.setPosition(this.commentControls_, 0,
+                -brkn.sidebar.CommentInput.COMMENT_CONTROLS_HEIGHT);
             this.dispatchEvent(goog.events.EventType.FOCUS)
           }, this))
       .listen(keyHandler,
@@ -140,13 +148,29 @@ brkn.sidebar.CommentInput.prototype.collapse = function() {
 
 
 /**
+ * @return {boolean}
+ */
+brkn.sidebar.CommentInput.prototype.isFocused = function() {
+  return goog.dom.classes.has(this.getElement(), 'focused');
+};
+
+
+/**
+ * @param {boolean} focus
+ */
+brkn.sidebar.CommentInput.prototype.setFocused = function(focus) {
+  return goog.dom.classes.enable(this.getElement(), 'focused', focus);
+};
+
+
+/**
  * @param {Event} e
  */
 brkn.sidebar.CommentInput.prototype.onAddComment_ = function(e) {
   if (this.commentInput_.getValue()) {
     this.commentInput_.setActive(false);
     this.commentInput_.setEnabled(false);
-    goog.dom.classes.add(this.commentInput_.getElement(), 'focused');
+    this.setFocused(true);
     this.dispatchEvent({
       type: 'add',
       callback: goog.bind(function() {

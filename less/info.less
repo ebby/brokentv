@@ -1,0 +1,200 @@
+div.info {
+  margin-top: 10px;
+  div.publisher {
+    position: relative;
+    left: 10px;
+    top: 10px;
+    div.name {
+      a {
+        color: #f5f5f5;
+        text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
+      }
+      font-size: 12px;
+    }
+  }
+  img.thumb {
+    height: 70px;
+    border-radius: 6px;
+    position: absolute;
+    box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.5), 0 0 1px 1px rgba(255, 255, 255, .9);
+    border: 0px solid whiteSmoke;
+    left: 10px;
+    top: 30px;
+  }
+  div.label {
+    font-size: 11px;
+    color: #f5f5f5;
+    margin-bottom: 7px;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
+  }
+  div.title {
+    position: relative;
+    left: 110px;
+    top: 15px;
+    padding-right: 10px;
+    color: whiteSmoke;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
+    font-size: 13px;
+    height: 50px;
+    width: 180px;
+    overflow: hidden;
+  }
+  div.options {
+    position: absolute;
+    top: 73px;
+    left: 113px;
+    div.button {
+      border-radius: 0;
+      margin-left: -1px;
+      width: 59px;
+      height: 18px;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+    div.button:last-child {
+      border-top-right-radius: 3px;
+      border-bottom-right-radius: 3px;
+    }
+    div.button:first-child {
+      border-top-left-radius: 3px;
+      border-bottom-left-radius: 3px;
+    }
+    div.play {
+      background-image: url(/static/img/16-play@2x.png);
+      background-size: auto 50%;
+    }
+    div.star {
+      background-image: url(/static/img/28-star@2x.png);
+      background-size: auto 60%;
+      &.goog-custom-button-checked {
+        background-image: url(/static/img/28-star-yellow@2x.png);
+      }
+    }
+    div.share {
+
+    }
+  }
+  div.description {
+    margin-top: 50px;
+    width: 280px;
+    font-size: 10px;
+    height: 38px;
+    overflow: hidden;
+    position: relative;
+    left: 5px;
+    margin-right: 5px;
+    padding: 0 5px;
+    border-bottom: 1px solid rgba(0, 0, 0, .3);
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
+  }
+  div.viewers {
+    position: relative;
+    top: 10px;
+    left: 9px;
+    padding-right: 9px;
+    width: 280px;
+    div.viewer {
+      background: #ccc;
+      width: 25px;
+      height: 24px;
+      border-radius: 10px;
+      box-shadow: 0px 1px 1px 0px rgba(255, 255, 255, .6);
+      display: inline-block;
+      margin-left: 9px;
+      img {
+        width: 21px;
+        height: 20px;
+        margin-left: 2px;
+        margin-top: 2px;
+        border-radius: 10px;
+      }
+    }
+  }
+  div.tweets {
+    position: relative;
+    top: 20px;
+    margin-right: 20px;
+    width: 280px;
+    left: 10px;
+    div.tweet {
+      position: relative;
+      width: 99%;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid #888;
+      padding-bottom: 20px;
+      overflow: hidden;
+      img {
+        width: 28px;
+        height: 28px;
+        left: 4px;
+        top: 4px;
+        position: absolute;
+      }
+      div.text {
+        a {
+          color: #f5f5f5;
+        }
+        position: relative;
+        left: 37px;
+        top: 3px;
+        font-size: 13px;
+        width: 240px;
+      }
+      div.timestamp {
+        position: absolute;
+        bottom: 3px;
+        right: 5px;
+        font-size: 10px;
+        color: #bbb;
+      }
+    }
+  }
+  div.comments-holder {
+    position: relative;
+    top: 35px;
+    left: 10px;
+    margin-right: 20px;
+    width: 280px;
+    div.comments {
+      overflow-x: scroll;
+      -webkit-transition: height .5s ease;
+         -moz-transition: height .5s ease;
+              transition: height .5s ease;
+    }
+    div.comment {
+      position: relative;
+      width: 99%;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid #888;
+      padding-bottom: 20px;
+      overflow: hidden;
+      margin-bottom: 5px;
+      img {
+        width: 28px;
+        height: 28px;
+        left: 4px;
+        top: 4px;
+        position: absolute;
+      }
+      div.text {
+        a {
+          color: #f5f5f5;
+        }
+        position: relative;
+        left: 37px;
+        top: 3px;
+        font-size: 13px;
+        width: 240px;
+      }
+      div.timestamp {
+        position: absolute;
+        bottom: 3px;
+        right: 5px;
+        font-size: 10px;
+        color: #bbb;
+      }
+    }
+  }
+}

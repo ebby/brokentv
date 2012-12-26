@@ -13,7 +13,17 @@ class Comment(db.Model):
   @classmethod
   def get_by_media(cls, media):
     return Comment.all().filter('media =', media).order('time').fetch(100)
-  
+
+  @classmethod
+  def add(cls, media, user, text, parent_id=None):
+    c = Comment(media=media, user=user, text=text)
+    if parent_id:
+      c.parent = Comment.get_by_id(int(parent_id))
+    c.put()
+    from useractivity import *
+    UserActivity.add_comment(c.user, c)
+    return c
+
   def toJson(self):
     json = {}
     json['id'] = self.key().id()
@@ -23,3 +33,4 @@ class Comment(db.Model):
     json['text'] = self.text
     json['time'] = self.time.isoformat()
     return json
+  
