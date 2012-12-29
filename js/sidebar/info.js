@@ -43,6 +43,16 @@ brkn.sidebar.Info = function(media) {
   this.starToggle_ = new goog.ui.CustomButton('Star');
   this.starToggle_.setSupportedState(goog.ui.Component.State.CHECKED,
       true);
+
+  /**
+   * @type {goog.ui.CustomButton}
+   */
+  this.fbButton_ = new goog.ui.CustomButton('Facebook');
+
+  /**
+   * @type {goog.ui.CustomButton}
+   */
+  this.twitterButton_ = new goog.ui.CustomButton('Twitter');
 };
 goog.inherits(brkn.sidebar.Info, goog.ui.Component);
 
@@ -81,9 +91,13 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
   this.media_.subscribe(brkn.model.Media.Actions.ADD_COMMENT, this.addComment_, this);
   
   var viewersEl = goog.dom.getElementByClass('viewers', this.getElement());
+  var picEl = goog.dom.getElementByClass('picture', this.getElement());
+  var img = /** @type {Element} */ picEl.firstChild;
   this.commentsEl_ = goog.dom.getElementByClass('comments', this.getElement());
   this.commentInput_.render(this.getElement());
   this.starToggle_.decorate(goog.dom.getElementByClass('star', this.getElement()));
+  this.fbButton_.decorate(goog.dom.getElementByClass('facebook', this.getElement()));
+  this.twitterButton_.decorate(goog.dom.getElementByClass('twitter', this.getElement()));
 
   goog.net.XhrIo.send('/_seen/' + this.media_.id, goog.bind(function(e) {
     var seen = /** @type {Array.<Object>} */ goog.json.parse(e.target.getResponse());
@@ -129,17 +143,14 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
       .listen(this.starToggle_, goog.ui.Component.EventType.ACTION, goog.bind(function() {
             goog.net.XhrIo.send('/_star', undefined, 'POST', 'media_id=' + this.media_.id +
                 (!this.starToggle_.isChecked() ? '&delete=1' : ''));
-            //this.starToggle_.setChecked(true);
           }, this))
+      .listen(this.fbButton_, goog.ui.Component.EventType.ACTION,
+          goog.bind(this.onFacebookButton_, this))
+      .listen(this.twitterButton_, goog.ui.Component.EventType.ACTION,
+          goog.bind(this.onTwitterButton_, this))
       .listen(this.commentInput_,
           'add',
-          goog.bind(function(e) {
-            goog.net.XhrIo.send(
-                '/_comment',
-                e.callback,
-                'POST',
-                'media_id=' + this.media_.id + '&text=' + e.text);
-          }, this))
+          goog.bind(this.onAddComment_, this))
       .listen(this.commentInput_,
           goog.events.EventType.FOCUS,
           goog.bind(function(e) {
@@ -160,8 +171,54 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
               this.commentInput_.collapse();
               this.resize();
             }
-          }, this));
+          }, this))
+      .listen(img,
+          goog.events.EventType.LOAD,
+          function() {
+            goog.style.showElement(img, true);
+            goog.Timer.callOnce(function() {
+              if (goog.style.getSize(img).height < goog.style.getSize(picEl).height + 50) {
+                goog.dom.classes.add(img, 'fix-height');
+              }
+              
+              if (goog.style.getSize(img).width > 2*goog.style.getSize(picEl).width) {
+                goog.dom.classes.add(img, 'pan-left');
+              } else if (goog.style.getSize(img).height > 2*goog.style.getSize(picEl).height) {
+                goog.dom.classes.add(img, 'pan-top');
+              }
+
+              // Center the cropped picture.
+              img.style.marginTop = -goog.style.getSize(img).height/2 + 'px';
+              img.style.marginLeft = -goog.style.getSize(img).width/2 + 'px';
+            });
+          });
       
+};
+
+
+/**
+ * @param {Object} e
+ * @private
+ */
+brkn.sidebar.Info.prototype.onAddComment_ = function(e) {
+  goog.net.XhrIo.send(
+      '/_comment',
+      e.callback,
+      'POST',
+      'media_id=' + this.media_.id + '&text=' + e.text + '&tweet=' + e.twitter);
+  
+  if (e.facebook) {
+    FB.api('/me/feed', 'POST', {
+      'message': e.text,
+      'name': this.media_.name,
+      'link': 'http://www.broken.tv',
+      'picture': this.media_.thumbnail,
+      'caption': 'on Broken.TV',
+      'description': this.media_.description
+    }, function(response) {
+      window.console.log(response)
+    });
+  }
 };
 
 
@@ -197,4 +254,37 @@ brkn.sidebar.Info.prototype.resize = function(opt_extra) {
         [this.commentsEl_.scrollLeft, this.commentsEl_.scrollHeight], 300);
     scrollAnim.play();
   }, this), opt_extra ? 0 : 100);
+};
+
+
+/**
+ * @private
+ */
+brkn.sidebar.Info.prototype.onFacebookButton_ = function() {
+  goog.style.showElement(goog.dom.getElement('overlay'), true);
+  FB.ui(
+      {
+        method: 'feed',
+        name: this.media_.name,
+        link: 'http://www.broken.tv',
+        picture: this.media_.thumbnail,
+        caption: 'on Broken.TV',
+        description: this.media_.description
+      },
+      function(response) {
+        goog.style.showElement(goog.dom.getElement('overlay'), false);
+      }
+    );
+};
+
+
+/**
+ * @private
+ */
+brkn.sidebar.Info.prototype.onTwitterButton_ = function() {
+  var url = 'https://twitter.com/share?url=www.broken.tv&text=I\'m watching ' + this.media_.name;
+  var newWindow = window.open(url,'Tweet','height=300,width=550');
+  newWindow.moveTo(screen.width/2-225,
+      screen.height/2-150)
+  newWindow.focus();
 };

@@ -7,6 +7,8 @@ goog.require('brkn.model.Clock');
 goog.require('brkn.model.Popup');
 goog.require('brkn.model.Popup.Action');
 
+goog.require('goog.fx.DragListDirection');
+goog.require('goog.fx.DragListGroup');
 goog.require('goog.ui.Component');
 goog.require('goog.ui.Component.EventType');
 goog.require('goog.ui.CustomButton');
@@ -31,6 +33,12 @@ brkn.Channel = function(model, timeline, startTime, startTimeOffset, minTime) {
    * @private
    */
   this.isAdmin_ = brkn.model.Users.getInstance().currentUser.isAdmin();
+  
+  /**
+   * @type {boolean}
+   * @private
+   */
+  this.adminMode_ = false;
 	
 	/**
 	 * @type {number}
@@ -74,8 +82,21 @@ brkn.Channel = function(model, timeline, startTime, startTimeOffset, minTime) {
    * @private
    */
   this.programs_ = {};
+  
+  /**
+   * @type {goog.fx.DragListGroup}
+   * @private
+   */
+  this.dragListGroup_ = this.isAdmin_ ? new goog.fx.DragListGroup() : null;
 };
 goog.inherits(brkn.Channel, goog.ui.Component);
+
+
+/**
+ * @type {number}
+ * @constant
+ */
+brkn.Channel.PROGRAM_PADDING = 12;
 
 
 /**
@@ -83,6 +104,7 @@ goog.inherits(brkn.Channel, goog.ui.Component);
  * @private
  */
 brkn.Channel.prototype.programsEl_;
+
 
 /**
  * @type {?string}
@@ -103,6 +125,7 @@ brkn.Channel.prototype.viewersEl_;
  * @private
  */
 brkn.Channel.prototype.nameEl_;
+
 
 /**
  * @private
@@ -161,6 +184,9 @@ brkn.Channel.prototype.enterDocument = function() {
   		this.addProgram(programs[i]);
   	}
   }
+  if (this.isAdmin_) {
+    this.setupDragging_();
+  }
   
   goog.array.forEachRight(this.getModel().viewerSessions, this.addViewer, this);
   
@@ -192,6 +218,10 @@ brkn.Channel.prototype.enterDocument = function() {
 	    this.updateCurrentProgram_, this);
 	brkn.model.Channels.getInstance().subscribe(brkn.model.Channels.Actions.CHANGE_CHANNEL,
       this.updateCurrentProgram_, this);
+	brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_ADMIN,
+      function(show) {
+        this.adminMode_ = show;
+      }, this);
 
 	this.update(); // Refresh UI
 };
@@ -248,7 +278,10 @@ brkn.Channel.prototype.constructPath = function() {
  * @param {brkn.model.Program} program The program to add
  */
 brkn.Channel.prototype.addProgram = function(program) {
-	var programEl = goog.dom.createDom('div', 'program');
+	var programEl = goog.dom.createDom('div', {
+	  'class': 'program',
+	  'id': program.id
+	});
 	var showAdmin = this.isAdmin_ &&
 	    (program.time.getTime() + program.media.duration*1000) > goog.now();
 	soy.renderElement(programEl, brkn.channel.program, {
@@ -268,7 +301,7 @@ brkn.Channel.prototype.addProgram = function(program) {
 			this.getModel().currentProgram && this.getModel().currentProgram.id == program.id);
 	var programsWidth = goog.style.getSize(this.programsEl_).width;
 	var width = program.media.duration/this.timeline_ * programsWidth;
-	goog.style.setWidth(programEl, width - 12 /* padding */);
+	goog.style.setWidth(programEl, width - brkn.Channel.PROGRAM_PADDING);
 	var offset = (program.time.getTime() - this.minTime_.getTime())/(this.timeline_ * 1000) *
 			programsWidth;
 	goog.style.setPosition(programEl, offset);
@@ -356,6 +389,20 @@ brkn.Channel.prototype.onRemoveProgram_ = function(program, programEl) {
     undefined,
     'POST',
     'program=' + program.id);
+};
+
+
+/**
+ * @param {number} programId
+ * @param {number} newTime 
+ * @private
+ */
+brkn.Channel.prototype.onRescheduleProgram_ = function(programId, newTime) {
+  goog.net.XhrIo.send(
+    '/admin/_rescheduleprogram',
+    undefined,
+    'POST',
+    'program=' + programId + '&time=' + newTime);
 };
 
 
@@ -464,3 +511,108 @@ brkn.Channel.prototype.update = function() {
 	// Redraw (THIS CAN CAUSE LATENCY ISSUE)
 	goog.style.getPosition(goog.dom.getElement('guide'));
 };
+
+
+/**
+ * @private
+ */
+brkn.Channel.prototype.setupDragging_ = function() {
+  this.dragListGroup_.addDragList(this.programsEl_, goog.fx.DragListDirection.RIGHT);
+  this.dragListGroup_.setDraggerElClass('drag');
+  var parent = this.getElement();
+  this.dragListGroup_.handlePotentialDragStart_ = function(e) {
+    var uid = goog.getUid(/** @type {Node} */ (e.currentTarget));
+    this.currDragItem_ = /** @type {Element} */ (this.dragItemForHandle_[uid]);
+
+    this.draggerEl_ = this.cloneNode_(this.currDragItem_);
+    if (this.draggerElClass_) {
+      // Add CSS class for the clone, if any.
+      goog.dom.classes.add(this.draggerEl_, this.draggerElClass_);
+    }
+
+    this.draggerEl_.style.margin = '0';
+    this.draggerEl_.style.position = 'absolute';
+    this.draggerEl_.style.visibility = 'hidden';
+    parent.appendChild(this.draggerEl_);
+    var currDragItemPos = goog.style.getPageOffset(this.currDragItem_);
+    goog.style.setPageOffset(this.draggerEl_, currDragItemPos);
+
+    this.dragger_ = new goog.fx.Dragger(this.draggerEl_);
+    this.dragger_.setHysteresis(this.hysteresisDistance_);
+    goog.events.listen(this.dragger_, goog.fx.Dragger.EventType.START,
+        this.handleDragStart_, false, this);
+    goog.events.listen(this.dragger_, goog.fx.Dragger.EventType.END,
+        this.handleDragEnd_, false, this);
+    goog.events.listen(this.dragger_, goog.fx.Dragger.EventType.EARLY_CANCEL,
+        this.cleanup_, false, this);
+    this.dragger_.startDrag(e);
+  };
+  
+  this.dragListGroup_.init();
+  var displaced = {};
+  var newPosition;
+  var newTime;
+  var startCenter;
+  var startLeft;
+  var hoverPrevItem;
+  var hasPrev = true;
+  this.getHandler()
+      .listen(this.dragListGroup_,
+          goog.fx.DragListGroup.EventType.BEFOREDRAGSTART, goog.bind(function(e) {
+            if (!this.adminMode_ || !e.event.shiftKey) {
+              e.preventDefault();
+            }
+          }, this))
+      .listen(this.dragListGroup_,
+          goog.fx.DragListGroup.EventType.DRAGMOVE, function(e) {
+            startCenter = startCenter || e.draggerElCenter.x;
+            startLeft = startLeft || goog.style.getPosition(e.currDragItem).x;
+            hoverPrevItem = hoverPrevItem || goog.dom.getPreviousElementSibling(e.currDragItem);
+            hasPrev = hasPrev && !!hoverPrevItem;
+            var prevWidth = hoverPrevItem ? goog.style.getSize(hoverPrevItem).width : undefined;
+            var prevLeft = hoverPrevItem ? goog.style.getPosition(hoverPrevItem).x : undefined;
+            var delta = e.draggerElCenter.x - startCenter;
+            if (Math.abs(delta) < 10) {
+              return;
+            }
+            if (e.hoverNextItem && !displaced[e.hoverNextItem.id] && delta > 0) {
+              var width = goog.style.getSize(e.currDragItem).width;
+              var left = goog.style.getPosition(e.hoverNextItem).x;
+              newPosition = left - width + goog.style.getSize(e.hoverNextItem).width;
+              var nextProgram = this.getModel().getProgram(e.hoverNextItem.id);
+              newTime = nextProgram.time.getTime()/1000 + nextProgram.media.duration -
+                  this.getModel().getProgram(e.currDragItem.id).media.duration;
+              goog.style.setPosition(e.currDragItem, newPosition);
+              goog.style.setPosition(e.hoverNextItem, left - width - brkn.Channel.PROGRAM_PADDING);
+              displaced[e.hoverNextItem.id] = true;
+              goog.dom.insertSiblingAfter(e.currDragItem, e.hoverNextItem);
+            } else if (hasPrev && delta < 0 &&
+                startLeft + delta < prevLeft + prevWidth) {
+              var width = goog.style.getSize(e.currDragItem).width;
+              var left = goog.style.getPosition(hoverPrevItem).x;
+              newPosition = left;
+              newTime = this.getModel().getProgram(hoverPrevItem.id).time.getTime()/1000;
+              goog.style.setPosition(e.currDragItem, newPosition);
+              goog.style.setPosition(hoverPrevItem, left + width + brkn.Channel.PROGRAM_PADDING);
+              var nextPrev = goog.dom.getPreviousElementSibling(hoverPrevItem);
+              goog.dom.insertSiblingBefore(e.currDragItem, hoverPrevItem);
+              hoverPrevItem = nextPrev;
+              hasPrev = !!nextPrev;
+            } 
+          })
+      .listen(this.dragListGroup_,
+          goog.fx.DragListGroup.EventType.DRAGEND, function(e) {
+            if (newTime) {
+              this.onRescheduleProgram_(e.draggerEl.id, newTime);
+              this.dragListGroup_.init();
+              newTime = undefined;
+            }
+            displaced = {};
+            startCenter = undefined;
+            startLeft = undefined;
+            hoverPrevItem = undefined;
+            newPosition = undefined;
+            hasPrev = true;
+          });
+};
+

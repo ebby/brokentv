@@ -14,18 +14,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-import webapp2
-import base64
-import datetime
+
 import constants
+import datetime
 import facebook
 import logging
 import math
+import oauth
 import os.path
 import re
 import simplejson
-import urllib
 import jinja2
+import webapp2
 
 from google.appengine.api import channel as webchannel
 from google.appengine.api import images
@@ -46,6 +46,7 @@ jinja_environment = jinja2.Environment(
 class MainHandler(BaseHandler):
     def get(self):
       template_data = {}
+      template_data['host_url'] = self.request.host_url
       template_data['js_location'] = constants.JS_SOURCE
       if not constants.DEVELOPMENT:
         template_data['css_location'] = constants.CSS_SOURCE
@@ -125,9 +126,16 @@ class CommentHandler(BaseHandler):
     def post(self):
       media = Media.get_by_key_name(self.request.get('media_id'))
       text = self.request.get('text')
+      tweet = self.request.get('tweet') == 'true'
       if media and text:
         c = Comment.add(media, self.current_user, text, self.request.get('parent_id'))
         broadcastNewComment(c);
+        if tweet:
+          client = oauth.TwitterClient(constants.TWITTER_CONSUMER_KEY,
+                                       constants.TWITTER_CONSUMER_SECRET,
+                                       'http://local.broken.tv:8011/_twitter/callback')
+          response = client.update_status(text, self.current_user.twitter_token,
+                                          self.current_user.twitter_secret)
       
 class SeenHandler(BaseHandler):
     def get(self, id):
@@ -205,6 +213,30 @@ class StarHandler(BaseHandler):
       collection.add_media(media)
       UserActivity.add_starred(self.current_user, media)
     # Broadcast?
+    
+class TwitterHandler(BaseHandler):
+  def get(self):
+    client = oauth.TwitterClient(constants.TWITTER_CONSUMER_KEY, constants.TWITTER_CONSUMER_SECRET,
+                                 constants.TWITTER_CALLBACK)
+    response = {
+      'auth': self.current_user.twitter_token,
+      'auth_url': client.get_authorization_url()
+    }
+    self.response.out.write(simplejson.dumps(response))
+  def post(self):
+    client = oauth.TwitterClient(constants.TWITTER_CONSUMER_KEY, constants.TWITTER_CONSUMER_SECRET,
+                                 constants.TWITTER_CALLBACK)
+    client.update_status(self.request.get('status'))
+
+class TwitterCallbackHandler(BaseHandler):
+  def get(self):
+    auth_token = self.request.get("oauth_token")
+    auth_verifier = self.request.get("oauth_verifier")
+    client = oauth.TwitterClient(constants.TWITTER_CONSUMER_KEY, constants.TWITTER_CONSUMER_SECRET,
+                                 constants.TWITTER_CALLBACK)
+    user_info = client.get_user_info(auth_token, auth_verifier=auth_verifier)
+    self.current_user.set_twitter_info(user_info)
+    self.response.out.write('<script>window.close()</script>')
 
 #--------------------------------------
 # ADMIN HANDLERS
@@ -222,8 +254,15 @@ class AdminRemoveProgramHandler(BaseHandler):
       program = Program.get_by_id(int(self.request.get('program')))
       channel = program.channel;
       effected = program.remove()
-      logging.info(len(effected))
       broadcastProgramChanges(channel, effected)
+      
+class AdminRescheduleProgramHandler(BaseHandler):
+    def post(self):
+      program = Program.get_by_id(int(self.request.get('program')))
+      new_time = datetime.datetime.fromtimestamp(float(self.request.get('time')))
+      channel = program.channel;
+      effected = program.reschedule(new_time)
+      #broadcastProgramChanges(channel, effected)
 
 #--------------------------------------
 # CHANNEL HANDLERS
@@ -307,12 +346,15 @@ app = webapp2.WSGIApplication([
     ('/_session', SessionHandler),
     ('/_star', StarHandler),
     ('/_star/(.*)', StarHandler),
+    ('/_twitter', TwitterHandler),
+    ('/_twitter/callback', TwitterCallbackHandler),
 
     # Admin
     ('/admin/_collections/(.*)', CollectionsHandler),
     ('/admin/_media/collection/(.*)', CollectionsMediaHandler),
     ('/admin/_media/publisher/(.*)', PublisherMediaHandler),
     ('/admin/_addprogram', AdminAddProgramHandler),
+    ('/admin/_rescheduleprogram', AdminRescheduleProgramHandler),
     ('/admin/_removeprogram', AdminRemoveProgramHandler),
 
     ('/', MainHandler)],

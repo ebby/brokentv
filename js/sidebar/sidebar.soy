@@ -6,15 +6,18 @@
  */
 {template .info}
   <div class="info">
-    <div class="publisher">
-      <div class="name"><a href="#">{$media.publisher.name}</a></div>
-    </div>
-    <img src="{$media.thumbnail}" class="thumb">
-    <div class="title">{$media.name}</div>
-    <div class="options">
-      <div class="button play"></div>
-      <div class="button star"></div>
-      <div class="button share"></div>
+    <div class="picture">
+      <img src="{$media.thumbnail}" class="thumb">
+      <div class="publisher">
+        <div class="name"><a href="#">{$media.publisher.name}</a></div>
+      </div>
+      <div class="title">{$media.name}</div>
+      <div class="options">
+        <div class="button play"></div>
+        <div class="button star"></div>
+        <div class="button facebook"></div>
+        <div class="button twitter"></div>
+      </div>
     </div>
     <div class="description">{$media.description}</div>
     <div class="viewers" style="display: none">

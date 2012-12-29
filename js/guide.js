@@ -49,6 +49,12 @@ brkn.Guide = function() {
    * @private
    */
   this.channelMap_ = {};
+  
+  /**
+   * @type {boolean}
+   * @private
+   */
+  this.isAdmin_ = brkn.model.Users.getInstance().currentUser.isAdmin();
 };
 goog.inherits(brkn.Guide, goog.ui.Component);
 
@@ -85,10 +91,10 @@ brkn.Guide.prototype.enterDocument = function() {
         goog.dom.classes.enable(this.getElement(), 'toggled', show);
       }, this);
   
-  brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_SIDEBAR,
-      function(show) {
-        goog.dom.classes.enable(this.getElement(), 'faded', show);
-      }, this);
+//  brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_SIDEBAR,
+//      function(show) {
+//        goog.dom.classes.enable(this.getElement(), 'faded', show);
+//      }, this);
 
   // Set start time
   var startTime = new goog.date.DateTime();
@@ -150,8 +156,6 @@ brkn.Guide.prototype.enterDocument = function() {
         goog.bind(function() {
           var elapsed = (goog.now() - minTime.getTime()) / (this.timeline * 1000) * this.width_;
           goog.style.setPosition(this.tickerEl_, elapsed);
-        }, this)).listen(dragger, goog.fx.Dragger.EventType.DRAG, goog.bind(function(e) {
-          goog.style.getPosition(this.getElement());
         }, this))
     .listen(
         headerEl,
@@ -175,6 +179,15 @@ brkn.Guide.prototype.enterDocument = function() {
       function(show) {
         goog.dom.classes.enable(this.getElement(), 'admin', show);
       }, this);
+  
+  if (this.isAdmin_) {
+    // Don't drag when shift key is pressed...we're rescheduling a show.
+    this.getHandler().listen(dragger, goog.fx.Dragger.EventType.BEFOREDRAG, goog.bind(function(e) {
+      if (e.browserEvent.shiftKey) {
+        e.preventDefault();
+      }
+    }, this));
+  }
 };
 
 

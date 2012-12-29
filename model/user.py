@@ -11,6 +11,15 @@ class User(db.Model):
     email = db.StringProperty()
     access_token = db.StringProperty()
     location = db.StringProperty()
+    twitter_token = db.StringProperty()
+    twitter_secret = db.StringProperty()
+    twitter_handle = db.StringProperty()
+    
+    def set_twitter_info(self, info):
+      self.twitter_token = info['token']
+      self.twitter_secret = info['secret']
+      self.twitter_handle = info['id']
+      self.put()
 
     def to_session(self):
         return dict(name=self.name, profile_url=self.profile_url, id=self.id, access_token=self.access_token)

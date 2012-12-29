@@ -23,7 +23,10 @@ goog.require('goog.ui.Component.EventType');
 brkn.Sidebar = function() {
   goog.base(this);
   
-  
+  /**
+   * @type {boolean}
+   * @private
+   */
   this.isAdmin_ = brkn.model.Users.getInstance().currentUser.isAdmin();
   
   /**

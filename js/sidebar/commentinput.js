@@ -43,6 +43,24 @@ brkn.sidebar.CommentInput = function() {
       true);
   
   /**
+   * @type {boolean}
+   * @private
+   */
+  this.fbPublish_;
+  
+  /**
+   * @type {boolean}
+   * @private
+   */
+  this.twitterPublish_;
+  
+  /**
+   * @type {boolean}
+   * @private
+   */
+  this.twitterAuthUrl_;
+
+  /**
    * @type {goog.ui.CustomButton}
    * @private
    */
@@ -92,9 +110,20 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
   
   this.addChild(this.tweetToggle_);
   this.tweetToggle_.decorate(goog.dom.getElementByClass('tweet-toggle', this.getElement()));
+  goog.net.XhrIo.send('/_twitter', goog.bind(function(e) {
+    var response = e.target.getResponseJson()
+    this.twitterPublish_ = response['auth'];
+    this.twitterAuthUrl_ = response['auth_url'];
+    this.tweetToggle_.setChecked(this.twitterPublish_);
+  }, this));
   
   this.addChild(this.fbToggle_);
   this.fbToggle_.decorate(goog.dom.getElementByClass('fb-toggle', this.getElement()));
+  FB.api('/me/permissions', goog.bind(function(response) {
+    this.fbPublish_ = !!response.data[0]['publish_stream'];
+    this.fbToggle_.setChecked(this.fbPublish_);
+  }, this));
+  
   
   this.addChild(this.addCommentButton_);
   this.addCommentButton_.decorate(goog.dom.getElementByClass('add-comment', this.getElement()));
@@ -104,8 +133,7 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
       .listen(this.commentInput_.getElement(),
           goog.events.EventType.FOCUS,
           goog.bind(function(e) {
-            goog.style.setPosition(this.commentControls_, 0,
-                -brkn.sidebar.CommentInput.COMMENT_CONTROLS_HEIGHT);
+            goog.style.setPosition(this.commentControls_, 0, 0);
             this.dispatchEvent(goog.events.EventType.FOCUS)
           }, this))
       .listen(keyHandler,
@@ -124,6 +152,12 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
           goog.bind(function(e) {
             this.dispatchEvent(e);
           }, this))
+      .listen(this.fbToggle_,
+          goog.ui.Component.EventType.ACTION,
+          goog.bind(this.onFacebookToggle_, this))
+      .listen(this.tweetToggle_,
+          goog.ui.Component.EventType.ACTION,
+          goog.bind(this.onTwitterToggle_, this))
       .listen(this.addCommentButton_,
           goog.ui.Component.EventType.ACTION,
           goog.bind(this.onAddComment_, this));
@@ -143,7 +177,8 @@ brkn.sidebar.CommentInput.prototype.getValue = function() {
  * 
  */
 brkn.sidebar.CommentInput.prototype.collapse = function() {
-  goog.style.setPosition(this.commentControls_, 0, 0);
+  goog.style.setPosition(this.commentControls_, 0,
+      brkn.sidebar.CommentInput.COMMENT_CONTROLS_HEIGHT);
 }
 
 
@@ -178,7 +213,36 @@ brkn.sidebar.CommentInput.prototype.onAddComment_ = function(e) {
           this.commentInput_.setEnabled(true);
           this.commentInput_.setFocused(true);
         }, this),
+      facebook: this.fbToggle_.isChecked(),
+      twitter: this.tweetToggle_.isChecked(),
       text: this.commentInput_.getValue()
     });
   }
+};
+
+
+/**
+ * @param {Event} e
+ */
+brkn.sidebar.CommentInput.prototype.onFacebookToggle_ = function(e) {
+  if (!this.fbPublish_ && this.fbToggle_.isChecked()) {
+    goog.style.showElement(goog.dom.getElement('overlay'), true);
+    FB.login(function(response) {
+      goog.style.showElement(goog.dom.getElement('overlay'), false);
+      this.facebookPublish_ = !!response['authResponse'];
+      this.fbToggle_.setChecked(this.facebookPublish_);
+    }, { scope: 'publish_stream' });
+  }
+};
+
+
+/**
+ * @param {Event} e
+ */
+brkn.sidebar.CommentInput.prototype.onTwitterToggle_ = function(e) {
+  if (!this.twitterPublish_ && this.tweetToggle_.isChecked()) {
+      var newWindow = window.open(this.twitterAuthUrl_,'Twitter Login','height=300,width=550');
+      newWindow.moveTo(screen.width/2-225, screen.height/2-150);
+      newWindow.focus();
+   }
 };

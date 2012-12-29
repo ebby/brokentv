@@ -1,9 +1,52 @@
 div.info {
-  margin-top: 10px;
-  div.publisher {
+  margin-top: -2px;
+  div.picture {
+    display: inline-block;
+    width: 300px;
+    height: 200px;
     position: relative;
+    overflow: hidden;
+    background: #f5f5f5;
+    border-bottom: 1px solid #181818;
+    box-shadow: 0 1px 1px 0 rgba(255,255,255,.5);
+    /*
+    &:hover img {
+     -webkit-transition: opacity .6s ease, top 4s ease-out, left 4s ease-out;
+        -moz-transition: opacity .6s ease, top 4s ease-out, left 4s ease-out;
+          -o-transition: opacity .6s ease, top 4s ease-out, left 4s ease-out;
+         -ms-transition: opacity .6s ease, top 4s ease-out, left 4s ease-out;
+             transition: opacity .6s ease, top 4s ease-out, left 4s ease-out;
+      -webkit-filter: none !important;
+      opacity: 1;
+    }
+    &:hover div.title {
+      color: #f5f5f5;
+      text-shadow: 0px 0px 4px black;
+    }
+    */
+    img {
+      width: 100%;
+      height: auto;
+      position: absolute;
+      opacity: .5;
+      top: 50%;
+      left: 50%;
+      margin-top: -20px;
+      /* -webkit-filter: grayscale() brightness(40%); */
+      &.fix-height {
+        height: 150%;
+        width: auto;
+      }
+    }
+  }
+  div.publisher {
     left: 10px;
     top: 10px;
+    background: rgba(0, 0, 0, .6);
+    display: inline-block;
+    padding: 5px;
+    border-radius: 3px;
+    position: absolute;
     div.name {
       a {
         color: #f5f5f5;
@@ -29,56 +72,56 @@ div.info {
   }
   div.title {
     position: relative;
-    left: 110px;
-    top: 15px;
+    left: 10px;
+    top: 40px;
     padding-right: 10px;
     color: whiteSmoke;
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
-    font-size: 13px;
-    height: 50px;
-    width: 180px;
+    font-size: 14px;
+    width: 225px;
     overflow: hidden;
+    background: rgba(0, 0, 0, .6);
+    border-radius: 3px;
+    padding: 5px;
   }
   div.options {
     position: absolute;
-    top: 73px;
-    left: 113px;
+    top: 0;
+    right: 0;
     div.button {
+      display: block;
       border-radius: 0;
-      margin-left: -1px;
-      width: 59px;
-      height: 18px;
+      margin-top: -1px;
+      width: 40px;
+      height: 32px;
       background-repeat: no-repeat;
       background-position: center;
     }
-    div.button:last-child {
-      border-top-right-radius: 3px;
-      border-bottom-right-radius: 3px;
-    }
-    div.button:first-child {
-      border-top-left-radius: 3px;
-      border-bottom-left-radius: 3px;
-    }
     div.play {
       background-image: url(/static/img/16-play@2x.png);
-      background-size: auto 50%;
+      background-size: auto 30%;
     }
     div.star {
       background-image: url(/static/img/28-star@2x.png);
-      background-size: auto 60%;
+      background-size: auto 40%;
       &.goog-custom-button-checked {
         background-image: url(/static/img/28-star-yellow@2x.png);
       }
     }
-    div.share {
-
+    div.facebook {
+      background-image: url(/static/img/facebook.png);
+      background-size: auto 40%;
+    }
+    div.twitter {
+      background-image: url(/static/img/twitter.png);
+      background-size: auto 40%; 
     }
   }
   div.description {
-    margin-top: 50px;
+    margin-top: 10px;
     width: 280px;
-    font-size: 10px;
-    height: 38px;
+    font-size: 12px;
+    height: 48px;
     overflow: hidden;
     position: relative;
     left: 5px;
