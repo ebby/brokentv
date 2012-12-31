@@ -60,10 +60,10 @@ class Program(db.Model):
     self.put()
     return effected
   
-  def toJson(self, fetch_channel=True):
+  def toJson(self, fetch_channel=True, fetch_media=True):
     json = {}
     json['id'] = self.key().id()
-    json['media'] = self.media.toJson()
+    json['media'] = self.media.toJson() if fetch_media else self.media.key().name()
     json['time'] = self.time.isoformat() if self.time else None
     json['channel'] = self.channel.toJson() if fetch_channel else {'id': self.channel.key().id()}
     return json

@@ -174,7 +174,8 @@ div#guide {
           }
           &:hover div.title, &.playing div.title {
             color: #f5f5f5;
-            text-shadow: 0px 0px 4px black;
+            text-shadow: 1px 1px 1px rgba(0, 0, 0, .6), -1px -1px 1px rgba(0, 0, 0, .6),
+                -1px 1px 1px rgba(0, 0, 0, .6), 1px -1px 1px rgba(0, 0, 0, .6);
           }
           &.playing div.progress {
             display: block;
@@ -214,14 +215,14 @@ div#guide {
 					div.title {
 					  left: 5px;
 						top: 5px;
-            color: #5d5d5d;
+            color: #4d4d4d;
             text-shadow: 1px 1px 1px white;
 						height: 40px;
 						font-size: 14px;
 						position: absolute;
 						white-space: nowrap;
 						overflow: hidden;
-						margin-right: 25px;
+						padding-right: 25px;
 						&.marquee {
 						  .transition(margin-left, 10s, linear);
 						}
@@ -258,9 +259,16 @@ div#guide {
 	      pointer-events: none;
 	      z-index: 1;
 	      margin-bottom: 1px;
+	      opacity: 0;
+	      visibility: hidden;
+	      .transition(opacity, .3s, ease);
 	      svg {
 	        top: 5px;
 	      }
+      }
+      &:hover div.graph {
+        opacity: 1;
+        visibility: visible;
       }
     	div.viewers {
 	      width: 100%;

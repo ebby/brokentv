@@ -39,10 +39,45 @@
 	    url('/static/webfonts/235CED_0_0.ttf') format('truetype');
 }
 
+@font-face {
+  font-family: 'MuseoSans100';
+  src: url('/static/webfonts/museosans/100.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'MuseoSans300';
+  src: url('/static/webfonts/museosans/300.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'MuseoSans500';
+  src: url('/static/webfonts/museosans/500.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'MuseoSans700';
+  src: url('/static/webfonts/museosans/700.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'KievitBook';
+  src: url('/static/webfonts/KievitWebPro-Book.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'KievitBold';
+  src: url('/static/webfonts/KievitWebPro-Bold.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'KievitLight';
+  src: url('/static/webfonts/KievitWebPro-Light.woff') format('woff');
+}
+
 html, body {
   background: #181818;
   margin: 0;
-  font-family: MuseoSans;
+  font-family: MuseoSans300;
   overflow: hidden;
 }
 
@@ -58,6 +93,7 @@ div#overlay {
 
 a {
   text-decoration: none;
+  font-family: MuseoSans700;
   &:hover {
     text-decoration: underline;
   }

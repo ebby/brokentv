@@ -60,9 +60,7 @@ class CollectionPublisher(db.Model):
   
   @classmethod
   def get_publishers(cls, collection):
-    logging.info(collection)
     collection_publishers = CollectionPublisher.all().filter('collection =', collection).fetch(100);
-    logging.info(collection_publishers)
     return [c_p.publisher for c_p in collection_publishers]
     
 # Media in this collection
@@ -77,7 +75,6 @@ class CollectionMedia(db.Model):
     if not collection_media:
       collection_media = CollectionMedia(collection=collection, media=media, published=media.published)
       collection_media.put()
-    logging.info(collection_media)
     return collection_media
 
 # Channels that may play from this collection

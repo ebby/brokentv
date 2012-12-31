@@ -323,12 +323,14 @@ brkn.Sidebar.prototype.navigate = function(to, opt_back, opt_title) {
 /**
  * @param {Array.<brkn.model.Media>} medias
  * @param {string} name
+ * @param {?string=} opt_thumb
+ * @param {?string=} opt_desc
  */
-brkn.Sidebar.prototype.showMediaList = function(medias, name) {
-  var mediaList = new brkn.sidebar.MediaList(medias);
+brkn.Sidebar.prototype.showMediaList = function(medias, name, opt_thumb, opt_desc) {
+  var mediaList = new brkn.sidebar.MediaList(medias, opt_thumb, opt_desc);
   mediaList.decorate(this.mediaListEl_);
   brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NAVIGATE,
-      this.mediaListEl_, true, name);
+      this.mediaListEl_, true, name, opt_thumb, opt_desc);
 };
 
 

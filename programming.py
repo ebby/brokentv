@@ -48,7 +48,7 @@ class Programming():
           collection_channel.put()
       collection.fetch()
       for channel in collection.get_channels():
-        for media in collection.get_medias(25):
+        for media in collection.get_medias(100):
           #if (datetime.datetime.now() - media.published).days < 100:
           Program.add_program(channel, media)
 

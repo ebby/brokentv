@@ -496,13 +496,13 @@ brkn.Channel.prototype.update = function() {
 	}
 	
 	// Update current program if playing
-	if (this.currentProgram_) {
-	  var programEl = this.programs_[this.currentProgram_];
-	  var progress = goog.dom.getElementByClass('progress', programEl);
-	  var program = this.getModel().getProgram(this.currentProgram_);
-	  var elapsed = (goog.now() - program.time.getTime())/(program.media.duration * 10);
-	  goog.style.setWidth(progress, elapsed + '%');
-	}
+//	if (this.currentProgram_) {
+//	  var programEl = this.programs_[this.currentProgram_];
+//	  var progress = goog.dom.getElementByClass('progress', programEl);
+//	  var program = this.getModel().getProgram(this.currentProgram_);
+//	  var elapsed = (goog.now() - program.time.getTime())/(program.media.duration * 10);
+//	  goog.style.setWidth(progress, elapsed + '%');
+//	}
 
 	//Set programs and name heights
 	goog.style.setHeight(this.programsEl_, goog.style.getSize(this.getElement()).height - 21 /* padding */);

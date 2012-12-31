@@ -137,7 +137,8 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
                     return new brkn.model.Media(m);
                   });
                   brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.MEDIA_LIST,
-                      medias, this.media_.publisher.name);
+                      medias, this.media_.publisher.name, this.media_.publisher.picture,
+                      this.media_.publisher.description);
                 }, this));
           }, this))
       .listen(this.starToggle_, goog.ui.Component.EventType.ACTION, goog.bind(function() {

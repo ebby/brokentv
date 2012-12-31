@@ -9,7 +9,8 @@
     <div class="picture">
       <img src="{$media.thumbnail}" class="thumb">
       <div class="publisher">
-        <div class="name"><a href="#">{$media.publisher.name}</a></div>
+        <img src="{$media.publisher.picture}">
+        <div class="name">{$media.publisher.name}</div>
       </div>
       <div class="title">{$media.name}</div>
       <div class="options">
@@ -19,12 +20,14 @@
         <div class="button twitter"></div>
       </div>
     </div>
-    <div class="description">{$media.description}</div>
+    {if $media.description}
+      <div class="description">{$media.description}</div>
+    {/if}
     <div class="viewers" style="display: none">
-      <div class="label">Seen by</div>
+      <div class="label">SEEN BY</div>
     </div>
     <div class="tweets">
-      <div class="label">Latest Tweets</div>
+      <div class="label">LATEST TWEETS</div>
       <div class="tweet">
         <img src="https://twimg0-a.akamaihd.net/profile_images/1662065370/321812_10100678888848113_1240963_60891628_1940968369_o_normal.jpg"/>
         <div class="text">
@@ -35,7 +38,7 @@
       </div>
     </div>
     <div class="comments-holder">
-      <div class="label">Conversation</div>
+      <div class="label">CONVERSATION</div>
       <div class="comments"></div>
     </div>
   </div>
@@ -72,8 +75,8 @@
 {template .commentInput}
   <div class="comment-input">
     <div class="comment-controls">
-      <div class="comment-button tweet-toggle">tweet</div>
-      <div class="comment-button fb-toggle">post</div>
+      <div class="comment-button tweet-toggle">tweet<div class="check"></div></div>
+      <div class="comment-button fb-toggle">post<div class="check"></div></div>
       <div class="comment-button add-comment">add</div>
     </div>
     <div class="input-holder">
@@ -134,6 +137,20 @@
       <div class="timestamp">{$time}</div>
     </div>
     <div class="medias"></div>
+  </div>
+{/template}
+
+
+/**
+ * @param thumbnail
+ * @param description
+ */
+{template .listInfo}
+  <div class="list-info">
+    <div class="picture" {if $thumbnail}style="display:table-cell"{/if}>
+      <img class="thumb" src="{$thumbnail}">
+    </div>
+    <div class="description" {if $description}style="display:table-cell"{/if}>{$description}</div>
   </div>
 {/template}
 

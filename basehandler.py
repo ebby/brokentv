@@ -36,6 +36,7 @@ class BaseHandler(webapp2.RequestHandler):
                     profile = graph.get_object("me")
                     user = User(key_name=str(profile["id"]),
                         id=str(profile["id"]),
+                        access_level=(AccessLevel.ADMIN if constants.DEVELOPMENT else AccessLevel.WAITLIST),
                         name=profile["name"],
                         email=profile.get("email"),
                         profile_url=profile["link"],

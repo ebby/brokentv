@@ -24,7 +24,7 @@ div.info {
       text-shadow: 0px 0px 4px black;
     }
     */
-    img {
+    img.thumb {
       width: 100%;
       height: auto;
       position: absolute;
@@ -44,15 +44,25 @@ div.info {
     top: 10px;
     background: rgba(0, 0, 0, .6);
     display: inline-block;
-    padding: 5px;
     border-radius: 3px;
     position: absolute;
+    cursor: pointer;
+    img {
+      width: 22px;
+      height: 22px;
+      border-top-left-radius: 6px;
+      border-bottom-left-radius: 6px;
+      vertical-align: top;
+      border: 1px solid transparent;
+    }
     div.name {
-      a {
-        color: #f5f5f5;
-        text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
-      }
-      font-size: 12px;
+      color: #f5f5f5;
+      text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
+      font-size: 11px;
+      font-family: MuseoSans700;
+      line-height: 3px;
+      margin: 0 5px;
+      display: inline-block;
     }
   }
   img.thumb {
@@ -65,10 +75,11 @@ div.info {
     top: 30px;
   }
   div.label {
-    font-size: 11px;
-    color: #f5f5f5;
+    font-size: 10px;
+    color: #B8B8B8;
     margin-bottom: 7px;
-    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
+    text-shadow: 1px 1px 1px black;
+    font-family: MuseoSans700;
   }
   div.title {
     position: relative;
@@ -77,7 +88,8 @@ div.info {
     padding-right: 10px;
     color: whiteSmoke;
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
-    font-size: 14px;
+    font-size: 18px;
+    font-family: MuseoSans100;
     width: 225px;
     overflow: hidden;
     background: rgba(0, 0, 0, .6);
@@ -118,17 +130,20 @@ div.info {
     }
   }
   div.description {
-    margin-top: 10px;
+    margin-top: 1px;
     width: 280px;
-    font-size: 12px;
-    height: 48px;
+    font-size: 13px;
+    height: 60px;
     overflow: hidden;
+    overflow-y: scroll;
     position: relative;
-    left: 5px;
     margin-right: 5px;
-    padding: 0 5px;
-    border-bottom: 1px solid rgba(0, 0, 0, .3);
+    padding: 10px;
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
+    background: #181818;
+    box-shadow: inset -1px -1px 1px 0 #aaa;
+    line-height: 16px;
+    border-bottom: 1px solid #181818;
   }
   div.viewers {
     position: relative;
@@ -182,6 +197,7 @@ div.info {
         left: 37px;
         top: 3px;
         font-size: 13px;
+        line-height: 16px;
         width: 240px;
       }
       div.timestamp {
@@ -189,7 +205,6 @@ div.info {
         bottom: 3px;
         right: 5px;
         font-size: 10px;
-        color: #bbb;
       }
     }
   }
@@ -208,17 +223,25 @@ div.info {
     div.comment {
       position: relative;
       width: 99%;
-      border-radius: 3px;
       background: rgba(255, 255, 255, 0.2);
       border: 1px solid #888;
+      padding-top: 5px;
       padding-bottom: 20px;
       overflow: hidden;
-      margin-bottom: 5px;
+      margin-bottom: -1px;
+      &:first-child {
+        border-top-left-radius: 3px;
+        border-top-right-radius: 3px;
+      }
+      &:last-child {
+        border-bottom-left-radius: 3px;
+        border-bottom-right-radius: 3px;
+      }
       img {
         width: 28px;
         height: 28px;
         left: 4px;
-        top: 4px;
+        top: 7px;
         position: absolute;
       }
       div.text {
@@ -229,6 +252,7 @@ div.info {
         left: 37px;
         top: 3px;
         font-size: 13px;
+        line-height: 16px;
         width: 240px;
       }
       div.timestamp {
@@ -236,7 +260,6 @@ div.info {
         bottom: 3px;
         right: 5px;
         font-size: 10px;
-        color: #bbb;
       }
     }
   }

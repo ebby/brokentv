@@ -112,6 +112,14 @@ class SessionHandler(BaseHandler):
         data = get_session(self.current_user)
         self.response.out.write(simplejson.dumps(data))
 
+class ImagesHandler(webapp2.RequestHandler):
+    def get(self, entity, id):
+      if id and entity == 'publisher':
+        publisher = Publisher.get_by_id(int(id))
+        if publisher:
+          self.response.headers['Content-Type'] = 'image/jpeg'
+          self.response.out.write(publisher.picture)
+
 class ProgramHandler(BaseHandler):
     def post(self):
       channel = Channel.get_by_id(int(self.request.get('channel')))
@@ -321,8 +329,9 @@ def broadcastProgramChanges(channel, programs):
   response = {}
   response['type'] = 'update_programs'
   response['channel_id'] = channel.key().id()
-  response['programs'] = [p.toJson(False) for p in programs]
+  response['programs'] = [p.toJson(False, False) for p in programs]
   channels = simplejson.loads(memcache.get('web_channels') or '{}')
+  logging.info(simplejson.dumps(response))
   for client in channels.iterkeys():
     webchannel.send_message(client, simplejson.dumps(response))
 
@@ -334,6 +343,7 @@ app = webapp2.WSGIApplication([
     # Channel URIs
     ('/_ah/channel/connected/', WebChannelConnectedHandler),
     ('/_ah/channel/disconnected/', WebChannelDisconnectedHandler),
+
     # RPCs
     ('/_addprogram', ProgramHandler),
     ('/_activity', ActivityHandler),
@@ -356,7 +366,11 @@ app = webapp2.WSGIApplication([
     ('/admin/_addprogram', AdminAddProgramHandler),
     ('/admin/_rescheduleprogram', AdminRescheduleProgramHandler),
     ('/admin/_removeprogram', AdminRemoveProgramHandler),
-
+    
+    # Resources
+    ('/images/(.*)/(.*)', ImagesHandler),
+    
+    # Pagess
     ('/', MainHandler)],
   debug=True,
   config=constants.CONFIG)

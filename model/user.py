@@ -18,7 +18,7 @@ class User(db.Model):
     def set_twitter_info(self, info):
       self.twitter_token = info['token']
       self.twitter_secret = info['secret']
-      self.twitter_handle = info['id']
+      self.twitter_handle = info['username']
       self.put()
 
     def to_session(self):
