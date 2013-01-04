@@ -103,6 +103,8 @@ brkn.Player.prototype.changeChannel = function(channel) {
  */
 brkn.Player.prototype.playerStateChange_ = function(event) {
 	if (event.data == YT.PlayerState.ENDED) {
+	  window.console.log(brkn.model.Users.getInstance().currentUser.currentSession);
+	  window.console.log(brkn.model.Users.getInstance().currentUser.currentSession.id)
 	  goog.net.XhrIo.send(
 	      '/_seen',
 	      goog.functions.NULL(),

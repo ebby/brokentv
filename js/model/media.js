@@ -14,61 +14,56 @@ brkn.model.Media = function(media) {
 
 	/**
    * @type {string}
-   * @private
    */
   this.id = media.id;
 
 	/**
 	 * @type {string}
-	 * @private
 	 */
 	this.name = media.name;
 	
 	/**
 	 * @type {string}
-	 * @private
 	 */
 	this.host = 'youtube';
 	
 	/**
 	 * @type {string}
-	 * @private
 	 */
 	this.hostId = media['host_id'];
 
 	/**
 	 * @type {number}
-	 * @private
 	 */
 	this.duration = media.duration;
 	
 	/**
    * @type {string}
-   * @private
    */
   this.description = media.description;
   
   /**
    * @type {Object}
-   * @private
    */
   this.publisher = media['publisher'];
   
   /**
    * @type {goog.date.DateTime}
-   * @private
    */
   this.published = goog.date.fromIsoString(media['published'] + 'Z');
 
 	/**
 	 * @type {string}
-	 * @private
 	 */
 	this.thumbnail = 'http://i.ytimg.com/vi/' + this.hostId + '/0.jpg';
-	
+
+	/**
+	 * @type {goog.math.Size}
+	 */
+	this.thumbSize = new goog.math.Size(480, 360);
+
 	/**
    * @type {Array.<brkn.model.Comment>}
-   * @private
    */
   this.comments = [];
   

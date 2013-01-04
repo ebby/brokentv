@@ -5,9 +5,12 @@ CONFIG['webapp2_extras.sessions'] = dict(secret_key='JHG234K5HG34JH5B3K4J53N4KJ5
 
 DEVELOPMENT = os.environ['SERVER_SOFTWARE'].startswith('Development')
 
+# Make prod app
 TWITTER_CONSUMER_KEY = 'hiEtXnWvrHwBscT698zP3w'
 TWITTER_CONSUMER_SECRET = 'bGY381qzadl7rlcYeKWW3pFLTcYAoIgQYT4awjxXOc'
 TWITTER_CALLBACK = 'http://local.broken.tv:8011/_twitter/callback'
+
+GDATA_KEY = 'AIzaSyAUF3ESL0wYUuSWmOezgZclQFpNGZNBePw'
 
 if DEVELOPMENT:
   FACEBOOK_APP_ID = "164212930331128"

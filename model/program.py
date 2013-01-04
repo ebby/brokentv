@@ -3,20 +3,31 @@ from common import *
 from channel import Channel
 from media import Media
 
+from google.appengine.ext import deferred
+
 class Program(db.Model):
   media = db.ReferenceProperty(Media)
   channel = db.ReferenceProperty(Channel)
   time = db.DateTimeProperty()
 
   @classmethod
-  def get_current_programs(cls):
-    cutoff = datetime.datetime.now() - datetime.timedelta(hours=9)
-    return Program.all().filter('time >', cutoff).order('time').fetch(100)
+  def get_current_programs(cls, channels):    
+    cutoff = datetime.datetime.now() - datetime.timedelta(hours=3)
+    programming = simplejson.loads(memcache.get('programming') or '{}')
 
+    for channel in channels:
+      programs = [x.program for x in
+                  channel.channelPrograms.filter('time >', cutoff).order('time').fetch(100)]
+      
+      programming[channel.key().id()] = [p.toJson(fetch_channel=False, media_desc=False) for p in programs]
+
+    memcache.set('programming', simplejson.dumps(programming))
+    return programming
+      
   @classmethod
   def add_program(cls, channel, media):
     if media:
-      # Microseconds break equalities when passing datetimes to frontend
+      # Microseconds break equalities when passing datetimes between front/backend
       program = Program(media=media,
                         channel=channel,
                         time=channel.get_next_time().replace(microsecond=0))
@@ -24,6 +35,10 @@ class Program(db.Model):
       
       channelProgram = ChannelProgram(channel=channel, program=program, time=program.time)
       channelProgram.put()
+      
+      media.last_programmed = datetime.datetime.now()
+      media.put()
+
       return program
 
   def remove(self):
@@ -60,10 +75,10 @@ class Program(db.Model):
     self.put()
     return effected
   
-  def toJson(self, fetch_channel=True, fetch_media=True):
+  def toJson(self, fetch_channel=True, fetch_media=True, media_desc=True):
     json = {}
     json['id'] = self.key().id()
-    json['media'] = self.media.toJson() if fetch_media else self.media.key().name()
+    json['media'] = self.media.toJson(media_desc) if fetch_media else self.media.key().name()
     json['time'] = self.time.isoformat() if self.time else None
     json['channel'] = self.channel.toJson() if fetch_channel else {'id': self.channel.key().id()}
     return json

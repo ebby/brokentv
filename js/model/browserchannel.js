@@ -75,5 +75,14 @@ brkn.model.BrowserChannel.prototype.onMessage_ = function(rawMessage) {
 	    goog.array.forEach(programs, function(program) {
 	      channel.publish(brkn.model.Channel.Action.UPDATE_PROGRAM, program);
 	    }, this);
+	    break;
+	  case 'new_programs':
+	    goog.array.forEach((/** @type {Array.<Object>} */ message['programs']),
+	        goog.bind(function(program) {
+	          var p = new brkn.model.Program(program);
+	          var channel = brkn.model.Channels.getInstance().get(message['channel_id']);
+	          channel.publish(brkn.model.Channel.Action.ADD_PROGRAM, p);
+	        }, this));
+      break;
 	}
 };

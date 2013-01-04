@@ -97,9 +97,9 @@ class CollectionChannel(db.Model):
   
   @classmethod
   def add(cls, collection, channel):
-    collection_channel = CollectionMedia.all().filter('channel =', channel).get()
+    collection_channel = CollectionChannel.all().filter('channel =', channel).get()
     if not collection_channel:
-      collection_channel = CollectionMedia(collection=collection, channel=channel)
+      collection_channel = CollectionChannel(collection=collection, channel=channel)
       collection_channel.put()
     return collection_channel
 

@@ -214,9 +214,11 @@ brkn.Sidebar.prototype.fetchAndRenderStarred_ = function() {
  */
 brkn.Sidebar.prototype.onNextProgram_ = function(opt_program) {
   var program = opt_program || brkn.model.Channels.getInstance().currentChannel.getCurrentProgram();
-  this.currentMedia_ = program.media;
-  this.info_ = new brkn.sidebar.Info(this.currentMedia_);
-  this.info_.decorate(goog.dom.getElement('info'));
+  if (program) {
+    this.currentMedia_ = program.media;
+    this.info_ = new brkn.sidebar.Info(this.currentMedia_);
+    this.info_.decorate(goog.dom.getElement('info'));
+  }
 };
 
 

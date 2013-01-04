@@ -1,3 +1,4 @@
+import broadcast
 import constants
 import datetime
 import gdata.youtube
@@ -10,6 +11,7 @@ import urllib
 import types
 import re
 
+from google.appengine.api import memcache
 from google.appengine.api import urlfetch
 from google.appengine.ext import db
 

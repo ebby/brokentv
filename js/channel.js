@@ -40,6 +40,12 @@ brkn.Channel = function(model, timeline, startTime, startTimeOffset, minTime) {
    */
   this.adminMode_ = false;
 	
+  /**
+   * @type {boolean}
+   * @private
+   */
+  this.showGraph_ = false;
+  
 	/**
 	 * @type {number}
 	 * @private
@@ -153,21 +159,24 @@ brkn.Channel.prototype.enterDocument = function() {
   this.nameEl_ = goog.dom.getElementByClass('name', this.getElement());
   this.graphEl_ = goog.dom.getElementByClass('graph', this.getElement());
 
-  var sampleTime = 0;
-  var viewers = 40;
-  this.max_ = 0;
-  this.fakeViewerData_ = [new goog.math.Coordinate(sampleTime, viewers)];
-  this.fakeCurrentTime_ = Math.floor((goog.now() - this.minTime_.getTime())/1000);
+  if (this.showGraph_) {
+    var sampleTime = 0;
+    var viewers = 40;
+    this.max_ = 0;
+    this.fakeViewerData_ = [new goog.math.Coordinate(sampleTime, viewers)];
+    this.fakeCurrentTime_ = Math.floor((goog.now() - this.minTime_.getTime())/1000);
 
-  for (var i = 0; i < this.timeline_/40; i++) {
-  	this.fakeViewerData_.push(new goog.math.Coordinate(
-  			(sampleTime += 40),
-  			(viewers += [-30, -5, 15, 10, 25][Math.floor(Math.random() * 5)])));
-  	this.max_ = Math.max(this.max_, viewers);
+    for (var i = 0; i < this.timeline_/40; i++) {
+      this.fakeViewerData_.push(new goog.math.Coordinate(
+          (sampleTime += 40),
+          (viewers += [-30, -5, 15, 10, 25][Math.floor(Math.random() * 5)])));
+      this.max_ = Math.max(this.max_, viewers);
+    }
+    
+    var raphael = Raphael(this.graphEl_, '100%', 60);
+    //var c = graph.path("M0,0").attr({fill: "none", "stroke-width": 1, "stroke-linecap": "round"});
+    this.graph_ = raphael.path("M0,0").attr({stroke: "none", opacity: .8, fill: '#5d5d5d'/*Raphael.getColor(1)*/});
   }
-  var raphael = Raphael(this.graphEl_, '100%', 60);
-  //var c = graph.path("M0,0").attr({fill: "none", "stroke-width": 1, "stroke-linecap": "round"});
-  this.graph_ = raphael.path("M0,0").attr({stroke: "none", opacity: .8, fill: '#5d5d5d'/*Raphael.getColor(1)*/});
   
   // Color the name
   goog.style.setStyle(this.nameEl_, 'background', Raphael.getColor());
@@ -289,13 +298,35 @@ brkn.Channel.prototype.addProgram = function(program) {
 		admin: showAdmin
 	});
 	this.programs_[program.id] = programEl;
-	if (program.id == brkn.model.Channels.getInstance().currentChannel.getCurrentProgram().id) {
+	var currentProgram = brkn.model.Channels.getInstance().currentChannel.getCurrentProgram();
+	if (currentProgram && program.id == currentProgram.id) {
 	  goog.dom.classes.add(programEl, 'playing');
 	  this.currentProgram_ = program.id;
 	}	
 
-	// Position image
 	var img = goog.dom.getElementByClass('thumb', programEl);
+	goog.style.setTransparentBackgroundImage(img, program.media.thumbnail);
+	goog.Timer.callOnce(function() {
+    if (program.media.thumbSize.height < goog.style.getSize(programEl).height + 50) {
+      goog.dom.classes.add(img, 'fix-height');
+      goog.dom.classes.add(img, 'pan-left');
+    } else {
+      goog.dom.classes.add(img, 'pan-top');
+    }
+    
+//    if (program.media.thumbSize.width > 2*goog.style.getSize(programEl).width && !clipped) {
+//      goog.dom.classes.add(img, 'pan-left');
+//    } else if (program.media.thumbSize.height > 2*goog.style.getSize(programEl).height) {
+//      goog.dom.classes.add(img, 'pan-top');
+//    }
+
+    if (clipped) {
+      goog.style.setWidth(img, 200);
+    }
+    goog.style.setStyle(img, 'background-position', 'center');
+    goog.dom.classes.enable(programEl, 'stretched', program.media.thumbSize.height > 360);
+  });
+	
 	
 	goog.dom.classes.enable(programEl, 'current',
 			this.getModel().currentProgram && this.getModel().currentProgram.id == program.id);
@@ -331,30 +362,30 @@ brkn.Channel.prototype.addProgram = function(program) {
       });
 	
 	// Image cropping
-	this.getHandler().listen(img,
-	    goog.events.EventType.LOAD,
-	    function() {
-	      goog.style.showElement(img, true);
-	      goog.Timer.callOnce(function() {
-	        if (goog.style.getSize(img).height < goog.style.getSize(programEl).height + 50) {
-            goog.dom.classes.add(img, 'fix-height');
-          }
-	        
-	        if (goog.style.getSize(img).width > 2*goog.style.getSize(programEl).width && !clipped) {
-            goog.dom.classes.add(img, 'pan-left');
-          } else if (goog.style.getSize(img).height > 2*goog.style.getSize(programEl).height) {
-            goog.dom.classes.add(img, 'pan-top');
-          }
-
-	        if (clipped) {
-	          goog.style.setWidth(img, 200);
-	        }
-	        // Center the cropped picture.
-	        img.style.marginTop = -goog.style.getSize(img).height/2 + 'px';
-	        img.style.marginLeft = -goog.style.getSize(img).width/2 + 'px';
-	        goog.dom.classes.enable(programEl, 'stretched', goog.style.getSize(img).height > 360);
-	      });
-	    });
+//	this.getHandler().listen(img,
+//	    goog.events.EventType.LOAD,
+//	    function() {
+//	      goog.style.showElement(img, true);
+//	      goog.Timer.callOnce(function() {
+//	        if (goog.style.getSize(img).height < goog.style.getSize(programEl).height + 50) {
+//            goog.dom.classes.add(img, 'fix-height');
+//          }
+//	        
+//	        if (goog.style.getSize(img).width > 2*goog.style.getSize(programEl).width && !clipped) {
+//            goog.dom.classes.add(img, 'pan-left');
+//          } else if (goog.style.getSize(img).height > 2*goog.style.getSize(programEl).height) {
+//            goog.dom.classes.add(img, 'pan-top');
+//          }
+//
+//	        if (clipped) {
+//	          goog.style.setWidth(img, 200);
+//	        }
+//	        // Center the cropped picture.
+//	        img.style.marginTop = -goog.style.getSize(img).height/2 + 'px';
+//	        img.style.marginLeft = -goog.style.getSize(img).width/2 + 'px';
+//	        goog.dom.classes.enable(programEl, 'stretched', goog.style.getSize(img).height > 360);
+//	      });
+//	    });
 	
 	// Admin features
 	if (showAdmin) {
@@ -473,8 +504,10 @@ brkn.Channel.prototype.onSelectProgram_ = function(e) {
  * Updater
  */
 brkn.Channel.prototype.update = function() {
-	// Update path
-  this.constructPath();
+  if (this.showGraph_) {
+    // Update path
+    this.constructPath();
+  }
 
   // Update viewers
 	goog.object.forEach(this.getModel().viewerSessions, function(session) {
@@ -505,11 +538,11 @@ brkn.Channel.prototype.update = function() {
 //	}
 
 	//Set programs and name heights
-	goog.style.setHeight(this.programsEl_, goog.style.getSize(this.getElement()).height - 21 /* padding */);
+	//goog.style.setHeight(this.programsEl_, goog.style.getSize(this.getElement()).height - 21 /* padding */);
 	goog.style.setHeight(this.nameEl_, goog.style.getSize(this.getElement()).height - 1);
 	
 	// Redraw (THIS CAN CAUSE LATENCY ISSUE)
-	goog.style.getPosition(goog.dom.getElement('guide'));
+	// goog.style.getPosition(goog.dom.getElement('guide'));
 };
 
 

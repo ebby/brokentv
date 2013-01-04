@@ -37,7 +37,7 @@ class Publisher(db.Model):
       yt_service = gdata.youtube.service.YouTubeService()
       gdata.alt.appengine.run_on_appengine(yt_service)
 
-      if not self.last_fetch:
+      if not self.last_fetch or datetime.datetime.now() - self.last_fetch > datetime.timedelta(hours=3):
         logging.info(self.host_id)
         try:
           user_entry = yt_service.GetYouTubeUserEntry(username=self.host_id)
@@ -50,32 +50,32 @@ class Publisher(db.Model):
         self.link = user_entry.link[0].href
         self.put()
 
-      query = gdata.youtube.service.YouTubeVideoQuery()
-      query.author = self.host_id
-      if categories:
-        query.categories = categories
-      query.orderby = 'published'
-      query.max_results = 50
-      offset = 1
-      while offset <= 1:
-        query.start_index = offset
-        feed = yt_service.YouTubeQuery(query)
-        if len(feed.entry) == 0:
-          break
-        medias = Media.add_from_entry(feed.entry)
-        for media in medias:
-          PublisherMedia.add(publisher=self, media=media)
+        query = gdata.youtube.service.YouTubeVideoQuery()
+        query.author = self.host_id
+        if categories:
+          query.categories = categories
+        query.orderby = 'published'
+        query.max_results = 50
+        offset = 1
+        while offset <= 1:
+          query.start_index = offset
+          feed = yt_service.YouTubeQuery(query)
+          if len(feed.entry) == 0:
+            break
+          medias = Media.add_from_entry(feed.entry)
+          for media in medias:
+            PublisherMedia.add(publisher=self, media=media)
+  
+          last_media = medias[-1] if isinstance(medias, list) else medias
+          if self.last_fetch and last_media.published \
+              and last_media.published.replace(tzinfo=None) < self.last_fetch:
+            # We fetched all the latest media
+            logging.info('UP TO DATE')
+            break
+          offset += len(medias)
 
-        last_media = medias[-1] if isinstance(medias, list) else medias
-        if self.last_fetch and last_media.published \
-            and last_media.published.replace(tzinfo=None) < self.last_fetch:
-          # We fetched all the latest media
-          logging.info('UP TO DATE')
-          break
-        offset += len(medias)
-
-    self.last_fetch = datetime.datetime.now()
-    self.put()
+        self.last_fetch = datetime.datetime.now()
+        self.put()
 
 class PublisherMedia(db.Model):
   publisher = db.ReferenceProperty(Publisher, collection_name='publisherMedias')

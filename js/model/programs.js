@@ -29,13 +29,16 @@ brkn.model.Programs.prototype.currentChannel;
 
 
 /**
- * @param {Object} programs Programs json object.
+ * @param {Object} programming Programs json object.
  */
-brkn.model.Programs.prototype.loadFromJson = function(programs) {
-	goog.array.forEach((/** @type {Array.<Object>} */ programs),
-			goog.bind(function(program) {
-				var p = new brkn.model.Program(program);
-				brkn.model.Channels.getInstance().channelMap[program.channel.id].addProgram(p);
+brkn.model.Programs.prototype.loadFromJson = function(programming) {
+  window.console.log(programming)
+	goog.object.forEach((/** @type {Object.<string, Object>} */ programming),
+			goog.bind(function(programs, channelId) {
+			  goog.array.forEach((/** @type {Array.<Object>} */ programs), goog.bind(function(program) {
+			    var p = new brkn.model.Program(program);
+	        brkn.model.Channels.getInstance().channelMap[channelId].addProgram(p); 
+			  }, this));
 			}, this));
 };
 

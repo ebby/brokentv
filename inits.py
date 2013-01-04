@@ -82,46 +82,65 @@ PUBLISHERS = {
   },
   'Vantiy Fair': {
     'youtube': 'VanityFairMagazine'
-  } 
-                                          
+  },
+  'Huffington Post': {
+    'youtube': 'HuffingtonPost'
+  },
+  'Buzz60': {
+    'youtube': 'Buzz60'
+  }                                      
 }
 
 COLLECTIONS = {
   'Top News Stories': {
     'keywords': ['News'],
     'publishers': ['The New York Times',
-                   'Associated Press',
                    'ABC News',
                    'The Weather Channel',
                    'CNN',
                    'Vice',
-                   'Reuters',
                    'Town Square',
+                   'Slate',
                    'New Left Media',
                    'BuzzFeed',
-                   'Al Jazeera',
                    'Wall Street Journal',
                    'Ora TV',
                    'PBS',
                    'The Onion',
-                   'Vantiy Fair',
                    'The New Yorker',
                    'The Guardian',
-                   'The Real News'],
-    'channels': ['Broken News']
+                   'Huffington Post',
+                   'Buzz60']
   },
   'Creative Arts': {
     'keywords': ['Entertainment'],
-    'publishers': ['Cool Hunting'],
-    'channels': ['CREATE']
+    'publishers': ['Cool Hunting']
+  },
+  'Fashion': {
+    'keywords': ['Entertainment', 'Howto'],
+    'publishers': ['Buzz60', 'The New York Times', 'The New Yorker', 'Vantiy Fair']     
+  },
+  'TED': {
+    'keywords': ['Education', 'Howto'],
+    'publishers': ['TED']     
   }
 }
 
 CHANNELS = {
   'Broken News': {
-    'keywords': ['News']
+    'keywords': ['News'],
+    'collections': ['Top News Stories']
   },
   'CREATE': {
-    'keywords': ['Entertainment']                   
+    'keywords': ['Entertainment'],
+    'collections': ['Creative Arts']         
+  },
+  'Gotham Style': {
+    'keywords': ['Entertainment', 'Howto'],
+    'collections': ['Fashion']                   
+  },
+  'Inspire Me': {
+    'keywords': ['Education', 'Howto'],
+    'collections': ['TED']                   
   }
 }

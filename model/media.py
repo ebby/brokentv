@@ -17,6 +17,7 @@ class Media(db.Model):
   category = db.StringProperty()
   host_views = db.IntegerProperty()
   seen = db.StringListProperty(default=[])
+  last_programmed = db.DateTimeProperty()
 
   @classmethod
   def get(cls, id):
@@ -85,7 +86,7 @@ class Media(db.Model):
     else:
       return [User.get_by_key_name(uid).toJson() for uid in self.seen]
 
-  def toJson(self):
+  def toJson(self, get_desc=True):
     json = {}
     json['id'] = self.key().name()
     json['name'] = self.name
@@ -94,5 +95,5 @@ class Media(db.Model):
     json['host'] = self.host
     json['duration'] = self.duration
     json['published'] = self.published.isoformat()
-    json['description'] = self.description.replace("\n", r" ") if self.description else None
+    json['description'] = self.description.replace("\n", r" ") if self.description and get_desc else None
     return json

@@ -94,8 +94,8 @@ brkn.model.Channel.prototype.addViewer = function(session) {
  * @param {Object} program The program object
  */
 brkn.model.Channel.prototype.updateProgram = function(program) {
-  var p = goog.object.get(this.programMap_, program.id)
-  p.updateTime(program.time);
+  var p = goog.object.get(this.programMap_, program.id);
+  p && p.updateTime(program.time);
 };
 
 
