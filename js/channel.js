@@ -313,12 +313,6 @@ brkn.Channel.prototype.addProgram = function(program) {
     } else {
       goog.dom.classes.add(img, 'pan-top');
     }
-    
-//    if (program.media.thumbSize.width > 2*goog.style.getSize(programEl).width && !clipped) {
-//      goog.dom.classes.add(img, 'pan-left');
-//    } else if (program.media.thumbSize.height > 2*goog.style.getSize(programEl).height) {
-//      goog.dom.classes.add(img, 'pan-top');
-//    }
 
     if (clipped) {
       goog.style.setWidth(img, 200);
@@ -360,32 +354,6 @@ brkn.Channel.prototype.addProgram = function(program) {
         goog.style.setStyle(titleEl, 'margin-left', '');
         goog.dom.classes.remove(titleEl, 'marquee');
       });
-	
-	// Image cropping
-//	this.getHandler().listen(img,
-//	    goog.events.EventType.LOAD,
-//	    function() {
-//	      goog.style.showElement(img, true);
-//	      goog.Timer.callOnce(function() {
-//	        if (goog.style.getSize(img).height < goog.style.getSize(programEl).height + 50) {
-//            goog.dom.classes.add(img, 'fix-height');
-//          }
-//	        
-//	        if (goog.style.getSize(img).width > 2*goog.style.getSize(programEl).width && !clipped) {
-//            goog.dom.classes.add(img, 'pan-left');
-//          } else if (goog.style.getSize(img).height > 2*goog.style.getSize(programEl).height) {
-//            goog.dom.classes.add(img, 'pan-top');
-//          }
-//
-//	        if (clipped) {
-//	          goog.style.setWidth(img, 200);
-//	        }
-//	        // Center the cropped picture.
-//	        img.style.marginTop = -goog.style.getSize(img).height/2 + 'px';
-//	        img.style.marginLeft = -goog.style.getSize(img).width/2 + 'px';
-//	        goog.dom.classes.enable(programEl, 'stretched', goog.style.getSize(img).height > 360);
-//	      });
-//	    });
 	
 	// Admin features
 	if (showAdmin) {

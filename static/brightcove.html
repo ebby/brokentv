@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Select Next Video Example</title>
+    <script language="JavaScript" type="text/javascript" 
+		        src="http://admin.brightcove.com/js/BrightcoveExperiences.js">
+		</script>
+		<script language="JavaScript" type="text/javascript" 
+		        src="http://admin.brightcove.com/js/APIModules_all.js">
+		</script>
+  </head>
+  <body>
+    <script type="text/javascript" src="http://admin.brightcove.com/js/BrightcoveExperiences.js"></script> 
+    <button onclick="BCL.addPlayer()" />Add Player</button>
+    <div id="placeHolder" style="background-color:#64AAB2;width:485px;height:270px;text-align: center;padding:5px;">
+    
+    
+    <fieldset style="width:450px;color:#666;font-family:sans-serif;">
+      <legend>Now Playing</legend>
+      <div id="mediaInfo" style="color:#00CCFF;"></div>
+    </fieldset>
+    <script type="text/javascript"> 
+    var player; 
+    var modVP;
+    var nextVideo = 0;
+    var videos = new Array(2000694347001,1754276206001,1754276205001,1754234236001); 
+     
+    function myTemplateLoaded(experienceID) {
+      player = brightcove.api.getExperience(experienceID);
+      modVP = player.getModule(brightcove.api.modules.APIModules.VIDEO_PLAYER);
+    }
+     
+    function onTemplateReady(evt) {
+      modVP.loadVideoByID(videos[nextVideo]);
+      modVP.addEventListener(brightcove.api.events.MediaEvent.BEGIN, onMediaBegin);
+      modVP.addEventListener(brightcove.api.events.MediaEvent.COMPLETE, onMediaComplete);
+    }
+     
+    function onMediaBegin(evt) {
+      document.getElementById("mediaInfo").innerHTML = evt.media.displayName;
+    }
+    
+    function onMediaComplete(evt) {
+       nextVideo++;
+       if (nextVideo == videos.length) {
+        nextVideo = 0;
+       }
+       modVP.loadVideoByID(videos[nextVideo]);
+    }
+
+
+
+ // namespace to keep the global clear of clutter
+    var BCL = {};
+    // data for our player -- note that it must have ActionScript/JavaScript APIs enabled!!
+    BCL.playerData = { "playerId" : "1464964203001",
+                        "width" : "480",
+                        "publisherId": "1569970201",
+                        "token" : "SM7218Cwu_L8rh8C1P9qDBwRla_ZRVcoTxVKTN5DFro.",
+                        "height" : "270",
+                        "videoId" : "734462565001" };
+    // flag to keep track of whether there is a player
+    BCL.isPlayerAdded = false;
+    // template for the player object - will populate it with data using markup()
+    BCL.playerTemplate = "<div style=\"display:none\"></div><object id=\"myExperience\" class=\"BrightcoveExperience\"><param name=\"bgcolor\" value=\"#64AAB2\" /><param name=\"width\" value=\"{{width}}\" /><param name=\"height\" value=\"{{height}}\" /><param name=\"playerID\" value=\"{{playerID}}\" /><param name=\"publisherId\" value=\"{{publisherId}}\" /><param name=\"token\" value=\"{{token}}\" /><param name=\"isVid\" value=\"true\" /><param name=\"isUI\" value=\"true\" /><param name=\"dynamicStreaming\" value=\"true\" /><param name=\"@videoPlayer\" value=\"{{videoID}}\"; /><param name=\"templateLoadHandler\" value=\"BCL.onTemplateLoaded\"</object>";
+    BCL.addPlayer = function () {
+      // if we don't already have a player
+      if (BCL.isPlayerAdded == false) {
+        BCL.isPlayerAdded = true;
+        var playerHTML = "";
+        // set the videoID to the selected video
+        BCL.playerData.videoID = 2000694347001;
+        // populate the player object template
+        playerHTML = BCL.markup(BCL.playerTemplate, BCL.playerData);
+        // inject the player code into the DOM
+        document.getElementById("placeHolder").innerHTML = playerHTML;
+        // instantiate the player
+        brightcove.createExperiences();
+      }
+      // user must have requested a different video for player already loaded
+      else {
+        console.log(BCL.videoSelect.selectedIndex);
+        BCL.videoPlayer.loadVideo(BCL.videoData[BCL.videoSelect.selectedIndex].videoID);
+      }
+    };
+    /* 
+    simple HTML templating function
+     array example:
+       demo.markup("<div>{{1}}, {{0}}</div>", ["John", "Doe"]);
+     object example:
+       demo.markup("<div>{{last}}, {{first}}</div>", {first:"John", last:"Doe"});
+    */
+    BCL.markup = function (html, data) {
+        var m;
+        var i = 0;
+        var match = html.match(data instanceof Array ? /{{\d+}}/g : /{{\w+}}/g) || [];
+
+        while (m = match[i++]) {
+            html = html.replace(m, data[m.substr(2, m.length-4)]);
+        }
+        return html;
+    };
+    </script> 
+  </body>
+</html>

@@ -216,6 +216,7 @@ brkn.Sidebar.prototype.onNextProgram_ = function(opt_program) {
   var program = opt_program || brkn.model.Channels.getInstance().currentChannel.getCurrentProgram();
   if (program) {
     this.currentMedia_ = program.media;
+    goog.dispose(this.info_);
     this.info_ = new brkn.sidebar.Info(this.currentMedia_);
     this.info_.decorate(goog.dom.getElement('info'));
   }
@@ -230,6 +231,7 @@ brkn.Sidebar.prototype.onChangeChannel_ = function(opt_channel) {
   this.currentMedia_ = channel.getCurrentProgram().media;
   if (this.currentMedia_) {
     // In case the channel is empty
+    goog.dispose(this.info_);
     this.info_ = new brkn.sidebar.Info(this.currentMedia_);
     this.info_.decorate(goog.dom.getElement('info')); 
   }

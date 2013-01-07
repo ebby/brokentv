@@ -8,13 +8,14 @@ from google.appengine.api import memcache
 # CHANNEL HELPERS
 #--------------------------------------
 
-def broadcastViewerChange(user, last_channel_id, channel_id, time):
+def broadcastViewerChange(user, last_channel_id, channel_id, session_id, time):
   response = {}
   response['type'] = 'viewer_change'
   response['user'] = user.toJson()
   response['last_channel_id'] = last_channel_id
   response['channel_id'] = channel_id
   response['time'] = time
+  response['session_id'] = session_id
   channels = simplejson.loads(memcache.get('web_channels') or '{}')
   for client in channels.iterkeys():
     webchannel.send_message(client, simplejson.dumps(response))

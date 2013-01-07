@@ -80,8 +80,8 @@ PUBLISHERS = {
   'The Onion': {
     'youtube': 'TheOnion'
   },
-  'Vantiy Fair': {
-    'youtube': 'VanityFairMagazine'
+  'Vanity Fair': {
+    'brightcove': '1234' # Need to use BC api
   },
   'Huffington Post': {
     'youtube': 'HuffingtonPost'
@@ -118,7 +118,7 @@ COLLECTIONS = {
   },
   'Fashion': {
     'keywords': ['Entertainment', 'Howto'],
-    'publishers': ['Buzz60', 'The New York Times', 'The New Yorker', 'Vantiy Fair']     
+    'publishers': ['Buzz60', 'The New York Times', 'The New Yorker', 'Vanity Fair']     
   },
   'TED': {
     'keywords': ['Education', 'Howto'],

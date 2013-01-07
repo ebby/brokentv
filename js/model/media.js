@@ -73,6 +73,17 @@ goog.inherits(brkn.model.Media, goog.pubsub.PubSub);
 
 
 /**
+ * @param {?boolean=} opt_time Show the time 
+ * @return {string} Publication date as a readable string
+ */
+brkn.model.Media.prototype.getPublishDate = function (opt_time) {
+  var date = this.published.getMonth() + '/' + this.published.getDate() + '/' +
+      this.published.getYear();
+  return opt_time ? date + ' ' + this.published.toUsTimeString() : date
+};
+
+
+/**
  * @enum {string}
  */
 brkn.model.Media.Actions = {

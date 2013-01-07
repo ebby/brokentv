@@ -11,13 +11,14 @@ def get_session(current_user):
     cached_channels = {}
     for c in channels:
       cached_channels[c.key().id()] = c.toJson()
-    memcache.set('channels', simplejson.dumps(channels))
+    memcache.set('channels', simplejson.dumps(cached_channels))
     
   cached_programming = simplejson.loads(memcache.get('programming') or '{}')
   if not len(cached_programming):
     # No cached programming, attempt to fetch
     channels = channels or Channel.all().fetch(100)
     cached_programming = Program.get_current_programs(channels)
+    memcache.set('programming', simplejson.dumps(cached_programming))
 
   data['channels'] = cached_channels
   data['programs'] = cached_programming
@@ -49,6 +50,12 @@ def get_session(current_user):
     user_sessions[0].put()
   else:
     UserSession.new(current_user, current_channel)
+  
+  # Track current viewers by channel, useful for audience catering
+  channel_viewers = simplejson.loads(memcache.get('channel_viewers') or '{}')
+  channel_viewers[current_channel.id] = \
+      channel_viewers.get(current_channel.id, []) + [current_user.id]
+  memcache.set('channel_viewers', simplejson.dumps(channel_viewers))
 
   # Grab sessions for current_users (that we care about)
   viewer_sessions = []
@@ -120,10 +127,16 @@ class ChangeChannelHandler(BaseHandler):
     def post(self):
       channel_id = self.request.get('channel')
       channel = Channel.get_by_id(int(channel_id))
+      channel_viewers = simplejson.loads(memcache.get('channel_viewers') or '{}')
 
       user_sessions = UserSession.get_by_user(self.current_user)
       if len(user_sessions):
-        last_channel_id = user_sessions[0].channel.key().id()
+        last_channel_id = user_sessions[0].channel.id
+        
+        # Remove user from channel
+        if self.current_user.id in channel_viewers.get(last_channel_id, []):
+            channel_viewers[last_channel_id].remove(self.current_user.id)
+        
         if (datetime.datetime.now() - user_sessions[0].tune_in).seconds < 30:
           if len(user_sessions) > 1 and user_sessions[1].channel == channel:
             # If they switched to another channel, then switched back.
@@ -137,14 +150,32 @@ class ChangeChannelHandler(BaseHandler):
             session.put()
         else:
           user_sessions[0].end_session()
-          session = UserSession.new(self.current_user, channel)
+          
+          # Track the media opt-out behavior
+          last_channel = Channel.get_by_id(int(last_channel_id))
+          last_program = last_channel.get_current_program()
+          if last_program:
+            Media.add_opt_out(last_program.media.key().name(), self.current_user.id)
+            
+       
 
-      broadcast.broadcastViewerChange(self.current_user, last_channel_id, channel_id, session.tune_in.isoformat());
+        # New session for new channel
+        session = UserSession.new(self.current_user, channel)
+        # Track current viewers by channel, useful for audience catering
+        channel_viewers[channel_id] = channel_viewers.get(channel_id, []) + [self.current_user.id] 
+        memcache.set('channel_viewers', simplejson.dumps(channel_viewers))  
+        # Track the media opt-in behavior
+        current_program = channel.get_current_program()
+        if current_program:
+          Media.add_opt_in(current_program.media.key().name(), self.current_user.id)
+
+      broadcast.broadcastViewerChange(self.current_user, last_channel_id, channel_id,
+                                      session.key().id(), session.tune_in.isoformat());
 
 class CollectionsHandler(BaseHandler):
   def get(self, channel_id=None):
     channel = Channel.get_by_id(int(channel_id))
-    collections = CollectionChannel.get_collections(channel)
+    collections = channel.get_collections()
     self.response.out.write(simplejson.dumps([c.toJson() for c in collections]))
 
 class CollectionsMediaHandler(BaseHandler):

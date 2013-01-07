@@ -32,6 +32,7 @@ div.info {
       top: 50%;
       left: 50%;
       margin-top: -20px;
+      pointer-events: none;
       /* -webkit-filter: grayscale() brightness(40%); */
       &.fix-height {
         height: 150%;
@@ -95,6 +96,14 @@ div.info {
     background: rgba(0, 0, 0, .6);
     border-radius: 3px;
     padding: 5px;
+  }
+  div.published {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    color: #181818;
+    text-shadow: 1px 1px 1px rgba(255,255,255,.7);
+    font-size: 12px;
   }
   div.options {
     position: absolute;

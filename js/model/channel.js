@@ -103,25 +103,29 @@ brkn.model.Channel.prototype.updateProgram = function(program) {
  * @return {?brkn.model.Program}
  */
 brkn.model.Channel.prototype.getCurrentProgram = function() {
-	if (!this.currentProgram && !this.programming.length) {
+	if (!this.programming.length) {
 		return null;
 	}
-
 	var program = this.currentProgram;
-	if (!this.currentProgram) {
+	if (!program) {
 		program = this.programming[0];
 		this.currentProgramIndex = 0;
 	}
-  var now = new goog.date.DateTime();
-  var seek = (goog.now() - program.time.getTime())/1000;
-  while (program.media.duration - seek < 0) {
+	if (goog.now() >= program.time.getTime() &&
+	    goog.now() < program.time.getTime() + program.media.duration * 1000) {
+	  this.currentProgram = program;
+	  return this.currentProgram;
+	}
+
+  while (goog.now() > program.time.getTime() &&
+      goog.now() >= program.time.getTime() + program.media.duration * 1000) {
   	var nextProgram = this.getNextProgram();
   	if (!nextProgram) {
   		break;
   	}
   	program = nextProgram;
-  	seek = (goog.now() - program.time.getTime())/1000;
   }
+
   this.currentProgram = program;
   return program;
 };
@@ -136,11 +140,6 @@ brkn.model.Channel.prototype.getNextProgram = function() {
 		this.currentProgramIndex = 0;
 	}
 
-	if (!this.currentProgramIndex) {
-		this.currentProgramIndex = goog.array.findIndex(this.programming, goog.bind(function(program) {
-			return this.currentProgram.id == program.id;
-		}, this));
-	}
 	if (this.programming.length >= this.currentProgramIndex + 1) {
 		this.currentProgramIndex++;
 		this.currentProgram = this.programming[this.currentProgramIndex];

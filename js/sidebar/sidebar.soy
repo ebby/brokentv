@@ -3,6 +3,7 @@
 
 /**
  * @param media
+ * @param published
  */
 {template .info}
   <div class="info">
@@ -13,6 +14,7 @@
         <div class="name">{$media.publisher.name}</div>
       </div>
       <div class="title">{$media.name}</div>
+      <div class="published">{$published}</div>
       <div class="options">
         <div class="button play"></div>
         <div class="button star"></div>
@@ -37,7 +39,7 @@
         <div class="timestamp">2 days ago</div>
       </div>
     </div>
-    <div class="comments-holder">
+    <div class="comments-holder" style="display: none">
       <div class="label">CONVERSATION</div>
       <div class="comments"></div>
     </div>

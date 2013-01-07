@@ -4,7 +4,7 @@ from media import Media
 from user import User
 
 class Comment(db.Model):
-  media = db.ReferenceProperty(Media)
+  media = db.ReferenceProperty(Media, collection_name='comments')
   user = db.ReferenceProperty(User)
   parent_comment = db.SelfReferenceProperty()
   text = db.StringProperty()
@@ -20,6 +20,10 @@ class Comment(db.Model):
     if parent_id:
       c.parent = Comment.get_by_id(int(parent_id))
     c.put()
+    
+    media.comment_count += 1
+    media.put()
+    
     from useractivity import *
     UserActivity.add_comment(c.user, c)
     return c

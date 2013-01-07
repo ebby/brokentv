@@ -78,7 +78,8 @@ brkn.sidebar.Info.prototype.decorateInternal = function(el) {
   goog.base(this, 'decorateInternal', el);
 
   var contentEl = soy.renderAsElement(brkn.sidebar.info, {
-    media: this.media_
+    media: this.media_,
+    published: this.media_.getPublishDate()
   });
   el.innerHTML = contentEl.innerHTML;
 };

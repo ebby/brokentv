@@ -12,7 +12,7 @@ class Program(db.Model):
 
   @classmethod
   def get_current_programs(cls, channels):    
-    cutoff = datetime.datetime.now() - datetime.timedelta(hours=3)
+    cutoff = datetime.datetime.now() - datetime.timedelta(hours=1)
     programming = simplejson.loads(memcache.get('programming') or '{}')
 
     for channel in channels:

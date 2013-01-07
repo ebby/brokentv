@@ -15,9 +15,14 @@ class Media(db.Model):
   duration = db.FloatProperty()
   description = db.TextProperty()
   category = db.StringProperty()
-  host_views = db.IntegerProperty()
   seen = db.StringListProperty(default=[])
   last_programmed = db.DateTimeProperty()
+  
+  # Statistics
+  opt_in = db.StringListProperty(default=[]) # Users who tune-in or async play
+  opt_out = db.StringListProperty(default=[]) # Users who change channels or log out
+  host_views = db.IntegerProperty(default=0)
+  comment_count = db.IntegerProperty(default=0)
 
   @classmethod
   def get(cls, id):
@@ -41,9 +46,9 @@ class Media(db.Model):
       if not media:
         name = unicode(entry.media.title.text, errors='replace')
         desc = entry.media.description.text
-        desc = unicode(desc, errors='replace') if desc else None
+        desc = unicode(desc) if desc else None # unicode(desc, errors='replace') if desc else None
         category = entry.media.category[0].text
-        category = unicode(category, errors='replace') if category else None
+        category = unicode(category) if category else None #unicode(category, errors='replace') if category else None
         media = cls(key_name=(MediaHost.YOUTUBE + id),
                     type=MediaType.VIDEO,
                     host_id=id,
@@ -51,11 +56,11 @@ class Media(db.Model):
                     published=iso8601.parse_date(entry.published.text),
                     duration=float(entry.media.duration.seconds),
                     description=desc,
-                    host_views=int(entry.statistics.view_count) if entry.statistics else None,
+                    host_views=int(entry.statistics.view_count) if entry.statistics else 0,
                     category=category)
       media.put()
       medias.append(media)
-    return medias if len(medias) > 1 else medias[0] if len(medias) else None
+    return medias
 
   @classmethod
   def add_from_json(cls, json):
@@ -85,6 +90,20 @@ class Media(db.Model):
       return None
     else:
       return [User.get_by_key_name(uid).toJson() for uid in self.seen]
+    
+  @classmethod
+  @db.transactional
+  def add_opt_in(cls, key_name, uid):
+    obj = Media.get_by_key_name(key_name)
+    obj.opt_in.append(uid)
+    obj.put()
+
+  @classmethod
+  @db.transactional
+  def add_opt_out(cls, key_name, uid):
+    obj = Media.get_by_key_name(key_name)
+    obj.opt_out.append(uid)
+    obj.put()
 
   def toJson(self, get_desc=True):
     json = {}

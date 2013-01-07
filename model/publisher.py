@@ -57,7 +57,7 @@ class Publisher(db.Model):
         query.orderby = 'published'
         query.max_results = 50
         offset = 1
-        while offset <= 1:
+        while offset <= 100:
           query.start_index = offset
           feed = yt_service.YouTubeQuery(query)
           if len(feed.entry) == 0:

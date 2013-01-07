@@ -8,6 +8,10 @@ class Channel(db.Model):
   keywords = db.StringListProperty()
   next_gen = db.DateTimeProperty() # Next programming generation time
 
+  @property
+  def id(self):
+    return str(self.key().id())
+
   @classmethod
   def get_all(cls):
     return Channel.all().fetch(100)
@@ -15,6 +19,22 @@ class Channel(db.Model):
   def get_programming(self):
     channel_programs = ChannelProgram.all().filter('channel =', self).order('-time').fetch(limit=100)
     return [c_p.program for c_p in channel_programs]
+  
+  def get_current_program(self):
+    # MEMCACHE THIS!!
+    current_program = Program.get_by_id(self.current_program) if self.current_program else None
+    if current_program and current_program.time <= datetime.datetime.now() <= \
+          current_program.time + datetime.timedelta(seconds=current_program.media.duration):
+      return current_program
+
+    # WAYYY TOO EXPENSIVE
+    channel_programs = ChannelProgram.all().filter('channel =', self).order('-time').fetch(limit=30)
+    for c_p in channel_programs:
+      if c_p.time <= datetime.datetime.now() <= \
+          c_p.time + datetime.timedelta(seconds=c_p.program.media.duration):
+        self.current_program = c_p.program.key().id()
+        return c_p.program
+    return None
 
   def get_next_time(self):
     next_time = datetime.datetime.utcnow()

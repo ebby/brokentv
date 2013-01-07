@@ -97,6 +97,7 @@ app = webapp2.WSGIApplication([
     ('/admin/_addprogram', admin.AdminAddProgramHandler),
     ('/admin/_rescheduleprogram', admin.AdminRescheduleProgramHandler),
     ('/admin/_removeprogram', admin.AdminRemoveProgramHandler),
+    ('/admin/storysort', admin.StorySortHandler),
     
     # Resources
     ('/images/(.*)/(.*)', ImagesHandler),
@@ -105,7 +106,10 @@ app = webapp2.WSGIApplication([
     ('/_pubsub/subscriber.*', pubsub.PubsubHandler),
     ('/_pubsub', pubsub.PubsubHandler),
     
-    # Pagess
+    # Cron
+    ('/cron/fetch', cron.FetchHandler),
+    
+    # Pages
     ('/', MainHandler)],
   debug=True,
   config=constants.CONFIG)

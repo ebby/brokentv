@@ -1,0 +1,42 @@
+<html>
+  <head>
+  
+  </head>
+  <body>
+    <table style="width: 28%; display:inline-block;" border="1" cellspacing="0">
+     <tr>
+       <td>UNSORTED</td>
+     </tr>
+    {% for m in raw_medias %}
+      <tr>
+        <td>{{m.name}}</td>
+      </tr>
+    {% endfor %}
+    </table>
+    
+    <table style="width: 70%; display:inline-block;" border="1" cellspacing="0">
+    <tr>
+       <td>SORTED</td>
+       <td>Host Views</td>
+       <td>Opt Ins</td>
+       <td>Opt Outs</td>
+       <td>Comments</td>
+       <td>Published</td>
+       <td>Shown</td>
+       <td>Seen By</td>
+     </tr>
+    {% for m in sorted_medias %}
+      <tr>
+        <td>{{m.name}}</td>
+        <td>{{m.host_views}}</td>
+        <td>{{m.opt_in}}</td>
+        <td>{{m.opt_out}}</td>
+        <td>{{m.comment_count}}</td>
+        <td>{{m.published}}</td>
+        <td>{{m.last_programmed}}</td>
+        <td>{{m.seen_percent}}%</td>
+      </tr>
+    {% endfor %}
+    </table>
+  </body>
+</html>

@@ -9,6 +9,10 @@ class UserSession(db.Model):
   tune_in = db.DateTimeProperty()
   tune_out = db.DateTimeProperty()
   channel = db.ReferenceProperty(Channel)
+  
+  @property
+  def id(self):
+    return str(self.key().id())
 
   @classmethod
   def new(cls, user, channel):
@@ -28,8 +32,10 @@ class UserSession(db.Model):
   def end_session(self):
     tune_out = datetime.datetime.now()
     self.put()
-    if self.sessionMedia.get():
-      from useractivity import *
+    
+    # Track user activity
+    if self.sessionMedias.get():
+      from useractivity import UserActivity
       u_a = UserActivity.add_session(self.user, self)
 
   def toJson(self, get_media=False):
@@ -39,9 +45,10 @@ class UserSession(db.Model):
     json['tune_in'] = self.tune_in.isoformat()
     json['tune_out'] = self.tune_out.isoformat() if self.tune_out else None
     json['channel_id'] = self.channel.key().id()
-    json['media'] = [s_m.media.toJson() for s_m in self.sessionMedia.fetch(10)] if get_media else []
+    json['media'] = [s_m.media.toJson() for s_m in self.sessionMedias.fetch(10)] if get_media else []
     return json
   
 class SessionMedia(db.Model):
-  session = db.ReferenceProperty(UserSession, collection_name='sessionMedia')
-  media = db.ReferenceProperty(Media, collection_name='sessionMedia')
+  session = db.ReferenceProperty(UserSession, collection_name='sessionMedias')
+  media = db.ReferenceProperty(Media, collection_name='sessionMedias')
+  time = db.DateTimeProperty(auto_now_add=True)
