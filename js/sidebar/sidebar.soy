@@ -16,10 +16,11 @@
       <div class="title">{$media.name}</div>
       <div class="published">{$published}</div>
       <div class="options">
-        <div class="button play"></div>
+        
         <div class="button star"></div>
         <div class="button facebook"></div>
         <div class="button twitter"></div>
+        <div class="button play"></div>
       </div>
     </div>
     {if $media.description}
@@ -222,11 +223,27 @@
 
 /**
  * @param media
+ * @param published
  */
 {template .adminMedia}
   <div class="admin-media">
-    <img src="{$media.thumbnail}" class="thumb">
-    <div class="title">{$media.name}</div>
+    <div class="media">
+      <div class="preview">
+        <div class="thumb" style="background-image:url({$media.thumbnail});
+            background-position: 50% {$media.thumbPos}%"></div>
+        <div class="title">{$media.name}</div>
+        <div class="published">{$published}</div>
+        <div class="play"></div>
+        <div class="approve"></div>
+        <div class="remove"></div>
+        <div class="repos"></div>
+      </div>
+    </div>
+    <div class="publisher">
+      <img src="{$media.publisher.picture}">
+      <div class="name">{$media.publisher.name}</div>
+    </div>
+    <div class="duration">{$media.duration} seconds</div>
     <div class="description">{$media.description}</div>
   </div>
 {/template}

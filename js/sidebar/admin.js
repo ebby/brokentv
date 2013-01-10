@@ -3,7 +3,7 @@ goog.provide('brkn.sidebar.Admin');
 goog.require('soy');
 goog.require('brkn.model.Sidebar');
 goog.require('brkn.sidebar');
-goog.require('brkn.sidebar.MediaList');
+goog.require('brkn.sidebar.AdminList');
 
 goog.require('goog.events.KeyHandler.EventType');
 goog.require('goog.fx.dom.Scroll');
@@ -62,7 +62,7 @@ brkn.sidebar.Admin.prototype.enterDocument = function() {
   
   this.collectionsEl_ = goog.dom.getElementByClass('collections', this.getElement());
   this.storiesEl_ = goog.dom.getElementByClass('stories', this.getElement());
-  var mediaListEl = goog.dom.getElement('media-list');
+  var adminListEl = goog.dom.getElement('admin-list');
   var channel = brkn.model.Channels.getInstance().currentChannel;
 
   goog.net.XhrIo.send(
@@ -82,10 +82,10 @@ brkn.sidebar.Admin.prototype.enterDocument = function() {
                   medias = goog.array.map(medias, function(m) {
                     return new brkn.model.Media(m);
                   });
-                  var mediaList = new brkn.sidebar.MediaList(medias);
-                  mediaList.decorate(mediaListEl);
+                  var adminList = new brkn.sidebar.AdminList(col.id, medias);
+                  adminList.decorate(adminListEl);
                   brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NAVIGATE,
-                      mediaListEl, true, col.name);
+                      adminListEl, true, col.name);
                 }, this));
           }, this));
         }, this);

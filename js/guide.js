@@ -36,7 +36,7 @@ brkn.Guide = function() {
   /**
    * @type {number}
    */
-  this.timeline = this.timeslots_ * (this.interval_ * 2 + 1) * 60;
+  this.timeline = this.timeslots_ * this.interval_ * 60;
 
   /**
    * @type {Array.<brkn.Channel>}
@@ -58,17 +58,41 @@ brkn.Guide = function() {
 };
 goog.inherits(brkn.Guide, goog.ui.Component);
 
+
+/**
+ * @type {number}
+ * @constant
+ */
+brkn.Guide.NAME_WIDTH = 200;
+
+
 /**
  * @type {number}
  * @private
  */
 brkn.Guide.prototype.width_;
 
+
+/**
+ * @type {number}
+ * @private
+ */
+brkn.Guide.prototype.pixelsPerSecond_;
+
+
+/**
+ * @type {number}
+ * @private
+ */
+brkn.Guide.prototype.timeslotWidth_;
+
+
 /**
  * @type {brkn.Channel}
  * @private
  */
 brkn.Guide.prototype.currentChannel_;
+
 
 /**
  * @type {Element}
@@ -78,10 +102,19 @@ brkn.Guide.prototype.tickerEl_;
 
 
 /**
+ * Where the timeline starts
  * @type {goog.date.DateTime}
  * @private
  */
 brkn.Guide.prototype.minTime_;
+
+
+/**
+ * Where the timeline ends (end of last timeslot)
+ * @type {goog.date.DateTime}
+ * @private
+ */
+brkn.Guide.prototype.maxTime_;
 
 
 /**
@@ -119,23 +152,23 @@ brkn.Guide.prototype.enterDocument = function() {
   }
   startTime.setMinutes(minutes);
 
-  // Add time increment elements
-  var timesEl = goog.dom.getElementByClass('times', this.getElement());
-  for ( var i = -1 * (this.timeslots_ - 1); i <= this.timeslots_ + 1; i++) {
-    var slot = startTime.clone();
-    slot.add(new goog.date.Interval(0, 0, 0, 0, this.interval_ * i));
-    goog.dom.appendChild(timesEl, goog.dom.createDom('div', {
-      'class' : 'time',
-      'style' : 'width:' + this.width_ / (this.timeslots_ * 2 + 1) + 'px'
-    }, slot.toUsTimeString()));
-  }
+  
+  var historySlots = 2;
   this.minTime_ = startTime.clone();
-  this.minTime_.add(new goog.date.Interval(0, 0, 0, 0, -this.interval_ * (this.timeslots_ - 1)));
+  this.minTime_.add(new goog.date.Interval(0, 0, 0, 0, -this.interval_ * historySlots));
+  
+  this.maxTime_ = this.minTime_.clone();
+  this.maxTime_.add(new goog.date.Interval(0, 0, 0, 0, this.interval_ * (this.timeslots_ + 1)));
+  
+  this.addTimeSlots(this.timeslots_, this.minTime_);
 
   goog.style.setWidth(this.getElement(), this.width_);
-  var viewOffset = (this.timeslots_ - 1) / (this.timeslots_ * 2 + 1) * this.width_;
-  var startTimeOffset = viewOffset - 145;
+  var viewOffset = historySlots/this.timeslots_ * this.width_;
+  var startTimeOffset = viewOffset - brkn.Guide.NAME_WIDTH;
   goog.style.setPosition(this.getElement(), -1 * startTimeOffset);
+  
+  this.pixelsPerSecond_ = (this.width_ - brkn.Guide.NAME_WIDTH)/this.timeline;
+  this.timeslotWidth_ = this.width_/this.timeslots_;
 
   this.channelNameStyle_ = document.createElement('style');
   this.channelNameStyle_.id = 'channel-name-offs'
@@ -146,9 +179,9 @@ brkn.Guide.prototype.enterDocument = function() {
 
   var dragger = new goog.fx.Dragger(this.getElement());
   var channelNameStyle = this.channelNameStyle_;
-  var width = this.width_;
+  var el = this.getElement();
   dragger.defaultAction = function(x, y) {
-    if (x < 0 && x > (-1 * width + goog.dom.getViewportSize().width)) {
+    if (x < 0 && x > (-goog.style.getSize(el).width + goog.dom.getViewportSize().width)) {
       this.target.style.left = x + 'px';
       channelNameStyle.innerHTML = 'div#guide div.channels div.channel div.name' + '{left:' + -x
           + 'px !important}';
@@ -166,13 +199,39 @@ brkn.Guide.prototype.enterDocument = function() {
     this.channelMap_[c.id] = channel;
   }, this));
 
+  var resizing = false;
+  var nowLeft = goog.dom.getElement('now-left');
+  var nowRight = goog.dom.getElement('now-right');
+  
   this.getHandler()
     .listen(brkn.model.Clock.getInstance().clock,
         goog.Timer.TICK,
         goog.bind(function() {
-          var elapsed = (goog.now() - this.minTime_.getTime()) / (this.timeline * 1000) * this.width_;
+          var elapsed = (goog.now() - this.minTime_.getTime())/1000 * this.pixelsPerSecond_;
+
+          this.updateNowButtons_();
+          
+          if (elapsed + goog.dom.getViewportSize().width > this.width_ -
+              (brkn.model.Controller.getInstance().sidebarToggled ? 300 : 0) && !resizing) {
+            resizing = true;
+            window.console.log('infinite scrollerize');
+            
+            // Update UI per last set of params
+            var slotsPerHorizon = this.timeslots_/this.horizon_;
+            var newSlots = Math.ceil(slotsPerHorizon);
+            // Add a timeslot
+            this.addTimeSlots(1, this.maxTime_);
+            this.width_ += this.timeslotWidth_;
+            goog.style.setWidth(this.getElement(), this.width_);
+            this.timeslots_++;
+            //this.maxTime_.add(new goog.date.Interval(0, 0, 0, 0, this.interval_ * newSlots));
+            this.timeline = this.timeslots_ * this.interval_ * 60;
+            resizing = false;
+          }
           goog.style.setPosition(this.tickerEl_, elapsed);
         }, this))
+    .listen(nowLeft, goog.events.EventType.CLICK, goog.bind(this.align_, this))
+    .listen(nowRight, goog.events.EventType.CLICK, goog.bind(this.align_, this))
     .listen(dragger,
         goog.fx.Dragger.EventType.BEFOREDRAG,
         goog.bind(function() {
@@ -182,6 +241,7 @@ brkn.Guide.prototype.enterDocument = function() {
         goog.fx.Dragger.EventType.END,
         goog.bind(function() {
           goog.dom.classes.remove(this.getElement(), 'drag');
+          this.updateNowButtons_();
         }, this))
     .listen(headerEl,
         'mousewheel',
@@ -192,12 +252,13 @@ brkn.Guide.prototype.enterDocument = function() {
           goog.dom.classes.add(this.getElement(), 'drag');
           var delta = e.wheelDelta ? e.wheelDelta : e.detail ? -e.detail : 0;
           var x = goog.style.getPosition(this.getElement()).x + delta;
-          if (x < 0 && x > (-1 * width + goog.dom.getViewportSize().width)) {
+          if (x < 0 && x > (-1 * this.width_ + goog.dom.getViewportSize().width)) {
             goog.style.setPosition(this.getElement(), x);
             this.channelNameStyle_.innerHTML = 'div#guide div.channels div.channel div.name' + '{left:'
                 + -x + 'px !important}';
           }
           goog.dom.classes.remove(this.getElement(), 'drag');
+          this.updateNowButtons_();
         }, this));
 
   brkn.model.Channels.getInstance().subscribe(brkn.model.Channels.Actions.CHANGE_CHANNEL,
@@ -223,16 +284,21 @@ brkn.Guide.prototype.enterDocument = function() {
 
 
 /**
- * Gets the pixel offset for a certain time in the channels element.
- * 
- * @param {number}
- *          startTime
- * @param {number}
- *          time
- * @return {number} pixels
+ * Render time slots
+ * @param {number} timeslots
+ * @param {goog.date.DateTime} startTime
  */
-brkn.Guide.prototype.getPixelsFromTime = function(startTime, time) {
-  return 0;
+brkn.Guide.prototype.addTimeSlots = function(timeslots, startTime) {
+  // Add time increment elements
+  var timesEl = goog.dom.getElementByClass('times', this.getElement());
+  for (var i = 0; i <= timeslots; i++) {
+    var slot = startTime.clone();
+    slot.add(new goog.date.Interval(0, 0, 0, 0, this.interval_ * i));
+    goog.dom.appendChild(timesEl, goog.dom.createDom('div', {
+      'class' : 'time',
+      'style' : 'width:' + (this.width_ - brkn.Guide.NAME_WIDTH) / this.timeslots_ + 'px'
+    }, slot.toUsTimeString()));
+  }
 };
 
 
@@ -249,14 +315,29 @@ brkn.Guide.prototype.changeChannel = function(channel) {
 
 
 /**
+ * @param {?boolean=} opt_hide
+ * @private
+ */
+brkn.Guide.prototype.updateNowButtons_ = function(opt_hide) {
+  var nowLeft = goog.dom.getElement('now-left');
+  var nowRight = goog.dom.getElement('now-right');
+  var elapsed = (goog.now() - this.minTime_.getTime())/1000 * this.pixelsPerSecond_;
+  nowRight.style.right = brkn.model.Controller.getInstance().sidebarToggled ? '300px' : 0;
+  goog.style.showElement(nowRight, -elapsed < goog.style.getPosition(this.getElement()).x -
+      goog.dom.getViewportSize().width || opt_hide);
+  goog.style.showElement(nowLeft, -elapsed >
+      goog.style.getPosition(this.getElement()).x + brkn.Guide.NAME_WIDTH || opt_hide);
+};
+
+
+/**
  * @private
  */
 brkn.Guide.prototype.align_ = function() {
   var program = brkn.model.Channels.getInstance().currentChannel.getCurrentProgram();
   if (program) {
-    var offset = -(program.time.getTime() - this.minTime_.getTime())/(this.timeline * 1000) *
-        goog.style.getSize(this.getElement()).width + 195 /* name width */;
-    goog.style.setPosition(this.getElement(), offset);
+    var offset = -(program.time.getTime() - this.minTime_.getTime())/1000 * this.pixelsPerSecond_ + 5;
+    goog.style.setPosition(this.getElement(), Math.min(offset, 0));
     this.channelNameStyle_.innerHTML = 'div#guide div.channels div.channel div.name' +
         '{left:' + -offset + 'px !important}';
   }

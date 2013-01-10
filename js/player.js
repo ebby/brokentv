@@ -1,6 +1,7 @@
 goog.provide('brkn.Player');
 
 goog.require('brkn.model.Channels');
+goog.require('brkn.model.Player');
 
 goog.require('goog.ui.Component');
 goog.require('goog.ui.Component.EventType');
@@ -60,6 +61,8 @@ brkn.Player.prototype.enterDocument = function() {
   
   brkn.model.Channels.getInstance().subscribe(brkn.model.Channels.Actions.CHANGE_CHANNEL,
 			this.changeChannel, this);
+  brkn.model.Player.getInstance().subscribe(brkn.model.Player.Actions.PLAY_ASYNC,
+      this.playAsync_, this);
   brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_SIDEBAR,
       function(show) {
         this.resize(show);
@@ -99,22 +102,45 @@ brkn.Player.prototype.changeChannel = function(channel) {
 
 
 /**
+ * @param {brkn.model.Media} media
+ * @private
+ */
+brkn.Player.prototype.playAsync_ = function(media) {
+  this.asyncMedia_ = media;
+  this.player_.loadVideoById(media.hostId);
+  
+  goog.net.XhrIo.send('/_optin', goog.functions.NULL(), 'POST',
+      'media_id=' + this.currentProgram_.media.id);
+};
+
+
+/**
  * @param {Event} event
  */
 brkn.Player.prototype.playerStateChange_ = function(event) {
 	if (event.data == YT.PlayerState.ENDED) {
-	  window.console.log(brkn.model.Users.getInstance().currentUser.currentSession);
-	  window.console.log(brkn.model.Users.getInstance().currentUser.currentSession.id)
 	  goog.net.XhrIo.send(
 	      '/_seen',
 	      goog.functions.NULL(),
 	      'POST',
 	      'media_id=' + this.currentProgram_.media.id +
 	      '&session_id=' + brkn.model.Users.getInstance().currentUser.currentSession.id);
-		var nextProgram = brkn.model.Channels.getInstance().currentChannel.getNextProgram();
-		if (nextProgram) {
-		  brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.NEXT_PROGRAM, nextProgram);
-			this.player_.loadVideoById(nextProgram.media.hostId);
-		}
+	  
+	  if (this.asyncMedia_) {
+	    this.asyncMedia_ = null;
+	    var currentChannel = brkn.model.Channels.getInstance().currentChannel;
+	    this.currentProgram_ = currentChannel && currentChannel.getCurrentProgram();
+	    var seek = this.currentProgram_ ? (goog.now() - this.currentProgram_.time.getTime())/1000 : 0;
+	    this.player_.loadVideoById(this.currentProgram_.media.hostId, seek);
+	  } else {
+	    var nextProgram = brkn.model.Channels.getInstance().currentChannel.getNextProgram();
+	    if (nextProgram) {
+	      brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.NEXT_PROGRAM, nextProgram);
+	      this.player_.loadVideoById(nextProgram.media.hostId);
+	    }
+	    
+	    goog.net.XhrIo.send('/_started', goog.functions.NULL(), 'POST',
+	        'media_id=' + this.currentProgram_.media.id);
+	  }
 	}
 };

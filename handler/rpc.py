@@ -53,9 +53,11 @@ def get_session(current_user):
   
   # Track current viewers by channel, useful for audience catering
   channel_viewers = simplejson.loads(memcache.get('channel_viewers') or '{}')
-  channel_viewers[current_channel.id] = \
-      channel_viewers.get(current_channel.id, []) + [current_user.id]
-  memcache.set('channel_viewers', simplejson.dumps(channel_viewers))
+  if not channel_viewers.get(current_channel.id) or \
+      current_user.id not in channel_viewers[current_channel.id]:
+    channel_viewers[current_channel.id] = \
+        channel_viewers.get(current_channel.id, []) + [current_user.id]
+    memcache.set('channel_viewers', simplejson.dumps(channel_viewers))
 
   # Grab sessions for current_users (that we care about)
   viewer_sessions = []
@@ -187,6 +189,14 @@ class PublisherMediaHandler(BaseHandler):
   def get(self, pub_id=None):
     pub = Publisher.get_by_id(int(pub_id))
     self.response.out.write(simplejson.dumps([m.toJson() for m in pub.get_medias(20)]))
+
+class OptInHandler(BaseHandler):
+  def post(self):
+    Media.add_opt_in(self.request.get('media_id'), self.current_user.id)
+
+class StartedHandler(BaseHandler):
+  def post(self):
+    Media.add_started(self.request.get('media_id'), self.current_user.id)
 
 class StarHandler(BaseHandler):
   def get(self, uid=None):

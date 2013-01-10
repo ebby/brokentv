@@ -99,5 +99,6 @@ brkn.model.Channels.prototype.changeChannel = function(channel) {
  */
 brkn.model.Channels.Actions = {
 	CHANGE_CHANNEL: 'change-channel',
-	NEXT_PROGRAM: 'next-program'
+	NEXT_PROGRAM: 'next-program',
+	PLAY_ASYNC: 'play-async'
 };

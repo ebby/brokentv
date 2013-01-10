@@ -37,6 +37,7 @@ class Program(db.Model):
       channelProgram.put()
       
       media.last_programmed = datetime.datetime.now()
+      media.programmed_count += 1
       media.put()
 
       return program

@@ -65,7 +65,8 @@ brkn.Main.prototype.popup_;
 brkn.Main.prototype.decorateInternal = function(element) {
   goog.base(this, 'decorateInternal', element);
   
-  var mainEl = soy.renderAsElement(brkn.main.main);
+  var mainEl = soy.renderAsElement(brkn.main.main,
+      { admin: brkn.model.Users.getInstance().currentUser.isAdmin() });
   goog.dom.insertChildAt(element, mainEl, 0);
 };
 

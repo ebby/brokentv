@@ -80,15 +80,15 @@ PUBLISHERS = {
   'The Onion': {
     'youtube': 'TheOnion'
   },
-  'Vanity Fair': {
-    'brightcove': '1234' # Need to use BC api
-  },
   'Huffington Post': {
     'youtube': 'HuffingtonPost'
   },
   'Buzz60': {
     'youtube': 'Buzz60'
-  }                                      
+  },
+  'FashionTV': {
+    'youtube': 'fashiontv'
+  }                                     
 }
 
 COLLECTIONS = {
@@ -112,13 +112,19 @@ COLLECTIONS = {
                    'Huffington Post',
                    'Buzz60']
   },
+  'News Magazines': {
+    'keywords': ['News'],
+    'publishers': [
+                   'Vice',
+                   ]
+  },
   'Creative Arts': {
     'keywords': ['Entertainment'],
     'publishers': ['Cool Hunting']
   },
   'Fashion': {
     'keywords': ['Entertainment', 'Howto'],
-    'publishers': ['Buzz60', 'The New York Times', 'The New Yorker', 'Vanity Fair']     
+    'publishers': ['Buzz60', 'The New York Times', 'The New Yorker', 'Fashion TV']     
   },
   'TED': {
     'keywords': ['Education', 'Howto'],

@@ -32,7 +32,6 @@ brkn.model.Programs.prototype.currentChannel;
  * @param {Object} programming Programs json object.
  */
 brkn.model.Programs.prototype.loadFromJson = function(programming) {
-  window.console.log(programming)
 	goog.object.forEach((/** @type {Object.<string, Object>} */ programming),
 			goog.bind(function(programs, channelId) {
 			  goog.array.forEach((/** @type {Array.<Object>} */ programs), goog.bind(function(program) {

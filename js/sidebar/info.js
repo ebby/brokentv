@@ -53,6 +53,11 @@ brkn.sidebar.Info = function(media) {
    * @type {goog.ui.CustomButton}
    */
   this.twitterButton_ = new goog.ui.CustomButton('Twitter');
+  
+  /**
+   * @type {goog.ui.CustomButton}
+   */
+  this.playButton_ = new goog.ui.CustomButton('Play');
 };
 goog.inherits(brkn.sidebar.Info, goog.ui.Component);
 
@@ -99,7 +104,8 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
   this.starToggle_.decorate(goog.dom.getElementByClass('star', this.getElement()));
   this.fbButton_.decorate(goog.dom.getElementByClass('facebook', this.getElement()));
   this.twitterButton_.decorate(goog.dom.getElementByClass('twitter', this.getElement()));
-
+  this.playButton_.decorate(goog.dom.getElementByClass('play', this.getElement()));
+  
   goog.net.XhrIo.send('/_seen/' + this.media_.id, goog.bind(function(e) {
     var seen = /** @type {Array.<Object>} */ goog.json.parse(e.target.getResponse());
     goog.style.showElement(viewersEl, seen.length);
@@ -150,6 +156,8 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
           goog.bind(this.onFacebookButton_, this))
       .listen(this.twitterButton_, goog.ui.Component.EventType.ACTION,
           goog.bind(this.onTwitterButton_, this))
+      .listen(this.playButton_, goog.ui.Component.EventType.ACTION,
+          goog.bind(this.onPlayButton_, this))
       .listen(this.commentInput_,
           'add',
           goog.bind(this.onAddComment_, this))
@@ -243,7 +251,7 @@ brkn.sidebar.Info.prototype.addComment_ = function(comment) {
  * @param {?number=} opt_extra Extra space to subtract
  */
 brkn.sidebar.Info.prototype.resize = function(opt_extra) {
-  var extra = opt_extra || 0;
+  var extra = opt_extra + 10 || 10;
   if (this.commentsEl_) {
     goog.style.setHeight(this.commentsEl_, goog.dom.getViewportSize().height -
         goog.style.getPosition(this.commentsEl_.parentElement).y - 100 - extra);
@@ -253,7 +261,7 @@ brkn.sidebar.Info.prototype.resize = function(opt_extra) {
   goog.Timer.callOnce(goog.bind(function() {
     var scrollAnim = new goog.fx.dom.Scroll(this.commentsEl_,
         [this.commentsEl_.scrollLeft, this.commentsEl_.scrollTop],
-        [this.commentsEl_.scrollLeft, this.commentsEl_.scrollHeight], 300);
+        [this.commentsEl_.scrollLeft, this.commentsEl_.scrollHeight], 400);
     scrollAnim.play();
   }, this), opt_extra ? 0 : 100);
 };
@@ -289,4 +297,13 @@ brkn.sidebar.Info.prototype.onTwitterButton_ = function() {
   newWindow.moveTo(screen.width/2-225,
       screen.height/2-150)
   newWindow.focus();
+};
+
+
+/**
+ * @private
+ */
+brkn.sidebar.Info.prototype.onPlayButton_ = function() {
+  brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.PLAY_ASYNC,
+      this.getModel());
 };

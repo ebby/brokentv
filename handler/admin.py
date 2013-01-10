@@ -31,6 +31,9 @@ class StorySortHandler(BaseHandler):
             m.opt_out.append('1240963')
           if i%(len(medias)/2 - 1) == 0:
             m.comment_count = 10
+            
+      for media in medias:
+        media.have_seen = Programming.have_seen(media, viewers)
         
 
       # Don't repeat the same program within an hour
@@ -48,12 +51,32 @@ class StorySortHandler(BaseHandler):
       path = os.path.join(os.path.dirname(__file__), '../templates/storysort.html')
       self.response.out.write(template.render(path, template_data))
 
+class PositionThumbHandler(BaseHandler):
+    def post(self):
+      media = Media.get_by_key_name(self.request.get('media'))
+      pos = int(self.request.get('pos'))
+      media.thumb_pos = pos
+      media.put()
+
 class AdminAddProgramHandler(BaseHandler):
     def post(self):
       channel = Channel.get_by_id(int(self.request.get('channel')))
       media = Media.get_by_key_name(self.request.get('media'))
       program = Program.add_program(channel, media)
       self.response.out.write(simplejson.dumps(program.toJson(False)))
+      
+class CollectionMediaHandler(BaseHandler):
+    def get(self, col_id):
+      col = Collection.get_by_id(int(col_id))
+      self.response.out.write(simplejson.dumps([m.toJson() for m in col.get_medias(20, pending=True)]))
+   
+    def post(self):
+      approve = self.request.get('approve') == 'true'
+      col = Collection.get_by_id(int(self.request.get('col')))
+      media = Media.get_by_key_name(self.request.get('media'))
+      col_media = col.collectionMedias.filter('media =', media).get()
+      if col_media and approve is not None:
+        col_media.approve(approve)
 
 class AdminRemoveProgramHandler(BaseHandler):
     def post(self):

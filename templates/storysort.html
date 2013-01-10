@@ -6,10 +6,12 @@
     <table style="width: 28%; display:inline-block;" border="1" cellspacing="0">
      <tr>
        <td>UNSORTED</td>
+       <td>Seen></td>
      </tr>
     {% for m in raw_medias %}
       <tr>
-        <td>{{m.name}}</td>
+        <td id ="{{m.key.name}}">{{m.name}}</td>
+        <td>{{m.have_seen}}</td>
       </tr>
     {% endfor %}
     </table>

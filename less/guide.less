@@ -1,4 +1,4 @@
- @name-width: 200px;
+@name-width: 200px;
 
 div#guide {
   position: absolute;
@@ -21,8 +21,15 @@ div#guide {
     height: 230px;
   }
   &.admin {
-    div.remove {
+    div.remove, div.repos {
       display: block !important;
+    }
+    div.channels div.channel div.programs div.program:hover div.thumb,
+    div.channels div.channel div.programs div.program.playing div.thumb {
+      .transition(opacity, .6s, ease);
+      -webkit-filter: none !important;
+      opacity: 1;
+      background-position-y: inherit !important;
     }
   }
   &.faded {
@@ -38,7 +45,7 @@ div#guide {
     width: 100%;
     font-size: 10px;
     background: white -webkit-gradient(linear, 0% 0%, 0% 100%,
-		    from(rgba(45, 52, 70, .55)),to(rgba(45, 52, 70, .8)));
+		    from(rgba(26, 26, 26, .55)),to(rgba(26, 26, 26, .8)));
 		border-top: 1px solid #ccc;
 		-webkit-box-shadow: inset 0 -3px 7px -3px rgba(0,0,0,0.2), 0 0 5px 1px rgba(0, 0, 0, .6);
 		   -moz-box-shadow: inset 0 -3px 7px -3px rgba(0,0,0,0.2), 0 0 5px 1px rgba(0, 0, 0, .6);
@@ -55,8 +62,9 @@ div#guide {
     div.times {
       display: inline-block;
       width: 100%;
+      position: relative;
       white-space: nowrap;
-      margin-left: @name-width;
+      margin-left: @name-width - 10;
       div.time {
         display: inline-block;
         padding: 5px 0;
@@ -68,9 +76,53 @@ div#guide {
       width: 16px;
       height: 26px;
       background-size: 100%;
-      -webkit-transition: left 1s;
-	       -moz-transition: left 1s;
-	            transition: left 1s;
+      .transition(left, .5s, linear);
+    }
+    div.now-left {
+      width: 60px;
+      height: 21px;
+      margin-top: -1px;
+      box-shadow: inset -5px 0 1px -5px #F1F1F1, 0 0 1px #DEDEDE;
+      background: white -webkit-gradient(linear, 0% 0%, 0% 100%,
+        from(rgba(26, 26, 26, .55)),to(rgba(26, 26, 26, .8)));
+      border-top: 1px solid #ccc;
+      border-right: 1px solid #2d3446;
+      font-size: 11px;
+      font-family: MuseoSans700;
+      line-height: 21px;
+      position: fixed;
+      text-align: center;
+      cursor: pointer;
+      left: 0;
+      &:active {
+        border-top: 1px solid transparent;
+        background: #111;
+        box-shadow: inset 0 0 1px 1px #000;
+        color: #ddd;
+      }
+    }
+    div.now-right {
+      width: 60px;
+      height: 21px;
+      margin-top: -1px;
+      box-shadow: inset 5px 0 1px -5px #F1F1F1, 0 0 1px #DEDEDE;
+      background: white -webkit-gradient(linear, 0% 0%, 0% 100%,
+        from(rgba(26, 26, 26, .55)),to(rgba(26, 26, 26, .8)));
+      border-top: 1px solid #ccc;
+      border-left: 1px solid #2d3446;
+      font-size: 11px;
+      font-family: MuseoSans700;
+      line-height: 21px;
+      position: fixed;
+      text-align: center;
+      cursor: pointer;
+      right: 0;
+      &:active {
+        border-top: 1px solid transparent;
+        background: #111;
+        box-shadow: inset 0 0 1px 1px #000;
+        color: #ddd;
+      }
     }
   }
   div.channels {
@@ -140,7 +192,7 @@ div#guide {
         position: relative;
         vertical-align: top;
         margin-bottom: 4px;
-        margin-left: 10px;
+        margin-left: @name-width;
         margin-top: 6px;
         div.program {
           display: inline-block;
@@ -154,29 +206,15 @@ div#guide {
 					text-shadow: 1px 1px 1px white;
 					z-index: 0;
 					border-radius: 3px;
-					box-shadow: inset 0px 0px 1px 1px rgba(0, 0, 0, .3);
+					box-shadow: inset 0px 0px 1px 1px rgba(0, 0, 0, .4);
           border: 1px solid whiteSmoke;
+          padding: 1px;
           cursor: pointer;
 					.transition(all, .3s, ease);
 					&.clipped:hover {
 					  z-index: 1;
 					  width: 200px !important;
 					}
-					&:hover img, &.playing img {
-					 -webkit-transition: opacity .6s ease, top 4s ease-out, left 4s ease-out;
-              -moz-transition: opacity .6s ease, top 4s ease-out, left 4s ease-out;
-                -o-transition: opacity .6s ease, top 4s ease-out, left 4s ease-out;
-               -ms-transition: opacity .6s ease, top 4s ease-out, left 4s ease-out;
-                   transition: opacity .6s ease, top 4s ease-out, left 4s ease-out;
-            -webkit-filter: none !important;
-            opacity: 1;
-          }
-          &:hover img.pan-left {
-            left: 0%;
-          }
-          &:hover img.pan-top {
-            top: 100%
-          }
           &:hover div.title {
             display: block !important;
           }
@@ -185,12 +223,6 @@ div#guide {
             text-shadow: 1px 1px 1px rgba(0, 0, 0, .6), -1px -1px 1px rgba(0, 0, 0, .6),
                 -1px 1px 1px rgba(0, 0, 0, .6), 1px -1px 1px rgba(0, 0, 0, .6);
           }
-          &.playing div.progress {
-            /* display: block; */
-          }
-					&:last-child {
-					  border-right: 1px solid #CCC;
-					}
 					div.info {
 					  display: inline-block;
 					  width: 100%;
@@ -206,11 +238,8 @@ div#guide {
             -webkit-filter: none !important;
             opacity: 1;
           }
-          &:hover div.thumb.pan-left {
-            background-position-x: 30% !important;
-          }
-          &:hover div.thumb.pan-top {
-            background-position-y: 70% !important;
+          &.clipped:hover div.thumb, &.playing div.thumb {
+            .transition(background-position, 4s, ease-out);
           }
 					div.thumb {
 					  width: 100%;
@@ -218,24 +247,10 @@ div#guide {
 					  opacity: .2;
 					  background-size: 150% auto;
 					  background-position: center;
+					  border-radius: 3px;
 					  &.fix-height {
               background-size: auto 100%;
             }
-					}
-					img {
-					  width: 100%;
-					  height: auto;
-					  position: absolute;
-						opacity: .2;
-						top: 50%;
-						left: 50%;
-						margin-top: -20px;
-						z-index: -10;
-						-webkit-filter: blur(1px) grayscale();
-						&.fix-height {
-						  height: 150%;
-              width: auto;
-						}
 					}
 					div.progress {
 					  display: none;
@@ -249,7 +264,7 @@ div#guide {
 					div.title {
 					  left: 5px;
 						top: 5px;
-            color: #3d3d3d;
+            color: #2d2d2d;
             text-shadow: 1px 1px 1px white;
 						height: 40px;
 						font-size: 14px;
@@ -266,15 +281,36 @@ div#guide {
 	        }
 	        div.remove {
 	          display: none;
-	          position: absolute;
-	          background: url(/static/img/11-x.png) no-repeat;
-            background-size: 100%;
-	          top: 5px;
-	          right: 5px;
-	          width: 10px;
-	          height: 10px;
-	          font-size: 12px;
-	        }
+            position: absolute;
+            right: 5px;
+            top: 3px;
+            width: 20px;
+            height: 20px;
+            background-image: url(/static/img/31-circle-x.png);
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 80%;
+            filter: invert(100%);
+          }
+          div.repos {
+            display: none;
+            position: absolute;
+            right: 5px;
+            top: 23px;
+            width: 20px;
+            height: 20px;
+            background-image: url(/static/img/repos.png);
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 80%;
+          }
+          &:hover div.remove, &:hover div.repos {
+            filter: invert(100%);
+            -webkit-filter: invert(100%);
+            -moz-filter: invert(100%);
+            -o-filter: invert(100%);
+            -ms-filter: invert(100%);
+          }
 	        div.border {
 	          position: absolute;
 	          width: 98%;
@@ -352,7 +388,7 @@ div#guide {
 							width: 25px;
 							height: 25px;
 							border-radius: 10px;
-							right: -12px;
+							right: -5px;
 							top: -10px;
 							box-shadow: 0px 1px 1px 0px rgba(255, 255, 255, .6);
 							position: absolute;
@@ -378,6 +414,22 @@ div#guide {
       box-shadow: 1px 0 3px rgba(0, 0, 0, 0.8), -3px 0px 3px 3px rgba(105, 105, 105, 0.8) !important;
       z-index: 2 !important;
       cursor: default !important;
+      &:after {
+        left: 100%;
+        border: solid transparent;
+        content: " ";
+        height: 0;
+        width: 0;
+        position: absolute;
+        pointer-events: none;
+      }
+      
+      &:after {
+        border-left-color: #181818;
+        border-width: 15px;
+        top: 50%;
+        margin-top: -15px;
+      }
     }
   }
   .current div.program, div.program:hover {

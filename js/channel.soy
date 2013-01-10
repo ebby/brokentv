@@ -25,12 +25,13 @@
  */
 {template .program}
   <div class="info">
-    <div class="thumb"></div>
-	<!--  <img class="thumb" src="{$program.media.thumbnail}" style="display: none"> -->
+    <div class="thumb" style="background-image:url({$program.media.thumbnail});
+        background-position: 50% {$program.media.thumbPos}%"></div>
 	  <div class="progress"></div>
-	  <div class="title">{$program.media.name}</div>
+	  <div class="title">{$program.time} {$program.media.name}</div>
 	  {if $admin}
 	    <div class="remove"></div>
+	    <div class="repos"></div>
 	  {/if}
   </div>
 {/template}

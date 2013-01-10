@@ -41,4 +41,9 @@ class MediaHost:
 class MediaHostUrl:
   YOUTUBE = 'http://www.youtube.com/watch?v=%s'
   
+class Approval:
+  APPROVED = 0
+  REJECTED = 1
+  PENDING = 2
+  
   

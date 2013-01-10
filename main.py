@@ -82,6 +82,8 @@ app = webapp2.WSGIApplication([
     ('/_changechannel', rpc.ChangeChannelHandler),
     ('/_comment', rpc.CommentHandler),
     ('/_comment/(.*)', rpc.CommentHandler),
+    ('/_optin', rpc.OptInHandler),
+    ('/_started', rpc.StartedHandler),
     ('/_seen', rpc.SeenHandler),
     ('/_seen/(.*)', rpc.SeenHandler),
     ('/_session', rpc.SessionHandler),
@@ -92,11 +94,13 @@ app = webapp2.WSGIApplication([
 
     # Admin
     ('/admin/_collections/(.*)', rpc.CollectionsHandler),
-    ('/admin/_media/collection/(.*)', rpc.CollectionsMediaHandler),
+    ('/admin/_media/collection', admin.CollectionMediaHandler),
+    ('/admin/_media/collection/(.*)', admin.CollectionMediaHandler),
     ('/admin/_media/publisher/(.*)', rpc.PublisherMediaHandler),
     ('/admin/_addprogram', admin.AdminAddProgramHandler),
     ('/admin/_rescheduleprogram', admin.AdminRescheduleProgramHandler),
     ('/admin/_removeprogram', admin.AdminRemoveProgramHandler),
+    ('/admin/_posthumb', admin.PositionThumbHandler),
     ('/admin/storysort', admin.StorySortHandler),
     
     # Resources

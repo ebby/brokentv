@@ -17,12 +17,15 @@ class Media(db.Model):
   category = db.StringProperty()
   seen = db.StringListProperty(default=[])
   last_programmed = db.DateTimeProperty()
+  thumb_pos = db.IntegerProperty(default=50) # Percent to center of thumbnail
   
   # Statistics
+  started = db.StringListProperty(default=[]) # Users who let the program play
   opt_in = db.StringListProperty(default=[]) # Users who tune-in or async play
   opt_out = db.StringListProperty(default=[]) # Users who change channels or log out
   host_views = db.IntegerProperty(default=0)
   comment_count = db.IntegerProperty(default=0)
+  programmed_count = db.IntegerProperty(default=0)
 
   @classmethod
   def get(cls, id):
@@ -46,9 +49,9 @@ class Media(db.Model):
       if not media:
         name = unicode(entry.media.title.text, errors='replace')
         desc = entry.media.description.text
-        desc = unicode(desc) if desc else None # unicode(desc, errors='replace') if desc else None
+        desc = unicode(desc, errors='replace') if desc else None
         category = entry.media.category[0].text
-        category = unicode(category) if category else None #unicode(category, errors='replace') if category else None
+        category = unicode(category, errors='replace') if category else None
         media = cls(key_name=(MediaHost.YOUTUBE + id),
                     type=MediaType.VIDEO,
                     host_id=id,
@@ -93,17 +96,27 @@ class Media(db.Model):
     
   @classmethod
   @db.transactional
+  def add_started(cls, key_name, uid):
+    obj = Media.get_by_key_name(key_name)
+    if uid not in obj.started:
+      obj.started.append(uid)
+      obj.put()
+  
+  @classmethod
+  @db.transactional
   def add_opt_in(cls, key_name, uid):
     obj = Media.get_by_key_name(key_name)
-    obj.opt_in.append(uid)
-    obj.put()
+    if uid not in obj.opt_in:
+      obj.opt_in.append(uid)
+      obj.put()
 
   @classmethod
   @db.transactional
   def add_opt_out(cls, key_name, uid):
     obj = Media.get_by_key_name(key_name)
-    obj.opt_out.append(uid)
-    obj.put()
+    if uid not in obj.opt_out:
+      obj.opt_out.append(uid)
+      obj.put()
 
   def toJson(self, get_desc=True):
     json = {}
@@ -115,4 +128,5 @@ class Media(db.Model):
     json['duration'] = self.duration
     json['published'] = self.published.isoformat()
     json['description'] = self.description.replace("\n", r" ") if self.description and get_desc else None
+    json['thumb_pos'] = self.thumb_pos
     return json

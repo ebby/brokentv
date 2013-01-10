@@ -2,6 +2,7 @@
 
 /**
  * Tucked away here for security 
+ * @param admin
  */
 {template .main}
 <div class="main">
@@ -13,7 +14,9 @@
     <div id="channels" class="channels"></div>
     <div class="header" id="header">
       <div class="times">
+        <div id="now-left" class="now-left" style="display:none">&#x25C0; NOW</div>
         <div id="ticker" class="ticker"></div>
+        <div id="now-right" class="now-right" style="display:none">NOW &#x25B6;</div>
       </div>
     </div>
   </div>
@@ -52,6 +55,9 @@
       <div id="starred" class="screen media-list"></div>
       <div id="admin" class="screen admin"></div>
       <div id="media-list" class="slide media-list"><div class="medias"></div></div>
+      {if $admin}
+        <div id="admin-list" class="slide admin-list"></div>
+      {/if}
       <div id="media-info" class="slide info"></div>
       <div id="profile" class="slide profile"></div>
     </div>

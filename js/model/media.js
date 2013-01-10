@@ -61,6 +61,11 @@ brkn.model.Media = function(media) {
 	 * @type {goog.math.Size}
 	 */
 	this.thumbSize = new goog.math.Size(480, 360);
+	
+	/**
+   * @type {number|string}
+   */
+  this.thumbPos = media['thumb_pos'] || 50;
 
 	/**
    * @type {Array.<brkn.model.Comment>}
@@ -77,7 +82,7 @@ goog.inherits(brkn.model.Media, goog.pubsub.PubSub);
  * @return {string} Publication date as a readable string
  */
 brkn.model.Media.prototype.getPublishDate = function (opt_time) {
-  var date = this.published.getMonth() + '/' + this.published.getDate() + '/' +
+  var date = (this.published.getMonth() + 1) + '/' + this.published.getDate() + '/' +
       this.published.getYear();
   return opt_time ? date + ' ' + this.published.toUsTimeString() : date
 };

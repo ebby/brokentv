@@ -13,13 +13,13 @@ class Collection(db.Model):
   owner = db.ReferenceProperty(User)
   # Add related links
   
-  def fetch(self):
+  def fetch(self, approve_all=False):
     publishers = self.get_publishers()
     medias = []
     for publisher in publishers:
       publisher_medias = publisher.get_media_by_category(self.keywords[0])
       for media in publisher_medias:
-        CollectionMedia.add(self, media)
+        CollectionMedia.add(self, media, approved=(True if approve_all else None))
         medias.append(media)
     return medias
     
@@ -37,9 +37,13 @@ class Collection(db.Model):
   def get_channels(self):
     return CollectionChannel.get_channels(self)
   
-  def get_medias(self, limit, offset=0):
-    col_medias = CollectionMedia.all().filter('collection =', self).order('-published') \
-        .fetch(limit=limit, offset=offset)
+  def get_medias(self, limit, offset=0, pending=False):
+    col_medias = CollectionMedia.all().filter('collection =', self)
+    if pending:
+      col_medias = col_medias.filter('approved =', Approval.PENDING)
+    else:
+      col_medias = col_medias.filter('approved =', Approval.APPROVED)
+    col_medias = col_medias.order('-published').fetch(limit=limit, offset=offset)
     return [c_m.media for c_m in col_medias]
   
   def toJson(self):
@@ -68,14 +72,21 @@ class CollectionMedia(db.Model):
   collection = db.ReferenceProperty(Collection, collection_name='collectionMedias')
   media = db.ReferenceProperty(Media, collection_name='collectionMedias')
   published = db.DateTimeProperty() # For sorted queries
+  approved = db.IntegerProperty(default=Approval.PENDING)
   
   @classmethod
-  def add(cls, collection, media):
+  def add(cls, collection, media, approved):
     collection_media = CollectionMedia.all().filter('media =', media).get()
     if not collection_media:
       collection_media = CollectionMedia(collection=collection, media=media, published=media.published)
+      if approved is not None:
+        collection_media.approved = Approval.APPROVED if approved else Approval.REJECTED
       collection_media.put()
     return collection_media
+  
+  def approve(self, approved):
+    self.approved = Approval.APPROVED if approved else Approval.REJECTED
+    self.put()
 
 # Channels that may play from this collection
 class CollectionChannel(db.Model):

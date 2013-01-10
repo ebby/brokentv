@@ -11,6 +11,12 @@ goog.require('goog.pubsub.PubSub');
  */
 brkn.model.Controller = function() {
 	goog.base(this);
+	
+	this.sidebarToggled = false;
+
+	this.subscribe(brkn.model.Controller.Actions.TOGGLE_SIDEBAR, function(show) {
+	  this.sidebarToggled = show;
+	}, this);
 };
 goog.inherits(brkn.model.Controller, goog.pubsub.PubSub);
 goog.addSingletonGetter(brkn.model.Controller);

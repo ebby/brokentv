@@ -7,6 +7,7 @@ goog.require('brkn.model.Sidebar');
 goog.require('brkn.sidebar');
 goog.require('brkn.sidebar.Admin');
 goog.require('brkn.sidebar.Info');
+goog.require('brkn.sidebar.MediaList');
 goog.require('brkn.sidebar.Profile');
 goog.require('brkn.sidebar.Stream');
 
