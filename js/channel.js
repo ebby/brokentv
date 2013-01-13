@@ -219,7 +219,8 @@ brkn.Channel.prototype.enterDocument = function() {
 		.listen(goog.dom.getElementByClass('name', this.getElement()),
 				goog.events.EventType.CLICK,
 				goog.bind(function() {
-				  if (this.getModel().id != brkn.model.Channels.getInstance().currentChannel.id) {
+				  if (this.getModel().id != brkn.model.Channels.getInstance().currentChannel.id &&
+				      this.getModel().getCurrentProgram()) {
 				    brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.CHANGE_CHANNEL,
 				        this.getModel());
 				  }
@@ -250,15 +251,18 @@ brkn.Channel.prototype.enterDocument = function() {
  * @private
  */
 brkn.Channel.prototype.updateCurrentProgram_ = function() {
-  var program = brkn.model.Channels.getInstance().currentChannel.getCurrentProgram();
   if (this.currentProgram_) {
     goog.dom.classes.remove(this.programs_[this.currentProgram_], 'playing');
   }
   this.currentProgram_ = null;
-  var programEl = this.programs_[program.id];
-  if (programEl) {
-    this.currentProgram_ = program.id;
-    goog.dom.classes.add(programEl, 'playing');
+  
+  var program = brkn.model.Channels.getInstance().currentChannel.getCurrentProgram();
+  if (program) {
+    var programEl = this.programs_[program.id];
+    if (programEl) {
+      this.currentProgram_ = program.id;
+      goog.dom.classes.add(programEl, 'playing');
+    }
   }
 };
 
@@ -445,7 +449,9 @@ brkn.Channel.prototype.addViewer = function(session) {
 		goog.dom.appendChild(this.viewersEl_, userEl);
 		this.viewers_[session.user.id] = userEl;
 	}
-	if (!session.tuneOut || session.tuneOut.getTime() > this.minTime_.getTime()) {
+
+	if (this.getModel().getCurrentProgram() &&
+	    (!session.tuneOut || session.tuneOut.getTime() > this.minTime_.getTime())) {
 		var lineEl = soy.renderAsElement(brkn.channel.line, {
 			user: session.user
 		});
@@ -509,7 +515,7 @@ brkn.Channel.prototype.update = function() {
 
   // Update viewers
 	goog.object.forEach(this.getModel().viewerSessions, function(session) {
-		if (!session.tuneOut) {
+		if (this.getModel().getCurrentProgram() && !session.tuneOut) {
 			var tuneInTime = Math.max(session.tuneIn.getTime(), this.minTime_.getTime());
 			var width = goog.style.getSize(this.programsEl_).width;
 			var elapsed = (goog.now() - tuneInTime)/1000 * this.pixelsPerSecond_;
@@ -525,22 +531,10 @@ brkn.Channel.prototype.update = function() {
 	if (delta < 0) {
 		goog.style.setStyle(this.graphEl_, 'margin-top', -delta + 'px');
 	}
-	
-	// Update current program if playing
-//	if (this.currentProgram_) {
-//	  var programEl = this.programs_[this.currentProgram_];
-//	  var progress = goog.dom.getElementByClass('progress', programEl);
-//	  var program = this.getModel().getProgram(this.currentProgram_);
-//	  var elapsed = (goog.now() - program.time.getTime())/(program.media.duration * 10);
-//	  goog.style.setWidth(progress, elapsed + '%');
-//	}
 
 	//Set programs and name heights
 	//goog.style.setHeight(this.programsEl_, goog.style.getSize(this.getElement()).height - 21 /* padding */);
 	goog.style.setHeight(this.nameEl_, goog.style.getSize(this.getElement()).height - 1);
-	
-	// Redraw (THIS CAN CAUSE LATENCY ISSUE)
-	// goog.style.getPosition(goog.dom.getElement('guide'));
 };
 
 

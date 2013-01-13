@@ -45,7 +45,7 @@ class Channel(db.Model):
     return max(datetime.datetime.utcnow(), next_time)
   
   def get_collections(self):
-    return [chan_col.collection for chan_col in self.channelCollections.fetch(100)]
+    return [chan_col.collection for chan_col in self.channelCollections.fetch(20)]
 
   def toJson(self):
     json = {}
@@ -60,7 +60,7 @@ from collection import *
 # Collections that may play into this collection
 class ChannelCollection(db.Model):
   
-  collection = db.ReferenceProperty(Collection, collection_name='channelCollections')
+  collection = db.ReferenceProperty(Collection, collection_name='channels')
   channel = db.ReferenceProperty(Channel, collection_name='channelCollections')
   
   @classmethod
@@ -78,7 +78,7 @@ class ChannelCollection(db.Model):
   
   @classmethod
   def add(cls, channel, collection):
-    collection_channel = ChannelCollection.all().filter('channel =', channel).get()
+    collection_channel = ChannelCollection.all().filter('channel =', channel).filter('collection =', collection).get()
     if not collection_channel:
       collection_channel = ChannelCollection(collection=collection, channel=channel)
       collection_channel.put()

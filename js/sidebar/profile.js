@@ -46,7 +46,7 @@ brkn.sidebar.Profile.prototype.enterDocument = function() {
       '/_activity/' + this.user_.id,
       goog.bind(function(e) {
         var activities = /** @type {Array.<Object>} */ e.target.getResponseJson();
-        this.stream_ = new brkn.sidebar.Stream(activities);
+        this.stream_ = new brkn.sidebar.Stream(activities, this.user_.id);
         this.stream_.decorate(goog.dom.getElementByClass('stream', this.getElement()));
       }, this));
 };

@@ -23,6 +23,25 @@ goog.addSingletonGetter(brkn.model.Controller);
 
 
 /**
+ * @param {string} count
+ */
+brkn.model.Controller.prototype.setPending = function(count) {
+  var togglePending = goog.dom.getElement('toggle-pending');
+  goog.dom.setTextContent(togglePending, count);
+  goog.style.showElement(togglePending, !!count);
+};
+
+
+/**
+ * @return {string}
+ */
+brkn.model.Controller.prototype.getPending = function() {
+  var togglePending = goog.dom.getElement('toggle-pending');
+  return goog.dom.getTextContent(togglePending);
+};
+
+
+/**
  * @enum {string}
  */
 brkn.model.Controller.Actions = {

@@ -125,9 +125,14 @@ brkn.model.Channel.prototype.getCurrentProgram = function() {
   	}
   	program = nextProgram;
   }
-
-  this.currentProgram = program;
-  return program;
+  
+  if (goog.now() >= program.time.getTime() &&
+      goog.now() < program.time.getTime() + program.media.duration * 1000) {
+    this.currentProgram = program;
+    return this.currentProgram;
+  } else {
+    return null;
+  }
 };
 
 

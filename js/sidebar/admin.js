@@ -64,15 +64,17 @@ brkn.sidebar.Admin.prototype.enterDocument = function() {
   this.storiesEl_ = goog.dom.getElementByClass('stories', this.getElement());
   var adminListEl = goog.dom.getElement('admin-list');
   var channel = brkn.model.Channels.getInstance().currentChannel;
+  var totalPending = 0;
 
   goog.net.XhrIo.send(
-      '/admin/_collections/' + channel.id,
+      '/admin/_collections',
       goog.bind(function(e) {
         var collections = /** @type {Array.<Object>} */goog.json.parse(e.target.getResponse());
         goog.array.forEach(collections, function(col) {
           var colEl = soy.renderAsElement(brkn.sidebar.collection, {
             collection: col
           });
+          totalPending += col['pending'];
           goog.dom.appendChild(this.collectionsEl_, colEl);
           goog.events.listen(colEl, goog.events.EventType.CLICK, goog.bind(function(e) {
             goog.net.XhrIo.send(
@@ -82,12 +84,16 @@ brkn.sidebar.Admin.prototype.enterDocument = function() {
                   medias = goog.array.map(medias, function(m) {
                     return new brkn.model.Media(m);
                   });
-                  var adminList = new brkn.sidebar.AdminList(col.id, medias);
+                  var adminList = new brkn.sidebar.AdminList(col.id, medias,
+                      goog.dom.getElementByClass('pending', colEl));
                   adminList.decorate(adminListEl);
                   brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NAVIGATE,
                       adminListEl, true, col.name);
                 }, this));
           }, this));
         }, this);
+        if (totalPending) {
+          brkn.model.Controller.getInstance().setPending(totalPending);
+        }
       }, this));
 };

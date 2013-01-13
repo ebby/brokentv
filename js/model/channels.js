@@ -59,7 +59,17 @@ brkn.model.Channels.prototype.loadFromJson = function(channels, currentChannel) 
 				this.channels.push(c);
 				this.channelMap[channel.id] = c;
 			}, this));
-	this.currentChannel = this.channelMap[currentChannel] || this.channels[0];
+	
+	// Set current channel or first channel with content.
+	var channel = this.channelMap[currentChannel] || this.channels[0];
+	var lastChannel = channel;
+	var index = 0;
+	while (!channel.getCurrentProgram() && index < this.channels.length) {
+	  channel = this.channels[index];
+	  index++;
+	}
+	// If neither have content, go back to lastChannel
+	this.currentChannel = !channel.getCurrentProgram() ? lastChannel : channel;
 };
 
 

@@ -38,6 +38,14 @@ div#guide {
       opacity: 1;
     }
   }
+  div.ticker {
+    position: absolute;
+    background: url(/static/img/ticker.png) no-repeat;
+    width: 16px;
+    height: 26px;
+    background-size: 100%;
+    .transition(left, .5s, linear);
+  }
   div.header {
     position: absolute;
     top: 0;
@@ -69,14 +77,6 @@ div#guide {
         display: inline-block;
         padding: 5px 0;
       }
-    }
-    div.ticker {
-      position: absolute;
-      background: url(/static/img/ticker.png) no-repeat;
-      width: 16px;
-      height: 26px;
-      background-size: 100%;
-      .transition(left, .5s, linear);
     }
     div.now-left {
       width: 60px;
@@ -205,7 +205,7 @@ div#guide {
 					color: #999;
 					text-shadow: 1px 1px 1px white;
 					z-index: 0;
-					border-radius: 3px;
+					border-radius: 5px;
 					box-shadow: inset 0px 0px 1px 1px rgba(0, 0, 0, .4);
           border: 1px solid whiteSmoke;
           padding: 1px;

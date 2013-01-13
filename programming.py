@@ -38,12 +38,22 @@ class Programming():
     for name, properties in inits.COLLECTIONS.iteritems():
       collection = Collection.all().filter('name =', name).get()
       if not collection:
-        collection = Collection(name=name, keywords=properties['keywords'])
+        
+        collection = Collection(name=name,
+                                keywords=properties.get('keywords', []),
+                                lifespan=properties.get('lifespan'),
+                                yt_playlist=properties.get('yt_playlist'))
         collection.put()
+        
         for publisher in properties['publishers']:
           collection_publisher = CollectionPublisher(collection=collection,
                                                      publisher=self.publishers[publisher])
           collection_publisher.put()
+      collection.yt_playlist = properties.get('yt_playlist')
+      collection.put()
+      for child_col in properties.get('collections', []):
+        col_col = CollectionCollection.add(parent_col=collection,
+                                           child_col=self.collections[child_col])
       self.collections[name] = collection
       if fetch:
         collection.fetch(approve_all=True)
@@ -65,23 +75,26 @@ class Programming():
     memcache.set('channels', simplejson.dumps([c.toJson() for c in self.channels.itervalues()]))
       
   @classmethod
-  def set_programming(cls, channel_id):
+  def set_programming(cls, channel_id, schedule_next=True):
     channel = Channel.get_by_id(channel_id)
     viewers = simplejson.loads(memcache.get('channel_viewers') or '{}').get(str(channel_id), [])
     cols = channel.get_collections()
     all_medias = []
     for col in cols:
       medias = []
+      backup_medias = []
       limit = 50
       offset = 0
       while not len(medias):
-        medias = col.get_medias(limit=limit, offset=offset)
+        medias = col.get_medias(limit=limit, offset=offset, last_programmed = 3200)
+        backup_medias = backup_medias if len(backup_medias) else medias
         if not len(medias):
           logging.info('NO MORE MEDIA FOR: ' + col.name)
+          all_medias += backup_medias
           break
-        # Don't repeat the same program within 2 hours
+        # Don't repeat the same program within an hour
         medias = [c for c in medias if not c.last_programmed or
-                 (datetime.datetime.now() - c.last_programmed).seconds > 6400]
+                 (datetime.datetime.now() - c.last_programmed).seconds > 3200]
         # At most, 30% of the audience has already "witnessed" this program
         medias = [m for m in medias if not len(viewers) or
                   float(len(Programming.have_seen(m, viewers)))/len(viewers) < .3]
@@ -96,10 +109,7 @@ class Programming():
     
     programs = []
     for media in all_medias:      
-      #assert not media.last_programmed \
-      #    or (datetime.datetime.now() - media.last_programmed).seconds > 6400, 'REPROGRAMMED TOO SOON'
-      #assert len(Programming.have_seen(media, ['1240963'])) == 0, 'SEEN BEFORE'
-      
+      logging.info('ADDING: ' + media.name + ' seen: ' + str(Programming.have_seen(media, viewers)))
       programs.append(Program.add_program(channel, media))
     broadcast.broadcastNewPrograms(channel, programs)
 
@@ -114,11 +124,13 @@ class Programming():
 
     # Schedule our next programming selection
     if len(programs):
-      next_gen = programs[-2].time if len(programs) > 1 else programs[-1].time
-      print (next_gen - datetime.datetime.now()).seconds
+      next_gen = (programs[-2].time - datetime.datetime.now()).seconds if len(programs) > 1 \
+          else 0
+      logging.info('COUNTDOWN FOR ' + channel.name + ': ' + str(next_gen))
+      logging.info(str(next_gen))
       deferred.defer(Programming.set_programming, channel.key().id(),
                      _name=channel.name.replace(' ', '') + '-' + str(uuid.uuid1()),
-                     _countdown=max((next_gen - datetime.datetime.now()).seconds, 30))
+                     _countdown=next_gen)
 
     return programs
   
@@ -142,13 +154,15 @@ class Programming():
       e = max(len(media.opt_out), 1) # Each comment outweighs an opt-out
       f = 999999999
       g = 1
+      h = 50
       score = a * float(media.host_views)/max_views \
             + b * len(media.seen) \
             + c * len(media.opt_in) \
             - d * len(media.opt_out) \
             + e * media.comment_count \
             + f * (0 if media.last_programmed else 1)/max_views \
-            - g * (media.programmed_count or 0)
+            - g * (media.programmed_count or 0) \
+            - h * (datetime.datetime.now() - media.published).days
       score *= max_views
       return int(score)
 
@@ -205,6 +219,19 @@ class Programming():
         medias = Media.add_from_entry(feed.entry)
         for media in medias:
           Program.add_program(channel, media)
+  
+  
+  @classmethod
+  def clear_collection(cls, col):
+    for q in [col.collectionMedias, col.collections, col.publishers, col.channels]:
+      try:
+        while True:
+          assert q.count()
+          db.delete(q.fetch(200))
+          time.sleep(0.5)
+      except Exception, e:
+        pass
+    col.delete()
             
   @classmethod
   def clear(cls):

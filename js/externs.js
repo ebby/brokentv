@@ -29,6 +29,13 @@ YT.Player = function(id, params) {};
  */
 YT.Player.prototype.loadVideoById = function(id, opt_seek) {};
 
+/**
+ * @return {number}
+ */
+YT.Player.prototype.getPlayerState;
+
+YT.Player.prototype.playVideo;
+
 /** 
  * enum {string} 
  */

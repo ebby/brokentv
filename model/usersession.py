@@ -36,7 +36,7 @@ class UserSession(db.Model):
     # Track user activity
     if self.sessionMedias.get():
       from useractivity import UserActivity
-      u_a = UserActivity.add_session(self.user, self)
+      broadcast.broadcastNewActivity(UserActivity.add_session(self.user, self))
 
   def toJson(self, get_media=False):
     json = {}

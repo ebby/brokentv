@@ -1,5 +1,6 @@
 from common import *
 
+import urlparse
 from user import User
 
 
@@ -44,7 +45,8 @@ class Media(db.Model):
   def add_from_entry(cls, entries):
     medias = []
     for entry in entries:
-      id = re.match('.+/(.*)$', entry.id.text).group(1)
+      content_url = urlparse.urlparse(entry.media.player.url)
+      id = urlparse.parse_qs(content_url.query)['v'][0]
       media = Media.get_by_key_name(MediaHost.YOUTUBE + id)
       if not media:
         name = unicode(entry.media.title.text, errors='replace')

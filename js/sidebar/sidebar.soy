@@ -52,7 +52,7 @@
  * @param user
  */
 {template .viewer}
-  <div class="viewer">
+  <div class="viewer" style="background-color:{$user.color}">
     <img src="{$user.picture}">
   </div>
 {/template}
@@ -60,6 +60,7 @@
 
 /**
  * @param comment
+ * @param timestamp
  */
 {template .comment}
   <div class="comment">
@@ -68,7 +69,7 @@
       <a href="#">{$comment.user.name}</a>{sp}
       {$comment.text}
     </div>
-    <div class="timestamp">2 days ago</div>
+    <div class="timestamp">{$timestamp}</div>
   </div>
 {/template}
 
@@ -164,7 +165,8 @@
 {template .mediaPreview}
   <div class="media">
     <div class="preview">
-      <img class="thumb" src="{$media.thumbnail}">
+      <div class="thumb" style="background-image:url({$media.thumbnail});
+          background-position: 50% {$media.thumbPos}%"></div>
       <div class="title">{$media.name}</div>
     </div>
   </div>
@@ -192,11 +194,11 @@
     <div class="results">
     </div>
     <div class="section">
-      <div class="label">Collections</div>
+      <div class="label">COLLECTIONS</div>
       <div class="collections"></div>
     </div>
     <div class="section">
-      <div class="label">Stories</div>
+      <div class="label">STORIES</div>
       <div class="stories"></div>
     </div>
   </div>
@@ -209,6 +211,9 @@
 {template .collection}
   <div class="collection">
     <div class="title">{$collection.name}</div>
+    {if $collection.pending}
+      <div class="pending">{$collection.pending}</div>
+    {/if}
   </div>
 {/template}
 
@@ -242,8 +247,8 @@
     <div class="publisher">
       <img src="{$media.publisher.picture}">
       <div class="name">{$media.publisher.name}</div>
+      <div class="duration">{$media.duration} seconds</div>
     </div>
-    <div class="duration">{$media.duration} seconds</div>
     <div class="description">{$media.description}</div>
   </div>
 {/template}

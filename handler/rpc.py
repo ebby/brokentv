@@ -119,10 +119,14 @@ class SeenHandler(BaseHandler):
        
 class ActivityHandler(BaseHandler):
     def get(self, uid=None):
-      user = self.current_user
+      offset = self.request.get('offset') or 0
+      logging.info(offset)
       if uid:
-        user = user.get_by_key_name(uid)
-      activities = UserActivity.get_for_user(user)
+        user = User.get_by_key_name(uid)
+        activities = UserActivity.get_for_user(user, offset=int(offset))
+      else:
+        activities = UserActivity.get_stream(self.current_user, offset=int(offset))
+        logging.info(len(activities))
       return self.response.out.write(simplejson.dumps([a.toJson() for a in activities]))
       
 class ChangeChannelHandler(BaseHandler):
@@ -174,12 +178,6 @@ class ChangeChannelHandler(BaseHandler):
       broadcast.broadcastViewerChange(self.current_user, last_channel_id, channel_id,
                                       session.key().id(), session.tune_in.isoformat());
 
-class CollectionsHandler(BaseHandler):
-  def get(self, channel_id=None):
-    channel = Channel.get_by_id(int(channel_id))
-    collections = channel.get_collections()
-    self.response.out.write(simplejson.dumps([c.toJson() for c in collections]))
-
 class CollectionsMediaHandler(BaseHandler):
   def get(self, col_id=None):
     col = Collection.get_by_id(int(col_id))
@@ -211,7 +209,7 @@ class StarHandler(BaseHandler):
       collection.remove_media(media)
     else:
       collection.add_media(media)
-      UserActivity.add_starred(self.current_user, media)
+      broadcast.broadcastNewActivity(UserActivity.add_starred(self.current_user, media))
     # Broadcast?
     
 class TwitterHandler(BaseHandler):

@@ -1,4 +1,4 @@
-.button.dark {
+.button {
   display: inline-block;
   border-radius: 3px;
   border: 1px solid #2d3446;
@@ -12,6 +12,17 @@
   text-shadow: 1px 1px black;
   cursor: pointer;
   outline: none;
+  background: rgba(218, 218, 218, 0.9);
+}
+.button.goog-custom-button-active,
+.button.goog-custom-button-checked,
+.button:active {
+  background: rgba(180, 180, 180, 0.9);
+  box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.3), 0 0 1px #dedede;
+  color: #ddd;
+}
+.button.dark {
+  background: none;
 }
 .button.dark.goog-custom-button-active,
 .button.dark.goog-custom-button-checked,
@@ -20,13 +31,19 @@
   box-shadow: inset 0 0 1px 1px #000;
   color: #ddd;
 }
+.button.dark.goog-custom-button-disabled {
+  background: #111;
+  box-shadow: inset 0 0 1px 1px #000;
+  color: #ddd;
+  cursor: default;
+}
 div.controller {
   width: 100%;
   position: fixed;
   bottom: 0;
   height: 40px;
   z-index: 100;
-  background: #ffffff -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(45, 52, 70, 0.55)), to(rgba(45, 52, 70, 0.8)));
+  background: #ffffff -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(26, 26, 26, 0.55)), to(rgba(26, 26, 26, 0.8)));
   border-top: 1px solid #ccc;
   -webkit-box-shadow: inset 0 -3px 7px -3px rgba(0, 0, 0, 0.2), 0 0 5px 0 rgba(0, 0, 0, 0.5);
   -moz-box-shadow: inset 0 -3px 7px -3px rgba(0, 0, 0, 0.2), 0 0 5px 0 rgba(0, 0, 0, 0.5);
@@ -42,7 +59,8 @@ div.controller div.button.guide-toggle {
   height: 25px;
   left: 5px;
   line-height: 29px;
-  font-size: 12px;
+  font-size: 11px;
+  font-family: MuseoSans700;
 }
 div.controller div.button.sidebar-toggle {
   position: absolute;
@@ -53,6 +71,30 @@ div.controller div.button.sidebar-toggle {
   background-image: url(/static/img/comment.png);
   background-repeat: no-repeat;
   background-position: center;
+}
+div.controller div.button.admin-toggle {
+  position: absolute;
+  right: 50px;
+  top: 4px;
+  width: 35px;
+  height: 25px;
+  background-image: url(/static/img/19-gear.png);
+  background-repeat: no-repeat;
+  background-position: center;
+}
+div.controller div.button.admin-toggle div.pending {
+  height: 13px;
+  background: red;
+  color: white;
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  border-radius: 3px;
+  font-size: 10px;
+  text-align: center;
+  line-height: 14px;
+  border: 1px solid #460000;
+  padding: 0 3px;
 }
 div.controller div.controls {
   position: absolute;
@@ -89,15 +131,36 @@ div#guide {
   bottom: 40px;
   height: 0px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.95);
+  background: #f7f7f7;
   width: 100%;
   color: #ccc;
-  -webkit-transition: height .5s ease, opacity .5s ease;
-  -moz-transition: height .5s ease, opacity .5s ease;
-  transition: height .5s ease, opacity .5s ease;
+  -webkit-transition: height 0.5s ease, opacity 0.5s ease, left 1s ease-in-out;
+  -moz-transition: height 0.5s ease, opacity 0.5s ease, left 5s ease-in-out;
+  transition: height 0.5s ease, opacity 0.5s ease, left 5s ease-in-out;
+}
+div#guide.drag,
+div#guide.drag div.channel div.name {
+  -webkit-transition: none !important;
+  -moz-transition: none !important;
+  transition: none !important;
 }
 div#guide.toggled {
   height: 230px;
+}
+div#guide.admin div.remove,
+div#guide.admin div.repos {
+  display: block !important;
+}
+div#guide.admin div.channels div.channel div.programs div.program:hover div.thumb,
+div#guide.admin div.channels div.channel div.programs div.program.playing div.thumb {
+  -webkit-transition: opacity 0.6s ease;
+  -moz-transition: opacity 0.6s ease;
+  -o-transition: opacity 0.6s ease;
+  -ms-transition: opacity 0.6s ease;
+  transition: opacity 0.6s ease;
+  -webkit-filter: none !important;
+  opacity: 1;
+  background-position-y: inherit !important;
 }
 div#guide.faded {
   opacity: .5;
@@ -105,14 +168,25 @@ div#guide.faded {
 div#guide.faded:hover {
   opacity: 1;
 }
+div#guide div.ticker {
+  position: absolute;
+  background: url(/static/img/ticker.png) no-repeat;
+  width: 16px;
+  height: 26px;
+  background-size: 100%;
+  -webkit-transition: left 0.5s linear;
+  -moz-transition: left 0.5s linear;
+  -o-transition: left 0.5s linear;
+  -ms-transition: left 0.5s linear;
+  transition: left 0.5s linear;
+}
 div#guide div.header {
   position: absolute;
   top: 0;
   z-index: 100;
   width: 100%;
-  border-bottom: 1px solid #ccc;
   font-size: 10px;
-  background: #ffffff -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(45, 52, 70, 0.55)), to(rgba(45, 52, 70, 0.8)));
+  background: #ffffff -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(26, 26, 26, 0.55)), to(rgba(26, 26, 26, 0.8)));
   border-top: 1px solid #ccc;
   -webkit-box-shadow: inset 0 -3px 7px -3px rgba(0, 0, 0, 0.2), 0 0 5px 1px rgba(0, 0, 0, 0.6);
   -moz-box-shadow: inset 0 -3px 7px -3px rgba(0, 0, 0, 0.2), 0 0 5px 1px rgba(0, 0, 0, 0.6);
@@ -130,26 +204,61 @@ div#guide div.header div.name {
 div#guide div.header div.times {
   display: inline-block;
   width: 100%;
+  position: relative;
   white-space: nowrap;
-  margin-left: 145px;
+  margin-left: 190px;
 }
 div#guide div.header div.times div.time {
   display: inline-block;
   padding: 5px 0;
 }
-div#guide div.header div.ticker {
-  position: absolute;
-  background: url(/static/img/ticker.png) no-repeat;
-  width: 16px;
-  height: 26px;
-  background-size: 100%;
-  -webkit-transition: left 1s;
-  -moz-transition: left 1s;
-  transition: left 1s;
+div#guide div.header div.now-left {
+  width: 60px;
+  height: 21px;
+  margin-top: -1px;
+  box-shadow: inset -5px 0 1px -5px #f1f1f1, 0 0 1px #dedede;
+  background: #ffffff -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(26, 26, 26, 0.55)), to(rgba(26, 26, 26, 0.8)));
+  border-top: 1px solid #ccc;
+  border-right: 1px solid #2d3446;
+  font-size: 11px;
+  font-family: MuseoSans700;
+  line-height: 21px;
+  position: fixed;
+  text-align: center;
+  cursor: pointer;
+  left: 0;
+}
+div#guide div.header div.now-left:active {
+  border-top: 1px solid transparent;
+  background: #111;
+  box-shadow: inset 0 0 1px 1px #000;
+  color: #ddd;
+}
+div#guide div.header div.now-right {
+  width: 60px;
+  height: 21px;
+  margin-top: -1px;
+  box-shadow: inset 5px 0 1px -5px #f1f1f1, 0 0 1px #dedede;
+  background: #ffffff -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(26, 26, 26, 0.55)), to(rgba(26, 26, 26, 0.8)));
+  border-top: 1px solid #ccc;
+  border-left: 1px solid #2d3446;
+  font-size: 11px;
+  font-family: MuseoSans700;
+  line-height: 21px;
+  position: fixed;
+  text-align: center;
+  cursor: pointer;
+  right: 0;
+}
+div#guide div.header div.now-right:active {
+  border-top: 1px solid transparent;
+  background: #111;
+  box-shadow: inset 0 0 1px 1px #000;
+  color: #ddd;
 }
 div#guide div.channels {
   position: absolute;
-  padding-top: 25px;
+  padding-top: 22px;
   width: 100%;
   height: 210px;
   overflow-x: hidden;
@@ -159,10 +268,10 @@ div#guide div.channels {
 div#guide div.channels div.channel {
   border-bottom: 1px solid #ccc;
   position: relative;
-  background: #dedede;
+  background: #f7f7f7;
 }
 div#guide div.channels div.channel div.name {
-  width: 145px;
+  width: 200px;
   text-align: center;
   display: inline-block;
   position: absolute;
@@ -173,7 +282,13 @@ div#guide div.channels div.channel div.name {
   opacity: .8;
   margin-right: 1px solid #888;
   box-shadow: 1px 0 3px rgba(0, 0, 0, 0.8);
+  cursor: pointer;
   z-index: 1;
+  -webkit-transition: left 1s ease-in-out;
+  -moz-transition: left 1s ease-in-out;
+  -o-transition: left 1s ease-in-out;
+  -ms-transition: left 1s ease-in-out;
+  transition: left 1s ease-in-out;
 }
 div#guide div.channels div.channel div.name div.text {
   position: relative;
@@ -203,18 +318,18 @@ div#guide div.channels div.channel div.programming {
   width: 100%;
 }
 div#guide div.channels div.channel div.programs-container {
-  height: 60px;
+  height: 80px;
 }
 div#guide div.channels div.channel div.programs {
   display: inline-block;
   white-space: nowrap;
   width: 100%;
-  height: 40px;
+  height: 80px;
   min-width: 540px;
   position: relative;
   vertical-align: top;
   margin-bottom: 4px;
-  margin-left: 10px;
+  margin-left: 200px;
   margin-top: 6px;
 }
 div#guide div.channels div.channel div.programs div.program {
@@ -227,10 +342,12 @@ div#guide div.channels div.channel div.programs div.program {
   height: 100%;
   color: #999;
   text-shadow: 1px 1px 1px white;
-  z-index: 1;
-  border-radius: 3px;
-  box-shadow: inset 0px 0px 1px 1px rgba(0, 0, 0, 0.3);
+  z-index: 0;
+  border-radius: 5px;
+  box-shadow: inset 0px 0px 1px 1px rgba(0, 0, 0, 0.4);
   border: 1px solid whiteSmoke;
+  padding: 1px;
+  cursor: pointer;
   -webkit-transition: all 0.3s ease;
   -moz-transition: all 0.3s ease;
   -o-transition: all 0.3s ease;
@@ -238,62 +355,73 @@ div#guide div.channels div.channel div.programs div.program {
   transition: all 0.3s ease;
 }
 div#guide div.channels div.channel div.programs div.program.clipped:hover {
-  z-index: 3;
+  z-index: 1;
   width: 200px !important;
-}
-div#guide div.channels div.channel div.programs div.program:hover img {
-  -webkit-transition: opacity 0.6s ease, top 4s ease-out, left 4s ease-out;
-  -moz-transition: opacity 0.6s ease, top 4s ease-out, left 4s ease-out;
-  -o-transition: opacity 0.6s ease, top 4s ease-out, left 4s ease-out;
-  -ms-transition: opacity 0.6s ease, top 4s ease-out, left 4s ease-out;
-  transition: opacity 0.6s ease, top 4s ease-out, left 4s ease-out;
-  -webkit-filter: none !important;
-  opacity: 1;
-}
-div#guide div.channels div.channel div.programs div.program:hover img.pan-left {
-  left: 0%;
-}
-div#guide div.channels div.channel div.programs div.program:hover img.pan-top {
-  top: 100%;
 }
 div#guide div.channels div.channel div.programs div.program:hover div.title {
   display: block !important;
 }
-div#guide div.channels div.channel div.programs div.program:last-child {
-  border-right: 1px solid #CCC;
+div#guide div.channels div.channel div.programs div.program:hover div.title,
+div#guide div.channels div.channel div.programs div.program.playing div.title {
+  color: #f5f5f5;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.6), -1px -1px 1px rgba(0, 0, 0, 0.6), -1px 1px 1px rgba(0, 0, 0, 0.6), 1px -1px 1px rgba(0, 0, 0, 0.6);
 }
 div#guide div.channels div.channel div.programs div.program div.info {
   display: inline-block;
   width: 100%;
+  height: 100%;
   /*box-shadow: inset 0px 15px 30px -1px rgba(0, 0, 0, .9);*/
 
 }
-div#guide div.channels div.channel div.programs div.program img {
-  width: 100%;
-  height: auto;
-  position: absolute;
-  opacity: .2;
-  top: 50%;
-  left: 50%;
-  margin-top: -20px;
-  z-index: -10;
-  -webkit-filter: blur(1px) grayscale();
+div#guide div.channels div.channel div.programs div.program:hover div.thumb,
+div#guide div.channels div.channel div.programs div.program.playing div.thumb {
+  -webkit-transition: opacity 0.6s ease, background-position 4s ease-out;
+  -moz-transition: opacity 0.6s ease, background-position 4s ease-out;
+  -o-transition: opacity 0.6s ease, background-position 4s ease-out;
+  -ms-transition: opacity 0.6s ease, background-position 4s ease-out;
+  transition: opacity 0.6s ease, background-position 4s ease-out;
+  -webkit-filter: none !important;
+  opacity: 1;
 }
-div#guide div.channels div.channel div.programs div.program img.fix-height {
-  height: 150%;
-  width: auto;
+div#guide div.channels div.channel div.programs div.program.clipped:hover div.thumb,
+div#guide div.channels div.channel div.programs div.program.playing div.thumb {
+  -webkit-transition: background-position 4s ease-out;
+  -moz-transition: background-position 4s ease-out;
+  -o-transition: background-position 4s ease-out;
+  -ms-transition: background-position 4s ease-out;
+  transition: background-position 4s ease-out;
+}
+div#guide div.channels div.channel div.programs div.program div.thumb {
+  width: 100%;
+  height: 100%;
+  opacity: .2;
+  background-size: 150% auto;
+  background-position: center;
+  border-radius: 3px;
+}
+div#guide div.channels div.channel div.programs div.program div.thumb.fix-height {
+  background-size: auto 100%;
+}
+div#guide div.channels div.channel div.programs div.program div.progress {
+  display: none;
+  width: 0;
+  height: 100%;
+  background: rgba(218, 218, 218, 0.8);
+  position: absolute;
+  margin-top: -10px;
+  border-right: 2px solid #5d5d5d;
 }
 div#guide div.channels div.channel div.programs div.program div.title {
   left: 5px;
   top: 5px;
-  color: #5d5d5d;
+  color: #2d2d2d;
   text-shadow: 1px 1px 1px white;
   height: 40px;
   font-size: 14px;
   position: absolute;
   white-space: nowrap;
   overflow: hidden;
-  margin-right: 25px;
+  padding-right: 25px;
 }
 div#guide div.channels div.channel div.programs div.program div.title.marquee {
   -webkit-transition: margin-left 10s linear;
@@ -302,22 +430,41 @@ div#guide div.channels div.channel div.programs div.program div.title.marquee {
   -ms-transition: margin-left 10s linear;
   transition: margin-left 10s linear;
 }
-div#guide div.channels div.channel div.programs div.program:hover div.title {
-  color: #f5f5f5;
-  text-shadow: 0px 0px 4px black;
-}
 div#guide div.channels div.channel div.programs div.program.current {
   background: rgba(255, 255, 255, 0.3);
 }
 div#guide div.channels div.channel div.programs div.program div.remove {
+  display: none;
   position: absolute;
-  background: url(/static/img/11-x.png) no-repeat;
-  background-size: 100%;
-  top: 5px;
   right: 5px;
-  width: 10px;
-  height: 10px;
-  font-size: 12px;
+  top: 3px;
+  width: 20px;
+  height: 20px;
+  background-image: url(/static/img/31-circle-x.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 80%;
+  filter: invert(100%);
+}
+div#guide div.channels div.channel div.programs div.program div.repos {
+  display: none;
+  position: absolute;
+  right: 5px;
+  top: 23px;
+  width: 20px;
+  height: 20px;
+  background-image: url(/static/img/repos.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 80%;
+}
+div#guide div.channels div.channel div.programs div.program:hover div.remove,
+div#guide div.channels div.channel div.programs div.program:hover div.repos {
+  filter: invert(100%);
+  -webkit-filter: invert(100%);
+  -moz-filter: invert(100%);
+  -o-filter: invert(100%);
+  -ms-filter: invert(100%);
 }
 div#guide div.channels div.channel div.programs div.program div.border {
   position: absolute;
@@ -335,9 +482,20 @@ div#guide div.channels div.channel div.graph {
   pointer-events: none;
   z-index: 1;
   margin-bottom: 1px;
+  opacity: 0;
+  visibility: hidden;
+  -webkit-transition: opacity 0.3s ease;
+  -moz-transition: opacity 0.3s ease;
+  -o-transition: opacity 0.3s ease;
+  -ms-transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease;
 }
 div#guide div.channels div.channel div.graph svg {
   top: 5px;
+}
+div#guide div.channels div.channel:hover div.graph {
+  opacity: 1;
+  visibility: visible;
 }
 div#guide div.channels div.channel div.viewers {
   width: 100%;
@@ -390,7 +548,7 @@ div#guide div.channels div.channel div.viewers div.viewer div.line div.pic {
   width: 25px;
   height: 25px;
   border-radius: 10px;
-  right: -12px;
+  right: -5px;
   top: -10px;
   box-shadow: 0px 1px 1px 0px rgba(255, 255, 255, 0.6);
   position: absolute;
@@ -411,6 +569,22 @@ div#guide div.channels .current div.name {
   background: #181818 !important;
   box-shadow: 1px 0 3px rgba(0, 0, 0, 0.8), -3px 0px 3px 3px rgba(105, 105, 105, 0.8) !important;
   z-index: 2 !important;
+  cursor: default !important;
+}
+div#guide div.channels .current div.name:after {
+  left: 100%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+div#guide div.channels .current div.name:after {
+  border-left-color: #181818;
+  border-width: 15px;
+  top: 50%;
+  margin-top: -15px;
 }
 div#guide .current div.program,
 div#guide div.program:hover {
@@ -426,6 +600,21 @@ div#guide .current div.program img {
   -webkit-transition: width .5s ease, height .5s ease, top .5s ease;
   -moz-transition: width .5s ease, height .5s ease, top .5s ease;
   transition: width .5s ease, height .5s ease, top .5s ease;
+}
+#stagecover {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: #181818;
+}
+#stagecover div.message {
+  font-size: 30px;
+  color: #f7f7f7;
+  position: absolute;
+  left: 50%;
+  top: 50%;
 }
 div#popup {
   width: 260px;
@@ -585,23 +774,31 @@ div#sidebar {
   top: 0;
   width: 300px;
   height: 100%;
-  background: url(/static/img/ios-linen.jpg);
+  background: #353535 url(/static/img/LightGrey-linen.png);
   z-index: 100;
-  border-left: 1px solid black;
-  box-shadow: inset 4px 0 6px -3px rgba(0, 0, 0, 0.7), 0 0 0 1px #181818;
+  border-left: 1px solid rgba(0, 0, 0, 0.7);
   overflow: hidden;
-  color: #ccc;
+  font-family: MuseoSans300;
+  color: white;
+  text-shadow: 1px 1px 1px #181818;
   -webkit-transition: right .5s ease;
   -moz-transition: right .5s ease;
   transition: right .5s ease;
 }
 div#sidebar.toggled {
   right: 0px;
+  box-shadow: inset 4px 0 6px -4px rgba(0, 0, 0, 0.7), 0 0 1px 1px rgba(146, 146, 146, 0.6);
+}
+div#sidebar.admin div.admin {
+  display: block !important;
+}
+div#sidebar.admin li.tab.admin {
+  display: table-cell !important;
 }
 div#sidebar div#toolbar {
   width: 100%;
   height: 40px;
-  background: #f5f5f5;
+  background: #f7f7f7;
   position: relative;
   border-bottom: 2px solid #AAA;
   box-shadow: 0 2px 3px 1px rgba(0, 0, 0, 0.4), inset 4px 2px 6px -3px rgba(0, 0, 0, 0.7), 0 0 0 1px #181818;
@@ -713,12 +910,16 @@ div#sidebar div#toolbar ul.tabs li.tab {
   vertical-align: middle;
   cursor: pointer;
 }
+div#sidebar div#toolbar ul.tabs li.tab.admin {
+  display: none;
+}
 div#sidebar div#toolbar ul.tabs li.tab:last-child {
   border-right: none;
 }
 div#sidebar div#toolbar ul.tabs li.tab div.label {
   text-align: center;
-  font-size: 13px;
+  font-family: MuseoSans700;
+  font-size: 11px;
   color: #7d7d7d;
   text-shadow: 1px 1px 1px white;
 }
@@ -779,7 +980,7 @@ div#sidebar div#sidebar-content div.slide {
   position: absolute;
   width: 0;
   height: 100%;
-  top: 35px;
+  top: 45px;
   overflow: hidden;
   -webkit-transition: all 0.3s ease;
   -moz-transition: all 0.3s ease;
@@ -791,246 +992,39 @@ div#sidebar div#sidebar-content .current {
   width: 100% !important;
   right: 0 !important;
 }
-div#sidebar div#sidebar-content div.info {
-  margin-top: 10px;
-}
-div#sidebar div#sidebar-content div.info div.publisher {
-  position: relative;
-  left: 10px;
-  top: 10px;
-}
-div#sidebar div#sidebar-content div.info div.publisher div.name {
-  font-size: 12px;
-}
-div#sidebar div#sidebar-content div.info div.publisher div.name a {
-  color: #f5f5f5;
-  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
-}
-div#sidebar div#sidebar-content div.info img.thumb {
-  height: 70px;
-  border-radius: 6px;
-  position: absolute;
-  box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.5), 0 0 1px 1px rgba(255, 255, 255, 0.9);
-  border: 0px solid whiteSmoke;
-  left: 10px;
-  top: 30px;
-}
-div#sidebar div#sidebar-content div.info div.label {
-  font-size: 11px;
-  color: #f5f5f5;
-  margin-bottom: 7px;
-  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
-}
-div#sidebar div#sidebar-content div.info div.title {
-  position: relative;
-  left: 110px;
-  top: 15px;
-  padding-right: 10px;
-  color: whiteSmoke;
-  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
-  font-size: 13px;
-  height: 100px;
-  width: 180px;
-}
-div#sidebar div#sidebar-content div.info div.options {
-  position: absolute;
-  top: 50px;
-  left: 110px;
-}
-div#sidebar div#sidebar-content div.info div.options div.play {
-  background: url(/static/img/16-play@2x.png);
-  background-size: 100%;
-  width: 30px;
-  height: 30px;
-}
-div#sidebar div#sidebar-content div.info div.options div.star {
-  background: url(/static/img/28-star@2x.png);
-  background-size: 100%;
-  width: 30px;
-  height: 30px;
-}
-div#sidebar div#sidebar-content div.info div.options div.share {
-  width: 30px;
-  height: 30px;
-}
-div#sidebar div#sidebar-content div.info div.description {
-  width: 280px;
-  font-size: 10px;
-  height: 38px;
-  overflow: hidden;
-  position: relative;
-  left: 5px;
-  margin-right: 5px;
-  padding: 0 5px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
-  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
-}
-div#sidebar div#sidebar-content div.info div.viewers {
-  position: relative;
-  top: 10px;
-  left: 9px;
-  padding-right: 9px;
-  width: 280px;
-}
-div#sidebar div#sidebar-content div.info div.viewers div.viewer {
-  background: #ccc;
-  width: 25px;
-  height: 24px;
-  border-radius: 10px;
-  box-shadow: 0px 1px 1px 0px rgba(255, 255, 255, 0.6);
-  display: inline-block;
-  margin-left: 9px;
-}
-div#sidebar div#sidebar-content div.info div.viewers div.viewer img {
-  width: 21px;
-  height: 20px;
-  margin-left: 2px;
-  margin-top: 2px;
-  border-radius: 10px;
-}
-div#sidebar div#sidebar-content div.info div.tweets {
-  position: relative;
-  top: 20px;
-  margin-right: 20px;
-  width: 280px;
-  left: 10px;
-}
-div#sidebar div#sidebar-content div.info div.tweets div.tweet {
-  position: relative;
-  width: 99%;
-  border-radius: 3px;
-  background: rgba(255, 255, 255, 0.2);
-  border: 1px solid #888;
-  padding-bottom: 20px;
-  overflow: hidden;
-}
-div#sidebar div#sidebar-content div.info div.tweets div.tweet img {
-  width: 28px;
-  height: 28px;
-  left: 4px;
-  top: 4px;
-  position: absolute;
-}
-div#sidebar div#sidebar-content div.info div.tweets div.tweet div.text {
-  position: relative;
-  left: 37px;
-  top: 3px;
-  font-size: 13px;
-  width: 240px;
-}
-div#sidebar div#sidebar-content div.info div.tweets div.tweet div.text a {
-  color: #f5f5f5;
-}
-div#sidebar div#sidebar-content div.info div.tweets div.tweet div.timestamp {
-  position: absolute;
-  bottom: 3px;
-  right: 5px;
-  font-size: 10px;
-  color: #bbb;
-}
-div#sidebar div#sidebar-content div.info div.comments-holder {
-  position: relative;
-  top: 35px;
-  left: 10px;
-  margin-right: 20px;
-  width: 280px;
-}
-div#sidebar div#sidebar-content div.info div.comments-holder div.comments {
-  overflow-x: scroll;
-  -webkit-transition: height .5s ease;
-  -moz-transition: height .5s ease;
-  transition: height .5s ease;
-}
-div#sidebar div#sidebar-content div.info div.comments-holder div.comment {
-  position: relative;
-  width: 99%;
-  border-radius: 3px;
-  background: rgba(255, 255, 255, 0.2);
-  border: 1px solid #888;
-  padding-bottom: 20px;
-  overflow: hidden;
-  margin-bottom: 5px;
-}
-div#sidebar div#sidebar-content div.info div.comments-holder div.comment img {
-  width: 28px;
-  height: 28px;
-  left: 4px;
-  top: 4px;
-  position: absolute;
-}
-div#sidebar div#sidebar-content div.info div.comments-holder div.comment div.text {
-  position: relative;
-  left: 37px;
-  top: 3px;
-  font-size: 13px;
-  width: 240px;
-}
-div#sidebar div#sidebar-content div.info div.comments-holder div.comment div.text a {
-  color: #f5f5f5;
-}
-div#sidebar div#sidebar-content div.info div.comments-holder div.comment div.timestamp {
-  position: absolute;
-  bottom: 3px;
-  right: 5px;
-  font-size: 10px;
-  color: #bbb;
-}
-div#sidebar div#sidebar-content div.admin {
-  margin-top: -2px;
-}
-div#sidebar div#sidebar-content div.admin div.search {
-  background: #f5f5f5;
-  width: 100%;
-  height: 35px;
-}
-div#sidebar div#sidebar-content div.admin div.search input[type=text] {
-  height: auto;
-  border-radius: 3px;
-  width: 280px;
-  font-size: 13px;
-  min-height: 16px;
-  outline: none;
-  border: 1px solid #CCC;
-  resize: none;
-  margin-left: 10px;
-  margin-top: 7px;
-  margin-bottom: 5px;
-}
-div#sidebar div#sidebar-content div.admin div.label {
-  font-size: 11px;
-  color: #f5f5f5;
-  margin-bottom: 7px;
-}
-div#sidebar div#sidebar-content div.admin div.section {
-  position: relative;
-  margin: 10px;
-}
-div#sidebar div#sidebar-content div.admin div.collections div.collection {
-  position: relative;
-  width: 99%;
-  border-radius: 3px;
-  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(153, 153, 153, 0.9)), to(rgba(99, 99, 99, 0.9)));
-  border: 1px solid #888;
-  padding-bottom: 20px;
-  overflow: hidden;
-  margin-bottom: 5px;
-  font-size: 13px;
-}
-div#sidebar div#sidebar-content div.admin div.collections div.collection div.title {
-  position: relative;
-  left: 5px;
-  top: 5px;
-  font-size: 13px;
-  width: 240px;
-}
-div#sidebar div#sidebar-content div#media-list {
+div#sidebar div#sidebar-content div.media-list {
   overflow-y: scroll;
-  padding: 15px 0;
-  margin-top: 10px;
 }
-div#sidebar div#sidebar-content div#media-list div.media {
-  position: relative;
+div#sidebar div#sidebar-content div.media-list div.list-info {
+  margin: 10px;
+  display: table;
+  table-layout: fixed;
+  border-collapse: collapse;
   width: 280px;
+}
+div#sidebar div#sidebar-content div.media-list div.list-info > div {
+  display: none;
+  vertical-align: top;
+}
+div#sidebar div#sidebar-content div.media-list div.list-info div.picture {
+  width: 60px;
+}
+div#sidebar div#sidebar-content div.media-list div.list-info div.picture img {
+  width: 60px;
+  height: 60px;
+  box-shadow: 0 0 2px 1px rgba(255, 255, 255, 0.3), 0 0 1px 2px rgba(0, 0, 0, 0.7);
+  border-radius: 3px;
+}
+div#sidebar div#sidebar-content div.media-list div.list-info div.description {
+  font-size: 12px;
+  padding-left: 10px;
+}
+div#sidebar div#sidebar-content div.media-list div.medias {
+  padding-bottom: 15px;
+}
+div#sidebar div#sidebar-content div.media-list div.media {
+  position: relative;
+  width: 278px;
   background: rgba(255, 255, 255, 0.2);
   border: 1px solid #888;
   padding-bottom: 20px;
@@ -1038,32 +1032,32 @@ div#sidebar div#sidebar-content div#media-list div.media {
   margin-left: 10px;
   margin-top: -1px;
 }
-div#sidebar div#sidebar-content div#media-list div.media:first-child {
+div#sidebar div#sidebar-content div.media-list div.media:first-child {
   border-top-left-radius: 3px;
   border-top-right-radius: 3px;
 }
-div#sidebar div#sidebar-content div#media-list div.media:last-child {
+div#sidebar div#sidebar-content div.media-list div.media:last-child {
   border-bottom-left-radius: 3px;
   border-bottom-right-radius: 3px;
 }
-div#sidebar div#sidebar-content div#media-list div.media img {
+div#sidebar div#sidebar-content div.media-list div.media img {
   width: 28px;
   height: 28px;
   left: 4px;
   top: 4px;
   position: absolute;
 }
-div#sidebar div#sidebar-content div#media-list div.media div.title {
+div#sidebar div#sidebar-content div.media-list div.media div.title {
   position: relative;
   left: 37px;
   top: 3px;
   font-size: 13px;
   width: 240px;
 }
-div#sidebar div#sidebar-content div#media-list div.media div.title a {
+div#sidebar div#sidebar-content div.media-list div.media div.title a {
   color: #f5f5f5;
 }
-div#sidebar div#sidebar-content div#media-list div.media div.published {
+div#sidebar div#sidebar-content div.media-list div.media div.published {
   position: absolute;
   bottom: 3px;
   right: 5px;
@@ -1076,9 +1070,7 @@ div#sidebar div.comment-input {
   width: 100%;
   min-height: 31px;
   position: absolute;
-  bottom: 54px;
-  border-top: 2px solid #ccc;
-  box-shadow: 0 -2px 3px 1px rgba(0, 0, 0, 0.4), inset 4px -2px 6px -3px rgba(0, 0, 0, 0.7), 0 0 0 1px #181818;
+  bottom: 42px;
   -webkit-transition: all 0.5s ease;
   -moz-transition: all 0.5s ease;
   -o-transition: all 0.5s ease;
@@ -1092,9 +1084,8 @@ div#sidebar div.comment-input div.comment-controls {
   background: rgba(255, 255, 255, 0.7);
   color: #7D7D7D;
   text-shadow: 1px 1px 1px white;
-  top: 0;
-  position: absolute;
-  z-index: -1;
+  top: 27px;
+  position: relative;
   -webkit-transition: top .5s ease;
   -moz-transition: top .5s ease;
   transition: top .5s ease;
@@ -1103,11 +1094,11 @@ div#sidebar div.comment-input div.comment-controls div.comment-button {
   width: 100px;
   height: 100%;
   display: inline-block;
-  margin-left: -4px;
   border-right: 1px solid #ccc;
   font-size: 12px;
   outline: none;
   cursor: pointer;
+  position: relative;
 }
 div#sidebar div.comment-input div.comment-controls div.comment-button:first-child {
   margin-left: -2px;
@@ -1115,15 +1106,27 @@ div#sidebar div.comment-input div.comment-controls div.comment-button:first-chil
 div#sidebar div.comment-input div.comment-controls div.comment-button:last-child {
   border-right: none;
 }
+div#sidebar div.comment-input div.comment-controls div.comment-button.tweet-toggle {
+  background-image: url(/static/img/twitter.png);
+  background-repeat: no-repeat;
+  background-size: 13px;
+  background-position: 10px 5px;
+}
+div#sidebar div.comment-input div.comment-controls div.comment-button.fb-toggle {
+  background-image: url(/static/img/facebook.png);
+  background-repeat: no-repeat;
+  background-size: 7px;
+  background-position: 10px 3px;
+}
 div#sidebar div.comment-input div.comment-controls div.comment-button .goog-custom-button-inner-box {
   margin-top: 5px;
   text-align: center;
 }
 div#sidebar div.comment-input div.comment-controls div.comment-button.goog-custom-button-checked,
-div#sidebar div.comment-input div.comment-controls div.comment-button#add-comment {
-  background: rgba(255, 255, 255, 0.8);
+div#sidebar div.comment-input div.comment-controls div.comment-button.add-comment {
+  background-color: rgba(255, 255, 255, 0.8);
 }
-div#sidebar div.comment-input div.comment-controls div.comment-button.goog-custom-button-checked {
+div#sidebar div.comment-input div.comment-controls div.comment-button.goog-custom-button-checked div.check {
   background-image: url(/static/img/check@2x.png);
   background-repeat: no-repeat;
   background-size: 10px;
@@ -1133,14 +1136,23 @@ div#sidebar div.comment-input div.comment-controls div.comment-button.goog-custo
   background: none !important;
   cursor: normal;
 }
-div#sidebar div.comment-input div.comment-controls div.comment-button#add-comment.goog-custom-button-active {
+div#sidebar div.comment-input div.comment-controls div.comment-button.add-comment.goog-custom-button-active {
   background: rgba(0, 0, 0, 0.1);
   color: #6D6D6D;
 }
-div#sidebar div.comment-input div.input-holder {
-  background: #f5f5f5;
+div#sidebar div.comment-input div.comment-controls div.comment-button div.check {
   width: 100%;
   height: 100%;
+  position: absolute;
+  top: 0;
+}
+div#sidebar div.comment-input div.input-holder {
+  background: #f7f7f7;
+  width: 100%;
+  height: 100%;
+  border-top: 2px solid #ccc;
+  box-shadow: 0 -2px 2px 0 rgba(0, 0, 0, 0.4), inset 4px -2px 6px -3px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(24, 24, 24, 0.3);
+  position: relative;
 }
 div#sidebar div.comment-input div.input-holder textarea {
   resize: none;
@@ -1153,11 +1165,8 @@ div#sidebar div.comment-input div.input-holder textarea {
   border-color: #CCC;
   resize: none;
   margin-left: 10px;
-  margin-top: 7px;
+  margin-top: 8px;
   margin-bottom: 5px;
-}
-div#sidebar div.slide div.comment-input {
-  bottom: 44px;
 }
 div#sidebar div.info.current div.comment-input {
   visibility: visible;
@@ -1290,20 +1299,890 @@ div#login div.broken-media-production {
     -webkit-transform: rotate(90deg);
   }
 }
+div.program.drag {
+  display: inline-block;
+  position: absolute;
+  white-space: normal;
+  overflow: hidden;
+  border-left: 1px solid #CCC;
+  vertical-align: middle;
+  height: 100px;
+  color: #999;
+  text-shadow: 1px 1px 1px white;
+  z-index: 0;
+  border-radius: 3px;
+  box-shadow: inset 0px 0px 1px 1px rgba(0, 0, 0, 0.3);
+  border: 1px solid whiteSmoke;
+  background: white;
+  cursor: move;
+}
+div.program.drag.playing div.progress {
+  display: block;
+}
+div.program.drag:last-child {
+  border-right: 1px solid #CCC;
+}
+div.program.drag div.info {
+  display: inline-block;
+  width: 100%;
+  /*box-shadow: inset 0px 15px 30px -1px rgba(0, 0, 0, .9);*/
+
+}
+div.program.drag img {
+  width: 100%;
+  height: auto;
+  position: absolute;
+  opacity: .2;
+  top: 50%;
+  left: 50%;
+  margin-top: -20px;
+  z-index: -10;
+  -webkit-filter: blur(1px) grayscale();
+}
+div.program.drag img.fix-height {
+  height: 150%;
+  width: auto;
+}
+div.program.drag div.progress {
+  display: none;
+  width: 0;
+  height: 100%;
+  background: rgba(218, 218, 218, 0.8);
+  position: absolute;
+  margin-top: -10px;
+  border-right: 2px solid #5d5d5d;
+}
+div.program.drag div.title {
+  left: 5px;
+  top: 5px;
+  color: #5d5d5d;
+  text-shadow: 1px 1px 1px white;
+  height: 40px;
+  font-size: 14px;
+  position: absolute;
+  white-space: nowrap;
+  overflow: hidden;
+  margin-right: 25px;
+}
+div.program.drag div.title.marquee {
+  -webkit-transition: margin-left 10s linear;
+  -moz-transition: margin-left 10s linear;
+  -o-transition: margin-left 10s linear;
+  -ms-transition: margin-left 10s linear;
+  transition: margin-left 10s linear;
+}
+div.program.drag.current {
+  background: rgba(255, 255, 255, 0.3);
+}
+div.program.drag div.remove {
+  display: none;
+  position: absolute;
+  background: url(/static/img/11-x.png) no-repeat;
+  background-size: 100%;
+  top: 5px;
+  right: 5px;
+  width: 10px;
+  height: 10px;
+  font-size: 12px;
+}
+div.program.drag div.border {
+  position: absolute;
+  width: 98%;
+  height: 98%;
+  left: -1%;
+  top: -1%;
+  border-radius: 16px;
+  border: 8px solid #f5f5f5;
+}
+div#sidebar div.info {
+  margin-top: -2px;
+}
+div#sidebar div.info div.picture {
+  display: inline-block;
+  width: 300px;
+  height: 200px;
+  position: relative;
+  overflow: hidden;
+  background: #f5f5f5;
+  border-bottom: 1px solid rgba(75, 72, 72, 0.6);
+  box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 0.8);
+  /*
+    &:hover img {
+     -webkit-transition: opacity .6s ease, top 4s ease-out, left 4s ease-out;
+        -moz-transition: opacity .6s ease, top 4s ease-out, left 4s ease-out;
+          -o-transition: opacity .6s ease, top 4s ease-out, left 4s ease-out;
+         -ms-transition: opacity .6s ease, top 4s ease-out, left 4s ease-out;
+             transition: opacity .6s ease, top 4s ease-out, left 4s ease-out;
+      -webkit-filter: none !important;
+      opacity: 1;
+    }
+    &:hover div.title {
+      color: #f5f5f5;
+      text-shadow: 0px 0px 4px black;
+    }
+    */
+
+}
+div#sidebar div.info div.picture img.thumb {
+  width: 100%;
+  height: auto;
+  position: absolute;
+  opacity: .5;
+  top: 50%;
+  left: 50%;
+  margin-top: -20px;
+  pointer-events: none;
+  /* -webkit-filter: grayscale() brightness(40%); */
+
+}
+div#sidebar div.info div.picture img.thumb.fix-height {
+  height: 150%;
+  width: auto;
+}
+div#sidebar div.info div.publisher {
+  left: 10px;
+  top: 10px;
+  background: rgba(0, 0, 0, 0.6);
+  display: inline-block;
+  border-radius: 3px;
+  position: absolute;
+  cursor: pointer;
+}
+div#sidebar div.info div.publisher img {
+  width: 22px;
+  height: 22px;
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+  vertical-align: top;
+  border: 1px solid transparent;
+}
+div#sidebar div.info div.publisher div.name {
+  color: #f5f5f5;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
+  font-size: 11px;
+  font-family: MuseoSans700;
+  line-height: 3px;
+  margin: 0 5px;
+  display: inline-block;
+}
+div#sidebar div.info img.thumb {
+  height: 70px;
+  border-radius: 6px;
+  position: absolute;
+  box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.5), 0 0 1px 1px rgba(255, 255, 255, 0.9);
+  border: 0px solid whiteSmoke;
+  left: 10px;
+  top: 30px;
+}
+div#sidebar div.info div.label {
+  font-size: 10px;
+  color: #181818;
+  margin-bottom: 7px;
+  text-shadow: 1px 1px 1px white;
+  font-family: MuseoSans700;
+}
+div#sidebar div.info div.title {
+  position: relative;
+  left: 10px;
+  top: 40px;
+  padding-right: 10px;
+  color: whiteSmoke;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
+  font-size: 18px;
+  font-family: MuseoSans100;
+  width: 225px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 3px;
+  padding: 5px;
+}
+div#sidebar div.info div.published {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  color: #181818;
+  text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+}
+div#sidebar div.info div.options {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+div#sidebar div.info div.options div.button {
+  display: block;
+  border-radius: 0;
+  margin-top: -1px;
+  width: 40px;
+  height: 32px;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+div#sidebar div.info div.options div.play {
+  background-image: url(/static/img/16-play@2x.png);
+  background-size: auto 30%;
+}
+div#sidebar div.info div.options div.star {
+  background-image: url(/static/img/28-star@2x.png);
+  background-size: auto 40%;
+}
+div#sidebar div.info div.options div.star.goog-custom-button-checked {
+  background-image: url(/static/img/28-star-yellow@2x.png);
+}
+div#sidebar div.info div.options div.facebook {
+  background-image: url(/static/img/facebook.png);
+  background-size: auto 40%;
+}
+div#sidebar div.info div.options div.twitter {
+  background-image: url(/static/img/twitter.png);
+  background-size: auto 40%;
+}
+div#sidebar div.info div.description {
+  margin-top: 1px;
+  width: 280px;
+  font-size: 13px;
+  overflow: hidden;
+  overflow-y: scroll;
+  position: relative;
+  margin-right: 5px;
+  padding: 5px 10px;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.65);
+  box-shadow: inset -1px -4px 8px -4px rgba(0, 0, 0, 0.9);
+  line-height: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.8);
+}
+div#sidebar div.info div.viewers {
+  position: relative;
+  top: 10px;
+  left: 9px;
+  padding-right: 9px;
+  width: 280px;
+}
+div#sidebar div.info div.viewers div.viewer {
+  background: #ccc;
+  width: 25px;
+  height: 24px;
+  border-radius: 10px;
+  box-shadow: 0px 1px 1px 0px rgba(255, 255, 255, 0.6);
+  display: inline-block;
+  margin-left: 9px;
+}
+div#sidebar div.info div.viewers div.viewer img {
+  width: 21px;
+  height: 20px;
+  margin-left: 2px;
+  margin-top: 2px;
+  border-radius: 10px;
+}
+div#sidebar div.info div.tweets {
+  position: relative;
+  top: 20px;
+  margin-right: 20px;
+  width: 280px;
+  left: 10px;
+}
+div#sidebar div.info div.tweets div.tweet {
+  position: relative;
+  width: 99%;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.65);
+  border: 1px solid #333;
+  padding-bottom: 20px;
+  overflow: hidden;
+  box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.8);
+}
+div#sidebar div.info div.tweets div.tweet img {
+  width: 28px;
+  height: 28px;
+  left: 4px;
+  top: 4px;
+  position: absolute;
+  border-radius: 3px;
+}
+div#sidebar div.info div.tweets div.tweet div.text {
+  position: relative;
+  left: 37px;
+  top: 3px;
+  font-size: 13px;
+  line-height: 16px;
+  width: 240px;
+}
+div#sidebar div.info div.tweets div.tweet div.text a {
+  color: #f5f5f5;
+}
+div#sidebar div.info div.tweets div.tweet div.timestamp {
+  position: absolute;
+  bottom: 3px;
+  right: 5px;
+  font-size: 10px;
+}
+div#sidebar div.info div.comments-holder {
+  position: relative;
+  top: 35px;
+  left: 10px;
+  margin-right: 20px;
+  width: 280px;
+}
+div#sidebar div.info div.comments-holder div.comments {
+  overflow-x: scroll;
+  -webkit-transition: height .5s ease;
+  -moz-transition: height .5s ease;
+  transition: height .5s ease;
+}
+div#sidebar div.info div.comments-holder div.comment {
+  position: relative;
+  width: 99%;
+  background: rgba(0, 0, 0, 0.65);
+  border: 1px solid #333;
+  box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.8), 0 3px 1px -1px rgba(255, 255, 255, 0.5);
+  padding-top: 5px;
+  padding-bottom: 20px;
+  overflow: hidden;
+}
+div#sidebar div.info div.comments-holder div.comment:first-child {
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+div#sidebar div.info div.comments-holder div.comment:last-child {
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+  box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.8);
+}
+div#sidebar div.info div.comments-holder div.comment img {
+  width: 28px;
+  height: 28px;
+  left: 4px;
+  top: 7px;
+  position: absolute;
+  border-radius: 3px;
+}
+div#sidebar div.info div.comments-holder div.comment div.text {
+  position: relative;
+  left: 37px;
+  top: 3px;
+  font-size: 13px;
+  line-height: 16px;
+  width: 240px;
+}
+div#sidebar div.info div.comments-holder div.comment div.text a {
+  color: #f5f5f5;
+}
+div#sidebar div.info div.comments-holder div.comment div.timestamp {
+  position: absolute;
+  bottom: 3px;
+  right: 5px;
+  font-size: 10px;
+}
+div#sidebar div.stream {
+  overflow-y: scroll !important;
+  padding-top: 10px;
+  color: white;
+  text-shadow: 1px 1px 1px black;
+  width: 100%;
+  height: 100%;
+}
+div#sidebar div.stream div.spinner {
+  width: 100%;
+  height: 95px;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.6);
+  margin-top: -50px;
+  line-height: 40px;
+  -webkit-transition: height 0.3s linear;
+  -moz-transition: height 0.3s linear;
+  -o-transition: height 0.3s linear;
+  -ms-transition: height 0.3s linear;
+  transition: height 0.3s linear;
+}
+div#sidebar div.stream div.spinner.finished {
+  height: 0;
+}
+div#sidebar div.stream div.activities {
+  padding-bottom: 45px;
+}
+div#sidebar div.stream div.activity {
+  opacity: 0;
+  position: relative;
+  font-size: 13px;
+  margin-bottom: 15px;
+  width: 300px;
+  -webkit-transition: opacity 0.3s ease-in;
+  -moz-transition: opacity 0.3s ease-in;
+  -o-transition: opacity 0.3s ease-in;
+  -ms-transition: opacity 0.3s ease-in;
+  transition: opacity 0.3s ease-in;
+}
+div#sidebar div.stream div.activity.show {
+  opacity: 1;
+}
+div#sidebar div.stream div.activity div.picture {
+  position: absolute;
+  background: #ccc;
+  width: 35px;
+  height: 34px;
+  border-radius: 18px;
+  box-shadow: 0px 1px 1px 0px rgba(255, 255, 255, 0.6);
+  display: inline-block;
+  margin-left: 9px;
+}
+div#sidebar div.stream div.activity div.picture img {
+  width: 31px;
+  height: 30px;
+  margin-left: 2px;
+  margin-top: 2px;
+  border-radius: 15px;
+}
+div#sidebar div.stream div.activity div.text {
+  position: relative;
+  left: 50px;
+  top: 0px;
+  min-height: 20px;
+  width: 240px;
+  padding-bottom: 13px;
+  margin-bottom: 15px;
+  font-family: MuseoSans700;
+}
+div#sidebar div.stream div.activity div.text a {
+  color: white;
+}
+div#sidebar div.stream div.activity div.text div.timestamp {
+  font-size: 11px;
+  font-family: MuseoSans300;
+  position: absolute;
+  bottom: 0;
+}
+div#sidebar div.stream div.medias {
+  margin: 10px;
+}
+div#sidebar div.stream div.medias div.media {
+  white-space: normal;
+  overflow: hidden;
+  vertical-align: middle;
+  height: 50px;
+  color: #999;
+  text-shadow: 1px 1px 1px white;
+  box-shadow: 0px 0px 2px 0px rgba(255, 255, 255, 0.7);
+  border: 1px solid #333;
+  margin-top: -1px;
+  cursor: pointer;
+  -webkit-transition: all 0.3s ease;
+  -moz-transition: all 0.3s ease;
+  -o-transition: all 0.3s ease;
+  -ms-transition: all 0.3s ease;
+  transition: all 0.3s ease;
+}
+div#sidebar div.stream div.medias div.media:first-child {
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+div#sidebar div.stream div.medias div.media:last-child {
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+  margin-bottom: 5px;
+}
+div#sidebar div.stream div.medias div.media div.preview {
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  background: #ffffff -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(26, 26, 26, 0.9)), to(rgba(26, 26, 26, 0.3)));
+  border-radius: 2px;
+}
+div#sidebar div.stream div.medias div.media div.preview:hover div.title {
+  color: #f5f5f5;
+  text-shadow: 0px 0px 4px black;
+}
+div#sidebar div.stream div.medias div.media div.preview:hover div.thumb,
+div#sidebar div.stream div.medias div.media div.preview.playing div.thumb {
+  -webkit-transition: opacity 0.6s ease, background-position 2s ease-out;
+  -moz-transition: opacity 0.6s ease, background-position 2s ease-out;
+  -o-transition: opacity 0.6s ease, background-position 2s ease-out;
+  -ms-transition: opacity 0.6s ease, background-position 2s ease-out;
+  transition: opacity 0.6s ease, background-position 2s ease-out;
+  opacity: 1;
+  -webkit-filter: none;
+}
+div#sidebar div.stream div.medias div.media div.preview:hover div.title,
+div#sidebar div.stream div.medias div.media div.preview:hover div.published {
+  color: #f5f5f5;
+  text-shadow: 0px 0px 4px black;
+}
+div#sidebar div.stream div.medias div.media div.preview div.thumb {
+  width: 100%;
+  height: 100%;
+  opacity: .5;
+  background-size: 100% auto;
+  background-position: center;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  -webkit-filter: grayscale(100%);
+}
+div#sidebar div.stream div.medias div.media div.preview div.title {
+  left: 5px;
+  top: 5px;
+  color: white;
+  text-shadow: 1px 1px 1px black;
+  height: 35px;
+  font-size: 14px;
+  white-space: nowrap;
+  width: 100%;
+  text-overflow: ellipsis;
+  position: absolute;
+  overflow: hidden;
+  margin-right: 25px;
+}
+div#sidebar div.stream div.medias div.media div.preview div.title.marquee {
+  -webkit-transition: margin-left 10s linear;
+  -moz-transition: margin-left 10s linear;
+  -o-transition: margin-left 10s linear;
+  -ms-transition: margin-left 10s linear;
+  transition: margin-left 10s linear;
+}
+div#sidebar div.stream div.medias div.media:hover div.title {
+  color: #f5f5f5;
+  text-shadow: 0px 0px 4px black;
+}
+div#sidebar div.admin {
+  margin-top: -2px;
+  display: none;
+}
+div#sidebar div.admin div.search {
+  background: #f5f5f5;
+  width: 100%;
+  height: 35px;
+}
+div#sidebar div.admin div.search input[type=text] {
+  height: auto;
+  border-radius: 3px;
+  width: 280px;
+  font-size: 13px;
+  min-height: 16px;
+  outline: none;
+  border: 1px solid #CCC;
+  resize: none;
+  margin-left: 10px;
+  margin-top: 7px;
+  margin-bottom: 5px;
+}
+div#sidebar div.admin div.label {
+  font-size: 10px;
+  color: #181818;
+  margin-bottom: 7px;
+  text-shadow: 1px 1px 1px white;
+  font-family: MuseoSans700;
+}
+div#sidebar div.admin div.section {
+  position: relative;
+  margin: 10px;
+}
+div#sidebar div.admin div.collections div.collection {
+  position: relative;
+  width: 99%;
+  background: rgba(0, 0, 0, 0.65);
+  border: 1px solid #333;
+  overflow: hidden;
+  box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.8), 0 3px 1px -1px rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  font-family: MuseoSans500;
+}
+div#sidebar div.admin div.collections div.collection:first-child {
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+div#sidebar div.admin div.collections div.collection:last-child {
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+  box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.8);
+}
+div#sidebar div.admin div.collections div.collection div.title {
+  position: relative;
+  left: 5px;
+  top: 5px;
+  font-size: 13px;
+  width: 240px;
+  color: white;
+  line-height: 27px;
+  height: 36px;
+}
+div#sidebar div.admin div.collections div.collection div.pending {
+  width: 20px;
+  height: 20px;
+  background: red;
+  color: white;
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  border-radius: 3px;
+  font-size: 12px;
+  text-align: center;
+  line-height: 21px;
+  border: 1px solid #460000;
+}
+div#sidebar div#admin-list {
+  overflow-y: scroll !important;
+}
+div#sidebar div#admin-list div.list-info {
+  margin: 10px;
+  display: table;
+  table-layout: fixed;
+  border-collapse: collapse;
+  width: 280px;
+}
+div#sidebar div#admin-list div.list-info > div {
+  display: none;
+  vertical-align: top;
+}
+div#sidebar div#admin-list div.list-info div.picture {
+  width: 60px;
+}
+div#sidebar div#admin-list div.list-info div.picture img {
+  width: 60px;
+  height: 60px;
+  box-shadow: 0 0 2px 1px rgba(255, 255, 255, 0.3), 0 0 1px 2px rgba(0, 0, 0, 0.7);
+  border-radius: 3px;
+}
+div#sidebar div#admin-list div.list-info div.description {
+  font-size: 12px;
+  padding-left: 10px;
+}
+div#sidebar div#admin-list div.label {
+  margin-top: 10px;
+  margin-left: 10px;
+  font-size: 10px;
+  color: #181818;
+  margin-bottom: 7px;
+  text-shadow: 1px 1px 1px white;
+  font-family: MuseoSans700;
+}
+div#sidebar div#admin-list div.medias {
+  padding-bottom: 15px;
+  margin: 10px;
+}
+div#sidebar div#admin-list div.admin-media {
+  margin-bottom: 10px;
+  border-radius: 3px;
+  position: relative;
+  background: rgba(0, 0, 0, 0.65);
+  border: 1px solid #333;
+  box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.8);
+}
+div#sidebar div#admin-list div.admin-media.remove {
+  opacity: 0;
+  -webkit-transition: opacity 0.3s ease;
+  -moz-transition: opacity 0.3s ease;
+  -o-transition: opacity 0.3s ease;
+  -ms-transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease;
+}
+div#sidebar div#admin-list div.admin-media:hover div.thumb,
+div#sidebar div#admin-list div.admin-media.playing div.thumb {
+  -webkit-transition: opacity 0.6s ease;
+  -moz-transition: opacity 0.6s ease;
+  -o-transition: opacity 0.6s ease;
+  -ms-transition: opacity 0.6s ease;
+  transition: opacity 0.6s ease;
+  opacity: 1;
+}
+div#sidebar div#admin-list div.admin-media:hover div.title,
+div#sidebar div#admin-list div.admin-media:hover div.published {
+  color: #f5f5f5;
+  text-shadow: 0px 0px 4px black;
+}
+div#sidebar div#admin-list div.admin-media:hover div.approve,
+div#sidebar div#admin-list div.admin-media:hover div.remove,
+div#sidebar div#admin-list div.admin-media:hover div.repos,
+div#sidebar div#admin-list div.admin-media:hover div.play {
+  filter: invert(100%);
+  -webkit-filter: invert(100%);
+  -moz-filter: invert(100%);
+  -o-filter: invert(100%);
+  -ms-filter: invert(100%);
+}
+div#sidebar div#admin-list div.admin-media div.thumb {
+  width: 100%;
+  height: 100%;
+  opacity: .2;
+  background-size: 150% auto;
+  background-position: center;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+div#sidebar div#admin-list div.admin-media div.title {
+  left: 5px;
+  top: 5px;
+  color: #181818;
+  text-shadow: 1px 1px 1px white;
+  height: 30px;
+  font-size: 14px;
+  position: absolute;
+  overflow: hidden;
+  margin-right: 60px;
+  font-family: MuseoSans500;
+}
+div#sidebar div#admin-list div.admin-media div.title.marquee {
+  -webkit-transition: margin-left 10s linear;
+  -moz-transition: margin-left 10s linear;
+  -o-transition: margin-left 10s linear;
+  -ms-transition: margin-left 10s linear;
+  transition: margin-left 10s linear;
+}
+div#sidebar div#admin-list div.admin-media div.published {
+  position: absolute;
+  bottom: 3px;
+  font-size: 10px;
+  color: #181818;
+  left: 5px;
+}
+div#sidebar div#admin-list div.media {
+  white-space: normal;
+  overflow: hidden;
+  vertical-align: middle;
+  height: 50px;
+  color: #999;
+  text-shadow: 1px 1px 1px white;
+  margin-top: -1px;
+  cursor: pointer;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  -webkit-transition: all 0.3s ease;
+  -moz-transition: all 0.3s ease;
+  -o-transition: all 0.3s ease;
+  -ms-transition: all 0.3s ease;
+  transition: all 0.3s ease;
+}
+div#sidebar div#admin-list div.media div.preview {
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  background: #f5f5f5;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  margin-top: 1px;
+}
+div#sidebar div#admin-list div.media div.preview div.approve {
+  position: absolute;
+  right: 25px;
+  top: 3px;
+  width: 20px;
+  height: 20px;
+  background-image: url(/static/img/39-circle-check.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 80%;
+}
+div#sidebar div#admin-list div.media div.preview div.remove {
+  position: absolute;
+  right: 5px;
+  top: 3px;
+  width: 20px;
+  height: 20px;
+  background-image: url(/static/img/31-circle-x.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 80%;
+  filter: invert(100%);
+}
+div#sidebar div#admin-list div.media div.preview div.repos {
+  position: absolute;
+  right: 5px;
+  bottom: 3px;
+  width: 20px;
+  height: 20px;
+  background-image: url(/static/img/repos.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 80%;
+}
+div#sidebar div#admin-list div.media div.preview div.play {
+  position: absolute;
+  right: 45px;
+  top: 3px;
+  width: 20px;
+  height: 20px;
+  background-image: url(/static/img/36-circle-play.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 80%;
+}
+div#sidebar div#admin-list div.media:hover div.title {
+  color: #f5f5f5;
+  text-shadow: 0px 0px 4px black;
+}
+div#sidebar div#admin-list div.publisher {
+  left: 10px;
+  top: 10px;
+  border-radius: 3px;
+  position: relative;
+  top: 3px;
+  left: 0px;
+  margin-bottom: 5px;
+  border-bottom: 1px solid rgba(204, 204, 204, 0.32);
+  width: 100%;
+  padding: 3px;
+  font-family: MuseoSans500;
+}
+div#sidebar div#admin-list div.publisher img {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  vertical-align: top;
+  border: 1px solid transparent;
+}
+div#sidebar div#admin-list div.publisher div.name {
+  font-size: 11px;
+  line-height: 3px;
+  margin: 0 5px;
+  display: inline-block;
+}
+div#sidebar div#admin-list div.publisher div.duration {
+  position: absolute;
+  right: 3px;
+  top: 3px;
+}
+div#sidebar div#admin-list div.description,
+div#sidebar div#admin-list div.duration {
+  font-size: 11px;
+  margin: 5px;
+}
 @font-face {
-  font-family: 'MuseoSans';
-  src: url('/static/webfonts/235CED_0_0.eot');
-  src: url('/static/webfonts/235CED_0_0.eot?#iefix') format('embedded-opentype'), url('/static/webfonts/235CED_0_0.woff') format('woff'), url('/static/webfonts/235CED_0_0.ttf') format('truetype');
+  font-family: 'MuseoSans100';
+  src: url('/static/webfonts/museosans/100.woff') format('woff');
+}
+@font-face {
+  font-family: 'MuseoSans300';
+  src: url('/static/webfonts/museosans/300.woff') format('woff');
+}
+@font-face {
+  font-family: 'MuseoSans500';
+  src: url('/static/webfonts/museosans/500.woff') format('woff');
+}
+@font-face {
+  font-family: 'MuseoSans700';
+  src: url('/static/webfonts/museosans/700.woff') format('woff');
 }
 html,
 body {
   background: #181818;
   margin: 0;
-  font-family: MuseoSans;
+  font-family: MuseoSans300;
   overflow: hidden;
+}
+div#overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 100;
 }
 a {
   text-decoration: none;
+  font-family: MuseoSans700;
 }
 a:hover {
   text-decoration: underline;

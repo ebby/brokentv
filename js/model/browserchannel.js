@@ -56,10 +56,8 @@ brkn.model.BrowserChannel.prototype.onMessage_ = function(rawMessage) {
 	    var channel = brkn.model.Channels.getInstance().get(message['channel_id']);
 	    var time = goog.date.fromIsoString(message['time'] + 'Z');
 	    var session = new brkn.model.Session(message['session_id'], user, channel, time);
-	    //var last_channel = brkn.model.Channels.getInstance().get(message['last_channel_id']);
 	    user.currentSession.tuneOut = time;
 	    user.currentSession = session;
-	    //last_channel.publish(brkn.model.Channel.Action.REMOVE_VIEWER, user.currentSession, time);
 	    channel.publish(brkn.model.Channel.Action.ADD_VIEWER, session);
 	    break;
 	  case 'new_comment':
@@ -69,6 +67,10 @@ brkn.model.BrowserChannel.prototype.onMessage_ = function(rawMessage) {
 	      media.publish(brkn.model.Media.Actions.ADD_COMMENT, comment);
 	    }
 	    break;
+	  case 'new_activity':
+	    brkn.model.Users.getInstance().publish(brkn.model.Users.Action.NEW_ACTIVITY,
+	        message['activity'])
+      break;
 	  case 'update_programs':
 	    var programs = message['programs'];
 	    var channel = brkn.model.Channels.getInstance().get(message['channel_id']);

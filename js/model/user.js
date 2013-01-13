@@ -43,6 +43,12 @@ brkn.model.User = function(user) {
    * @type {number}
    */
   this.accessLevel = user['access_level'];	
+  
+  /**
+   * @type {Array.<Object>}
+   * @private
+   */
+  this.activities = []
 };
 goog.inherits(brkn.model.User, goog.pubsub.PubSub);
 
@@ -52,6 +58,18 @@ goog.inherits(brkn.model.User, goog.pubsub.PubSub);
  */
 brkn.model.User.prototype.isAdmin = function() {
   return this.accessLevel == brkn.model.User.AccessLevel.ADMIN;
+};
+
+/**
+ * @return {Array.<Object>}
+ */
+brkn.model.User.prototype.getActivities = function() {
+  goog.array.sort(this.activities, function(a, b) {
+    var aTime = goog.date.fromIsoString(a['time'] + 'Z'); 
+    var bTime = goog.date.fromIsoString(b['time'] + 'Z');
+    return aTime.getTime() <= bTime.getTime() ? 1 : -1;
+  });
+  return this.activities;
 };
 
 

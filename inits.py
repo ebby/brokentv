@@ -91,9 +91,18 @@ PUBLISHERS = {
   }                                     
 }
 
+
+'''
+ACCEPTABLE COLLECTIONS:
+  PUBLISHERS + KEYWORDS
+  PUBLISHER + PLAYLIST
+  PUBLISHERS + KEYWORDS + (CHILD) COLLECTIONS
+
+'''
 COLLECTIONS = {
   'Top News Stories': {
     'keywords': ['News'],
+    'lifespan': 2,
     'publishers': ['The New York Times',
                    'ABC News',
                    'The Weather Channel',
@@ -112,30 +121,34 @@ COLLECTIONS = {
                    'Huffington Post',
                    'Buzz60']
   },
-  'News Magazines': {
-    'keywords': ['News'],
-    'publishers': [
-                   'Vice',
-                   ]
-  },
   'Creative Arts': {
     'keywords': ['Entertainment'],
     'publishers': ['Cool Hunting']
   },
   'Fashion': {
     'keywords': ['Entertainment', 'Howto'],
-    'publishers': ['Buzz60', 'The New York Times', 'The New Yorker', 'Fashion TV']     
+    'publishers': ['Buzz60', 'The New York Times', 'The New Yorker', 'FashionTV']     
   },
   'TED': {
     'keywords': ['Education', 'Howto'],
     'publishers': ['TED']     
-  }
+  },
+  'Larry King Now': {
+    'yt_playlist': 'PL-PGk0xTdoUJ7rxQ6VDV08HdIptwk3X5D',
+    'publishers': ['Ora TV']
+  },
+  'News Magazines': {
+    'keywords': ['News'],
+    'publishers': ['Vice'],
+    'collections': ['Larry King Now'],
+    'lifespan': 365
+  },
 }
 
 CHANNELS = {
   'Broken News': {
     'keywords': ['News'],
-    'collections': ['Top News Stories']
+    'collections': ['Top News Stories', 'News Magazines']
   },
   'CREATE': {
     'keywords': ['Entertainment'],

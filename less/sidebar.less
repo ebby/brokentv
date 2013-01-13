@@ -7,8 +7,6 @@ div#sidebar {
   background: #353535 url(/static/img/LightGrey-linen.png);
   z-index: 100;
   border-left: 1px solid rgba(0, 0, 0, .7);
-  box-shadow: inset 4px 0 6px -4px rgba(0, 0, 0, 0.7),
-      0 0 0 1px #6d6d6d;
   overflow: hidden;
   font-family: MuseoSans300;
   color: white;
@@ -18,9 +16,9 @@ div#sidebar {
           transition: right .5s ease;
   &.toggled {
     right: 0px;
+    box-shadow: inset 4px 0 6px -4px rgba(0, 0, 0, 0.7),
+      0 0 1px 1px rgba(146, 146, 146, 0.6);
   }
-  @import "stream.less";
-  @import "info.less";
   
   &.admin {
     div.admin {
@@ -367,7 +365,7 @@ div#sidebar {
       height: 100%;
       border-top: 2px solid #ccc;
       box-shadow: 0 -2px 2px 0 rgba(0, 0, 0, 0.4), inset 4px -2px 6px -3px rgba(0, 0, 0, 0.7),
-          0 0 0 1px #181818;
+          0 0 0 1px rgba(24, 24, 24, 0.3);
       position: relative;
       textarea {
         resize:none;
@@ -380,7 +378,7 @@ div#sidebar {
         border-color: #CCC;
         resize: none;
         margin-left: 10px;
-        margin-top: 7px;
+        margin-top: 8px;
         margin-bottom: 5px;
       }
     }
@@ -390,5 +388,3 @@ div#sidebar {
     opacity: 1;
   }
 }
-
-@import "admin.less";

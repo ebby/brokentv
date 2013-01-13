@@ -74,6 +74,13 @@ brkn.Guide.prototype.width_;
 
 
 /**
+ * @type {boolean}
+ * @private
+ */
+brkn.Guide.prototype.aligned_;
+
+
+/**
  * @type {number}
  * @private
  */
@@ -139,10 +146,11 @@ brkn.Guide.prototype.enterDocument = function() {
         goog.dom.classes.enable(this.getElement(), 'toggled', show);
       }, this);
   
-//  brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_SIDEBAR,
-//      function(show) {
-//        goog.dom.classes.enable(this.getElement(), 'faded', show);
-//      }, this);
+  brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_SIDEBAR,
+      function(show) {
+        this.align_();
+    //goog.dom.classes.enable(this.getElement(), 'faded', show);
+      }, this);
 
   // Set start time
   var startTime = new goog.date.DateTime();
@@ -199,7 +207,6 @@ brkn.Guide.prototype.enterDocument = function() {
     this.channelMap_[c.id] = channel;
   }, this));
 
-  var resizing = false;
   var nowLeft = goog.dom.getElement('now-left');
   var nowRight = goog.dom.getElement('now-right');
   
@@ -210,28 +217,16 @@ brkn.Guide.prototype.enterDocument = function() {
           var elapsed = (goog.now() - this.minTime_.getTime())/1000 * this.pixelsPerSecond_;
 
           this.updateNowButtons_();
-          
           if (elapsed + goog.dom.getViewportSize().width > this.width_ -
-              (brkn.model.Controller.getInstance().sidebarToggled ? 300 : 0) && !resizing) {
-            resizing = true;
-            window.console.log('infinite scrollerize');
-            
-            // Update UI per last set of params
-            var slotsPerHorizon = this.timeslots_/this.horizon_;
-            var newSlots = Math.ceil(slotsPerHorizon);
-            // Add a timeslot
-            this.addTimeSlots(1, this.maxTime_);
-            this.width_ += this.timeslotWidth_;
-            goog.style.setWidth(this.getElement(), this.width_);
-            this.timeslots_++;
-            //this.maxTime_.add(new goog.date.Interval(0, 0, 0, 0, this.interval_ * newSlots));
-            this.timeline = this.timeslots_ * this.interval_ * 60;
-            resizing = false;
+              (brkn.model.Controller.getInstance().sidebarToggled ? 300 : 0)) {
+            this.expand_();
           }
           goog.style.setPosition(this.tickerEl_, elapsed);
+          this.align_();
         }, this))
-    .listen(nowLeft, goog.events.EventType.CLICK, goog.bind(this.align_, this))
-    .listen(nowRight, goog.events.EventType.CLICK, goog.bind(this.align_, this))
+    .listen(window, goog.events.EventType.RESIZE, goog.bind(this.align_, this))
+    .listen(nowLeft, goog.events.EventType.CLICK, goog.bind(this.align_, this, true))
+    .listen(nowRight, goog.events.EventType.CLICK, goog.bind(this.align_, this, true))
     .listen(dragger,
         goog.fx.Dragger.EventType.BEFOREDRAG,
         goog.bind(function() {
@@ -241,6 +236,7 @@ brkn.Guide.prototype.enterDocument = function() {
         goog.fx.Dragger.EventType.END,
         goog.bind(function() {
           goog.dom.classes.remove(this.getElement(), 'drag');
+          this.aligned_ = false;
           this.updateNowButtons_();
         }, this))
     .listen(headerEl,
@@ -258,19 +254,20 @@ brkn.Guide.prototype.enterDocument = function() {
                 + -x + 'px !important}';
           }
           goog.dom.classes.remove(this.getElement(), 'drag');
+          this.aligned_ = false;
           this.updateNowButtons_();
         }, this));
 
   brkn.model.Channels.getInstance().subscribe(brkn.model.Channels.Actions.CHANGE_CHANNEL,
       this.changeChannel, this);
   brkn.model.Channels.getInstance().subscribe(brkn.model.Channels.Actions.NEXT_PROGRAM,
-      this.align_, this);
+      goog.bind(this.align_, this, true));
   brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_ADMIN,
       function(show) {
         goog.dom.classes.enable(this.getElement(), 'admin', show);
       }, this);
   
-  this.align_();
+  this.align_(true);
   
   if (this.isAdmin_) {
     // Don't drag when shift key is pressed...we're rescheduling a show.
@@ -310,7 +307,7 @@ brkn.Guide.prototype.changeChannel = function(channel) {
   goog.dom.classes.remove(this.currentChannel_.getElement(), 'current');
   this.currentChannel_ = this.channelMap_[channel.id];
   goog.dom.classes.add(this.currentChannel_.getElement(), 'current');
-  this.align_();
+  this.align_(true);
 };
 
 
@@ -333,10 +330,35 @@ brkn.Guide.prototype.updateNowButtons_ = function(opt_hide) {
 /**
  * @private
  */
-brkn.Guide.prototype.align_ = function() {
+brkn.Guide.prototype.expand_ = function() {
+  // Update UI per last set of params
+  var slotsPerHorizon = this.timeslots_/this.horizon_;
+  var newSlots = Math.ceil(slotsPerHorizon);
+  // Add a timeslot
+  this.addTimeSlots(1, this.maxTime_);
+  this.width_ += this.timeslotWidth_;
+  goog.style.setWidth(this.getElement(), this.width_);
+  this.timeslots_++;
+  //this.maxTime_.add(new goog.date.Interval(0, 0, 0, 0, this.interval_ * newSlots));
+  this.timeline = this.timeslots_ * this.interval_ * 60;
+};
+
+
+/**
+ * @param {?boolean=} opt_setAligned
+ * @private
+ */
+brkn.Guide.prototype.align_ = function(opt_setAligned) {
   var program = brkn.model.Channels.getInstance().currentChannel.getCurrentProgram();
-  if (program) {
+  this.aligned_ = opt_setAligned || this.aligned_;
+  if (this.aligned_ && program) {
+    var elapsed = (goog.now() - this.minTime_.getTime())/1000 * this.pixelsPerSecond_;
     var offset = -(program.time.getTime() - this.minTime_.getTime())/1000 * this.pixelsPerSecond_ + 5;
+    var viewWidth = goog.dom.getViewportSize().width - 
+        (brkn.model.Controller.getInstance().sidebarToggled ? 300 : 0);
+    if (elapsed > -offset + viewWidth - 300) {
+      offset = -elapsed + viewWidth - 300;
+    }
     goog.style.setPosition(this.getElement(), Math.min(offset, 0));
     this.channelNameStyle_.innerHTML = 'div#guide div.channels div.channel div.name' +
         '{left:' + -offset + 'px !important}';

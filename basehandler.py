@@ -25,14 +25,13 @@ class BaseHandler(webapp2.RequestHandler):
             cookie = facebook.get_user_from_cookie(self.request.cookies,
                                                    constants.FACEBOOK_APP_ID,
                                                    constants.FACEBOOK_APP_SECRET)
-
             if cookie:
                 # Okay so user logged in 
                 # Now, check to see if existing user
+                graph = facebook.GraphAPI(cookie["access_token"])
                 user = User.get_by_key_name(cookie["uid"])
                 if not user:
                     # Not an existing user so get user info
-                    graph = facebook.GraphAPI(cookie["access_token"])
                     profile = graph.get_object("me")
                     user = User(key_name=str(profile["id"]),
                         id=str(profile["id"]),
@@ -43,10 +42,14 @@ class BaseHandler(webapp2.RequestHandler):
                         access_token=cookie["access_token"],
                         location=profile['location']['name'] \
                             if 'location' in profile else None)
-                    user.put()
                 elif user.access_token != cookie["access_token"]:
                     user.access_token = cookie["access_token"]
-                    user.put()
+                
+                # Update friends graph
+                friends = graph.get_connections("me", "friends")['data']
+                user.friends = [f['id'] for f in friends]
+                user.put()
+                
                 # User is now logged in
                 self.session["user"] = user.to_session()
                 return user#self.session.get("user")

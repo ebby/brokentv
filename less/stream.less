@@ -1,12 +1,35 @@
-div.stream {
+div#sidebar div.stream {
   overflow-y: scroll !important;
-  padding: 10px 0;
-
+  padding-top: 10px;
+  color: white;
+  text-shadow: 1px 1px 1px black;
+  width: 100%;
+  height: 100%;
+  div.spinner {
+    width: 100%;
+    height: 95px;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.6);
+    margin-top: -50px;
+    line-height: 40px;
+    .transition(height, .3s, linear);
+    &.finished {
+      height: 0;
+    }
+  }
+  div.activities {
+    padding-bottom: 45px;
+  }
   div.activity {
+    opacity: 0;
     position: relative;
     font-size: 13px;
     margin-bottom: 15px;
     width: 300px;
+    .transition(opacity, .3s, ease-in);
+    &.show {
+      opacity: 1;
+    }
     div.picture {
       position: absolute;
       background: #ccc;
@@ -32,12 +55,13 @@ div.stream {
       width: 240px;
       padding-bottom: 13px;
       margin-bottom: 15px;
+      font-family: MuseoSans700;
       a {
-        color: #f7f7f7;
+        color: white;
       }
       div.timestamp {
-        font-size: 10px;
-        color: #a5a5a5;
+        font-size: 11px;
+        font-family: MuseoSans300;
         position: absolute;
         bottom: 0;
       }
@@ -53,7 +77,7 @@ div.stream {
       color: #999;
       text-shadow: 1px 1px 1px white;
       box-shadow: 0px 0px 2px 0px rgba(255, 255, 255, 0.7);
-      border: 1px solid #4D4D4D;
+      border: 1px solid #333;
       margin-top: -1px;
       cursor: pointer;
       .transition(all, .3s, ease);
@@ -72,48 +96,46 @@ div.stream {
         height: 100%;
         position: relative;
         overflow: hidden;
-        background: #f5f5f5;
+        background: white -webkit-gradient(linear, 0% 0%, 0% 100%,
+            from(rgba(26, 26, 26, 0.9)), to(rgba(26, 26, 26, 0.3)));
         border-radius: 2px;
-        &:hover img {
-         -webkit-transition: opacity .6s ease, top 1s ease-out, left 1s ease-out;
-            -moz-transition: opacity .6s ease, top 1s ease-out, left 1s ease-out;
-              -o-transition: opacity .6s ease, top 1s ease-out, left 1s ease-out;
-             -ms-transition: opacity .6s ease, top 1s ease-out, left 1s ease-out;
-                 transition: opacity .6s ease, top 1s ease-out, left 1s ease-out;
-          -webkit-filter: none !important;
-          opacity: 1;
-        }
-        &:hover img.pan-left {
-          left: 0%;
-        }
-        &:hover img.pan-top {
-          top: 100%
-        }
         &:hover div.title {
           color: #f5f5f5;
           text-shadow: 0px 0px 4px black;
         }
-        img {
+        &:hover div.thumb, &.playing div.thumb {
+          -webkit-transition: opacity .6s ease, background-position 2s ease-out;
+             -moz-transition: opacity .6s ease, background-position 2s ease-out;
+               -o-transition: opacity .6s ease, background-position 2s ease-out;
+              -ms-transition: opacity .6s ease, background-position 2s ease-out;
+                  transition: opacity .6s ease, background-position 2s ease-out;
+          opacity: 1;
+          -webkit-filter: none;
+        }
+        &:hover div.title, &:hover div.published {
+          color: #f5f5f5;
+          text-shadow: 0px 0px 4px black;
+        }
+        div.thumb {
           width: 100%;
-          height: auto;
-          position: absolute;
+          height: 100%;
           opacity: .5;
-          top: 50%;
-          left: 50%;
-          margin-top: -20px;
-          -webkit-filter: grayscale() brightness(40%);
-          &.fix-height {
-            height: 150%;
-            width: auto;
-          }
+          background-size: 100% auto;
+          background-position: center;
+          border-top-left-radius: 3px;
+          border-top-right-radius: 3px;
+          -webkit-filter: grayscale(100%);
         }
         div.title {
           left: 5px;
           top: 5px;
-          color: #181818;
-          text-shadow: 1px 1px 1px white;
+          color: white;
+          text-shadow: 1px 1px 1px black;
           height: 35px;
           font-size: 14px;
+          white-space: nowrap;
+          width: 100%;
+          text-overflow: ellipsis;
           position: absolute;
           overflow: hidden;
           margin-right: 25px;

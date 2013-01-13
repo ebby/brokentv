@@ -9,14 +9,19 @@ from programming import Programming
 
 class StorySortHandler(BaseHandler):
     def get(self):
-      name = self.request.get('col')
+      name = self.request.get('channel')
       sim = self.request.get('sim')
-      offset = self.request.get('offset') or 0
+      pending = self.request.get('pending') == '1' or False
+      offset = int(self.request.get('offset')) if self.request.get('offset') else 0
       template_data = {}
-      col = Collection.all().filter('name =', name or 'Top News Stories').get()
-      medias = col.get_medias(limit=100, offset=offset)
+      
+      channel = Channel.all().filter('name =', name or 'Broken News').get()
+      cols = channel.get_collections()
+      medias = []
+      for col in cols:
+        medias += col.get_medias(limit=100, offset=offset, pending=pending)
       template_data['raw_medias'] = medias
-      viewers = ['1240963', '13423', '2423', '23534']
+      viewers = ['1240963']
       
       
       for i, m in enumerate(medias):
@@ -64,6 +69,14 @@ class AdminAddProgramHandler(BaseHandler):
       media = Media.get_by_key_name(self.request.get('media'))
       program = Program.add_program(channel, media)
       self.response.out.write(simplejson.dumps(program.toJson(False)))
+      
+class CollectionsHandler(BaseHandler):
+    def get(self):
+      if (self.current_user.id in constants.SUPER_ADMINS):
+        cols = Collection.all().fetch(100)
+      else:
+        cols = Collection.all().filter('admins =', self.current_user.id).fetch(100)
+      self.response.out.write(simplejson.dumps([c.toJson() for c in cols]))
       
 class CollectionMediaHandler(BaseHandler):
     def get(self, col_id):

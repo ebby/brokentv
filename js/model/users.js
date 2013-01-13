@@ -64,3 +64,11 @@ brkn.model.Users.prototype.get_or_add = function(user) {
 	}
 	return u;
 };
+
+
+/**
+ * @enum {string}
+ */
+brkn.model.Users.Action = {
+  NEW_ACTIVITY: 'new-activity'
+};

@@ -28,6 +28,15 @@ def broadcastNewComment(comment):
   for client in channels.iterkeys():
     webchannel.send_message(client, simplejson.dumps(response))
     
+def broadcastNewActivity(activity):
+  response = {}
+  response['type'] = 'new_activity'
+  response['activity'] = activity.toJson()
+  channels = simplejson.loads(memcache.get('web_channels') or '{}')
+  for client in channels.iterkeys():
+    if client in activity.acl:
+      webchannel.send_message(client, simplejson.dumps(response))
+    
 def broadcastProgramChanges(channel, programs):
   response = {}
   response['type'] = 'update_programs'

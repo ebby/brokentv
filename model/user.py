@@ -11,6 +11,7 @@ class User(db.Model):
     email = db.StringProperty()
     access_token = db.StringProperty()
     location = db.StringProperty()
+    friends = db.StringListProperty(default=[])
     twitter_token = db.StringProperty()
     twitter_secret = db.StringProperty()
     twitter_handle = db.StringProperty()

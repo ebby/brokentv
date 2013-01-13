@@ -51,7 +51,7 @@ class MainHandler(BaseHandler):
       template_data = {}
       template_data['host_url'] = self.request.host_url
       template_data['js_location'] = constants.JS_SOURCE
-      if not constants.DEVELOPMENT:
+      if not constants.DEVELOPMENT or self.request.get('css'):
         template_data['css_location'] = constants.CSS_SOURCE
 
       template_data['facebook_app_id'] = constants.FACEBOOK_APP_ID;
@@ -93,7 +93,7 @@ app = webapp2.WSGIApplication([
     ('/_twitter/callback', rpc.TwitterCallbackHandler),
 
     # Admin
-    ('/admin/_collections/(.*)', rpc.CollectionsHandler),
+    ('/admin/_collections', admin.CollectionsHandler),
     ('/admin/_media/collection', admin.CollectionMediaHandler),
     ('/admin/_media/collection/(.*)', admin.CollectionMediaHandler),
     ('/admin/_media/publisher/(.*)', rpc.PublisherMediaHandler),

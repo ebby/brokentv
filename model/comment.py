@@ -25,7 +25,7 @@ class Comment(db.Model):
     media.put()
     
     from useractivity import *
-    UserActivity.add_comment(c.user, c)
+    broadcast.broadcastNewActivity(UserActivity.add_comment(c.user, c))
     return c
 
   def toJson(self):

@@ -6,6 +6,7 @@ goog.require('brkn.sidebar');
 goog.require('brkn.sidebar.CommentInput');
 
 goog.require('goog.events.KeyHandler.EventType');
+goog.require('goog.date.relative');
 goog.require('goog.fx.dom.Scroll');
 goog.require('goog.ui.Component');
 goog.require('goog.ui.Component.EventType');
@@ -225,9 +226,7 @@ brkn.sidebar.Info.prototype.onAddComment_ = function(e) {
       'picture': this.media_.thumbnail,
       'caption': 'on Broken.TV',
       'description': this.media_.description
-    }, function(response) {
-      window.console.log(response)
-    });
+    }, function(response) {});
   }
 };
 
@@ -238,7 +237,8 @@ brkn.sidebar.Info.prototype.onAddComment_ = function(e) {
  */
 brkn.sidebar.Info.prototype.addComment_ = function(comment) {
   var commentEl = soy.renderAsElement(brkn.sidebar.comment, {
-    comment: comment
+    comment: comment,
+    timestamp: goog.date.relative.format(comment.time.getTime())
   });
   goog.dom.appendChild(this.commentsEl_, commentEl);
   this.resize(this.commentInput_.isFocused()

@@ -20,12 +20,13 @@ goog.require('goog.ui.Textarea.EventType');
 /**
  * @param {string} collectionId
  * @param {Array.<brkn.model.Media>} mediaList
+ * @param {?Element=} opt_pendingEl
  * @param {?string=} opt_thumb
  * @param {?string=} opt_desc
  * @constructor
  * @extends {goog.ui.Component}
  */
-brkn.sidebar.AdminList = function(collectionId, mediaList, opt_thumb, opt_desc) {
+brkn.sidebar.AdminList = function(collectionId, mediaList, opt_pendingEl, opt_thumb, opt_desc) {
   goog.base(this);
 
   /**
@@ -46,6 +47,12 @@ brkn.sidebar.AdminList = function(collectionId, mediaList, opt_thumb, opt_desc) 
    */
   this.mediaList_ = mediaList;
 
+  /**
+   * @type {?Element}
+   * @private
+   */
+  this.pendingEl_ = opt_pendingEl || null;
+  
   /**
    * @type {?string}
    * @private
@@ -178,12 +185,18 @@ brkn.sidebar.AdminList.prototype.onAddProgram_ = function(channel, media) {
 brkn.sidebar.AdminList.prototype.approval_ = function(media, approve, mediaEl) {
   goog.net.XhrIo.send(
       'admin/_media/collection',
-      function() {
+      goog.bind(function() {
         goog.dom.classes.add(mediaEl, 'remove');
         goog.Timer.callOnce(function() {
           goog.dom.removeNode(mediaEl)
         }, 300);
-      },
+        brkn.model.Controller.getInstance().setPending(
+            (/** @type {string}*/ brkn.model.Controller.getInstance().getPending() - 1));
+        if (this.pendingEl_) {
+          goog.dom.setTextContent(this.pendingEl_,
+              (/** @type {string} */ goog.dom.getTextContent(this.pendingEl_) - 1));
+        }
+      }, this),
       'POST',
       'col=' + this.collectionId_ + '&media=' + media.id + '&approve=' + approve);
 };

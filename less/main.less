@@ -6,6 +6,9 @@
 @import "sidebar.less";
 @import "login.less";
 @import "drag.less";
+@import "info.less";
+@import "stream.less";
+@import "admin.less";
 
 .transition (@style, @speed, ...) {
   -webkit-transition: @arguments;
@@ -31,15 +34,6 @@
 }
 
 @font-face {
-	font-family: 'MuseoSans';
-	src: url('/static/webfonts/235CED_0_0.eot');
-	src: url('/static/webfonts/235CED_0_0.eot?#iefix')
-	    format('embedded-opentype'),
-	    url('/static/webfonts/235CED_0_0.woff') format('woff'),
-	    url('/static/webfonts/235CED_0_0.ttf') format('truetype');
-}
-
-@font-face {
   font-family: 'MuseoSans100';
   src: url('/static/webfonts/museosans/100.woff') format('woff');
 }
@@ -57,21 +51,6 @@
 @font-face {
   font-family: 'MuseoSans700';
   src: url('/static/webfonts/museosans/700.woff') format('woff');
-}
-
-@font-face {
-  font-family: 'KievitBook';
-  src: url('/static/webfonts/KievitWebPro-Book.woff') format('woff');
-}
-
-@font-face {
-  font-family: 'KievitBold';
-  src: url('/static/webfonts/KievitWebPro-Bold.woff') format('woff');
-}
-
-@font-face {
-  font-family: 'KievitLight';
-  src: url('/static/webfonts/KievitWebPro-Light.woff') format('woff');
 }
 
 html, body {
