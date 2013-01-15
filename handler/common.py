@@ -10,6 +10,7 @@ import os.path
 import re
 import simplejson
 import jinja2
+import urlparse
 import webapp2
 
 from google.appengine.api import channel as browserchannel

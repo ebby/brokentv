@@ -61,7 +61,7 @@ class MainHandler(BaseHandler):
 class ImagesHandler(webapp2.RequestHandler):
     def get(self, entity, id):
       if id and entity == 'publisher':
-        publisher = Publisher.get_by_id(int(id))
+        publisher = Publisher.get_by_key_name(id)
         if publisher:
           self.response.headers['Content-Type'] = 'image/jpeg'
           self.response.out.write(publisher.picture)
@@ -93,6 +93,7 @@ app = webapp2.WSGIApplication([
     ('/_twitter/callback', rpc.TwitterCallbackHandler),
 
     # Admin
+    ('/admin/_add/collection/(.*)', admin.AddToCollectionHandler),
     ('/admin/_collections', admin.CollectionsHandler),
     ('/admin/_media/collection', admin.CollectionMediaHandler),
     ('/admin/_media/collection/(.*)', admin.CollectionMediaHandler),

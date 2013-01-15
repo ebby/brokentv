@@ -69,7 +69,32 @@ class AdminAddProgramHandler(BaseHandler):
       media = Media.get_by_key_name(self.request.get('media'))
       program = Program.add_program(channel, media)
       self.response.out.write(simplejson.dumps(program.toJson(False)))
+     
       
+class AddToCollectionHandler(BaseHandler):
+    def post(self, id):
+      col = Collection.get_by_id(int(id))
+      url = self.request.get('url')
+      if col:
+        response = {}
+        logging.info(url)
+        parsed_url = urlparse.urlparse(url)
+        host = parsed_url.hostname
+        qs = urlparse.parse_qs(parsed_url.query)
+        logging.info(qs)
+        if 'list' in qs:
+          response['type'] = 'playlist'
+          playlist = Playlist.add_from_url(url)
+          CollectionPlaylist.add(col, playlist)
+          response['data'] = playlist.toJson()
+        elif 'v' in qs:
+          response['type'] = 'media'
+          media = Media.add_from_url(url)
+          cm = CollectionMedia.add(col, media)
+          logging.info(cm)
+          response['data'] = media.toJson()
+        self.response.out.write(simplejson.dumps(response))
+
 class CollectionsHandler(BaseHandler):
     def get(self):
       if (self.current_user.id in constants.SUPER_ADMINS):
@@ -81,7 +106,13 @@ class CollectionsHandler(BaseHandler):
 class CollectionMediaHandler(BaseHandler):
     def get(self, col_id):
       col = Collection.get_by_id(int(col_id))
-      self.response.out.write(simplejson.dumps([m.toJson() for m in col.get_medias(20, pending=True)]))
+      pending = self.request.get('pending') == '1'
+      offset = self.request.get('offset') or 0
+      logging.info(offset);
+      res = {}
+      res['medias'] = [m.toJson() for m in col.get_medias(20, pending=pending, offset=int(offset))]
+      res['playlists'] = [p.toJson() for p in col.get_playlists()]
+      self.response.out.write(simplejson.dumps(res))
    
     def post(self):
       approve = self.request.get('approve') == 'true'

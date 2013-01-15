@@ -92,10 +92,16 @@ PUBLISHERS = {
 }
 
 
+PLAYLISTS = {
+  'Vice Interviews': {
+    'youtube': 'PLA8098C06012E9B51',
+    'publisher': 'Vice'                  
+  }
+}
+
 '''
 ACCEPTABLE COLLECTIONS:
   PUBLISHERS + KEYWORDS
-  PUBLISHER + PLAYLIST
   PUBLISHERS + KEYWORDS + (CHILD) COLLECTIONS
 
 '''
@@ -133,14 +139,10 @@ COLLECTIONS = {
     'keywords': ['Education', 'Howto'],
     'publishers': ['TED']     
   },
-  'Larry King Now': {
-    'yt_playlist': 'PL-PGk0xTdoUJ7rxQ6VDV08HdIptwk3X5D',
-    'publishers': ['Ora TV']
-  },
   'News Magazines': {
     'keywords': ['News'],
     'publishers': ['Vice'],
-    'collections': ['Larry King Now'],
+    'playlists': ['Vice Interviews'],
     'lifespan': 365
   },
 }

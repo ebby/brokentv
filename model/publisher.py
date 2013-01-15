@@ -25,12 +25,32 @@ class Publisher(db.Model):
   
   def toJson(self):
     json = {}
-    json['id'] = self.key().id()
+    json['id'] = self.key().name()
     json['name'] = self.name
     json['description'] = self.description
-    json['picture'] = '/images/publisher/' + str(self.key().id())
+    json['picture'] = '/images/publisher/' + str(self.key().name())
     json['link'] = self.link
     return json
+  
+  @classmethod
+  def add(self, host, host_id, name=None):
+    publisher = Publisher.get_by_key_name(host+host_id)
+    if not publisher:
+      yt_service = gdata.youtube.service.YouTubeService()
+      gdata.alt.appengine.run_on_appengine(yt_service)
+      try:
+        user_entry = yt_service.GetYouTubeUserEntry(username=host_id)
+      except Exception as e:
+        logging.error(e)
+        return
+      picture = urlfetch.fetch(user_entry.thumbnail.url)
+      publisher =Publisher.get_or_insert(key_name=host+host_id,
+                                         host_id=host_id,
+                                         name=(name or user_entry.title.text),
+                                         picture=db.Blob(picture.content),
+                                         description=user_entry.content.text,
+                                         link=user_entry.link[0].href)
+    return publisher
   
   def fetch(self, categories=None):
     if self.host == MediaHost.YOUTUBE:
@@ -57,7 +77,7 @@ class Publisher(db.Model):
         query.orderby = 'published'
         query.max_results = 50
         offset = 1
-        while offset <= 100:
+        while offset <= (100 if constants.DEVELOPMENT else 1000):
           query.start_index = offset
           feed = yt_service.YouTubeQuery(query)
           if len(feed.entry) == 0:

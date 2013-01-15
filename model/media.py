@@ -42,9 +42,21 @@ class Media(db.Model):
     return media
   
   @classmethod
+  def add_from_url(cls, url):
+    yt_service = gdata.youtube.service.YouTubeService()
+    gdata.alt.appengine.run_on_appengine(yt_service)
+    parsed_url = urlparse.urlparse(url)
+    host_id = urlparse.parse_qs(parsed_url.query)['v'][0]
+    entry = yt_service.GetYouTubeVideoEntry(video_id=host_id)
+    return Media.add_from_entry([entry])[0]
+  
+  @classmethod
   def add_from_entry(cls, entries):
+    from publisher import Publisher
+    from publisher import PublisherMedia
+    
     medias = []
-    for entry in entries:
+    for entry in [e for e in entries if e.media.player]:
       content_url = urlparse.urlparse(entry.media.player.url)
       id = urlparse.parse_qs(content_url.query)['v'][0]
       media = Media.get_by_key_name(MediaHost.YOUTUBE + id)
@@ -58,11 +70,15 @@ class Media(db.Model):
                     type=MediaType.VIDEO,
                     host_id=id,
                     name=name,
-                    published=iso8601.parse_date(entry.published.text),
+                    published=iso8601.parse_date(entry.published.text).replace(tzinfo=None),
                     duration=float(entry.media.duration.seconds),
                     description=desc,
                     host_views=int(entry.statistics.view_count) if entry.statistics else 0,
                     category=category)
+        
+        publisher_name = entry.author[0].name.text
+        publisher = Publisher.add(MediaHost.YOUTUBE, publisher_name)
+        PublisherMedia.add(publisher, media)
       media.put()
       medias.append(media)
     return medias

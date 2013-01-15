@@ -198,9 +198,46 @@
       <div class="collections"></div>
     </div>
     <div class="section">
-      <div class="label">STORIES</div>
-      <div class="stories"></div>
+      <div class="label">PLAYLISTS</div>
+      <div class="playlists"></div>
     </div>
+  </div>
+{/template}
+
+
+/**
+ */
+{template .adminList}
+  <div class="admin-list admin">
+    <div class="search">
+      <input class="input" type="text" placeholder="Paste video or playlist link" />
+    </div>
+    <div class="tabbed pending">
+      <ul class="tabs">
+        <li class="tab pending">
+          <div class="label">PENDING</div>
+        </li>
+        <li class="tab all">
+          <div class="label">ALL</div>
+        </li>
+        <li class="tab playlists">
+          <div class="label">PLAYLISTS</div>
+        </li>
+      </ul>
+      <div class="pending-content content pending"></div>
+      <div class="all-content content all"></div>
+      <div class="playlists-content content playlists"></div>
+      <div class="spinner" style="display:none">Loading More</div>
+  </div>
+{/template}
+
+
+/**
+ * @param playlist
+ */
+{template .playlist}
+  <div class="playlist">
+    <div class="title">{$playlist.name}</div>
   </div>
 {/template}
 

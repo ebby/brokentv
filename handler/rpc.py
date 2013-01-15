@@ -185,7 +185,7 @@ class CollectionsMediaHandler(BaseHandler):
     
 class PublisherMediaHandler(BaseHandler):
   def get(self, pub_id=None):
-    pub = Publisher.get_by_id(int(pub_id))
+    pub = Publisher.get_by_key_name(pub_id)
     self.response.out.write(simplejson.dumps([m.toJson() for m in pub.get_medias(20)]))
 
 class OptInHandler(BaseHandler):

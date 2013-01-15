@@ -69,7 +69,7 @@ brkn.sidebar.Admin.prototype.enterDocument = function() {
   goog.net.XhrIo.send(
       '/admin/_collections',
       goog.bind(function(e) {
-        var collections = /** @type {Array.<Object>} */goog.json.parse(e.target.getResponse());
+        var collections = /** @type {Array.<Object>} */ e.target.getResponseJson();
         goog.array.forEach(collections, function(col) {
           var colEl = soy.renderAsElement(brkn.sidebar.collection, {
             collection: col
@@ -78,13 +78,15 @@ brkn.sidebar.Admin.prototype.enterDocument = function() {
           goog.dom.appendChild(this.collectionsEl_, colEl);
           goog.events.listen(colEl, goog.events.EventType.CLICK, goog.bind(function(e) {
             goog.net.XhrIo.send(
-                '/admin/_media/collection/' + col.id,
+                '/admin/_media/collection/' + col.id + '?pending=1',
                 goog.bind(function(e) {
-                  var medias = /** @type {Array.<Object>} */ goog.json.parse(e.target.getResponse());
+                  var res = /** @type {Array.<Object>} */ goog.json.parse(e.target.getResponse());
+                  var medias = /** @type {Array.<Object>} */ res['medias'];
                   medias = goog.array.map(medias, function(m) {
                     return new brkn.model.Media(m);
                   });
-                  var adminList = new brkn.sidebar.AdminList(col.id, medias,
+                  var playlists = /** @type {Array.<Object>} */ res['playlists'];
+                  var adminList = new brkn.sidebar.AdminList(col.id, medias, playlists,
                       goog.dom.getElementByClass('pending', colEl));
                   adminList.decorate(adminListEl);
                   brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NAVIGATE,

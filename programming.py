@@ -26,14 +26,22 @@ class Programming():
     
     self.channels = {}
     self.publishers = {}
+    self.playlists = {}
     self.collections = {}
     
     for name, properties in inits.PUBLISHERS.iteritems():
-      publisher = Publisher.all().filter('name =', name).get()
-      if not publisher:
-        publisher = Publisher(name=name, host_id=properties['youtube'])
-        publisher.put()
+      publisher = Publisher.add('youtube', host_id=properties['youtube'], name=name)
       self.publishers[publisher.name] = publisher
+      
+    for name, properties in inits.PLAYLISTS.iteritems():
+      playlist = Playlist.get_or_insert('youtube' + properties.get('youtube'),
+                                        name=name,
+                                        host='youtube',
+                                        host_id=properties.get('youtube'),
+                                        publisher=self.publishers[properties.get('publisher')])
+      self.playlists[name] = playlist
+      if fetch:
+        playlist.fetch(approve_all=True)
     
     for name, properties in inits.COLLECTIONS.iteritems():
       collection = Collection.all().filter('name =', name).get()
@@ -49,13 +57,15 @@ class Programming():
           collection_publisher = CollectionPublisher(collection=collection,
                                                      publisher=self.publishers[publisher])
           collection_publisher.put()
-      collection.yt_playlist = properties.get('yt_playlist')
-      collection.put()
       for child_col in properties.get('collections', []):
         col_col = CollectionCollection.add(parent_col=collection,
                                            child_col=self.collections[child_col])
+      for playlist in properties.get('playlists', []):
+        col_playlist = CollectionPlaylist.add(collection=collection,
+                                              playlist=self.playlists[playlist])
       self.collections[name] = collection
       if fetch:
+        print 'fetching ' + name
         collection.fetch(approve_all=True)
     
     for name, properties in inits.CHANNELS.iteritems():
@@ -126,11 +136,12 @@ class Programming():
     if len(programs):
       next_gen = (programs[-2].time - datetime.datetime.now()).seconds if len(programs) > 1 \
           else 0
+      next_gen = min(next_gen,
+                     reduce(lambda x, y: x + y, [p.media.duration for p in programs], 0))
       logging.info('COUNTDOWN FOR ' + channel.name + ': ' + str(next_gen))
-      logging.info(str(next_gen))
-      deferred.defer(Programming.set_programming, channel.key().id(),
-                     _name=channel.name.replace(' ', '') + '-' + str(uuid.uuid1()),
-                     _countdown=next_gen)
+#      deferred.defer(Programming.set_programming, channel.key().id(),
+#                     _name=channel.name.replace(' ', '') + '-' + str(uuid.uuid1()),
+#                     _countdown=next_gen)
 
     return programs
   
@@ -220,7 +231,6 @@ class Programming():
         for media in medias:
           Program.add_program(channel, media)
   
-  
   @classmethod
   def clear_collection(cls, col):
     for q in [col.collectionMedias, col.collections, col.publishers, col.channels]:
@@ -235,7 +245,7 @@ class Programming():
             
   @classmethod
   def clear(cls):
-    channels = Channel.all().fetch(10)
+    channels = Channel.all().fetch(None)
     memcache.delete('programming')
     for c in channels:
       c.programming = []

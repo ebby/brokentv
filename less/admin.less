@@ -2,9 +2,10 @@ div#sidebar div.admin {
   margin-top: -2px;
   display: none;
   div.search {
-    background: #f5f5f5;
+    background: rgba(245, 245, 245, 0.6);
     width: 100%;
     height: 35px;
+    border-bottom: 1px solid rgba(112, 108, 108, 0.7);
     input[type=text] {
       height: auto;
       border-radius: 3px;
@@ -14,22 +15,54 @@ div#sidebar div.admin {
       outline: none;
       border: 1px solid #CCC;
       resize: none;
-      margin-left: 10px;
+      margin-left: 8px;
       margin-top: 7px;
       margin-bottom: 5px;
     }
   }
-  div.label {
-    font-size: 10px;
-    color: #181818;
-    margin-bottom: 7px;
-    text-shadow: 1px 1px 1px white;
-    font-family: MuseoSans700;
-  }
   div.section {
     position: relative;
     margin: 10px;
-  } 
+    div.label {
+      font-size: 10px;
+      color: #181818;
+      margin-bottom: 7px;
+      text-shadow: 1px 1px 1px white;
+      font-family: MuseoSans700;
+    }
+  }
+  div.playlists {
+    div.playlist {
+      position: relative;
+      width: 99%;
+      background: rgba(0, 0, 0, 0.65);
+      border: 1px solid #333;
+      overflow: hidden;
+      box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.8),
+          0 3px 1px -1px rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+      font-family: MuseoSans500;
+      &:first-child {
+        border-top-left-radius: 3px;
+        border-top-right-radius: 3px;
+      }
+      &:last-child {
+        border-bottom-left-radius: 3px;
+        border-bottom-right-radius: 3px;
+        box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.8);
+      }
+      div.title {
+        position: relative;
+        left: 5px;
+        top: 5px;
+        font-size: 13px;
+        width: 240px;
+        color: white;
+        line-height: 27px;
+        height: 36px;
+      } 
+    }
+  }
   div.collections {
     div.collection {
       position: relative;
@@ -79,6 +112,80 @@ div#sidebar div.admin {
 }
 div#sidebar div#admin-list {
   overflow-y: scroll !important;
+  
+  div.tabbed {
+    ul.tabs {
+      height: 30px;
+      width: 100%;
+      display: table;
+      table-layout: fixed;
+      border-collapse: collapse;
+      margin: 0;
+      border-bottom: 1px solid rgba(112, 108, 108, 0.7);
+      li.tab {
+        height: 100%;
+        border-right: 1px solid rgba(112, 108, 108, 0.7);
+        margin-left: -2px;
+        display: table-cell;
+        vertical-align: middle;
+        background: rgba(245, 245, 245, 0.9);
+        cursor: pointer;
+        &.admin {
+          display: none;
+        }
+        &:last-child {
+          border-right: none;
+        }
+        div.label {
+          text-align: center;
+          font-family: MuseoSans700;
+          font-size: 11px;
+          color: #7d7d7d;
+          text-shadow: 1px 1px 1px white;
+        }
+      }
+    }
+    div.content {
+      display: none;
+      margin: 10px;
+    }
+    &.pending {
+      div.pending {
+        display: block;
+      }
+      ul.tabs li.pending {
+        background: rgba(245, 245, 245, 0.6);
+      }
+    }
+    &.all {
+      div.all {
+        display: block;
+      }
+      ul.tabs li.all {
+        background: rgba(245, 245, 245, 0.6);
+      }
+    }
+    &.playlists {
+      div.playlists {
+        display: block;
+      }
+      ul.tabs li.playlists {
+        background: rgba(245, 245, 245, 0.6);
+      }
+    }
+  }
+  div.spinner {
+    width: 100%;
+    height: 43px;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.6);
+    line-height: 40px;
+    overflow: hidden;
+    .transition(height, .3s, linear);
+    &.finished {
+      height: 0;
+    }
+  }
   div.list-info {
     margin: 10px;
     display: table;
@@ -104,19 +211,6 @@ div#sidebar div#admin-list {
       padding-left: 10px;
     }
   }
-  div.label {
-    margin-top: 10px;
-    margin-left: 10px;
-    font-size: 10px;
-    color: #181818;
-    margin-bottom: 7px;
-    text-shadow: 1px 1px 1px white;
-    font-family: MuseoSans700;
-  }
-  div.medias {
-    padding-bottom: 15px;
-    margin: 10px;
-  }
   div.admin-media {
     margin-bottom: 10px;
     border-radius: 3px; 
@@ -124,9 +218,13 @@ div#sidebar div#admin-list {
     background: rgba(0, 0, 0, 0.65);
     border: 1px solid #333;
     box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.8);
+    opacity: 0;
+    .transition(opacity, .3s, ease-in);
+    &.show {
+      opacity: 1;
+    }
     &.remove {
       opacity: 0;
-      .transition(opacity, .3s, ease);
     }
     &:hover div.thumb, &.playing div.thumb {
       .transition(opacity, .6s, ease);

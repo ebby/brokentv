@@ -8,6 +8,7 @@ import iso8601
 import logging
 import simplejson
 import urllib
+import urlparse
 import types
 import re
 
