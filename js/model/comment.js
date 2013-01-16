@@ -2,8 +2,6 @@ goog.provide('brkn.model.Comment');
 
 goog.require('brkn.model.Users');
 
-goog.require('goog.pubsub.PubSub');
-
 
 
 /**

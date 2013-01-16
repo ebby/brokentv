@@ -6,10 +6,16 @@ import gdata.alt.appengine
 import inits
 import logging
 import uuid
+import tweepy
+import sys
+import webapp2
 
 from google.appengine.api import taskqueue
 from google.appengine.api import memcache
 from google.appengine.api import urlfetch
+from google.appengine.ext import deferred
+from google.appengine.ext import webapp
+from google.appengine.ext.webapp import util
 
 from model import *
 
@@ -79,13 +85,13 @@ class Programming():
         chan_col = ChannelCollection.add(channel=channel, collection=col)
 
       # We need to generate some programming now
-      Programming.set_programming(channel.key().id())
+      #Programming.set_programming(channel.key().id())
     
     # Cache the channels
     memcache.set('channels', simplejson.dumps([c.toJson() for c in self.channels.itervalues()]))
       
   @classmethod
-  def set_programming(cls, channel_id, schedule_next=True):
+  def set_programming(cls, channel_id, schedule_next=True, queue='default', target=None):
     channel = Channel.get_by_id(channel_id)
     viewers = simplejson.loads(memcache.get('channel_viewers') or '{}').get(str(channel_id), [])
     cols = channel.get_collections()
@@ -117,6 +123,13 @@ class Programming():
     # Grab 10 minutes of programming
     all_medias = Programming.timed_subset(all_medias, 600)
     
+    # Find related twitter posts
+    #Programming.fetch_related_tweets(all_medias)
+    deferred.defer(Programming.fetch_related_tweets, all_medias,
+                   _name='twitter-' + channel.name.replace(' ', '') + '-' + str(uuid.uuid1()),
+                   _queue='twitter',
+                   _countdown=30)
+    
     programs = []
     for media in all_medias:      
       logging.info('ADDING: ' + media.name + ' seen: ' + str(Programming.have_seen(media, viewers)))
@@ -139,9 +152,11 @@ class Programming():
       next_gen = min(next_gen,
                      reduce(lambda x, y: x + y, [p.media.duration for p in programs], 0))
       logging.info('COUNTDOWN FOR ' + channel.name + ': ' + str(next_gen))
-#      deferred.defer(Programming.set_programming, channel.key().id(),
-#                     _name=channel.name.replace(' ', '') + '-' + str(uuid.uuid1()),
-#                     _countdown=next_gen)
+      deferred.defer(Programming.set_programming, channel.key().id(),
+                     _name=channel.name.replace(' ', '') + '-' + str(uuid.uuid1()),
+                     _countdown=next_gen,
+                     _queue=queue,
+                     _target=target)
 
     return programs
   
@@ -217,6 +232,22 @@ class Programming():
       span -= medias[cutoff_index].duration
       cutoff_index += 1
     return medias[:cutoff_index]
+  
+  @classmethod
+  def fetch_related_tweets(cls, medias):
+    api = tweepy.API()
+    total = 0
+    for media in medias:
+      if media.last_twitter_fetch and \
+          (datetime.datetime.now() - media.last_twitter_fetch).seconds < 3600:
+        continue
+      for tweet in tweepy.Cursor(api.search, q=media.host_id, rpp=100, result_type="recent",
+                                 include_entities=True, lang="en").items():
+        total += 1
+        Tweet.add_from_result(tweet, media)
+      media.last_twitter_fetch = datetime.datetime.now()
+      media.put()
+      logging.info(str(total) + ' TWEETS FETCHED')
 
   @classmethod
   def add_youtube_feeds(cls):
@@ -259,3 +290,18 @@ class Programming():
           time.sleep(0.5)
       except Exception, e:
         pass
+      
+class StartHandler(webapp2.RequestHandler):
+  def get(self):
+    self.queue = taskqueue.Queue(name='programming')
+    self.queue.purge()
+    self.queue = taskqueue.Queue(name='twitter')
+    self.queue.purge()
+    channels = Channel.all().fetch(None)
+    if not len(channels):
+      Programming(False)
+    for c in channels:
+      Programming.set_programming(c.key().id(), queue='programming')
+    
+  
+app = webapp.WSGIApplication([('/_ah/start', StartHandler)], debug=True)

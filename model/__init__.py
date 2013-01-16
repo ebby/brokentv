@@ -7,6 +7,7 @@ from publisher import *
 from collection import *
 from playlist import *
 from comment import *
+from tweet import *
 from useractivity import *
 
 

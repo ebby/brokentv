@@ -70,7 +70,13 @@ class ImagesHandler(webapp2.RequestHandler):
 # APPLICATION INIT
 #--------------------------------------
 
-app = webapp2.WSGIApplication([
+def create_handlers_map():
+  """Create new handlers map.
+
+  Returns:
+    list of (regexp, handler) pairs for WSGIApplication constructor.
+  """
+  return [
     # Channel URIs
     ('/_ah/channel/connected/', webchannel.WebChannelConnectedHandler),
     ('/_ah/channel/disconnected/', webchannel.WebChannelDisconnectedHandler),
@@ -89,6 +95,7 @@ app = webapp2.WSGIApplication([
     ('/_session', rpc.SessionHandler),
     ('/_star', rpc.StarHandler),
     ('/_star/(.*)', rpc.StarHandler),
+    ('/_tweet/(.*)', rpc.TweetHandler),
     ('/_twitter', rpc.TwitterHandler),
     ('/_twitter/callback', rpc.TwitterCallbackHandler),
 
@@ -115,6 +122,24 @@ app = webapp2.WSGIApplication([
     ('/cron/fetch', cron.FetchHandler),
     
     # Pages
-    ('/', MainHandler)],
-  debug=True,
-  config=constants.CONFIG)
+    ('/', MainHandler)
+  ]
+
+def create_application():
+  """Create new WSGIApplication and register all handlers.
+
+  Returns:
+    an instance of webapp.WSGIApplication with all mapreduce handlers
+    registered.
+  """
+  return webapp.WSGIApplication(create_handlers_map(),
+                                config=constants.CONFIG,
+                                debug=True)
+
+app = create_application()
+
+def main():
+  util.run_wsgi_app(app)
+
+if __name__ == "__main__":
+  main()

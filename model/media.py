@@ -18,6 +18,7 @@ class Media(db.Model):
   category = db.StringProperty()
   seen = db.StringListProperty(default=[])
   last_programmed = db.DateTimeProperty()
+  last_twitter_fetch = db.DateTimeProperty()
   thumb_pos = db.IntegerProperty(default=50) # Percent to center of thumbnail
   
   # Statistics
@@ -97,12 +98,10 @@ class Media(db.Model):
       media.put()
       medias.append(media)
     return medias if len(medias) > 1 else medias[0]
-  
-  def get_tweets(self):
-    response = urlfetch.fetch(Media.TWITTER_SEARCH % (MediaHostUrl.YOUTUBE % self.host_id))
-    if response.status_code == 200:
-      results = simplejson.loads(response.content)['results']
-    
+
+  def get_tweets(self, limit=10, offset=0):
+    from tweet import Tweet
+    return Tweet.all().filter('media =', self).fetch(limit, offset=offset)
 
   def seen_by(self, user=None):
     if user and not user.id in self.seen:

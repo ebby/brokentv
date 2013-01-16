@@ -29,16 +29,10 @@
     <div class="viewers" style="display: none">
       <div class="label">SEEN BY</div>
     </div>
-    <div class="tweets">
+    <div class="tweet-holder" style="display:none">
       <div class="label">LATEST TWEETS</div>
-      <div class="tweet">
-        <img src="https://twimg0-a.akamaihd.net/profile_images/1662065370/321812_10100678888848113_1240963_60891628_1940968369_o_normal.jpg"/>
-        <div class="text">
-          <a target="_blank" href="http://www.twitter.com/ebbyamir">@ebbyamir</a>{sp}
-          this is the best show eveeeer #nameofshow #nodistractions
-        </div>
-        <div class="timestamp">2 days ago</div>
-      </div>
+      <div class="tweets"></div>
+      <div class="dot-nav"></div>
     </div>
     <div class="comments-holder" style="display: none">
       <div class="label">CONVERSATION</div>
@@ -57,6 +51,23 @@
   </div>
 {/template}
 
+
+/**
+ * @param tweet
+ * @param timestamp
+ */
+{template .tweet}
+  <div class="tweet">
+    <img src="{$tweet.picture}"/>
+    <div class="text">
+      <a target="_blank" href="http://www.twitter.com/{$tweet.handle}/status/{$tweet.id}">
+        {$tweet.handle}
+      </a>{sp}
+      {$tweet.text}
+    </div>
+    <div class="timestamp">{$timestamp}</div>
+  </div>
+{/template}
 
 /**
  * @param comment

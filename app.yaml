@@ -2,7 +2,7 @@ application: broken-tv
 version: 1
 runtime: python27
 api_version: 1
-threadsafe: yes
+threadsafe: true
 
 handlers:
 - url: /favicon\.ico
@@ -32,4 +32,5 @@ inbound_services:
 
 builtins:
 - deferred: on
+
   

@@ -1,0 +1,8 @@
+queue:  
+- name: programming
+  target: programming  
+  rate: 5/s
+  
+- name: twitter
+  target: programming  
+  rate: 1/s 

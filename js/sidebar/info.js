@@ -2,6 +2,7 @@ goog.provide('brkn.sidebar.Info');
 
 goog.require('soy');
 goog.require('brkn.model.Comment');
+goog.require('brkn.model.Tweet');
 goog.require('brkn.sidebar');
 goog.require('brkn.sidebar.CommentInput');
 
@@ -67,6 +68,33 @@ goog.inherits(brkn.sidebar.Info, goog.ui.Component);
  * @type {Element}
  * @private
  */
+brkn.sidebar.Info.prototype.tweetHolderEl_;
+
+/**
+ * @type {Element}
+ * @private
+ */
+brkn.sidebar.Info.prototype.tweetsEl_;
+
+
+/**
+ * @type {Element}
+ * @private
+ */
+brkn.sidebar.Info.prototype.dotNavEl_;
+
+
+/**
+ * @type {Element}
+ * @private
+ */
+brkn.sidebar.Info.prototype.currentDotEl_;
+
+
+/**
+ * @type {Element}
+ * @private
+ */
 brkn.sidebar.Info.prototype.commentsEl_;
 
 
@@ -100,6 +128,9 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
   var viewersEl = goog.dom.getElementByClass('viewers', this.getElement());
   var picEl = goog.dom.getElementByClass('picture', this.getElement());
   var img = /** @type {Element} */ picEl.firstChild;
+  this.tweetHolderEl_ = goog.dom.getElementByClass('tweet-holder', this.getElement());
+  this.tweetsEl_ = goog.dom.getElementByClass('tweets', this.getElement());
+  this.dotNavEl_ = goog.dom.getElementByClass('dot-nav', this.getElement());
   this.commentsEl_ = goog.dom.getElementByClass('comments', this.getElement());
   this.commentInput_.render(this.getElement());
   this.starToggle_.decorate(goog.dom.getElementByClass('star', this.getElement()));
@@ -113,13 +144,26 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
     goog.array.forEach(seen, function(viewer) {
       var viewerEl = soy.renderAsElement(brkn.sidebar.viewer, {
         user: brkn.model.Users.getInstance().get_or_add(viewer)
-      })
+      });
       goog.dom.appendChild(viewersEl, viewerEl);
     }, this);
     this.resize();
     
   }, this));
-
+  
+  var tweetTimer = new goog.Timer(5000);
+  goog.net.XhrIo.send('/_tweet/' + this.media_.id, goog.bind(function(e) {
+    var tweets = /** @type {Array.<Object>} */ goog.json.parse(e.target.getResponse());
+    window.console.log(tweets);
+    goog.array.forEach(tweets, function(tweet) {
+      var t = new brkn.model.Tweet(tweet);
+      this.addTweet_(t);
+      this.currentDotEl_ = /** @type {Element} */ this.dotNavEl_.firstChild;
+      goog.dom.classes.add(this.currentDotEl_, 'selected');
+    }, this);
+    tweetTimer.start();
+  }, this));
+  
   goog.net.XhrIo.send('/_comment/' + this.media_.id, goog.bind(function(e) {
       var comments = /** @type {Array.<Object>} */ goog.json.parse(e.target.getResponse());
       goog.style.showElement(goog.dom.getParentElement(this.commentsEl_), comments.length);
@@ -173,6 +217,20 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
             this.resize(brkn.sidebar.CommentInput.COMMENT_CONTROLS_HEIGHT +
                 (e.target.height_ - brkn.sidebar.CommentInput.INPUT_HEIGHT))
           }, this))
+      .listen(this.dotNavEl_,
+          goog.events.EventType.CLICK,
+          goog.bind(function(e) {
+            if (goog.dom.classes.has(e.target, 'dot')) {
+              this.toDot_(e.target);
+            }
+          }, this))
+      .listen(tweetTimer,
+          goog.Timer.TICK,
+          goog.bind(function() {
+            var dotEl = this.currentDotEl_ && goog.dom.getNextElementSibling(this.currentDotEl_) ||
+                goog.dom.getElementByClass('dot', this.getElement());
+            this.toDot_(dotEl);
+          }, this))
       .listen(window,
           goog.events.EventType.CLICK,
           goog.bind(function(e) {
@@ -208,6 +266,24 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
 
 
 /**
+ * @param {Element} dotEl
+ * @private
+ */
+brkn.sidebar.Info.prototype.toDot_ = function(dotEl) {
+  this.currentDotEl_ && goog.dom.classes.remove(this.currentDotEl_, 'selected');
+  this.currentDotEl_ = dotEl;
+  goog.dom.classes.add(this.currentDotEl_, 'selected');
+  var index = goog.array.findIndex(goog.dom.getChildren(this.dotNavEl_),
+      function(element) {return element == dotEl});
+  var scrollAnim = new goog.fx.dom.Scroll(this.tweetsEl_,
+      [this.tweetsEl_.scrollLeft, this.tweetsEl_.scrollTop],
+      [index * 300, this.tweetsEl_.scrollTop], 200);
+  scrollAnim.play();
+  this.resize();
+};
+
+
+/**
  * @param {Object} e
  * @private
  */
@@ -228,6 +304,22 @@ brkn.sidebar.Info.prototype.onAddComment_ = function(e) {
       'description': this.media_.description
     }, function(response) {});
   }
+};
+
+
+/**
+ * @param {brkn.model.Tweet} tweet
+ * @private
+ */
+brkn.sidebar.Info.prototype.addTweet_ = function(tweet) {
+  var tweetEl = soy.renderAsElement(brkn.sidebar.tweet, {
+    tweet: tweet,
+    timestamp: goog.date.relative.format(tweet.time.getTime())
+  });
+  goog.dom.appendChild(this.tweetsEl_, tweetEl);
+  goog.dom.appendChild(this.dotNavEl_, goog.dom.createDom('div', 'dot'));
+  this.resize();
+  goog.style.showElement(goog.dom.getParentElement(this.tweetsEl_), true);
 };
 
 

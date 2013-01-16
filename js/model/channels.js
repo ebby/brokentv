@@ -53,8 +53,8 @@ brkn.model.Channels.prototype.get = function(id) {
  * @param {Object} channels Channels json object.
  */
 brkn.model.Channels.prototype.loadFromJson = function(channels, currentChannel) {
-	goog.array.forEach((/** @type {Array.<Object>} */ channels),
-			goog.bind(function(channel) {
+	goog.object.forEach((/** @type {Object.<string, Object>} */ channels),
+			goog.bind(function(channel, id) {
 				var c = new brkn.model.Channel(channel)
 				this.channels.push(c);
 				this.channelMap[channel.id] = c;

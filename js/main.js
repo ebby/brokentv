@@ -99,6 +99,8 @@ brkn.Main.init = function(response, channelToken, channels, programs,
   fadeOut.play();
   
 	if (!goog.object.isEmpty(currentUser)) { brkn.model.Users.getInstance().setCurrentUser(currentUser); }
+	window.console.log(channels);
+	window.console.log(programs);
 	brkn.model.Channels.getInstance().loadFromJson(channels, currentUser['current_channel']);
 	brkn.model.Programs.getInstance().loadFromJson(programs);
 	brkn.model.Channels.getInstance().loadViewersFromJson(viewerSessions);

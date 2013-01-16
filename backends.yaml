@@ -1,0 +1,4 @@
+backends:
+- name: programming
+  start: programming.app
+  options: failfast

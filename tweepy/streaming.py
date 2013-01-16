@@ -3,6 +3,7 @@
 # See LICENSE for details.
 
 import httplib
+import logging
 from socket import timeout
 from threading import Thread
 from time import sleep
@@ -13,6 +14,14 @@ from tweepy.error import TweepError
 
 from tweepy.utils import import_simplejson, urlencode_noplus
 json = import_simplejson()
+
+
+from google.appengine.ext import deferred
+
+try:
+    from google.appengine.api.background_thread import BackgroundThread as Thread
+except:
+    from threading import Thread
 
 STREAM_VERSION = 1
 
@@ -28,7 +37,8 @@ class StreamListener(object):
         Override this method if you wish to manually handle
         the stream data. Return False to stop stream and close connection.
         """
-
+        logging.info('ON DATA')
+        
         if 'in_reply_to_status_id' in data:
             status = Status.parse(self.api, json.loads(data))
             if self.on_status(status) is False:
@@ -104,18 +114,21 @@ class Stream(object):
                     conn = httplib.HTTPSConnection(self.host)
                 self.auth.apply_auth(url, 'POST', self.headers, self.parameters)
                 conn.connect()
-                conn.sock.settimeout(self.timeout)
+                conn.timeout = self.timeout
                 conn.request('POST', self.url, self.body, headers=self.headers)
                 resp = conn.getresponse()
                 if resp.status != 200:
+                    logging.info('TWITTER NOT 200')
                     if self.listener.on_error(resp.status) is False:
                         break
                     error_counter += 1
                     sleep(self.retry_time)
                 else:
+                    logging.info('TWITTER CONNECTION ESTABLISHED')
                     error_counter = 0
                     self._read_loop(resp)
             except timeout:
+                logging.error('TIMEOUT')
                 if self.listener.on_timeout() == False:
                     break
                 if self.running is False:
@@ -123,6 +136,7 @@ class Stream(object):
                 conn.close()
                 sleep(self.snooze_time)
             except Exception, exception:
+                logging.error('EXCEPTION')
                 # any other exception is fatal, so kill loop
                 break
 
@@ -166,7 +180,7 @@ class Stream(object):
     def _start(self, async):
         self.running = True
         if async:
-            Thread(target=self._run).start()
+            deferred.defer(self._run)
         else:
             self._run()
 
