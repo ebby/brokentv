@@ -161,7 +161,7 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
       this.currentDotEl_ = /** @type {Element} */ this.dotNavEl_.firstChild;
       goog.dom.classes.add(this.currentDotEl_, 'selected');
     }, this);
-    tweetTimer.start();
+    tweets.length && tweetTimer.start();
   }, this));
   
   goog.net.XhrIo.send('/_comment/' + this.media_.id, goog.bind(function(e) {
@@ -316,6 +316,8 @@ brkn.sidebar.Info.prototype.addTweet_ = function(tweet) {
     tweet: tweet,
     timestamp: goog.date.relative.format(tweet.time.getTime())
   });
+  brkn.model.Clock.getInstance().addTimestamp(tweet.time,
+      goog.dom.getElementByClass('timestamp', tweetEl));
   goog.dom.appendChild(this.tweetsEl_, tweetEl);
   goog.dom.appendChild(this.dotNavEl_, goog.dom.createDom('div', 'dot'));
   this.resize();
@@ -332,6 +334,8 @@ brkn.sidebar.Info.prototype.addComment_ = function(comment) {
     comment: comment,
     timestamp: goog.date.relative.format(comment.time.getTime())
   });
+  brkn.model.Clock.getInstance().addTimestamp(comment.time,
+      goog.dom.getElementByClass('timestamp', commentEl));
   goog.dom.appendChild(this.commentsEl_, commentEl);
   this.resize(this.commentInput_.isFocused()
       ? brkn.sidebar.CommentInput.COMMENT_CONTROLS_HEIGHT : 0);

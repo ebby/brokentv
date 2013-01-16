@@ -151,7 +151,8 @@ div#guide {
   transition: height 0.5s ease, opacity 0.5s ease, left 5s ease-in-out;
 }
 div#guide.drag,
-div#guide.drag div.channel div.name {
+div#guide.drag div.channel div.name,
+div#guide.aligning div.channel div.name {
   -webkit-transition: none !important;
   -moz-transition: none !important;
   transition: none !important;
@@ -224,49 +225,43 @@ div#guide div.header div.times div.time {
   display: inline-block;
   padding: 5px 0;
 }
-div#guide div.header div.now-left {
-  width: 60px;
+div#guide div.header div.browse {
+  width: 30px;
   height: 21px;
   margin-top: -1px;
   box-shadow: inset -5px 0 1px -5px #f1f1f1, 0 0 1px #dedede;
   background: #5c5c5c url(/static/img/grad-20.png);
   border-top: 1px solid #ccc;
-  border-right: 1px solid #2d3446;
   font-size: 11px;
   font-family: MuseoSans700;
   line-height: 21px;
   position: fixed;
   text-align: center;
   cursor: pointer;
+}
+div#guide div.header div.browse.left {
+  border-right: 1px solid #2d3446;
   left: 0;
 }
-div#guide div.header div.now-left:active {
-  border-top: 1px solid transparent;
-  background: #111;
-  box-shadow: inset 0 0 1px 1px #000;
-  color: #ddd;
-}
-div#guide div.header div.now-right {
-  width: 60px;
-  height: 21px;
-  margin-top: -1px;
-  box-shadow: inset 5px 0 1px -5px #f1f1f1, 0 0 1px #dedede;
-  background: #5c5c5c url(/static/img/grad-20.png);
-  border-top: 1px solid #ccc;
+div#guide div.header div.browse.right {
   border-left: 1px solid #2d3446;
-  font-size: 11px;
-  font-family: MuseoSans700;
-  line-height: 21px;
-  position: fixed;
-  text-align: center;
-  cursor: pointer;
   right: 0;
 }
-div#guide div.header div.now-right:active {
+div#guide div.header div.browse:active {
   border-top: 1px solid transparent;
   background: #111;
   box-shadow: inset 0 0 1px 1px #000;
   color: #ddd;
+}
+div#guide div.header div.browse span {
+  display: none;
+  margin: 0 4px;
+}
+div#guide div.header div.browse.now {
+  width: 60px;
+}
+div#guide div.header div.browse.now span {
+  display: inline-block;
 }
 div#guide div.channels {
   position: absolute;
@@ -365,6 +360,9 @@ div#guide div.channels div.channel div.programs div.program {
   -o-transition: all 0.3s ease;
   -ms-transition: all 0.3s ease;
   transition: all 0.3s ease;
+}
+div#guide div.channels div.channel div.programs div.program.selected {
+  border: 1px solid rgba(0, 0, 255, 0.5);
 }
 div#guide div.channels div.channel div.programs div.program.clipped:hover {
   z-index: 1;

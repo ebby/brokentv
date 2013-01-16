@@ -100,9 +100,10 @@ brkn.model.Channel.prototype.updateProgram = function(program) {
 
 
 /**
+ * @param {?number=} opt_offset
  * @return {?brkn.model.Program}
  */
-brkn.model.Channel.prototype.getCurrentProgram = function() {
+brkn.model.Channel.prototype.getCurrentProgram = function(opt_offset) {
 	if (!this.programming.length) {
 		return null;
 	}
@@ -111,6 +112,11 @@ brkn.model.Channel.prototype.getCurrentProgram = function() {
 		program = this.programming[0];
 		this.currentProgramIndex = 0;
 	}
+
+  if (opt_offset) {
+    return this.programming[this.currentProgramIndex + opt_offset];
+  }
+
 	if (goog.now() >= program.time.getTime() &&
 	    goog.now() < program.time.getTime() + program.media.duration * 1000) {
 	  this.currentProgram = program;
@@ -123,9 +129,9 @@ brkn.model.Channel.prototype.getCurrentProgram = function() {
   	if (!nextProgram) {
   		break;
   	}
+  	
   	program = nextProgram;
   }
-  
   if (goog.now() >= program.time.getTime() &&
       goog.now() < program.time.getTime() + program.media.duration * 1000) {
     this.currentProgram = program;
@@ -135,6 +141,23 @@ brkn.model.Channel.prototype.getCurrentProgram = function() {
   }
 };
 
+/**
+ * @param {?number=} opt_offset
+ * @return {boolean}
+ */
+brkn.model.Channel.prototype.hasNextProgram = function(opt_offset) {
+  var offset = opt_offset || 0;
+  return this.currentProgramIndex + offset + 1 < this.programming.length;
+};
+
+/**
+ * @param {?number=} opt_offset
+ * @return {boolean}
+ */
+brkn.model.Channel.prototype.hasPrevProgram = function(opt_offset) {
+  var offset = opt_offset || 0;
+  return this.currentProgramIndex + offset - 1 >= 0;
+};
 
 /**
  * @return {?brkn.model.Program}

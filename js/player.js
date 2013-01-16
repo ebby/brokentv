@@ -107,8 +107,6 @@ brkn.Player.prototype.play = function(media, seek, opt_tries) {
     this.player_.loadVideoById(media.hostId, seek);
     goog.Timer.callOnce(goog.bind(function() {
       var tries = opt_tries || 0;
-      window.console.log(tries);
-      window.console.log(this.player_.getPlayerState());
       if (!this.player_.getPlayerState() && tries < 4) {
         this.play(media, seek + retry, ++tries);
       }

@@ -288,7 +288,6 @@ brkn.sidebar.AdminList.prototype.addPlaylist_ = function(playlist) {
  * @private
  */
 brkn.sidebar.AdminList.prototype.addMedia_ = function(parent, media, opt_top) {
-  window.console.log(media.published);
   var mediaEl = soy.renderAsElement(brkn.sidebar.adminMedia, {
     media: media,
     published: media.published.getMonth() + '/' + media.published.getDate() + '/' +

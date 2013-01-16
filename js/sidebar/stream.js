@@ -133,6 +133,9 @@ brkn.sidebar.Stream.prototype.addActivity_ = function(activity, opt_insertTop) {
     default:
       return;
   }
+  brkn.model.Clock.getInstance().addTimestamp(time,
+      goog.dom.getElementByClass('timestamp', activityEl));
+  
   this.getHandler()
     .listen(goog.dom.getElementByClass('user', activityEl),
         goog.events.EventType.CLICK, function() {
