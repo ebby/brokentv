@@ -65,7 +65,7 @@ class PositionThumbHandler(BaseHandler):
 
 class AdminAddProgramHandler(BaseHandler):
     def post(self):
-      channel = Channel.get_by_id(int(self.request.get('channel')))
+      channel = Channel.get_by_key_name(self.request.get('channel'))
       media = Media.get_by_key_name(self.request.get('media'))
       program = Program.add_program(channel, media)
       self.response.out.write(simplejson.dumps(program.toJson(False)))

@@ -4,5 +4,5 @@ queue:
   rate: 5/s
   
 - name: twitter
-  target: programming  
+  target: twitter  
   rate: 1/s 

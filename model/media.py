@@ -61,7 +61,7 @@ class Media(db.Model):
       content_url = urlparse.urlparse(entry.media.player.url)
       id = urlparse.parse_qs(content_url.query)['v'][0]
       media = Media.get_by_key_name(MediaHost.YOUTUBE + id)
-      if not media:
+      if not media and not entry.get('noembed'):
         name = unicode(entry.media.title.text, errors='replace')
         desc = entry.media.description.text
         desc = unicode(desc, errors='replace') if desc else None
@@ -101,7 +101,7 @@ class Media(db.Model):
 
   def get_tweets(self, limit=10, offset=0):
     from tweet import Tweet
-    return Tweet.all().filter('media =', self).fetch(limit, offset=offset)
+    return Tweet.all().filter('media =', self).order('-time').fetch(limit, offset=offset)
 
   def seen_by(self, user=None):
     if user and not user.id in self.seen:

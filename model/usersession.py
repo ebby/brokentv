@@ -44,7 +44,7 @@ class UserSession(db.Model):
     json['user'] = self.user.toJson()
     json['tune_in'] = self.tune_in.isoformat()
     json['tune_out'] = self.tune_out.isoformat() if self.tune_out else None
-    json['channel_id'] = self.channel.key().id()
+    json['channel_id'] = self.channel.id
     json['media'] = [s_m.media.toJson() for s_m in self.sessionMedias.fetch(10)] if get_media else []
     return json
   

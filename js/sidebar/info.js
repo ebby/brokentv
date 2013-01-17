@@ -154,7 +154,6 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
   var tweetTimer = new goog.Timer(5000);
   goog.net.XhrIo.send('/_tweet/' + this.media_.id, goog.bind(function(e) {
     var tweets = /** @type {Array.<Object>} */ goog.json.parse(e.target.getResponse());
-    window.console.log(tweets);
     goog.array.forEach(tweets, function(tweet) {
       var t = new brkn.model.Tweet(tweet);
       this.addTweet_(t);

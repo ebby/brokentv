@@ -443,6 +443,8 @@ brkn.Channel.prototype.onRescheduleProgram_ = function(programId, newTime) {
  * @param {brkn.model.Session} session The session to display
  */
 brkn.Channel.prototype.addViewer = function(session) {
+  window.console.log('ADD VIEWER');
+  window.console.log(session);
 	var userEl = this.viewers_[session.user.id];
 	if (!userEl) {
 		userEl = goog.dom.createDom('div', 'viewer');
@@ -508,6 +510,14 @@ brkn.Channel.prototype.onSelectProgram_ = function(e) {
  * Updater
  */
 brkn.Channel.prototype.update = function() {
+  // Hide if no content
+  var hide = !this.getModel().programming.length ||
+      (this.getModel().myChannel && !this.getModel().getCurrentProgram());
+  goog.dom.classes.enable(this.getElement(), 'offline', hide);
+  if (!this.getModel().programming.length) {
+    return;
+  }
+  
   if (this.showGraph_) {
     // Update path
     this.constructPath();

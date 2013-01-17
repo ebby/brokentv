@@ -40,7 +40,7 @@ def broadcastNewActivity(activity):
 def broadcastProgramChanges(channel, programs):
   response = {}
   response['type'] = 'update_programs'
-  response['channel_id'] = channel.key().id()
+  response['channel_id'] = channel.id
   response['programs'] = [p.toJson(False, False) for p in programs]
   channels = simplejson.loads(memcache.get('web_channels') or '{}')
   for client in channels.iterkeys():
@@ -51,7 +51,7 @@ def broadcastNewPrograms(channel, programs):
   
   response = {}
   response['type'] = 'new_programs'
-  response['channel_id'] = channel.key().id()
+  response['channel_id'] = channel.id
   response['programs'] = [p.toJson(False) for p in programs]
   channels = simplejson.loads(memcache.get('web_channels') or '{}')
   for client in channels.iterkeys():

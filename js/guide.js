@@ -122,6 +122,13 @@ brkn.Guide.prototype.currentChannel_;
 
 
 /**
+ * @type {brkn.model.Channel}
+ * @private
+ */
+brkn.Guide.prototype.myChannel_;
+
+
+/**
  * @type {Element}
  * @private
  */
@@ -140,6 +147,14 @@ brkn.Guide.prototype.channelsEl_;
  * @private
  */
 brkn.Guide.prototype.headerEl_;
+
+
+/**
+ * Where the current timeslot starts
+ * @type {goog.date.DateTime}
+ * @private
+ */
+brkn.Guide.prototype.startTime_;
 
 
 /**
@@ -187,15 +202,15 @@ brkn.Guide.prototype.enterDocument = function() {
       }, this);
 
   // Set start time
-  var startTime = new goog.date.DateTime();
+  this.startTime_ = new goog.date.DateTime();
   var minutes = 60;
-  while (minutes >= startTime.getMinutes()) {
+  while (minutes >= this.startTime_.getMinutes()) {
     minutes -= this.interval_;
   }
-  startTime.setMinutes(minutes);
+  this.startTime_.setMinutes(minutes);
 
   var historySlots = 2;
-  this.minTime_ = startTime.clone();
+  this.minTime_ = this.startTime_.clone();
   this.minTime_.add(new goog.date.Interval(0, 0, 0, 0, -this.interval_ * historySlots));
   
   this.maxTime_ = this.minTime_.clone();
@@ -230,12 +245,13 @@ brkn.Guide.prototype.enterDocument = function() {
   };
 
   goog.array.forEach(brkn.model.Channels.getInstance().channels, goog.bind(function(c) {
-    var channel = new brkn.Channel(c, this.timeline, startTime, startTimeOffset, this.minTime_);
+    var channel = new brkn.Channel(c, this.timeline, this.startTime_, startTimeOffset, this.minTime_);
     channel.render(this.channelsEl_);
     if (c.id == brkn.model.Channels.getInstance().currentChannel.id) {
       goog.dom.classes.add(channel.getElement(), 'current');
       this.currentChannel_ = channel;
     }
+    this.myChannel_ = c.myChannel ? c : this.myChannel_;
     this.channels_.push(channel);
     this.channelMap_[c.id] = channel;
   }, this));
@@ -303,6 +319,8 @@ brkn.Guide.prototype.enterDocument = function() {
       function(show) {
         goog.dom.classes.enable(this.getElement(), 'admin', show);
       }, this);
+  brkn.model.Player.getInstance().subscribe(brkn.model.Player.Actions.PLAY_ASYNC,
+      this.playAsync_, this);
   
   this.align_(true);
   
@@ -344,8 +362,37 @@ brkn.Guide.prototype.changeChannel = function(channel) {
   goog.dom.classes.remove(this.currentChannel_.getElement(), 'current');
   this.currentChannel_ = this.channelMap_[channel.id];
   goog.dom.classes.add(this.currentChannel_.getElement(), 'current');
-  this.align_(true);
   this.cursor_[0] = channel;
+  this.align_(true, undefined, false);
+};
+
+
+/**
+ * @param {brkn.model.Media} media
+ * @private
+ */
+brkn.Guide.prototype.playAsync_ = function(media) {
+  if (!this.myChannel_) {
+    // Create a private channel
+    var user = brkn.model.Users.getInstance().currentUser;
+    this.myChannel_ = new brkn.model.Channel({
+      id: user.id,
+      name: user.name.split(' ')[0] + '\'s Channel'
+    });
+    var channel = new brkn.Channel(this.myChannel_, this.timeline, this.startTime_, 0,
+        this.minTime_);
+    channel.render(this.channelsEl_);
+    this.channels_.push(channel);
+    this.channelMap_[this.myChannel_.id] = channel;
+  }
+  var program = brkn.model.Program.async(media);
+  this.myChannel_.publish(brkn.model.Channel.Action.ADD_PROGRAM, program);
+
+  brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.CHANGE_CHANNEL,
+      this.myChannel_);
+  
+  goog.net.XhrIo.send('/_addprogram', goog.functions.NULL(), 'POST',
+      'channel_id=' + brkn.model.Channels.getInstance().myChannel.id + '&media_id=' + media.id);
 };
 
 

@@ -28,6 +28,11 @@ brkn.model.Channels = function() {
 	 */
 	this.channelMap = {};
 	
+	/**
+   * @type {brkn.model.Channel}
+   */
+  this.myChannel;
+	
 	this.subscribe(brkn.model.Channels.Actions.CHANGE_CHANNEL, this.changeChannel, this);
 };
 goog.inherits(brkn.model.Channels, goog.pubsub.PubSub);
@@ -38,6 +43,11 @@ goog.addSingletonGetter(brkn.model.Channels);
  * @type {brkn.model.Channel}
  */
 brkn.model.Channels.prototype.currentChannel;
+
+/**
+ * @type {brkn.model.Channel}
+ */
+brkn.model.Channels.prototype.lastChannel;
 
 
 /**
@@ -50,6 +60,26 @@ brkn.model.Channels.prototype.get = function(id) {
 
 
 /**
+ * @return {brkn.model.Channel} The next channel with current programming
+ */
+brkn.model.Channels.prototype.findOnline = function() {
+  if (this.currentChannel && this.currentChannel.getCurrentProgram()) {
+    return this.currentChannel;
+  } else if (this.lastChannel && this.lastChannel.getCurrentProgram()) {
+    return this.lastChannel;
+  }
+  var channel = this.channels[0];
+  var index = 0;
+  while (!channel.getCurrentProgram() && index < this.channels.length) {
+    channel = this.channels[index];
+    index++;
+  }
+  // If neither have content, stick with current
+  return !channel.getCurrentProgram() ? this.currentChannel : channel;
+};
+
+
+/**
  * @param {Object} channels Channels json object.
  */
 brkn.model.Channels.prototype.loadFromJson = function(channels, currentChannel) {
@@ -58,18 +88,15 @@ brkn.model.Channels.prototype.loadFromJson = function(channels, currentChannel) 
 				var c = new brkn.model.Channel(channel)
 				this.channels.push(c);
 				this.channelMap[channel.id] = c;
+				if (c.myChannel) {
+				  this.myChannel = c;
+				}
 			}, this));
 	
 	// Set current channel or first channel with content.
 	var channel = this.channelMap[currentChannel] || this.channels[0];
-	var lastChannel = channel;
-	var index = 0;
-	while (!channel.getCurrentProgram() && index < this.channels.length) {
-	  channel = this.channels[index];
-	  index++;
-	}
-	// If neither have content, go back to lastChannel
-	this.currentChannel = !channel.getCurrentProgram() ? lastChannel : channel;
+	this.currentChannel = channel;
+	this.currentChannel = this.findOnline();
 };
 
 
@@ -98,6 +125,7 @@ brkn.model.Channels.prototype.loadViewersFromJson = function(viewerSessions) {
  */
 brkn.model.Channels.prototype.changeChannel = function(channel) {
   if (channel) {
+    this.lastChannel = this.currentChannel;
     this.currentChannel = channel;
     goog.net.XhrIo.send('/_changechannel', goog.functions.NULL(), 'POST', 'channel=' + channel.id);
   }

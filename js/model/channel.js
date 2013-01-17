@@ -29,6 +29,12 @@ brkn.model.Channel = function(channel) {
 	this.name = channel.name;
 
 	/**
+   * @type {String}
+   * @private
+   */
+  this.myChannel = channel['my_channel'];
+
+	/**
 	 * @type {Array.<brkn.model.Program>}
 	 * @private
 	 */

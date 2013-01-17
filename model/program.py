@@ -19,7 +19,7 @@ class Program(db.Model):
       programs = [x.program for x in
                   channel.channelPrograms.filter('time >', cutoff).order('time').fetch(100)]
       
-      programming[channel.key().id()] = [p.toJson(fetch_channel=False, media_desc=False) for p in programs]
+      programming[channel.id] = [p.toJson(fetch_channel=False, media_desc=False) for p in programs]
 
     memcache.set('programming', simplejson.dumps(programming))
     return programming
@@ -81,7 +81,7 @@ class Program(db.Model):
     json['id'] = self.key().id()
     json['media'] = self.media.toJson(media_desc) if fetch_media else self.media.key().name()
     json['time'] = self.time.isoformat() if self.time else None
-    json['channel'] = self.channel.toJson() if fetch_channel else {'id': self.channel.key().id()}
+    json['channel'] = self.channel.toJson() if fetch_channel else {'id': self.channel.id}
     return json
 
 class ChannelProgram(db.Model):

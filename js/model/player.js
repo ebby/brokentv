@@ -1,6 +1,7 @@
 goog.provide('brkn.model.Player');
 goog.provide('brkn.model.Player.Actions');
 
+goog.require('goog.net.XhrIo');
 goog.require('goog.pubsub.PubSub');
 
 
@@ -11,7 +12,7 @@ goog.require('goog.pubsub.PubSub');
  */
 brkn.model.Player = function() {
   goog.base(this);
-  
+
 };
 goog.inherits(brkn.model.Player, goog.pubsub.PubSub);
 goog.addSingletonGetter(brkn.model.Player);

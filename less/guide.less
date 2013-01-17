@@ -51,6 +51,7 @@ div#guide {
     width: 16px;
     height: 26px;
     background-size: 100%;
+    cursor: pointer;
     .transition(left, .5s, linear);
   }
   div.header {
@@ -135,6 +136,8 @@ div#guide {
       border-bottom: 1px solid #ccc;
       position: relative;
       background: #f7f7f7;
+      overflow: hidden;
+      .transition(height, .3s, ease);
       div.name {
         width: @name-width;
         text-align: center;
@@ -412,7 +415,8 @@ div#guide {
 	  }
 	  .current div.name {
       background: #181818 !important;
-      box-shadow: 1px 0 3px rgba(0, 0, 0, 0.8), -3px 0px 3px 3px rgba(105, 105, 105, 0.8) !important;
+      box-shadow: 1px 0 3px rgba(0, 0, 0, 0.8), -3px 0px 3px 3px rgba(105, 105, 105, 0.8),
+          10px 0 55px -8px rgba(255,255,255,.7) !important;
       z-index: 2 !important;
       cursor: default !important;
       &:after {
@@ -432,6 +436,9 @@ div#guide {
         margin-top: -15px;
       }
     }
+  }
+  .offline div.channel {
+    height: 0;
   }
   .current div.program, div.program:hover {
     opacity: 1 !important;

@@ -75,24 +75,22 @@ class Programming():
         collection.fetch(approve_all=True)
     
     for name, properties in inits.CHANNELS.iteritems():
-      channel = Channel.all().filter('name =', name).get()
-      if not channel:
-        channel = Channel(name=name, keywords=properties['keywords'])
-        channel.put()
-      self.channels[name] = channel
+      channel = Channel.get_or_insert(key_name=Channel.make_key(name),
+                                      name=name, keywords=properties['keywords'])
+      self.channels[channel.id] = channel
       for col_name in properties['collections']:
         col = self.collections[col_name]
         chan_col = ChannelCollection.add(channel=channel, collection=col)
 
       # We need to generate some programming now
-      #Programming.set_programming(channel.key().id())
+      #Programming.set_programming(channel.id)
     
     # Cache the channels
     memcache.set('channels', simplejson.dumps([c.toJson() for c in self.channels.itervalues()]))
       
   @classmethod
   def set_programming(cls, channel_id, schedule_next=True, queue='default', target=None):
-    channel = Channel.get_by_id(channel_id)
+    channel = Channel.get_by_key_name(channel_id)
     viewers = simplejson.loads(memcache.get('channel_viewers') or '{}').get(str(channel_id), [])
     cols = channel.get_collections()
     all_medias = []
@@ -128,18 +126,19 @@ class Programming():
     deferred.defer(Programming.fetch_related_tweets, all_medias,
                    _name='twitter-' + channel.name.replace(' ', '') + '-' + str(uuid.uuid1()),
                    _queue='twitter',
+                   #_target='twitter',
                    _countdown=30)
     
     programs = []
     for media in all_medias:      
-      logging.info('ADDING: ' + media.name + ' seen: ' + str(Programming.have_seen(media, viewers)))
-      programs.append(Program.add_program(channel, media))
+      program = Program.add_program(channel, media)
+      programs.append(program)
+      logging.info('ADDING: ' + media.name + ' at: ' + program.time.isoformat())
     broadcast.broadcastNewPrograms(channel, programs)
 
     # Update memcache
     programming = simplejson.loads(memcache.get('programming') or '{}')
-    channel_id = str(channel_id) # Memcache keys are all strings
-    
+
     # Add new programs to filtered, current programs
     programming[channel_id] = Programming.cutoff_programs(programming.get(channel_id), 1800) + \
         [p.toJson(fetch_channel=False, media_desc=False) for p in programs]
@@ -152,7 +151,7 @@ class Programming():
       next_gen = min(next_gen,
                      reduce(lambda x, y: x + y, [p.media.duration for p in programs], 0))
       logging.info('COUNTDOWN FOR ' + channel.name + ': ' + str(next_gen))
-      deferred.defer(Programming.set_programming, channel.key().id(),
+      deferred.defer(Programming.set_programming, channel.key().name(),
                      _name=channel.name.replace(' ', '') + '-' + str(uuid.uuid1()),
                      _countdown=next_gen,
                      _queue=queue,
@@ -297,11 +296,13 @@ class StartHandler(webapp2.RequestHandler):
     self.queue.purge()
     self.queue = taskqueue.Queue(name='twitter')
     self.queue.purge()
-    channels = Channel.all().fetch(None)
+    
+    channels = Channel.get_public()
     if not len(channels):
-      Programming(False)
+      no_media = len(Media.all().fetch(10)) == 0
+      Programming(no_media) # Do fetch if no media
     for c in channels:
-      Programming.set_programming(c.key().id(), queue='programming')
+      Programming.set_programming(c.key().name(), queue='programming')
     
   
 app = webapp.WSGIApplication([('/_ah/start', StartHandler)], debug=True)

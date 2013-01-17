@@ -7,18 +7,24 @@ def get_session(current_user):
   cached_channels = simplejson.loads(memcache.get('channels') or '{}')
   if not len(cached_channels):
     # No cached channels, attempt to fetch
-    channels = Channel.all().fetch(100)
-    cached_channels = {}
-    for c in channels:
-      cached_channels[c.key().id()] = c.toJson()
+    channels = Channel.get_public()
+    cached_channels = [c.toJson() for c in channels]
     memcache.set('channels', simplejson.dumps(cached_channels))
     
   cached_programming = simplejson.loads(memcache.get('programming') or '{}')
   if not len(cached_programming):
     # No cached programming, attempt to fetch
-    channels = channels or Channel.all().fetch(100)
+    channels = channels or Channel.get_public()
     cached_programming = Program.get_current_programs(channels)
     memcache.set('programming', simplejson.dumps(cached_programming))
+
+  # Tack on the user's private channel if it exists, and programming
+  user_channel = current_user.channel.get()
+  if user_channel:
+    user_programs = Program.get_current_programs([user_channel])
+    if user_programs:
+      cached_channels.append(user_channel.toJson())
+      cached_programming = dict(cached_programming.items() + user_programs.items())
 
   data['channels'] = cached_channels
   data['programs'] = cached_programming
@@ -33,19 +39,21 @@ def get_session(current_user):
     memcache.set('current_viewers', simplejson.dumps(current_viewers))
 
   data['current_viewers'] = current_viewers
-  current_channel = Channel.all().get()
+  channels = channels or Channel.get_public()
+  current_channel = channels[0] if len(channels) else None
   assert current_channel != None, 'NO CHANNELS IN DATABASE'
 
   # Add latest User Session, possibly end last session, possibly continue last session.
   user_sessions = UserSession.get_by_user(current_user)
   if len(user_sessions):
-    current_channel = Channel.get_by_id(int(user_sessions[0].channel.key().id()))
+    current_channel = Channel.get_by_key_name(user_sessions[0].channel.key().name())
 
   if len(user_sessions) and not user_sessions[0].tune_out:
     user_sessions[0].tune_out = user_sessions[0].tune_in + datetime.timedelta(seconds=180)
     user_sessions[0].put()
 
-  if len(user_sessions) and user_sessions[0].tune_out and (datetime.datetime.now() - user_sessions[0].tune_out).seconds < 180:
+  if len(user_sessions) and user_sessions[0].tune_out and \
+      (datetime.datetime.now() - user_sessions[0].tune_out).seconds < 180:
     user_sessions[0].tune_out = None
     user_sessions[0].put()
   else:
@@ -68,13 +76,13 @@ def get_session(current_user):
   data['viewer_sessions'] = viewer_sessions
 
   user_obj = current_user.toJson()
-  user_obj['current_channel'] = current_channel.key().id()
+  user_obj['current_channel'] = current_channel.id
   data['current_user'] = user_obj
   return data
 
 class SessionHandler(BaseHandler):
     def post(self):
-      if self.current_user.access_level < constants.AccessLevel.USER:
+      if self.current_user.access_level < AccessLevel.USER:
         self.error(401)
       else:
         data = get_session(self.current_user)
@@ -82,9 +90,14 @@ class SessionHandler(BaseHandler):
 
 class ProgramHandler(BaseHandler):
     def post(self):
-      channel = Channel.get_by_id(int(self.request.get('channel')))
-      program = Program.add_program(channel, self.request.get('youtube_id'))
-      self.response.out.write(simplejson.dumps(program.toJson(False)))
+      channel = Channel.get_by_key_name(self.request.get('channel_id'))
+      logging.info(channel.id)
+      logging.info(channel.id == self.current_user.id)
+      if channel and channel.id == self.current_user.id:
+        media = Media.get_by_key_name(self.request.get('media_id'))
+        program = Program.add_program(channel, media)
+        logging.info(str(program.toJson(False)))
+        self.response.out.write(simplejson.dumps(program.toJson(False)))
       
 class CommentHandler(BaseHandler):
     def get(self, id):
@@ -129,8 +142,14 @@ class ActivityHandler(BaseHandler):
       
 class ChangeChannelHandler(BaseHandler):
     def post(self):
-      channel_id = self.request.get('channel')
-      channel = Channel.get_by_id(int(channel_id))
+      channel_id = self.request.get('channel')  
+      channel = Channel.get_by_key_name(channel_id)
+      if not channel and channel_id == self.current_user.id:
+        # Create private user channel
+        name = self.current_user.name.split(' ')[0] + '\'s channel'
+        channel = Channel(key_name=self.current_user.id, name=name, privacy=Privacy.PRIVATE,
+                          user=self.current_user)
+        channel.put()
       channel_viewers = simplejson.loads(memcache.get('channel_viewers') or '{}')
 
       user_sessions = UserSession.get_by_user(self.current_user)
@@ -156,7 +175,7 @@ class ChangeChannelHandler(BaseHandler):
           user_sessions[0].end_session()
           
           # Track the media opt-out behavior
-          last_channel = Channel.get_by_id(int(last_channel_id))
+          last_channel = Channel.get_by_key_name(last_channel_id)
           last_program = last_channel.get_current_program()
           if last_program:
             Media.add_opt_out(last_program.media.key().name(), self.current_user.id)

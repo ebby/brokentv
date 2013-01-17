@@ -2,3 +2,4 @@ cron:
 - description: publisher fetch
   url: /cron/fetch
   schedule: every 1 hours
+  target: youtube

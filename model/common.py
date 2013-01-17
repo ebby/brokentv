@@ -12,39 +12,8 @@ import urlparse
 import types
 import re
 
+from constants import *
+
 from google.appengine.api import memcache
 from google.appengine.api import urlfetch
 from google.appengine.ext import db
-
-class AccessLevel:
-  WAITLIST = 0
-  USER = 1
-  ADMIN = 2
-
-class Privacy:
-  PRIVATE = 0
-  PUBLIC = 1
-  FRIENDS = 2
-
-class ActivityType:
-  COMMENT = 'comment'
-  SESSION = 'session'
-  STARRED = 'starred'
-  WATCHED = 'watched' # Streamed media by selection
-
-class MediaType:
-  VIDEO = 0
-  PICTURE = 1
-
-class MediaHost:
-  YOUTUBE = 'youtube'
-  
-class MediaHostUrl:
-  YOUTUBE = 'http://www.youtube.com/watch?v=%s'
-  
-class Approval:
-  APPROVED = 0
-  REJECTED = 1
-  PENDING = 2
-  
-  

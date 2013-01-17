@@ -29,10 +29,11 @@ class StreamHandler(StreamListener):
   
 class StartHandler(webapp2.RequestHandler):
   def get(self):
-    auth = OAuthHandler(constants.TWITTER_CONSUMER_KEY, constants.TWITTER_CONSUMER_SECRET)
-    auth.set_access_token(constants.TWITTER_ACCESS_TOKEN, constants.TWITTER_TOKEN_SECRET)
-    stream = Stream(auth, StreamHandler())  
-    stream.filter(track=['youtube'], async=True)
+#    auth = OAuthHandler(constants.TWITTER_CONSUMER_KEY, constants.TWITTER_CONSUMER_SECRET)
+#    auth.set_access_token(constants.TWITTER_ACCESS_TOKEN, constants.TWITTER_TOKEN_SECRET)
+#    stream = Stream(auth, StreamHandler())  
+#    stream.filter(track=['youtube'], async=True)
+    logging.info('TWITTER BACKEND STARTED')
     
   
 app = webapp.WSGIApplication([('/_ah/start', StartHandler)], debug=True)

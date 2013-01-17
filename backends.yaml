@@ -2,3 +2,9 @@ backends:
 - name: programming
   start: programming.app
   options: failfast
+- name: twitter
+  options: dynamic
+  start: twitter.app
+- name: youtube
+  options: dynamic
+  start: youtube.app

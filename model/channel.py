@@ -1,20 +1,31 @@
 from common import *
 
 from media import Media
+from user import User
 
 class Channel(db.Model):
   name = db.StringProperty()
   current_program = db.IntegerProperty()
   keywords = db.StringListProperty()
   next_gen = db.DateTimeProperty() # Next programming generation time
+  privacy = db.IntegerProperty(default=Privacy.PUBLIC)
+  user = db.ReferenceProperty(User, collection_name='channel')
 
   @property
   def id(self):
-    return str(self.key().id())
+    return str(self.key().name())
+
+  @classmethod
+  def make_key(cls, name):
+    return name.replace(' ', '-').lower()
+
+  @classmethod
+  def get_public(cls):
+    return Channel.all().filter('privacy =', Privacy.PUBLIC).fetch(None)
 
   @classmethod
   def get_all(cls):
-    return Channel.all().fetch(100)
+    return Channel.all().fetch(None)
 
   def get_programming(self):
     channel_programs = ChannelProgram.all().filter('channel =', self).order('-time').fetch(limit=100)
@@ -49,10 +60,11 @@ class Channel(db.Model):
 
   def toJson(self):
     json = {}
-    json['id'] = self.key().id()
+    json['id'] = self.key().name()
     json['name'] = self.name
     json['programming'] = [p.toJson(False) for p in self.get_programming()]
     json['current_program'] = Program.get_by_id(self.current_program).toJson(False) if self.current_program else None
+    json['my_channel'] = self.privacy == Privacy.PRIVATE
     return json
 
 from program import *

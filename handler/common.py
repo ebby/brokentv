@@ -1,5 +1,4 @@
 import broadcast
-import constants
 import datetime
 import facebook
 import feedparser
@@ -12,6 +11,8 @@ import simplejson
 import jinja2
 import urlparse
 import webapp2
+
+from constants import *
 
 from google.appengine.api import channel as browserchannel
 from google.appengine.api import images
