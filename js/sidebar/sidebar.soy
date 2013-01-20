@@ -16,11 +16,11 @@
       <div class="title">{$media.name}</div>
       <div class="published">{$published}</div>
       <div class="options">
-        
         <div class="button star"></div>
         <div class="button facebook"></div>
         <div class="button twitter"></div>
         <div class="button play"></div>
+        <div class="button plus"></div>
       </div>
     </div>
     {if $media.description}
@@ -116,7 +116,7 @@
 
 /**
  * @param activity
- * @param channel
+ * @param? channel
  * @param user
  * @param time
  */
@@ -128,7 +128,7 @@
     <div class="text">
       <a class="user" href="#">{$user.name}</a>{sp}
       {if $activity.session.tune_out}watched{else}is watching{/if}
-      {sp}<a href="#">{$channel.name}</a>
+      {if $channel}{sp}<a href="#">{$channel.name}</a>{/if}
       <div class="timestamp">{$time}</div>
     </div>
     <div class="medias"></div>
@@ -189,7 +189,7 @@
  * @param className
  */
 {template .tab}
-  <li class="tab{sp}{$className}">
+  <li class="{$className}{sp}tab">
     <div class="label">{$name}</div>
   </li>
 {/template}
@@ -269,7 +269,41 @@
 /**
  */
 {template .profile}
+  <div class="tabbed activity">
+    <ul class="tabs">
+      <li class="tab activity">
+        <div class="label">ACTIVITY</div>
+      </li>
+      <li class="tab starred">
+        <div class="label">STARRED</div>
+      </li>
+    </ul>
+    <div class="activity-content content activity"></div>
+    <div class="starred-content content starred"></div>
+    <div class="spinner" style="display:none">Loading More</div>
+  </div>
   <div class="stream">
+  </div>
+{/template}
+
+
+/**
+ * @param media
+ */
+{template .listMedia}
+  <div class="list-media show">
+    <div class="media">
+      <div class="preview">
+        <div class="thumb" style="background-image:url({$media.thumbnail});
+            background-position: 50% {$media.thumbPos}%"></div>
+        <div class="title">{$media.name}</div>
+      </div>
+    </div>
+    <div class="publisher">
+      <img src="{$media.publisher.picture}">
+      <div class="name">{$media.publisher.name}</div>
+      <div class="duration">{$media.duration} seconds</div>
+    </div>
   </div>
 {/template}
 
@@ -279,7 +313,7 @@
  * @param published
  */
 {template .adminMedia}
-  <div class="admin-media">
+  <div class="admin-media list-media">
     <div class="media">
       <div class="preview">
         <div class="thumb" style="background-image:url({$media.thumbnail});

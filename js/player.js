@@ -65,7 +65,7 @@ brkn.Player.prototype.enterDocument = function() {
       }, this);
   brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_GUIDE,
       function(show) {
-        this.resize(undefined, show);
+        goog.Timer.callOnce(this.resize);
       }, this);
   
   this.resize();
@@ -129,9 +129,10 @@ brkn.Player.prototype.resize = function() {
   var playerEl = goog.dom.getElement('ytplayer');
   var stagecover = goog.dom.getElement('stagecover');
   var message = goog.dom.getElementByClass('message', stagecover)
-  var guideHeight = goog.dom.classes.has(goog.dom.getElement('guide'), 'toggled') ? 230 : 0;
+  var guideHeight = goog.dom.getElement('guide').style.height;
+  guideHeight = guideHeight.substring(0, guideHeight.length - 2)
   var sidebarWidth = goog.dom.classes.has(goog.dom.getElement('sidebar'), 'toggled')  ? 300 : 0;
-  goog.style.setHeight(playerEl, goog.dom.getViewportSize().height - guideHeight - 40);
+  goog.style.setHeight(playerEl, goog.dom.getViewportSize().height - guideHeight);
   goog.style.setWidth(playerEl, goog.dom.getViewportSize().width - sidebarWidth); 
   goog.style.setHeight(stagecover, goog.dom.getViewportSize().height - guideHeight - 40);
   goog.style.setWidth(stagecover, goog.dom.getViewportSize().width - sidebarWidth);

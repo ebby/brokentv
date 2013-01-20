@@ -242,6 +242,7 @@ class YouTubePlaylistVideoEntry(gdata.GDataEntry):
                                                        Description)
   _children['{%s}rating' % gdata.GDATA_NAMESPACE] = ('rating', Rating)
   _children['{%s}comments' % gdata.GDATA_NAMESPACE] = ('comments', Comments)
+  _children['{%s}noembed' % YOUTUBE_NAMESPACE] = ('noembed', NoEmbed)
   _children['{%s}statistics' % YOUTUBE_NAMESPACE] = ('statistics', Statistics)
   _children['{%s}location' % YOUTUBE_NAMESPACE] = ('location', Location)
   _children['{%s}position' % YOUTUBE_NAMESPACE] = ('position', Position)
@@ -250,7 +251,7 @@ class YouTubePlaylistVideoEntry(gdata.GDataEntry):
   def __init__(self, author=None, category=None, content=None,
                atom_id=None, link=None, published=None, title=None,
                updated=None, feed_link=None, description=None,
-               rating=None, comments=None, statistics=None,
+               rating=None, noembed=None, comments=None, statistics=None,
                location=None, position=None, media=None,
                extension_elements=None, extension_attributes=None):
 
@@ -258,6 +259,7 @@ class YouTubePlaylistVideoEntry(gdata.GDataEntry):
     self.description = description
     self.rating = rating
     self.comments = comments
+    self.noembed = noembed
     self.statistics = statistics
     self.location = location
     self.position = position

@@ -18,22 +18,29 @@
     <div class="header" id="header">
       <div class="times">
         <div id="now-left" class="left browse">&#x25C0;<span> NOW</span></div>
-        <div id="ticker" class="ticker"></div>
         <div id="now-right" class="right browse"><span>NOW </span>&#x25B6;</div>
       </div>
     </div>
+    <div id="ticker" class="ticker"></div>
   </div>
-  <div id="controller" class="controller">
-    <div id="guide-toggle" class="guide-toggle dark button">GUIDE</div>
-    <div class="controls">
-      <div class="restart dark button"></div>
-      <div class="pause dark button"></div>
-      <div class="go-live dark button"></div>
+  <div id="controller" class="controller guide-toggled">
+    <div class="background"></div>
+    <div class="left">
+      <div id="guide-toggle" class="guide-toggle dark button">GUIDE</div>
+      <div class="controls">
+        <div class="restart dark button"></div>
+        <div class="pause dark button"></div>
+        <div class="go-live dark button"></div>
+      </div>
+      <div class="border"></div>
     </div>
-    <div id="admin-toggle" class="admin-toggle dark button" style="display: none">
-      <div id="toggle-pending" class="pending" style="display:none"></div>
+    <div class="right">
+      <div id="admin-toggle" class="admin-toggle dark button" style="display: none">
+        <div id="toggle-pending" class="pending" style="display:none"></div>
+      </div>
+      <div id="sidebar-toggle" class="sidebar-toggle dark button"></div>
+      <div class="border"></div>
     </div>
-    <div id="sidebar-toggle" class="sidebar-toggle dark button"></div>
   </div>
   <div id="sidebar">
     <div id="toolbar">
@@ -42,14 +49,14 @@
         <div class="back-title"></div>
       </div>
       <ul class="tabs">
-        <li class="tab info selected">
+        <li class="info tab selected">
           <div class="label">NOW</div>
         </li>
-        <li class="tab stream">
+        <li class="stream tab">
           <div class="label">STREAM</div>
         </li>
-        <li class="tab starred">
-          <div class="label">STARRED</div>
+        <li class="profile tab">
+          <div class="label">ME</div>
         </li>
       </ul>
       <div class="arrow"></div>
@@ -57,7 +64,7 @@
     <div id="sidebar-content">
       <div id="info" class="screen info"></div>
       <div id="stream" class="screen stream"></div>
-      <div id="starred" class="screen media-list"></div>
+      <div id="my-profile" class="screen profile"></div>
       <div id="admin" class="screen admin"></div>
       <div id="media-list" class="slide media-list"><div class="medias"></div></div>
       {if $admin}

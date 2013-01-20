@@ -78,10 +78,8 @@ brkn.sidebar.MediaList.prototype.decorateInternal = function(el) {
   goog.dom.appendChild(this.getElement(), mediasEl);
 
   goog.array.forEach(this.mediaList_, function(media) {
-    var mediaEl = soy.renderAsElement(brkn.sidebar.media, {
-      media: media,
-      published: media.published.getMonth() + '/' + media.published.getDate() + '/' +
-          media.published.getYear() + ' ' + media.published.toUsTimeString()
+    var mediaEl = soy.renderAsElement(brkn.sidebar.listMedia, {
+      media: media
     });
     goog.dom.appendChild(mediasEl, mediaEl);
     if (this.isAdmin_) {
@@ -100,23 +98,13 @@ brkn.sidebar.MediaList.prototype.decorateInternal = function(el) {
     this.dragDropGroup_.init();
     this.getHandler().listen(this.dragDropGroup_, 'drag', function(e) {window.console.log(e)});
   }
-  this.resize();
 };
-
 
 
 /** @inheritDoc */
 brkn.sidebar.MediaList.prototype.enterDocument = function() {
   goog.base(this, 'enterDocument');
 
-  this.getHandler()
-      .listen(window, 'resize',
-          goog.partial(goog.Timer.callOnce, goog.bind(this.resize, this)))
-};
-
-
-brkn.sidebar.MediaList.prototype.resize = function() {
-  goog.style.setHeight(this.getElement(), goog.dom.getViewportSize().height - 40);
 };
 
 

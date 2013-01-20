@@ -99,9 +99,19 @@ brkn.Controller.prototype.enterDocument = function() {
  * @private 
  */
 brkn.Controller.prototype.toggleGuide_ = function() {
+  var toggled = this.guideToggle_.isChecked();
   brkn.model.Controller.getInstance().publish(
       brkn.model.Controller.Actions.TOGGLE_GUIDE,
-      this.guideToggle_.isChecked());
+      toggled);
+  if (toggled) {
+    goog.dom.classes.remove(this.getElement(), 'window');
+  }
+  goog.Timer.callOnce(goog.bind(function() {
+    goog.dom.classes.enable(this.getElement(), 'guide-toggled', toggled);
+    if (!toggled) {
+      goog.Timer.callOnce(goog.bind(goog.dom.classes.add, this, this.getElement(), 'window'), 300);
+    }
+  }, this), toggled ? 0 : 600);
   this.resize();
 };
 

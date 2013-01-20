@@ -149,7 +149,7 @@ brkn.sidebar.Stream.prototype.addActivity_ = function(activity, opt_insertTop) {
   var mediasEl = goog.dom.getElementByClass('medias', activityEl);
   goog.array.forEach(medias, function(m) {
     var media = new brkn.model.Media(m);
-    var mediaEl = soy.renderAsElement(brkn.sidebar.mediaPreview, { media: media });
+    var mediaEl = soy.renderAsElement(brkn.sidebar.listMedia, { media: media });
     var img = goog.dom.getElementByClass('thumb', mediaEl);
     goog.dom.appendChild(mediasEl, mediaEl);
     

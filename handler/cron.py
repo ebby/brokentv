@@ -12,8 +12,8 @@ class FetchHandler(webapp2.RequestHandler):
         'UNAUTHENTICATED CRON REQUEST'
 
     new_medias = []
-    cols = Collection.all().fetch(100)
+    cols = Collection.all().fetch(None)
     for col in cols:
-      new_medias.append(col.fetch())
+      new_medias.append(col.fetch(True))
     logging.info('CRON FETCHED %s NEW MEDIAS' % len(new_medias))
   

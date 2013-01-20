@@ -179,8 +179,6 @@ class ChangeChannelHandler(BaseHandler):
           last_program = last_channel.get_current_program()
           if last_program:
             Media.add_opt_out(last_program.media.key().name(), self.current_user.id)
-            
-       
 
         # New session for new channel
         session = UserSession.new(self.current_user, channel)
@@ -221,13 +219,14 @@ class StarHandler(BaseHandler):
     self.response.out.write(simplejson.dumps([m.toJson() for m in col.get_medias(20)] if col else []))
   def post(self):
     media = Media.get_by_key_name(self.request.get('media_id'))
-    collection = Collection.get_or_insert(self.current_user.id, user=self.current_user, name='Starred')
+    collection = Collection.get_or_insert(self.current_user.id,
+                                          user=self.current_user,
+                                          name='Starred')
     if self.request.get('delete'):
       collection.remove_media(media)
     else:
-      collection.add_media(media)
+      collection.add_media(media, True)
       broadcast.broadcastNewActivity(UserActivity.add_starred(self.current_user, media))
-    # Broadcast?
     
 class TweetHandler(BaseHandler):
   def get(self, media_key):

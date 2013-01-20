@@ -43,7 +43,7 @@ brkn.Sidebar = function() {
   this.info_;
   
   /**
-   * @type {brkn.sidebar.MediaList}
+   * @type {brkn.sidebar.Profile}
    * @private
    */
   this.starred_;
@@ -53,6 +53,16 @@ brkn.Sidebar = function() {
    * @private
    */
   this.stream_;
+
+  /**
+   * @type {Object.<string, Element>}
+   */
+  this.tabs_ = {};
+  
+  /**
+   * @type {Array}
+   */
+  this.tabNames_ = [];
 };
 goog.inherits(brkn.Sidebar, goog.ui.Component);
 
@@ -78,10 +88,17 @@ brkn.Sidebar.prototype.lastScreen_;
 brkn.Sidebar.prototype.currentScreen_;
 
 /**
- * @type {Element}
+ * @type {string}
  * @private
  */
 brkn.Sidebar.prototype.currentTab_;
+
+
+/**
+ * @type {Element}
+ * @private
+ */
+brkn.Sidebar.prototype.contentEl_;
 
 
 /**
@@ -102,30 +119,43 @@ brkn.Sidebar.prototype.profileEl_;
 brkn.Sidebar.prototype.enterDocument = function() {
   goog.base(this, 'enterDocument');
 
-  var contentEl = goog.dom.getElement('sidebar-content');
+  this.contentEl_ = goog.dom.getElement('sidebar-content');
   this.mediaListEl_ = goog.dom.getElement('media-list');
   this.profileEl_ = goog.dom.getElement('profile');
   this.toolbar_ = goog.dom.getElement('toolbar');
-  this.tabs_ = goog.dom.getElementByClass('tabs', this.getElement());
+  this.tabsEl_ = goog.dom.getElementByClass('tabs', this.getElement());
+  
+  goog.array.forEach(goog.dom.getChildren(this.tabsEl_), function(tab) {
+    var tabName = goog.dom.classes.get(tab)[0];
+    this.tabs_[tabName] = tab;
+    this.tabNames_.push(tabName);
+  }, this);
+  window.console.log(this.tabs_);
 
   this.onNextProgram_();
   this.fetchAndRenderStream_();
-  this.fetchAndRenderStarred_();
+  
+  this.starred_ = new brkn.sidebar.Profile(brkn.model.Users.getInstance().currentUser);
+  this.starred_.decorate(goog.dom.getElement('my-profile'));
 
   if (this.info_) {
     this.currentScreen_ = this.info_.getElement();
-    this.currentTab_ = goog.dom.getElementByClass('info', this.tabs_);
+    this.currentTab_ = 'info';
   } else {
     this.currentScreen_ = goog.dom.getElement('stream');
-    this.currentTab_ = goog.dom.getElementByClass('stream', this.tabs_);
+    this.currentTab_ = 'stream';
   }
   goog.dom.classes.add(this.currentScreen_, 'current');
   
   if (this.isAdmin_) {
     this.admin_.decorate(goog.dom.getElement('admin'));
-    goog.dom.appendChild(this.tabs_, soy.renderAsElement(brkn.sidebar.tab,
-        {name: 'ADMIN', className: 'admin'}));
+    var adminTab = soy.renderAsElement(brkn.sidebar.tab,
+        {name: 'ADMIN', className: 'admin'});
+    goog.dom.appendChild(this.tabsEl_, adminTab);
+    this.tabs_['admin'] = adminTab;
+    this.tabNames_.push('admin');
   }
+  window.console.log(this.tabNames_);
   
   this.updateArrow_();
 
@@ -136,27 +166,13 @@ brkn.Sidebar.prototype.enterDocument = function() {
             goog.dom.classes.remove(this.toolbar_, 'back');
             this.navigate(this.lastScreen_);
           }, this))
-      .listen(this.tabs_,
+      .listen(this.tabsEl_,
           goog.events.EventType.CLICK,
           goog.bind(function(e) {
-            var tab = goog.dom.getAncestorByClass(e.target, 'tab');
-            goog.dom.classes.remove(this.currentTab_, 'selected');
-            this.currentTab_ = tab;
+            var tab = goog.dom.getAncestorByTagNameAndClass(e.target, 'li');
+            var tabName = goog.dom.classes.get(tab)[0];   
+            this.tabNav_(this.currentTab_, tabName); 
             goog.dom.classes.add(tab, 'selected');
-            if (goog.dom.classes.has(tab, 'info')) {
-              if (!this.info_) {
-                return;
-              }
-              this.shiftScreen(this.info_.getElement(), true);
-            } else if (goog.dom.classes.has(tab, 'stream')) {
-              var left = this.currentScreen_ == this.starred_.getElement();
-              this.shiftScreen(this.stream_.getElement(), left);
-            } else if (goog.dom.classes.has(tab, 'starred')) {
-              var left = this.admin_ && this.currentScreen_ == this.admin_.getElement();
-              this.shiftScreen(this.starred_.getElement(), left);
-            } else if (this.admin_) {
-              this.shiftScreen(this.admin_.getElement());
-            }
             goog.style.setPosition(goog.dom.getElementByClass('arrow', this.toolbar_),
                 goog.style.getSize(tab).width/2 + goog.style.getPosition(tab).x);
           }, this));
@@ -184,12 +200,12 @@ brkn.Sidebar.prototype.enterDocument = function() {
         if (show) {
           brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.TOGGLE_SIDEBAR,
               true);
-          this.shiftScreen(this.admin_.getElement());
-          this.currentTab_ = goog.dom.getElementByClass('admin', this.tabs_);
+          this.tabNav_(this.currentTab_, 'admin');
+          this.currentTab_ = 'admin';
           this.updateArrow_(); 
-        } else if (this.currentTab_ == goog.dom.getElementByClass('admin', this.tabs_)) {
-          this.shiftScreen(this.info_.getElement());
-          this.currentTab_ = goog.dom.getElementByClass('info', this.tabs_);
+        } else if (this.currentTab_ == 'admin') {
+          this.tabNav_('admin', 'info');
+          this.currentTab_ = 'info';
           this.updateArrow_(); 
         }
       }, this);
@@ -206,23 +222,6 @@ brkn.Sidebar.prototype.fetchAndRenderStream_ = function() {
         var activities = /** @type {Array.<Object>} */ e.target.getResponseJson();
         this.stream_ = new brkn.sidebar.Stream(activities);
         this.stream_.decorate(goog.dom.getElement('stream'));
-      }, this));
-};
-
-
-/**
- * @private
- */
-brkn.Sidebar.prototype.fetchAndRenderStarred_ = function() {
-  goog.net.XhrIo.send(
-      '/_star',
-      goog.bind(function(e) {
-        var medias = /** @type {Array.<Object>} */ e.target.getResponseJson();
-        medias = goog.array.map(medias, function(m) {
-          return new brkn.model.Media(m);
-        });
-        this.starred_ = new brkn.sidebar.MediaList(medias);
-        this.starred_.decorate(goog.dom.getElement('starred'));
       }, this));
 };
 
@@ -257,41 +256,51 @@ brkn.Sidebar.prototype.onChangeChannel_ = function(opt_channel) {
 
 
 /**
- * @param {Element} to The to element
- * @param {?boolean=} opt_left Animate left
+ * @param {string} from The from element
+ * @param {string} to The to element
+ * @suppress {uselessCode}
  */
-brkn.Sidebar.prototype.shiftScreen = function(to, opt_left) {
-  if (to == this.currentScreen_) {
-    return;
+brkn.Sidebar.prototype.tabNav_ = function(from, to) {
+  var toScreen = goog.dom.getElementByClass(to, this.contentEl_);
+  var fromIndex = goog.array.indexOf(this.tabNames_, from);
+  var toIndex = goog.array.indexOf(this.tabNames_, to);
+  window.console.log('from index:' + fromIndex);
+  window.console.log('to index: ' + toIndex);
+  var right = goog.array.indexOf(this.tabNames_, from) < toIndex;
+  window.console.log('going right? ' + right);
+  var i = right ? 0 : this.tabNames_.length - 1;
+  var condition = right ? i < this.tabNames_.length : i >= 0;
+  for (i; condition; i += right ? 1 : -1) {
+    var name = this.tabNames_[i];
+    var tab = goog.dom.getElementByClass(name, this.contentEl_);
+
+    if ((right && i > toIndex) || (!right && i < toIndex)) {
+      window.console.log('before')
+      goog.style.setStyle(tab, {
+        'left': '',
+        'right': ''
+      });
+    } else if ((right && i < toIndex) || (!right && i > toIndex)) {
+      window.console.log('after')
+      goog.style.setStyle(tab, {
+        'left': right ? '-300px' : '',
+        'right': ''
+      });
+    } else if (i == toIndex) {
+      window.console.log('Going to: ' + name);
+      goog.style.setStyle(tab, {
+        'right': right ? 0 : '',
+        'left': ''
+      });
+      break;
+    }
   }
 
-  if (opt_left) {
-    goog.style.setStyle(this.currentScreen_, {
-      'left': '',
-      'right': ''
-    });
-    goog.style.setStyle(to, {
-      'right': '',
-      'left': ''
-    });
-    goog.dom.classes.remove(this.currentScreen_, 'current');
-    goog.dom.classes.add(to, 'current');
-    this.currentScreen_ = to;
-    this.lastScreen_ = this.currentScreen_;
-  } else {
-    goog.style.setStyle(this.currentScreen_, {
-      'left': '-300px',
-      'right': ''
-    });
-    goog.style.setStyle(to, {
-      'right': 0,
-      'left': ''
-    }); 
-    this.lastScreen_ = this.currentScreen_;
-    this.currentScreen_ = to;
-    goog.dom.classes.remove(this.lastScreen_, 'current');
-    goog.dom.classes.add(this.currentScreen_, 'current');
-  }
+  this.currentTab_ = to;  
+  this.lastScreen_ = this.currentScreen_;
+  this.currentScreen_ = toScreen;
+  goog.dom.classes.remove(this.lastScreen_, 'current');
+  goog.dom.classes.add(this.currentScreen_, 'current');
 };
   
 
@@ -391,5 +400,6 @@ brkn.Sidebar.prototype.showProfile = function(user) {
  */
 brkn.Sidebar.prototype.updateArrow_ = function() {
   goog.style.setPosition(goog.dom.getElementByClass('arrow', this.toolbar_),
-      goog.style.getSize(this.currentTab_).width/2 + goog.style.getPosition(this.currentTab_).x);
+      goog.style.getSize(this.tabs_[this.currentTab_]).width/2 +
+          goog.style.getPosition(this.tabs_[this.currentTab_]).x);
 };

@@ -17,7 +17,7 @@ class Program(db.Model):
 
     for channel in channels:
       programs = [x.program for x in
-                  channel.channelPrograms.filter('time >', cutoff).order('time').fetch(100)]
+                  channel.channelPrograms.filter('time >', cutoff).order('time').fetch(None)]
       
       programming[channel.id] = [p.toJson(fetch_channel=False, media_desc=False) for p in programs]
 

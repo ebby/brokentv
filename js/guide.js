@@ -180,6 +180,13 @@ brkn.Guide.prototype.maxTime_;
 brkn.Guide.prototype.channelNameStyle_;
 
 
+/**
+ * @type {goog.fx.Dragger}
+ * @private
+ */
+brkn.Guide.prototype.dragger_;
+
+
 /** @inheritDoc */
 brkn.Guide.prototype.enterDocument = function() {
   goog.base(this, 'enterDocument');
@@ -190,9 +197,11 @@ brkn.Guide.prototype.enterDocument = function() {
   this.horizon_ = 3;
   this.width_ = goog.dom.getViewportSize().width * this.horizon_;
 
+  var throttle = new goog.Throttle(this.toggleGuide_, 1000, this);
   brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_GUIDE,
       function(show) {
-        goog.dom.classes.enable(this.getElement(), 'toggled', show);
+        this.toggleGuide_(show);
+        //throttle.fire();
       }, this);
   
   brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_SIDEBAR,
@@ -233,10 +242,10 @@ brkn.Guide.prototype.enterDocument = function() {
   this.channelNameStyle_.innerHTML = 'div#guide div.channels div.channel div.name' + '{left:'
       + startTimeOffset + 'px !important}';
 
-  var dragger = new goog.fx.Dragger(this.getElement());
+  this.dragger_ = new goog.fx.Dragger(this.getElement());
   var channelNameStyle = this.channelNameStyle_;
   var el = this.getElement();
-  dragger.defaultAction = function(x, y) {
+  this.dragger_.defaultAction = function(x, y) {
     if (x < 0 && x > (-goog.style.getSize(el).width + goog.dom.getViewportSize().width)) {
       this.target.style.left = x + 'px';
       channelNameStyle.innerHTML = 'div#guide div.channels div.channel div.name' + '{left:' + -x
@@ -280,12 +289,12 @@ brkn.Guide.prototype.enterDocument = function() {
         goog.bind(this.align_, this, true, undefined, false))
     .listen(nowLeft, goog.events.EventType.CLICK, goog.bind(this.onLeft_, this))
     .listen(nowRight, goog.events.EventType.CLICK, goog.bind(this.onRight_, this))
-    .listen(dragger,
+    .listen(this.dragger_,
         goog.fx.Dragger.EventType.BEFOREDRAG,
         goog.bind(function() {
           goog.dom.classes.add(this.getElement(), 'drag');
         }, this))
-    .listen(dragger,
+    .listen(this.dragger_,
         goog.fx.Dragger.EventType.END,
         goog.bind(function() {
           goog.dom.classes.remove(this.getElement(), 'drag');
@@ -322,16 +331,37 @@ brkn.Guide.prototype.enterDocument = function() {
   brkn.model.Player.getInstance().subscribe(brkn.model.Player.Actions.PLAY_ASYNC,
       this.playAsync_, this);
   
+  this.resize_();
   this.align_(true);
   
   if (this.isAdmin_) {
     // Don't drag when shift key is pressed...we're rescheduling a show.
-    this.getHandler().listen(dragger, goog.fx.Dragger.EventType.BEFOREDRAG, goog.bind(function(e) {
-      if (e.browserEvent.shiftKey) {
-        e.preventDefault();
-      }
-    }, this));
+    this.getHandler().listen(this.dragger_, goog.fx.Dragger.EventType.BEFOREDRAG,
+        goog.bind(function(e) {
+          if (e.browserEvent.shiftKey) {
+            e.preventDefault();
+          }
+        }, this));
   }
+};
+
+
+
+/**
+ * @param {boolean} show
+ * @private
+ */
+brkn.Guide.prototype.toggleGuide_ = function(show) {
+  goog.dom.classes.enable(this.getElement(), 'toggled', show);
+  goog.style.setHeight(this.getElement(), show ? goog.style.getSize(this.channelsEl_).height : 40);
+  goog.Timer.callOnce(goog.bind(function() {
+    goog.dom.classes.enable(this.getElement(), 'collapsed', !show);
+    this.channelsEl_.scrollTop = goog.style.getPosition(this.currentChannel_.getElement()).y;
+    this.resize_();
+  }, this), show ? 0 : 800);
+  this.align_(true, undefined, false);
+  show && this.resize_();
+  this.dragger_ && this.dragger_.setEnabled(show);
 };
 
 
@@ -477,7 +507,7 @@ brkn.Guide.prototype.align_ = function(opt_setAligned, opt_offset, opt_setScroll
     var viewWidth = goog.dom.getViewportSize().width - 
         (brkn.model.Controller.getInstance().sidebarToggled ? 300 : 0);
     if (!opt_offset && elapsed > -offset + viewWidth - 300) {
-      offset = -elapsed + viewWidth - 300;
+      offset = -elapsed + viewWidth - 350;
     }
 
     offset = Math.max(offset, -goog.style.getSize(this.getElement()).width + viewWidth)
@@ -500,6 +530,15 @@ brkn.Guide.prototype.align_ = function(opt_setAligned, opt_offset, opt_setScroll
   if (opt_offset) {
     this.updateNowButtons_();
   }
+};
+
+/**
+ * @private
+ */
+brkn.Guide.prototype.resize_ = function() {
+  var channelsHeight = goog.style.getSize(this.channelsEl_).height;
+  goog.style.setHeight(this.getElement(), goog.dom.classes.has(this.getElement(), 'collapsed') ?
+      channelsHeight : channelsHeight + 40);
 };
 
 

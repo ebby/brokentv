@@ -57,11 +57,11 @@ class Media(db.Model):
     from publisher import PublisherMedia
     
     medias = []
-    for entry in [e for e in entries if e.media.player]:
+    for entry in [e for e in entries if e.media.player and not e.noembed]:
       content_url = urlparse.urlparse(entry.media.player.url)
       id = urlparse.parse_qs(content_url.query)['v'][0]
       media = Media.get_by_key_name(MediaHost.YOUTUBE + id)
-      if not media and not entry.get('noembed'):
+      if not media:
         name = unicode(entry.media.title.text, errors='replace')
         desc = entry.media.description.text
         desc = unicode(desc, errors='replace') if desc else None
@@ -80,7 +80,7 @@ class Media(db.Model):
         publisher_name = entry.author[0].name.text
         publisher = Publisher.add(MediaHost.YOUTUBE, publisher_name)
         PublisherMedia.add(publisher, media)
-      media.put()
+        media.put()
       medias.append(media)
     return medias
 
