@@ -98,9 +98,9 @@ brkn.Main.init = function(response, channelToken, channels, programs,
   var fadeOut = new goog.fx.dom.FadeOutAndHide(goog.dom.getElement('login'), 2000, goog.fx.easing.easeIn);
   fadeOut.play();
   
-	if (!goog.object.isEmpty(currentUser)) { brkn.model.Users.getInstance().setCurrentUser(currentUser); }
-	window.console.log(channels);
-	window.console.log(programs);
+	if (!goog.object.isEmpty(currentUser)) {
+	  brkn.model.Users.getInstance().setCurrentUser(currentUser);
+	}
 	brkn.model.Channels.getInstance().loadFromJson(channels, currentUser['current_channel']);
 	brkn.model.Programs.getInstance().loadFromJson(programs);
 	brkn.model.Channels.getInstance().loadViewersFromJson(viewerSessions);

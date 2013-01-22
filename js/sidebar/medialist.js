@@ -88,16 +88,9 @@ brkn.sidebar.MediaList.prototype.decorateInternal = function(el) {
     this.getHandler().listen(mediaEl,
         goog.events.EventType.CLICK,
         goog.bind(function() {
-          var channel = brkn.model.Channels.getInstance().currentChannel;
-          this.onAddProgram_(channel, media);
+          brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.MEDIA_INFO, media);
         }, this));
   }, this);
-  
-  if (this.isAdmin_) {
-    this.dragDropGroup_.addTarget(new goog.fx.DragDrop(this.getElement()));
-    this.dragDropGroup_.init();
-    this.getHandler().listen(this.dragDropGroup_, 'drag', function(e) {window.console.log(e)});
-  }
 };
 
 

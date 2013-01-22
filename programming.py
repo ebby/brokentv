@@ -55,11 +55,10 @@ class Programming():
         
         collection = Collection(name=name,
                                 keywords=properties.get('keywords', []),
-                                lifespan=properties.get('lifespan'),
-                                yt_playlist=properties.get('yt_playlist'))
+                                lifespan=properties.get('lifespan'))
         collection.put()
         
-        for publisher in properties['publishers']:
+        for publisher in properties.get('publishers', []):
           collection_publisher = CollectionPublisher(collection=collection,
                                                      publisher=self.publishers[publisher])
           collection_publisher.put()
@@ -81,48 +80,51 @@ class Programming():
       for col_name in properties['collections']:
         col = self.collections[col_name]
         chan_col = ChannelCollection.add(channel=channel, collection=col)
-
-      # We need to generate some programming now
-      #Programming.set_programming(channel.id)
     
     # Cache the channels
     memcache.set('channels', simplejson.dumps([c.toJson() for c in self.channels.itervalues()]))
       
   @classmethod
-  def set_programming(cls, channel_id, schedule_next=True, queue='default', target=None):
+  def set_programming(cls, channel_id, duration=600, schedule_next=True,
+                      queue='default', target=None):
     channel = Channel.get_by_key_name(channel_id)
-    viewers = simplejson.loads(memcache.get('channel_viewers') or '{}').get(str(channel_id), [])
+    viewers = (memcache.get('channel_viewers') or {}).get(str(channel_id), [])
+    print viewers
     cols = channel.get_collections()
     all_medias = []
+    backup_medias = []
     for col in cols:
       medias = []
-      backup_medias = []
+      backup = []
       limit = 50
       offset = 0
       while not len(medias):
         medias = col.get_medias(limit=limit, offset=offset, last_programmed = 3200)
-        backup_medias = backup_medias if len(backup_medias) else medias
+        logging.info('MEDIAS COUNT: ' + str(len(medias)))
+        backup = backup if len(backup) else medias
         if not len(medias):
           logging.info('NO MORE MEDIA FOR: ' + col.name)
-          all_medias += backup_medias
+          backup_medias += backup
           break
         # Don't repeat the same program within an hour
         medias = [c for c in medias if not c.last_programmed or
-                 (datetime.datetime.now() - c.last_programmed).seconds > 3200]
+                 (datetime.datetime.now() - c.last_programmed).seconds > 3600]
         # At most, 30% of the audience has already "witnessed" this program
         medias = [m for m in medias if not len(viewers) or
                   float(len(Programming.have_seen(m, viewers)))/len(viewers) < .3]
         offset += limit
       all_medias += medias
     
+    if not len(all_medias):
+      all_medias = backup_medias
+    
     # StorySort algorithm
     all_medias = Programming.story_sort(all_medias)
     
     # Grab 10 minutes of programming
-    all_medias = Programming.timed_subset(all_medias, 600)
+    all_medias = Programming.timed_subset(all_medias, duration)
     
     # Find related twitter posts
-    #Programming.fetch_related_tweets(all_medias)
     deferred.defer(Programming.fetch_related_tweets, all_medias,
                    _name='twitter-' + channel.name.replace(' ', '') + '-' + str(uuid.uuid1()),
                    _queue='twitter',
@@ -130,7 +132,8 @@ class Programming():
                    _countdown=30)
     
     programs = []
-    for media in all_medias:      
+    for media in all_medias:  
+      print 'ADDING: ' + media.name + ' last: ' + str(media.last_programmed)    
       program = Program.add_program(channel, media)
       programs.append(program)
       logging.info('ADDING: ' + media.name + ' at: ' + program.time.isoformat())
@@ -145,7 +148,7 @@ class Programming():
     memcache.set('programming', simplejson.dumps(programming))
 
     # Schedule our next programming selection
-    if len(programs):
+    if schedule_next and (not constants.DEVELOPMENT or (constants.DEVELOPMENT and len(medias))):
       next_gen = (programs[-2].time - datetime.datetime.now()).seconds if len(programs) > 1 \
           else 0
       next_gen = min(next_gen,
@@ -154,8 +157,7 @@ class Programming():
       deferred.defer(Programming.set_programming, channel.key().name(),
                      _name=channel.name.replace(' ', '') + '-' + str(uuid.uuid1()),
                      _countdown=next_gen,
-                     _queue=queue,
-                     _target=target)
+                     _queue=queue)
 
     return programs
   
@@ -301,6 +303,7 @@ class StartHandler(webapp2.RequestHandler):
     if not len(channels):
       no_media = len(Media.all().fetch(10)) == 0
       Programming(no_media) # Do fetch if no media
+      channels = Channel.get_public()
     for c in channels:
       Programming.set_programming(c.key().name(), queue='programming')
     

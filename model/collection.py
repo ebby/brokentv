@@ -24,7 +24,7 @@ class Collection(db.Model):
 
     if self.keywords:
       for publisher in publishers:
-        logging.info(publisher.name)
+        logging.info('FETCHING: ' + publisher.name)
         publisher_medias = publisher.get_media_by_category(self.keywords[0])
         for media in publisher_medias:
           CollectionMedia.add(self, media, approved=(True if approve_all else None))
@@ -49,7 +49,8 @@ class Collection(db.Model):
   def get_channels(self):
     return CollectionChannel.get_channels(self)
   
-  def get_medias(self, limit, offset=0, deep=True, pending=False, last_programmed=None):
+  def get_medias(self, limit, offset=0, deep=True, pending=False,
+                 last_programmed=None, lifespan=None):
     col_medias = self.collectionMedias
     if pending:
       col_medias = col_medias.filter('approved =', Approval.PENDING)
@@ -57,14 +58,14 @@ class Collection(db.Model):
       col_medias = col_medias.filter('approved =', Approval.APPROVED)
     if self.lifespan:
       cutoff = datetime.datetime.now() - datetime.timedelta(days=self.lifespan)
-      col_medias.filter('published >', cutoff)
+      col_medias = col_medias.filter('published >', cutoff)
     
     col_medias = col_medias.order('-published').fetch(limit=limit, offset=offset)
     medias = [c_m.media for c_m in col_medias]
 
     if deep:
       for col_playlist in self.playlists.fetch(None):
-        medias += col_playlist.playlist.get_medias(limit, offset)
+        medias += col_playlist.playlist.get_medias(limit, offset, lifespan=self.lifespan)
       
       for col_col in self.collections.fetch(None):
         medias += col_col.child_col.get_medias(limit, offset)

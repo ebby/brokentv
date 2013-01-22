@@ -43,14 +43,79 @@ div.controller {
   bottom: 0;
   height: 40px;
   z-index: 100;
-  background: #5c5c5c url(/static/img/grad.png);
+  background: transparent url(/static/img/grad-window.png);
+  -webkit-transition: all 0.3s ease;
+  -moz-transition: all 0.3s ease;
+  -o-transition: all 0.3s ease;
+  -ms-transition: all 0.3s ease;
+  transition: all 0.3s ease;
   border-top: 1px solid #ccc;
+  pointer-events: none;
   -webkit-box-shadow: inset 0 -3px 7px -3px rgba(0, 0, 0, 0.2), 0 0 5px 0 rgba(0, 0, 0, 0.5);
   -moz-box-shadow: inset 0 -3px 7px -3px rgba(0, 0, 0, 0.2), 0 0 5px 0 rgba(0, 0, 0, 0.5);
   box-shadow: inset 0 -3px 7px -3px rgba(0, 0, 0, 0.2), 0 0 5px 0 rgba(0, 0, 0, 0.5);
   -webkit-transition: width .5s ease;
   -moz-transition: width .5s ease;
   transition: width .5s ease;
+}
+div.controller.window div.background {
+  opacity: 0;
+  -webkit-transition: opacity 0.3s ease;
+  -moz-transition: opacity 0.3s ease;
+  -o-transition: opacity 0.3s ease;
+  -ms-transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+div.controller.window div.left div.border,
+div.controller.window div.right div.border {
+  display: block;
+}
+div.controller div.background {
+  opacity: 1;
+  background: #5c5c5c url(/static/img/grad.png);
+  pointer-events: all;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+div.controller div.left {
+  background: #5c5c5c url(/static/img/grad.png);
+  display: inline-block;
+  position: relative;
+  width: 203px;
+  height: 100%;
+  pointer-events: all;
+}
+div.controller div.left div.border {
+  display: none;
+  width: 6px;
+  height: 100%;
+  background: url(/static/img/grad-window-left.png);
+  position: absolute;
+  right: -6px;
+  top: 0;
+}
+div.controller div.right {
+  background: #5c5c5c url(/static/img/grad.png);
+  display: inline-block;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 100px;
+  height: 100%;
+  pointer-events: all;
+}
+div.controller div.right div.border {
+  display: none;
+  width: 6px;
+  height: 100%;
+  background: url(/static/img/grad-window-right.png);
+  position: absolute;
+  left: -6px;
+  top: 0;
 }
 div.controller div.button.guide-toggle {
   position: absolute;
@@ -98,7 +163,7 @@ div.controller div.button.admin-toggle div.pending {
 }
 div.controller div.controls {
   position: absolute;
-  left: 75px;
+  left: 80px;
   top: 4px;
 }
 div.controller div.controls div.button {
@@ -140,8 +205,8 @@ div.right-grad {
 }
 div#guide {
   position: absolute;
-  bottom: 40px;
-  height: 0px;
+  bottom: 0px;
+  height: 40px;
   overflow: hidden;
   background: #f7f7f7;
   width: 100%;
@@ -156,9 +221,6 @@ div#guide.aligning div.channel div.name {
   -webkit-transition: none !important;
   -moz-transition: none !important;
   transition: none !important;
-}
-div#guide.toggled {
-  height: 230px;
 }
 div#guide.admin div.remove,
 div#guide.admin div.repos {
@@ -183,16 +245,22 @@ div#guide.faded:hover {
 }
 div#guide div.ticker {
   position: absolute;
+  top: 0;
   background: url(/static/img/ticker.png) no-repeat;
-  width: 16px;
-  height: 26px;
-  background-size: 100%;
+  margin-left: 183px;
+  width: 30px;
+  height: 45px;
+  background-position: 0 -4px;
   cursor: pointer;
   -webkit-transition: left 0.5s linear;
   -moz-transition: left 0.5s linear;
   -o-transition: left 0.5s linear;
   -ms-transition: left 0.5s linear;
   transition: left 0.5s linear;
+  z-index: 110;
+}
+div#guide.collapsed div.header div.times {
+  display: none;
 }
 div#guide div.header {
   position: absolute;
@@ -200,11 +268,6 @@ div#guide div.header {
   z-index: 100;
   width: 100%;
   font-size: 10px;
-  background: #5c5c5c url(/static/img/grad-20.png);
-  border-top: 1px solid #ccc;
-  -webkit-box-shadow: inset 0 -3px 7px -3px rgba(0, 0, 0, 0.2), 0 0 5px 1px rgba(0, 0, 0, 0.6);
-  -moz-box-shadow: inset 0 -3px 7px -3px rgba(0, 0, 0, 0.2), 0 0 5px 1px rgba(0, 0, 0, 0.6);
-  box-shadow: inset 0 -3px 7px -3px rgba(0, 0, 0, 0.2), 0 0 5px 1px rgba(0, 0, 0, 0.6);
 }
 div#guide div.header div.name {
   width: 10%;
@@ -216,11 +279,15 @@ div#guide div.header div.name {
   border-top: 1px solid #181818;
 }
 div#guide div.header div.times {
-  display: inline-block;
   width: 100%;
   position: relative;
   white-space: nowrap;
-  margin-left: 190px;
+  padding-left: 190px;
+  background: #7e7e7e url(/static/img/grad-flat.png);
+  border-top: 1px solid #ccc;
+  -webkit-box-shadow: inset 0 -3px 7px -3px rgba(0, 0, 0, 0.2), 0 0 5px 1px rgba(0, 0, 0, 0.6);
+  -moz-box-shadow: inset 0 -3px 7px -3px rgba(0, 0, 0, 0.2), 0 0 5px 1px rgba(0, 0, 0, 0.6);
+  box-shadow: inset 0 -3px 7px -3px rgba(0, 0, 0, 0.2), 0 0 5px 1px rgba(0, 0, 0, 0.6);
 }
 div#guide div.header div.times div.time {
   display: inline-block;
@@ -228,10 +295,9 @@ div#guide div.header div.times div.time {
 }
 div#guide div.header div.browse {
   width: 30px;
-  height: 21px;
+  height: 20px;
   margin-top: -1px;
-  box-shadow: inset -5px 0 1px -5px #f1f1f1, 0 0 1px #dedede;
-  background: #5c5c5c url(/static/img/grad-20.png);
+  background: #7e7e7e url(/static/img/grad-flat.png);
   border-top: 1px solid #ccc;
   font-size: 11px;
   font-family: MuseoSans700;
@@ -242,10 +308,12 @@ div#guide div.header div.browse {
 }
 div#guide div.header div.browse.left {
   border-right: 1px solid #2d3446;
+  box-shadow: inset -5px 0px 2px -5px #dedede;
   left: 0;
 }
 div#guide div.header div.browse.right {
   border-left: 1px solid #2d3446;
+  box-shadow: inset 1px 0px 2px -1px #dedede;
   right: 0;
 }
 div#guide div.header div.browse:active {
@@ -264,11 +332,66 @@ div#guide div.header div.browse.now {
 div#guide div.header div.browse.now span {
   display: inline-block;
 }
+div#guide.toggled div.channels {
+  margin-top: 22px;
+}
+div#guide.toggled div.channels div.channel div.name {
+  display: inline-block;
+}
+div#guide.toggled div.channels div.channel div.programs div.program.playing div.title {
+  color: #f5f5f5;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.6), -1px -1px 1px rgba(0, 0, 0, 0.6), -1px 1px 1px rgba(0, 0, 0, 0.6), 1px -1px 1px rgba(0, 0, 0, 0.6);
+}
+div#guide.toggled div.channels div.channel div.programs div.program.clipped:hover {
+  z-index: 1;
+  width: 200px !important;
+}
+div#guide.collapsed div.channels {
+  height: 40px;
+}
+div#guide.collapsed div.channels div.current div.channel div.programs {
+  background: #3d3d3d url(/static/img/grad.png);
+  margin-top: 5px;
+}
+div#guide.collapsed div.channels div.current div.channel div.programs div.program {
+  box-shadow: none;
+  border-radius: 0;
+  border: none;
+  border-left: 1px solid #2d3446;
+  padding-right: 10px;
+  margin-top: -1px;
+  box-shadow: inset -1px 0 1px -1px #f1f1f1, 0 0 1px #dedede;
+}
+div#guide.collapsed div.channels div.current div.channel div.programs div.program:last-child {
+  border-right: 1px solid #2d3446;
+}
+div#guide.collapsed div.channels div.current div.channel div.programs div.program div.info div.title {
+  position: relative;
+  top: 8px;
+  color: #f7f7f7;
+  font-family: MuseoSans700;
+  font-size: 11px;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.7);
+  padding-right: 0;
+  text-overflow: ellipsis;
+}
+div#guide.collapsed div.channels div.current div.channel div.programs div.program:active {
+  background: #111;
+  box-shadow: inset -1px 0 1px #000000;
+  color: #ddd;
+}
+div#guide.collapsed div.channels div.channel div.programs div.program div.thumb {
+  display: none;
+}
 div#guide div.channels {
   position: absolute;
-  padding-top: 22px;
+  margin-top: 2px;
+  -webkit-transition: padding-top 0.5s ease;
+  -moz-transition: padding-top 0.5s ease;
+  -o-transition: padding-top 0.5s ease;
+  -ms-transition: padding-top 0.5s ease;
+  transition: padding-top 0.5s ease;
   width: 100%;
-  height: 210px;
   overflow-x: hidden;
   overflow-y: scroll;
   font-size: 12px;
@@ -277,11 +400,17 @@ div#guide div.channels div.channel {
   border-bottom: 1px solid #ccc;
   position: relative;
   background: #f7f7f7;
+  overflow: hidden;
+  -webkit-transition: height 0.3s ease;
+  -moz-transition: height 0.3s ease;
+  -o-transition: height 0.3s ease;
+  -ms-transition: height 0.3s ease;
+  transition: height 0.3s ease;
 }
 div#guide div.channels div.channel div.name {
   width: 200px;
   text-align: center;
-  display: inline-block;
+  display: none;
   position: absolute;
   top: 0;
   left: 0;
@@ -356,24 +485,19 @@ div#guide div.channels div.channel div.programs div.program {
   border: 1px solid whiteSmoke;
   padding: 1px;
   cursor: pointer;
-  -webkit-transition: all 0.3s ease;
-  -moz-transition: all 0.3s ease;
-  -o-transition: all 0.3s ease;
-  -ms-transition: all 0.3s ease;
-  transition: all 0.3s ease;
+  -webkit-transition: width 0.3s ease;
+  -moz-transition: width 0.3s ease;
+  -o-transition: width 0.3s ease;
+  -ms-transition: width 0.3s ease;
+  transition: width 0.3s ease;
 }
 div#guide div.channels div.channel div.programs div.program.selected {
   border: 1px solid rgba(0, 0, 255, 0.5);
 }
-div#guide div.channels div.channel div.programs div.program.clipped:hover {
-  z-index: 1;
-  width: 200px !important;
-}
 div#guide div.channels div.channel div.programs div.program:hover div.title {
   display: block !important;
 }
-div#guide div.channels div.channel div.programs div.program:hover div.title,
-div#guide div.channels div.channel div.programs div.program.playing div.title {
+div#guide div.channels div.channel div.programs div.program:hover div.title {
   color: #f5f5f5;
   text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.6), -1px -1px 1px rgba(0, 0, 0, 0.6), -1px 1px 1px rgba(0, 0, 0, 0.6), 1px -1px 1px rgba(0, 0, 0, 0.6);
 }
@@ -386,13 +510,13 @@ div#guide div.channels div.channel div.programs div.program div.info {
 }
 div#guide div.channels div.channel div.programs div.program:hover div.thumb,
 div#guide div.channels div.channel div.programs div.program.playing div.thumb {
-  -webkit-transition: opacity 0.6s ease, background-position 4s ease-out;
-  -moz-transition: opacity 0.6s ease, background-position 4s ease-out;
-  -o-transition: opacity 0.6s ease, background-position 4s ease-out;
-  -ms-transition: opacity 0.6s ease, background-position 4s ease-out;
-  transition: opacity 0.6s ease, background-position 4s ease-out;
+  -webkit-transition: opacity 0.6s ease, background-position 3s ease-out;
+  -moz-transition: opacity 0.6s ease, background-position 3s ease-out;
+  -o-transition: opacity 0.6s ease, background-position 3s ease-out;
+  -ms-transition: opacity 0.6s ease, background-position 3s ease-out;
+  transition: opacity 0.6s ease, background-position 3s ease-out;
   -webkit-filter: none !important;
-  opacity: 1;
+  opacity: .9;
 }
 div#guide div.channels div.channel div.programs div.program.clipped:hover div.thumb,
 div#guide div.channels div.channel div.programs div.program.playing div.thumb {
@@ -406,8 +530,8 @@ div#guide div.channels div.channel div.programs div.program div.thumb {
   width: 100%;
   height: 100%;
   opacity: .2;
-  background-size: 150% auto;
-  background-position: center;
+  background-size: 110% auto;
+  background-position: 50% 37%;
   border-radius: 3px;
 }
 div#guide div.channels div.channel div.programs div.program div.thumb.fix-height {
@@ -521,9 +645,11 @@ div#guide div.channels div.channel div.viewers div.viewer {
   position: relative;
   margin-left: 6px;
   height: 25px;
-  -webkit-transition: width 1s;
-  -moz-transition: width 1s;
-  transition: width 1s;
+  -webkit-transition: width 1s ease;
+  -moz-transition: width 1s ease;
+  -o-transition: width 1s ease;
+  -ms-transition: width 1s ease;
+  transition: width 1s ease;
 }
 div#guide div.channels div.channel div.viewers div.viewer div.line {
   position: absolute;
@@ -532,6 +658,10 @@ div#guide div.channels div.channel div.viewers div.viewer div.line {
   top: 11px;
   width: 100%;
   box-shadow: 0px 1px 1px 0px rgba(255, 255, 255, 0.6);
+  display: none;
+}
+div#guide div.channels div.channel div.viewers div.viewer div.line:last-child {
+  display: inline-block;
 }
 div#guide div.channels div.channel div.viewers div.viewer div.line::before {
   content: '';
@@ -578,7 +708,7 @@ div#guide div.channels div.channel div.viewers div.viewer div.username {
 }
 div#guide div.channels .current div.name {
   background: #181818 !important;
-  box-shadow: 1px 0 3px rgba(0, 0, 0, 0.8), -3px 0px 3px 3px rgba(105, 105, 105, 0.8) !important;
+  box-shadow: 1px 0 3px rgba(0, 0, 0, 0.8), -3px 0px 3px 3px rgba(105, 105, 105, 0.8), 10px 0 55px -8px rgba(255, 255, 255, 0.7) !important;
   z-index: 2 !important;
   cursor: default !important;
 }
@@ -596,6 +726,10 @@ div#guide div.channels .current div.name:after {
   border-width: 15px;
   top: 50%;
   margin-top: -15px;
+}
+div#guide div.channels div.offline div.channel {
+  height: 0;
+  border: none;
 }
 div#guide .current div.program,
 div#guide div.program:hover {
@@ -785,16 +919,17 @@ div#sidebar {
   top: 0;
   width: 300px;
   height: 100%;
-  background: #353535 url(/static/img/LightGrey-linen.png);
+  background: #aaaaaa url(/static/img/linen-75.png);
   z-index: 100;
   border-left: 1px solid rgba(0, 0, 0, 0.7);
   overflow: hidden;
   font-family: MuseoSans300;
-  color: white;
+  color: #f5f5f5;
   text-shadow: 1px 1px 1px #181818;
   -webkit-transition: right .5s ease;
   -moz-transition: right .5s ease;
   transition: right .5s ease;
+  z-index: 110;
 }
 div#sidebar.toggled {
   right: 0px;
@@ -975,10 +1110,17 @@ div#sidebar div#sidebar-content {
   left: 0;
 }
 div#sidebar div#sidebar-content div.screen {
+  opacity: 0;
+  visibility: hidden;
+  -webkit-transition: opacity 0.5s ease-in-out;
+  -moz-transition: opacity 0.5s ease-in-out;
+  -o-transition: opacity 0.5s ease-in-out;
+  -ms-transition: opacity 0.5s ease-in-out;
+  transition: opacity 0.5s ease-in-out;
   position: absolute;
   width: 100%;
   height: 100%;
-  top: 45px;
+  top: 43px;
   right: -300px;
   overflow: hidden;
   -webkit-transition: all 0.3s ease;
@@ -999,9 +1141,12 @@ div#sidebar div#sidebar-content div.slide {
   -ms-transition: all 0.3s ease;
   transition: all 0.3s ease;
 }
-div#sidebar div#sidebar-content .current {
-  width: 100% !important;
-  right: 0 !important;
+div#sidebar div#sidebar-content div.screen.current,
+div#sidebar div#sidebar-content div.slide.current {
+  opacity: 1;
+  visibility: visible;
+  width: 100%;
+  right: 0;
 }
 div#sidebar div#sidebar-content div.media-list {
   overflow-y: scroll;
@@ -1019,61 +1164,21 @@ div#sidebar div#sidebar-content div.media-list div.list-info > div {
 }
 div#sidebar div#sidebar-content div.media-list div.list-info div.picture {
   width: 60px;
+  box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.65);
+  border-radius: 3px;
 }
 div#sidebar div#sidebar-content div.media-list div.list-info div.picture img {
   width: 60px;
   height: 60px;
-  box-shadow: 0 0 2px 1px rgba(255, 255, 255, 0.3), 0 0 1px 2px rgba(0, 0, 0, 0.7);
-  border-radius: 3px;
+  border-bottom: 1px solid rgba(204, 204, 204, 0.32);
 }
 div#sidebar div#sidebar-content div.media-list div.list-info div.description {
   font-size: 12px;
   padding-left: 10px;
 }
 div#sidebar div#sidebar-content div.media-list div.medias {
-  padding-bottom: 15px;
-}
-div#sidebar div#sidebar-content div.media-list div.media {
-  position: relative;
-  width: 278px;
-  background: rgba(255, 255, 255, 0.2);
-  border: 1px solid #888;
-  padding-bottom: 20px;
-  overflow: hidden;
-  margin-left: 10px;
-  margin-top: -1px;
-}
-div#sidebar div#sidebar-content div.media-list div.media:first-child {
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
-}
-div#sidebar div#sidebar-content div.media-list div.media:last-child {
-  border-bottom-left-radius: 3px;
-  border-bottom-right-radius: 3px;
-}
-div#sidebar div#sidebar-content div.media-list div.media img {
-  width: 28px;
-  height: 28px;
-  left: 4px;
-  top: 4px;
-  position: absolute;
-}
-div#sidebar div#sidebar-content div.media-list div.media div.title {
-  position: relative;
-  left: 37px;
-  top: 3px;
-  font-size: 13px;
-  width: 240px;
-}
-div#sidebar div#sidebar-content div.media-list div.media div.title a {
-  color: #f5f5f5;
-}
-div#sidebar div#sidebar-content div.media-list div.media div.published {
-  position: absolute;
-  bottom: 3px;
-  right: 5px;
-  font-size: 10px;
-  color: #bbb;
+  margin: 10px;
 }
 div#sidebar div.comment-input {
   visibility: hidden;
@@ -1176,12 +1281,262 @@ div#sidebar div.comment-input div.input-holder textarea {
   border-color: #CCC;
   resize: none;
   margin-left: 10px;
-  margin-top: 8px;
+  margin-top: 7px;
   margin-bottom: 5px;
 }
 div#sidebar div.info.current div.comment-input {
   visibility: visible;
   opacity: 1;
+}
+div#sidebar div.tabbed ul.tabs {
+  height: 30px;
+  width: 100%;
+  display: table;
+  table-layout: fixed;
+  border-collapse: collapse;
+  margin: 0;
+  border-bottom: 1px solid rgba(112, 108, 108, 0.7);
+}
+div#sidebar div.tabbed ul.tabs li.tab {
+  height: 100%;
+  border-right: 1px solid #ccc;
+  margin-left: -2px;
+  display: table-cell;
+  vertical-align: middle;
+  background: rgba(245, 245, 245, 0.9);
+  cursor: pointer;
+}
+div#sidebar div.tabbed ul.tabs li.tab.admin {
+  display: none;
+}
+div#sidebar div.tabbed ul.tabs li.tab:last-child {
+  border-right: none;
+}
+div#sidebar div.tabbed ul.tabs li.tab div.label {
+  text-align: center;
+  font-family: MuseoSans700;
+  font-size: 11px;
+  color: #7d7d7d;
+  text-shadow: 1px 1px 1px white;
+}
+div#sidebar div.tabbed div.content {
+  display: none;
+}
+div#sidebar div.tabbed.activity div.activity {
+  display: block;
+}
+div#sidebar div.tabbed.activity ul.tabs li.activity {
+  background: rgba(245, 245, 245, 0.6);
+}
+div#sidebar div.tabbed.starred div.starred {
+  display: block;
+}
+div#sidebar div.tabbed.starred ul.tabs li.starred {
+  background: rgba(245, 245, 245, 0.6);
+}
+div#sidebar div.list-media {
+  margin-bottom: 10px;
+  border-radius: 3px;
+  position: relative;
+  background: rgba(0, 0, 0, 0.65);
+  border: 1px solid #333;
+  box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.8);
+  color: #f5f5f5;
+  text-shadow: 1px 1px 1px #181818;
+  opacity: 0;
+  -webkit-transition: opacity 0.3s ease-in;
+  -moz-transition: opacity 0.3s ease-in;
+  -o-transition: opacity 0.3s ease-in;
+  -ms-transition: opacity 0.3s ease-in;
+  transition: opacity 0.3s ease-in;
+}
+div#sidebar div.list-media.show {
+  opacity: 1;
+}
+div#sidebar div.list-media.remove {
+  opacity: 0;
+}
+div#sidebar div.list-media:hover div.media div.preview {
+  background: -webkit-linear-gradient(top, #000000, #aaaaaa);
+  background-size: auto 100%;
+}
+div#sidebar div.list-media:hover div.media div.preview div.thumb {
+  -webkit-transition: all 0.3s ease;
+  -moz-transition: all 0.3s ease;
+  -o-transition: all 0.3s ease;
+  -ms-transition: all 0.3s ease;
+  transition: all 0.3s ease;
+  opacity: .7;
+  background-position-y: 40% !important;
+}
+div#sidebar div.list-media:hover div.media div.preview div.title,
+div#sidebar div.list-media:hover div.media div.preview div.published {
+  color: #f7f7f7;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5), -1px -1px rgba(0, 0, 0, 0.5), 1px -1px 1px rgba(0, 0, 0, 0.5), -1px 1px rgba(0, 0, 0, 0.5);
+}
+div#sidebar div.list-media:hover div.media div.preview div.approve,
+div#sidebar div.list-media:hover div.media div.preview div.remove,
+div#sidebar div.list-media:hover div.media div.preview div.repos,
+div#sidebar div.list-media:hover div.media div.preview div.play {
+  filter: invert(100%);
+  -webkit-filter: invert(100%);
+  -moz-filter: invert(100%);
+  -o-filter: invert(100%);
+  -ms-filter: invert(100%);
+}
+div#sidebar div.list-media:active {
+  margin-bottom: 11px;
+  box-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);
+}
+div#sidebar div.list-media:active div.publisher {
+  margin-bottom: 5px;
+}
+div#sidebar div.list-media div.media {
+  white-space: normal;
+  overflow: hidden;
+  vertical-align: middle;
+  height: 50px;
+  color: #999;
+  text-shadow: 1px 1px 1px white;
+  margin-top: -1px;
+  cursor: pointer;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  -webkit-transition: all 0.3s ease;
+  -moz-transition: all 0.3s ease;
+  -o-transition: all 0.3s ease;
+  -ms-transition: all 0.3s ease;
+  transition: all 0.3s ease;
+}
+div#sidebar div.list-media div.media div.preview {
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  background: #f5f5f5;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  margin-top: 1px;
+}
+div#sidebar div.list-media div.media div.preview div.thumb {
+  width: 100%;
+  height: 100%;
+  opacity: .2;
+  background-size: 150% auto;
+  background-position: center;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+div#sidebar div.list-media div.media div.preview div.title {
+  left: 5px;
+  top: 5px;
+  color: #181818;
+  text-shadow: 1px 1px 1px white;
+  height: 100%;
+  font-size: 14px;
+  line-height: 20px;
+  position: absolute;
+  overflow: hidden;
+  font-family: MuseoSans300;
+}
+div#sidebar div.list-media div.media div.preview div.title.marquee {
+  -webkit-transition: margin-left 10s linear;
+  -moz-transition: margin-left 10s linear;
+  -o-transition: margin-left 10s linear;
+  -ms-transition: margin-left 10s linear;
+  transition: margin-left 10s linear;
+}
+div#sidebar div.list-media div.media div.preview div.published {
+  position: absolute;
+  bottom: 3px;
+  font-size: 10px;
+  color: #181818;
+  left: 5px;
+}
+div#sidebar div.list-media div.media div.preview div.approve {
+  position: absolute;
+  right: 25px;
+  top: 3px;
+  width: 20px;
+  height: 20px;
+  background-image: url(/static/img/39-circle-check.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 80%;
+}
+div#sidebar div.list-media div.media div.preview div.remove {
+  position: absolute;
+  right: 5px;
+  top: 3px;
+  width: 20px;
+  height: 20px;
+  background-image: url(/static/img/31-circle-x.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 80%;
+  filter: invert(100%);
+}
+div#sidebar div.list-media div.media div.preview div.repos {
+  position: absolute;
+  right: 5px;
+  bottom: 3px;
+  width: 20px;
+  height: 20px;
+  background-image: url(/static/img/repos.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 80%;
+}
+div#sidebar div.list-media div.media div.preview div.play {
+  position: absolute;
+  right: 45px;
+  top: 3px;
+  width: 20px;
+  height: 20px;
+  background-image: url(/static/img/36-circle-play.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 80%;
+}
+div#sidebar div.list-media div.media:hover div.title {
+  color: #f5f5f5;
+  text-shadow: 0px 0px 4px black;
+}
+div#sidebar div.list-media div.publisher {
+  left: 10px;
+  top: 10px;
+  position: relative;
+  top: 3px;
+  left: 0px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid rgba(204, 204, 204, 0.32);
+  width: 100%;
+  padding: 3px;
+  font-family: MuseoSans500;
+}
+div#sidebar div.list-media div.publisher img {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  vertical-align: top;
+  border: 1px solid transparent;
+}
+div#sidebar div.list-media div.publisher div.name {
+  font-size: 11px;
+  line-height: 3px;
+  margin: 0 5px;
+  display: inline-block;
+}
+div#sidebar div.list-media div.publisher div.duration {
+  position: absolute;
+  right: 3px;
+  top: 3px;
+}
+div#sidebar div.list-media div.description,
+div#sidebar div.list-media div.duration {
+  font-size: 11px;
+  margin: 5px;
 }
 div#login {
   width: 100%;
@@ -1411,28 +1766,14 @@ div#sidebar div.info {
 div#sidebar div.info div.picture {
   display: inline-block;
   width: 300px;
-  height: 200px;
+  height: 199px;
   position: relative;
   overflow: hidden;
   background: #f5f5f5;
-  border-bottom: 1px solid rgba(75, 72, 72, 0.6);
-  box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 0.8);
-  /*
-    &:hover img {
-     -webkit-transition: opacity .6s ease, top 4s ease-out, left 4s ease-out;
-        -moz-transition: opacity .6s ease, top 4s ease-out, left 4s ease-out;
-          -o-transition: opacity .6s ease, top 4s ease-out, left 4s ease-out;
-         -ms-transition: opacity .6s ease, top 4s ease-out, left 4s ease-out;
-             transition: opacity .6s ease, top 4s ease-out, left 4s ease-out;
-      -webkit-filter: none !important;
-      opacity: 1;
-    }
-    &:hover div.title {
-      color: #f5f5f5;
-      text-shadow: 0px 0px 4px black;
-    }
-    */
+  /*box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 0.8); */
 
+  border-bottom: 1px solid #181818;
+  box-shadow: 0 0 2px 2px rgba(77, 77, 77, 0.7), 0 0 1px #5e5e5e;
 }
 div#sidebar div.info div.picture img.thumb {
   width: 100%;
@@ -1517,25 +1858,39 @@ div#sidebar div.info div.published {
 }
 div#sidebar div.info div.options {
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 2px;
+  right: -2px;
+  box-shadow: -1px 0 1px 0px rgba(200, 200, 200, 0.6);
 }
 div#sidebar div.info div.options div.button {
   display: block;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(45, 52, 70, 0.4);
   border-radius: 0;
+  box-shadow: inset 0 0 1px 1px rgba(140, 140, 140, 0.7), 0 0 1px #5e5e5e;
   margin-top: -1px;
   width: 40px;
-  height: 32px;
+  height: 33px;
   background-repeat: no-repeat;
   background-position: center;
+}
+div#sidebar div.info div.options div.button:active,
+div#sidebar div.info div.options div.button.goog-custom-button-active,
+div#sidebar div.info div.options div.button.goog-custom-button-disabled,
+div#sidebar div.info div.options div.button.goog-custom-button-checked {
+  background-color: rgba(80, 80, 80, 0.6);
 }
 div#sidebar div.info div.options div.play {
   background-image: url(/static/img/16-play@2x.png);
   background-size: auto 30%;
 }
+div#sidebar div.info div.options div.plus {
+  background-image: url(/static/img/13-plus@2x.png);
+  background-size: auto 30%;
+}
 div#sidebar div.info div.options div.star {
   background-image: url(/static/img/28-star@2x.png);
-  background-size: auto 40%;
+  background-size: auto 30%;
 }
 div#sidebar div.info div.options div.star.goog-custom-button-checked {
   background-image: url(/static/img/28-star-yellow@2x.png);
@@ -1546,23 +1901,26 @@ div#sidebar div.info div.options div.facebook {
 }
 div#sidebar div.info div.options div.twitter {
   background-image: url(/static/img/twitter.png);
-  background-size: auto 40%;
+  background-size: auto 30%;
 }
 div#sidebar div.info div.description {
   margin-top: 1px;
   width: 280px;
-  font-size: 13px;
   max-height: 60px;
   overflow: hidden;
   overflow-y: scroll;
   position: relative;
   margin-right: 5px;
-  padding: 5px 10px;
+  padding: 8px 10px;
   text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
-  background: rgba(0, 0, 0, 0.65);
-  box-shadow: inset -1px -4px 8px -4px rgba(0, 0, 0, 0.9);
-  line-height: 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.8);
+  background: rgba(0, 0, 0, 0.75);
+  /* box-shadow: inset -1px -4px 8px -4px rgba(0, 0, 0, 0.9); */
+
+  border-bottom: 1px solid rgba(24, 24, 24, 0.6);
+  box-shadow: inset 0 -1px 0px 0px #555555, inset -1px -2px 0px -1px #5e5e5e, 0px 1px 0px 1px rgba(200, 200, 200, 0.7);
+  line-height: 18px;
+  font-family: MuseoSans100;
+  font-size: 12px;
 }
 div#sidebar div.info div.viewers {
   position: relative;
@@ -1648,6 +2006,7 @@ div#sidebar div.info div.tweet-holder div.dot-nav div.dot {
   background: black;
   display: inline-block;
   margin: 10px 5px;
+  cursor: pointer;
 }
 div#sidebar div.info div.tweet-holder div.dot-nav div.dot.selected {
   background: white;
@@ -1712,10 +2071,9 @@ div#sidebar div.info div.comments-holder div.comment div.timestamp {
 div#sidebar div.stream {
   overflow-y: scroll !important;
   padding-top: 10px;
-  color: white;
-  text-shadow: 1px 1px 1px black;
   width: 100%;
-  height: 100%;
+  color: #181818;
+  text-shadow: 1px 1px 1px #f5f5f5;
 }
 div#sidebar div.stream div.spinner {
   width: 100%;
@@ -1734,7 +2092,7 @@ div#sidebar div.stream div.spinner.finished {
   height: 0;
 }
 div#sidebar div.stream div.activities {
-  padding-bottom: 45px;
+  padding-bottom: 30px;
 }
 div#sidebar div.stream div.activity {
   position: relative;
@@ -1776,10 +2134,10 @@ div#sidebar div.stream div.activity div.text {
   width: 240px;
   padding-bottom: 13px;
   margin-bottom: 15px;
-  font-family: MuseoSans700;
+  font-family: MuseoSans500;
 }
 div#sidebar div.stream div.activity div.text a {
-  color: white;
+  color: #181818;
 }
 div#sidebar div.stream div.activity div.text div.timestamp {
   font-size: 11px;
@@ -1789,95 +2147,6 @@ div#sidebar div.stream div.activity div.text div.timestamp {
 }
 div#sidebar div.stream div.medias {
   margin: 10px;
-}
-div#sidebar div.stream div.medias div.media {
-  white-space: normal;
-  overflow: hidden;
-  vertical-align: middle;
-  height: 50px;
-  color: #999;
-  text-shadow: 1px 1px 1px white;
-  box-shadow: 0px 0px 2px 0px rgba(255, 255, 255, 0.7);
-  border: 1px solid #333;
-  margin-top: -1px;
-  cursor: pointer;
-  -webkit-transition: all 0.3s ease;
-  -moz-transition: all 0.3s ease;
-  -o-transition: all 0.3s ease;
-  -ms-transition: all 0.3s ease;
-  transition: all 0.3s ease;
-}
-div#sidebar div.stream div.medias div.media:first-child {
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
-}
-div#sidebar div.stream div.medias div.media:last-child {
-  border-bottom-left-radius: 3px;
-  border-bottom-right-radius: 3px;
-  margin-bottom: 5px;
-}
-div#sidebar div.stream div.medias div.media div.preview {
-  display: inline-block;
-  width: 100%;
-  height: 100%;
-  position: relative;
-  overflow: hidden;
-  background: #ffffff -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(26, 26, 26, 0.9)), to(rgba(26, 26, 26, 0.3)));
-  border-radius: 2px;
-}
-div#sidebar div.stream div.medias div.media div.preview:hover div.title {
-  color: #f5f5f5;
-  text-shadow: 0px 0px 4px black;
-}
-div#sidebar div.stream div.medias div.media div.preview:hover div.thumb,
-div#sidebar div.stream div.medias div.media div.preview.playing div.thumb {
-  -webkit-transition: opacity 0.6s ease, background-position 2s ease-out;
-  -moz-transition: opacity 0.6s ease, background-position 2s ease-out;
-  -o-transition: opacity 0.6s ease, background-position 2s ease-out;
-  -ms-transition: opacity 0.6s ease, background-position 2s ease-out;
-  transition: opacity 0.6s ease, background-position 2s ease-out;
-  opacity: 1;
-  -webkit-filter: none;
-}
-div#sidebar div.stream div.medias div.media div.preview:hover div.title,
-div#sidebar div.stream div.medias div.media div.preview:hover div.published {
-  color: #f5f5f5;
-  text-shadow: 0px 0px 4px black;
-}
-div#sidebar div.stream div.medias div.media div.preview div.thumb {
-  width: 100%;
-  height: 100%;
-  opacity: .5;
-  background-size: 100% auto;
-  background-position: center;
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
-  -webkit-filter: grayscale(100%);
-}
-div#sidebar div.stream div.medias div.media div.preview div.title {
-  left: 5px;
-  top: 5px;
-  color: white;
-  text-shadow: 1px 1px 1px black;
-  height: 35px;
-  font-size: 14px;
-  white-space: nowrap;
-  width: 100%;
-  text-overflow: ellipsis;
-  position: absolute;
-  overflow: hidden;
-  margin-right: 25px;
-}
-div#sidebar div.stream div.medias div.media div.preview div.title.marquee {
-  -webkit-transition: margin-left 10s linear;
-  -moz-transition: margin-left 10s linear;
-  -o-transition: margin-left 10s linear;
-  -ms-transition: margin-left 10s linear;
-  transition: margin-left 10s linear;
-}
-div#sidebar div.stream div.medias div.media:hover div.title {
-  color: #f5f5f5;
-  text-shadow: 0px 0px 4px black;
 }
 div#sidebar div.admin {
   margin-top: -2px;
@@ -1988,39 +2257,7 @@ div#sidebar div.admin div.collections div.collection div.pending {
 div#sidebar div#admin-list {
   overflow-y: scroll !important;
 }
-div#sidebar div#admin-list div.tabbed ul.tabs {
-  height: 30px;
-  width: 100%;
-  display: table;
-  table-layout: fixed;
-  border-collapse: collapse;
-  margin: 0;
-  border-bottom: 1px solid rgba(112, 108, 108, 0.7);
-}
-div#sidebar div#admin-list div.tabbed ul.tabs li.tab {
-  height: 100%;
-  border-right: 1px solid rgba(112, 108, 108, 0.7);
-  margin-left: -2px;
-  display: table-cell;
-  vertical-align: middle;
-  background: rgba(245, 245, 245, 0.9);
-  cursor: pointer;
-}
-div#sidebar div#admin-list div.tabbed ul.tabs li.tab.admin {
-  display: none;
-}
-div#sidebar div#admin-list div.tabbed ul.tabs li.tab:last-child {
-  border-right: none;
-}
-div#sidebar div#admin-list div.tabbed ul.tabs li.tab div.label {
-  text-align: center;
-  font-family: MuseoSans700;
-  font-size: 11px;
-  color: #7d7d7d;
-  text-shadow: 1px 1px 1px white;
-}
 div#sidebar div#admin-list div.tabbed div.content {
-  display: none;
   margin: 10px;
 }
 div#sidebar div#admin-list div.tabbed.pending div.pending {
@@ -2081,197 +2318,16 @@ div#sidebar div#admin-list div.list-info div.description {
   font-size: 12px;
   padding-left: 10px;
 }
-div#sidebar div#admin-list div.admin-media {
-  margin-bottom: 10px;
-  border-radius: 3px;
-  position: relative;
-  background: rgba(0, 0, 0, 0.65);
-  border: 1px solid #333;
-  box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.8);
-  opacity: 0;
-  -webkit-transition: opacity 0.3s ease-in;
-  -moz-transition: opacity 0.3s ease-in;
-  -o-transition: opacity 0.3s ease-in;
-  -ms-transition: opacity 0.3s ease-in;
-  transition: opacity 0.3s ease-in;
-}
-div#sidebar div#admin-list div.admin-media.show {
-  opacity: 1;
-}
-div#sidebar div#admin-list div.admin-media.remove {
-  opacity: 0;
-}
-div#sidebar div#admin-list div.admin-media:hover div.thumb,
-div#sidebar div#admin-list div.admin-media.playing div.thumb {
-  -webkit-transition: opacity 0.6s ease;
-  -moz-transition: opacity 0.6s ease;
-  -o-transition: opacity 0.6s ease;
-  -ms-transition: opacity 0.6s ease;
-  transition: opacity 0.6s ease;
-  opacity: 1;
-}
-div#sidebar div#admin-list div.admin-media:hover div.title,
-div#sidebar div#admin-list div.admin-media:hover div.published {
-  color: #f5f5f5;
-  text-shadow: 0px 0px 4px black;
-}
-div#sidebar div#admin-list div.admin-media:hover div.approve,
-div#sidebar div#admin-list div.admin-media:hover div.remove,
-div#sidebar div#admin-list div.admin-media:hover div.repos,
-div#sidebar div#admin-list div.admin-media:hover div.play {
-  filter: invert(100%);
-  -webkit-filter: invert(100%);
-  -moz-filter: invert(100%);
-  -o-filter: invert(100%);
-  -ms-filter: invert(100%);
-}
-div#sidebar div#admin-list div.admin-media div.thumb {
-  width: 100%;
-  height: 100%;
-  opacity: .2;
-  background-size: 150% auto;
-  background-position: center;
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
-}
-div#sidebar div#admin-list div.admin-media div.title {
-  left: 5px;
-  top: 5px;
-  color: #181818;
-  text-shadow: 1px 1px 1px white;
-  height: 30px;
-  font-size: 14px;
-  position: absolute;
-  overflow: hidden;
+div#sidebar div#admin-list div.list-media div.media div.preview div.title {
   margin-right: 60px;
-  font-family: MuseoSans500;
+  height: 30px;
+  line-height: 14px;
 }
-div#sidebar div#admin-list div.admin-media div.title.marquee {
-  -webkit-transition: margin-left 10s linear;
-  -moz-transition: margin-left 10s linear;
-  -o-transition: margin-left 10s linear;
-  -ms-transition: margin-left 10s linear;
-  transition: margin-left 10s linear;
+div#sidebar div#sidebar-content div.screen.profile {
+  overflow-y: scroll;
 }
-div#sidebar div#admin-list div.admin-media div.published {
-  position: absolute;
-  bottom: 3px;
-  font-size: 10px;
-  color: #181818;
-  left: 5px;
-}
-div#sidebar div#admin-list div.media {
-  white-space: normal;
-  overflow: hidden;
-  vertical-align: middle;
-  height: 50px;
-  color: #999;
-  text-shadow: 1px 1px 1px white;
-  margin-top: -1px;
-  cursor: pointer;
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
-  -webkit-transition: all 0.3s ease;
-  -moz-transition: all 0.3s ease;
-  -o-transition: all 0.3s ease;
-  -ms-transition: all 0.3s ease;
-  transition: all 0.3s ease;
-}
-div#sidebar div#admin-list div.media div.preview {
-  display: inline-block;
-  width: 100%;
-  height: 100%;
-  position: relative;
-  overflow: hidden;
-  background: #f5f5f5;
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
-  margin-top: 1px;
-}
-div#sidebar div#admin-list div.media div.preview div.approve {
-  position: absolute;
-  right: 25px;
-  top: 3px;
-  width: 20px;
-  height: 20px;
-  background-image: url(/static/img/39-circle-check.png);
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 80%;
-}
-div#sidebar div#admin-list div.media div.preview div.remove {
-  position: absolute;
-  right: 5px;
-  top: 3px;
-  width: 20px;
-  height: 20px;
-  background-image: url(/static/img/31-circle-x.png);
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 80%;
-  filter: invert(100%);
-}
-div#sidebar div#admin-list div.media div.preview div.repos {
-  position: absolute;
-  right: 5px;
-  bottom: 3px;
-  width: 20px;
-  height: 20px;
-  background-image: url(/static/img/repos.png);
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 80%;
-}
-div#sidebar div#admin-list div.media div.preview div.play {
-  position: absolute;
-  right: 45px;
-  top: 3px;
-  width: 20px;
-  height: 20px;
-  background-image: url(/static/img/36-circle-play.png);
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 80%;
-}
-div#sidebar div#admin-list div.media:hover div.title {
-  color: #f5f5f5;
-  text-shadow: 0px 0px 4px black;
-}
-div#sidebar div#admin-list div.publisher {
-  left: 10px;
-  top: 10px;
-  border-radius: 3px;
-  position: relative;
-  top: 3px;
-  left: 0px;
-  margin-bottom: 5px;
-  border-bottom: 1px solid rgba(204, 204, 204, 0.32);
-  width: 100%;
-  padding: 3px;
-  font-family: MuseoSans500;
-}
-div#sidebar div#admin-list div.publisher img {
-  width: 22px;
-  height: 22px;
-  border-radius: 6px;
-  vertical-align: top;
-  border: 1px solid transparent;
-}
-div#sidebar div#admin-list div.publisher div.name {
-  font-size: 11px;
-  line-height: 3px;
-  margin: 0 5px;
-  display: inline-block;
-}
-div#sidebar div#admin-list div.publisher div.duration {
-  position: absolute;
-  right: 3px;
-  top: 3px;
-}
-div#sidebar div#admin-list div.description,
-div#sidebar div#admin-list div.duration {
-  font-size: 11px;
-  margin: 5px;
+div#sidebar div#sidebar-content div.screen.profile div.content.starred {
+  margin: 10px;
 }
 @font-face {
   font-family: 'MuseoSans100';

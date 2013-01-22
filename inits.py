@@ -114,7 +114,6 @@ COLLECTIONS = {
                    'The Weather Channel',
                    'CNN',
                    'Vice',
-                   'Town Square',
                    'Slate',
                    'New Left Media',
                    'BuzzFeed',
@@ -143,7 +142,7 @@ COLLECTIONS = {
     'keywords': ['News'],
     'publishers': ['Vice'],
     'playlists': ['Vice Interviews'],
-    'lifespan': 365
+    'lifespan': 3
   },
 }
 

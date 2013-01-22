@@ -60,12 +60,19 @@ def get_session(current_user):
     UserSession.new(current_user, current_channel)
   
   # Track current viewers by channel, useful for audience catering
-  channel_viewers = simplejson.loads(memcache.get('channel_viewers') or '{}')
+  channel_viewers = memcache.get('channel_viewers') or {}
   if not channel_viewers.get(current_channel.id) or \
       current_user.id not in channel_viewers[current_channel.id]:
-    channel_viewers[current_channel.id] = \
-        channel_viewers.get(current_channel.id, []) + [current_user.id]
-    memcache.set('channel_viewers', simplejson.dumps(channel_viewers))
+    client = memcache.Client()
+    for i in range(3): # Retry loop
+      channel_viewers = client.gets('channel_viewers') or {}
+      channel_viewers[current_channel.id] = \
+          channel_viewers.get(current_channel.id, []) + [current_user.id]
+      set = client.cas('channel_viewers', channel_viewers)
+      if set:
+         break
+    if not set:
+      memcache.set('channel_viewers', channel_viewers)
 
   # Grab sessions for current_users (that we care about)
   viewer_sessions = []
@@ -91,12 +98,9 @@ class SessionHandler(BaseHandler):
 class ProgramHandler(BaseHandler):
     def post(self):
       channel = Channel.get_by_key_name(self.request.get('channel_id'))
-      logging.info(channel.id)
-      logging.info(channel.id == self.current_user.id)
       if channel and channel.id == self.current_user.id:
         media = Media.get_by_key_name(self.request.get('media_id'))
         program = Program.add_program(channel, media)
-        logging.info(str(program.toJson(False)))
         self.response.out.write(simplejson.dumps(program.toJson(False)))
       
 class CommentHandler(BaseHandler):
@@ -150,15 +154,13 @@ class ChangeChannelHandler(BaseHandler):
         channel = Channel(key_name=self.current_user.id, name=name, privacy=Privacy.PRIVATE,
                           user=self.current_user)
         channel.put()
-      channel_viewers = simplejson.loads(memcache.get('channel_viewers') or '{}')
+      channel_viewers = memcache.get('channel_viewers') or {}
 
       user_sessions = UserSession.get_by_user(self.current_user)
+      remove_user = False
       if len(user_sessions):
         last_channel_id = user_sessions[0].channel.id
-        
-        # Remove user from channel
-        if self.current_user.id in channel_viewers.get(last_channel_id, []):
-            channel_viewers[last_channel_id].remove(self.current_user.id)
+        remove_user = True
         
         if (datetime.datetime.now() - user_sessions[0].tune_in).seconds < 30:
           if len(user_sessions) > 1 and user_sessions[1].channel == channel:
@@ -182,9 +184,19 @@ class ChangeChannelHandler(BaseHandler):
 
         # New session for new channel
         session = UserSession.new(self.current_user, channel)
+        
         # Track current viewers by channel, useful for audience catering
-        channel_viewers[channel_id] = channel_viewers.get(channel_id, []) + [self.current_user.id] 
-        memcache.set('channel_viewers', simplejson.dumps(channel_viewers))  
+        client = memcache.Client()
+        for i in range(3):
+          channel_viewers = client.gets('channel_viewers') or {}
+          if remove_user and self.current_user.id in channel_viewers.get(last_channel_id, []):
+            # Remove user from channel
+            channel_viewers[last_channel_id].remove(self.current_user.id)
+          channel_viewers[channel_id] = channel_viewers.get(channel_id, []) + [self.current_user.id]
+          set = client.cas('channel_viewers', channel_viewers)
+        if not set:
+          memcache.set('channel_viewers', channel_viewers)
+        
         # Track the media opt-in behavior
         current_program = channel.get_current_program()
         if current_program:

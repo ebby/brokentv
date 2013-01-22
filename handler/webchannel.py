@@ -19,7 +19,7 @@ class WebChannelDisconnectedHandler(BaseHandler):
     memcache.set('web_channels', simplejson.dumps(web_channels))
 
     current_viewers = simplejson.loads(memcache.get('current_viewers') or '{}')
-    channel_viewers = simplejson.loads(memcache.get('channel_viewers') or '{}')
+    channel_viewers = memcache.get('channel_viewers') or {}
     if clientId in current_viewers:
       user = User.get_by_key_name(clientId)
 
@@ -33,5 +33,12 @@ class WebChannelDisconnectedHandler(BaseHandler):
 
       if channel_viewers.get(user_sessions[0].channel.id) and \
           clientId in channel_viewers[user_sessions[0].channel.id]:
-        channel_viewers[user_sessions[0].channel.id].remove(clientId)
-        memcache.set('channel_viewers', simplejson.dumps(channel_viewers))
+        client = memcache.Client()
+        for i in range(3):
+          channel_viewers = client.gets('channel_viewers')
+          channel_viewers[user_sessions[0].channel.id].remove(clientId)
+          set = client.cas('channel_viewers', channel_viewers)
+          if set:
+            break
+        if not set:
+          memcache.set('channel_viewers', channel_viewers)

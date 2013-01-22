@@ -56,22 +56,15 @@ class Program(db.Model):
   def reschedule(self, new_time):
     effected = Program.all().filter('channel =', self.channel).filter('time >=', min(self.time, new_time)) \
         .order('time').fetch(1000)
-    logging.info(new_time)
-    logging.info(self.time)
-    logging.info('TIMES')
     for i, program in enumerate(effected):
-      logging.info(program.time)
       if program.key().id() == self.key().id():
         continue
       if self.time < program.time <= new_time:
-        logging.info('HERE AND SHOULD NOT BE')
         program.time = program.time - datetime.timedelta(seconds=self.media.duration)
         program.put()
       elif new_time <= program.time < self.time:
-        logging.info('HERE AND SHOULD BE')
         program.time = program.time + datetime.timedelta(seconds=self.media.duration)
         program.put()
-      logging.info(program.time)
     self.time = new_time
     self.put()
     return effected

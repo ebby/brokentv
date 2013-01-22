@@ -151,15 +151,10 @@ brkn.Popup.prototype.onProgramInput_ = function(channel, e) {
 	var contentEl = goog.dom.getElementByClass('select-content', this.getElement());
 	try {
 		var video = goog.ui.media.YoutubeModel.newInstance(this.suggestInput_.getValue());
-		goog.net.XhrIo.send(
-				'https://gdata.youtube.com/feeds/api/users/bbc/uploads?alt=json',
-				goog.bind(function(e){
-					window.console.log(goog.json.parse(e.target.getResponse()));
-				}, this));
+
 		goog.net.XhrIo.send(		
 				goog.string.subs(brkn.Popup.YOUTUBE_DATA, video.getVideoId()),
 				goog.bind(function(e){
-					window.console.log(goog.json.parse(e.target.getResponse()));
 					var entry = goog.json.parse(e.target.getResponse())['entry'];
 					var title = entry['title']['$t'];
 					var thumb = entry['media$group']['media$thumbnail'][0]['url'];

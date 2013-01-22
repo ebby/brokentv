@@ -37,8 +37,6 @@ class StreamListener(object):
         Override this method if you wish to manually handle
         the stream data. Return False to stop stream and close connection.
         """
-        logging.info('ON DATA')
-        
         if 'in_reply_to_status_id' in data:
             status = Status.parse(self.api, json.loads(data))
             if self.on_status(status) is False:
@@ -118,17 +116,14 @@ class Stream(object):
                 conn.request('POST', self.url, self.body, headers=self.headers)
                 resp = conn.getresponse()
                 if resp.status != 200:
-                    logging.info('TWITTER NOT 200')
                     if self.listener.on_error(resp.status) is False:
                         break
                     error_counter += 1
                     sleep(self.retry_time)
                 else:
-                    logging.info('TWITTER CONNECTION ESTABLISHED')
                     error_counter = 0
                     self._read_loop(resp)
             except timeout:
-                logging.error('TIMEOUT')
                 if self.listener.on_timeout() == False:
                     break
                 if self.running is False:
@@ -136,7 +131,6 @@ class Stream(object):
                 conn.close()
                 sleep(self.snooze_time)
             except Exception, exception:
-                logging.error('EXCEPTION')
                 # any other exception is fatal, so kill loop
                 break
 

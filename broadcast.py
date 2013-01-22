@@ -34,7 +34,7 @@ def broadcastNewActivity(activity):
   response['activity'] = activity.toJson()
   channels = simplejson.loads(memcache.get('web_channels') or '{}')
   for client in channels.iterkeys():
-    if client in activity.acl:
+    if client in activity.acl or client == activity.user.id:
       webchannel.send_message(client, simplejson.dumps(response))
     
 def broadcastProgramChanges(channel, programs):

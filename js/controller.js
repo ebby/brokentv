@@ -61,11 +61,15 @@ brkn.Controller.prototype.enterDocument = function() {
   goog.style.showElement(this.adminToggle_.getElement(),
       brkn.model.Users.getInstance().currentUser.accessLevel == brkn.model.User.AccessLevel.ADMIN);
 
+  var guideThrottle = new goog.Throttle(this.toggleGuide_, 1000, this);
+  
   this.getHandler()
       .listen(window, 'resize', goog.bind(this.resize, this))
   		.listen(this.guideToggle_,
   				goog.ui.Component.EventType.ACTION,
-  				goog.bind(this.toggleGuide_, this))
+  				goog.bind(function() {
+  				  guideThrottle.fire();
+  				}, this))
   	  .listen(this.sidebarToggle_,
   	      goog.ui.Component.EventType.ACTION,
   	      goog.bind(function(e) {

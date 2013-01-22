@@ -57,6 +57,12 @@ brkn.Player.prototype.enterDocument = function() {
   
   brkn.model.Channels.getInstance().subscribe(brkn.model.Channels.Actions.CHANGE_CHANNEL,
 			this.changeChannel, this);
+  brkn.model.Channels.getInstance().subscribe(brkn.model.Channels.Actions.NEXT_PROGRAM,
+      function(program) {
+        this.currentProgram_ = program;
+        this.playProgram(program);
+        this.updateStagecover_();
+      }, this);
   brkn.model.Player.getInstance().subscribe(brkn.model.Player.Actions.PLAY_ASYNC,
       this.playAsync_, this);
   brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_SIDEBAR,
@@ -184,9 +190,8 @@ brkn.Player.prototype.playerStateChange_ = function(event) {
 	  
 	  var nextProgram = brkn.model.Channels.getInstance().currentChannel.getCurrentProgram();
 	  if (nextProgram) {
-      brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.NEXT_PROGRAM, nextProgram);
-      this.currentProgram_ = nextProgram;
-      this.playProgram(nextProgram);
+      brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.NEXT_PROGRAM,
+          nextProgram);
     } else {
       brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.CHANGE_CHANNEL,
           brkn.model.Channels.getInstance().findOnline());
@@ -219,7 +224,7 @@ brkn.Player.prototype.onPlayerReady_ = function(event) {
  * @param {Event} event
  */
 brkn.Player.prototype.onPlayerError_ = function(event) {
-  window.console.log(event);
+  goog.DEBUG && window.console.log(event);
 };
 
 

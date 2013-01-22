@@ -18,6 +18,11 @@ brkn.model.Clock = function() {
 	this.clock = new goog.Timer(1000);
 	
 	/**
+   * @type {goog.Timer}
+   */
+  this.timestampClock = new goog.Timer(30000);
+	
+	/**
 	 * @type {Array.<Object>}
 	 */
 	this.timestamps = [];
@@ -31,8 +36,9 @@ goog.addSingletonGetter(brkn.model.Clock);
  */
 brkn.model.Clock.prototype.init = function() {
 	this.clock.start();
+	this.timestampClock.start();
 	
-	goog.events.listen(this.clock, goog.Timer.TICK, goog.bind(function() {
+	goog.events.listen(this.timestampClock, goog.Timer.TICK, goog.bind(function() {
 	  goog.array.forEach(this.timestamps, function(timestamp) {
 	    goog.dom.setTextContent(timestamp.element,
 	        goog.date.relative.format(timestamp.time.getTime()));

@@ -77,7 +77,10 @@ brkn.sidebar.Stream.prototype.decorateInternal = function(el) {
     this.addActivity_(activity)
   }, this);
   brkn.model.Users.getInstance().subscribe(brkn.model.Users.Action.NEW_ACTIVITY, function(activity) {
-    this.addActivity_(activity, true)
+    if (this.uid_ == activity.user.id ||
+        (!this.uid_ && activity.user.id != brkn.model.Users.getInstance().currentUser.id)) {
+      this.addActivity_(activity, true);
+    }
   }, this);
   
   this.getHandler().listen(this.getElement(), goog.events.EventType.SCROLL, goog.bind(function(e) {

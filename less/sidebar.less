@@ -4,12 +4,12 @@ div#sidebar {
   top: 0;
   width: 300px;
   height: 100%;
-  background: #aaa url(/static/img/LightGrey-linen.png);
+  background: #aaa url(/static/img/linen-75.png);
   z-index: 100;
   border-left: 1px solid rgba(0, 0, 0, .7);
   overflow: hidden;
   font-family: MuseoSans300;
-  color: white;
+  color: #f5f5f5;
   text-shadow: 1px 1px 1px #181818;
   -webkit-transition: right .5s ease;
      -moz-transition: right .5s ease;
@@ -231,11 +231,13 @@ div#sidebar {
         }
         div.picture{
           width: 60px;
+          box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.8);
+          background: rgba(0, 0, 0, 0.65);
+          border-radius: 3px;
           img {
             width: 60px;
             height: 60px;
-            box-shadow: 0 0 2px 1px rgba(255, 255, 255, .3), 0 0 1px 2px rgba(0, 0, 0, 0.7);
-            border-radius: 3px;
+            border-bottom: 1px solid rgba(204, 204, 204, 0.32);
           }
         }
         div.description {
@@ -244,49 +246,7 @@ div#sidebar {
         }
       }
       div.medias {
-        padding-bottom: 15px;
-      }
-      div.media {
-        position: relative;
-        width: 278px;
-        background: rgba(255, 255, 255, 0.2);
-        border: 1px solid #888;
-        padding-bottom: 20px;
-        overflow: hidden;
-        margin-left: 10px;
-        margin-top: -1px;
-        &:first-child {
-          border-top-left-radius: 3px;
-          border-top-right-radius: 3px;
-        }
-        &:last-child {
-          border-bottom-left-radius: 3px;
-          border-bottom-right-radius: 3px;
-        }
-        img {
-          width: 28px;
-          height: 28px;
-          left: 4px;
-          top: 4px;
-          position: absolute;
-        }
-        div.title {
-          a {
-            color: #f5f5f5;
-          }
-          position: relative;
-          left: 37px;
-          top: 3px;
-          font-size: 13px;
-          width: 240px;
-        }
-        div.published {
-          position: absolute;
-          bottom: 3px;
-          right: 5px;
-          font-size: 10px;
-          color: #bbb;
-        }
+        margin: 10px;
       }
     }
   }
@@ -385,7 +345,7 @@ div#sidebar {
         border-color: #CCC;
         resize: none;
         margin-left: 10px;
-        margin-top: 8px;
+        margin-top: 7px;
         margin-bottom: 5px;
       }
     }
@@ -455,6 +415,8 @@ div#sidebar {
     background: rgba(0, 0, 0, 0.65);
     border: 1px solid #333;
     box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.8);
+    color: #f5f5f5;
+    text-shadow: 1px 1px 1px #181818;
     opacity: 0;
     .transition(opacity, .3s, ease-in);
     &.show {
@@ -484,6 +446,13 @@ div#sidebar {
           -o-filter: invert(100%);
           -ms-filter: invert(100%);
         }
+      }
+    }
+    &:active {
+      margin-bottom: 11px;
+      box-shadow: 0 1px 1px rgba(255,255,255,.2);
+      div.publisher {
+        margin-bottom: 5px;
       }
     }
     div.media {
@@ -589,14 +558,14 @@ div#sidebar {
         color: #f5f5f5;
         text-shadow: 0px 0px 4px black;
       }
-    } 
+    }
     div.publisher {
       left: 10px;
       top: 10px;
       position: relative;
       top: 3px;
       left: 0px;
-      margin-bottom: 5px;
+      margin-bottom: 6px;
       border-bottom: 1px solid rgba(204, 204, 204, 0.32);
       width: 100%;
       padding: 3px;

@@ -359,7 +359,7 @@ brkn.Channel.prototype.addProgram = function(program) {
     	  }
     	  if (!this.adminMode_) {
     	    goog.style.setStyle(img, 'background-position-y', program.media.thumbPos +
-    	        15 * Math.max(program.media.thumbSize.width/programWidth, 1) + '%');
+    	        10 * Math.max(program.media.thumbSize.width/programWidth, 1) + '%');
     	  }
     	})
     	.listen(programEl, goog.events.EventType.MOUSEOUT, function() {
@@ -443,8 +443,9 @@ brkn.Channel.prototype.onRescheduleProgram_ = function(programId, newTime) {
  * @param {brkn.model.Session} session The session to display
  */
 brkn.Channel.prototype.addViewer = function(session) {
-  window.console.log('ADD VIEWER');
-  window.console.log(session);
+  if (brkn.model.Users.getInstance().currentUser.id == session.user.id && !goog.DEBUG) {
+    return;
+  }
 	var userEl = this.viewers_[session.user.id];
 	if (!userEl) {
 		userEl = goog.dom.createDom('div', 'viewer');
@@ -525,7 +526,7 @@ brkn.Channel.prototype.update = function() {
 
   // Update viewers
 	goog.object.forEach(this.getModel().viewerSessions, function(session) {
-		if (this.getModel().getCurrentProgram() && !session.tuneOut) {
+		if (this.getModel().getCurrentProgram() && !session.tuneOut && this.viewers_[session.user.id]) {
 			var tuneInTime = Math.max(session.tuneIn.getTime(), this.minTime_.getTime());
 			var width = goog.style.getSize(this.programsEl_).width;
 			var elapsed = (goog.now() - tuneInTime)/1000 * this.pixelsPerSecond_;

@@ -58,7 +58,6 @@ class Publisher(db.Model):
       gdata.alt.appengine.run_on_appengine(yt_service)
 
       if not self.last_fetch or datetime.datetime.now() - self.last_fetch > datetime.timedelta(hours=3):
-        logging.info(self.host_id)
         try:
           user_entry = yt_service.GetYouTubeUserEntry(username=self.host_id)
         except Exception as e:

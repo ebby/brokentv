@@ -221,6 +221,7 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
           goog.bind(function(e) {
             if (goog.dom.classes.has(e.target, 'dot')) {
               this.toDot_(e.target);
+              tweetTimer.stop();
             }
           }, this))
       .listen(tweetTimer,

@@ -77,11 +77,9 @@ class AddToCollectionHandler(BaseHandler):
       url = self.request.get('url')
       if col:
         response = {}
-        logging.info(url)
         parsed_url = urlparse.urlparse(url)
         host = parsed_url.hostname
         qs = urlparse.parse_qs(parsed_url.query)
-        logging.info(qs)
         if 'list' in qs:
           response['type'] = 'playlist'
           playlist = Playlist.add_from_url(url)
@@ -91,7 +89,6 @@ class AddToCollectionHandler(BaseHandler):
           response['type'] = 'media'
           media = Media.add_from_url(url)
           cm = CollectionMedia.add(col, media)
-          logging.info(cm)
           response['data'] = media.toJson()
         self.response.out.write(simplejson.dumps(response))
 
@@ -108,7 +105,6 @@ class CollectionMediaHandler(BaseHandler):
       col = Collection.get_by_id(int(col_id))
       pending = self.request.get('pending') == '1'
       offset = self.request.get('offset') or 0
-      logging.info(offset);
       res = {}
       res['medias'] = [m.toJson() for m in col.get_medias(20, pending=pending, offset=int(offset))]
       res['playlists'] = [p.toJson() for p in col.get_playlists()]
@@ -121,6 +117,20 @@ class CollectionMediaHandler(BaseHandler):
       col_media = col.collectionMedias.filter('media =', media).get()
       if col_media and approve is not None:
         col_media.approve(approve)
+        
+class SetProgrammingHandler(BaseHandler):
+    def get(self):
+      if not self.current_user.id in constants.SUPER_ADMINS:
+        return
+      channel_name = self.request.get('channel')
+      duration = self.request.get('duration') or 600
+      if channel_name:
+        channels = Channel.all().filter('name =', channel_name).fetch(1)
+      else:
+        channels = Channel.get_public()
+      for channel in channels:
+        Programming.set_programming(channel.id, duration=int(duration), schedule_next=False)
+        
 
 class AdminRemoveProgramHandler(BaseHandler):
     def post(self):

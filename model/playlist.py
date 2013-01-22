@@ -57,12 +57,15 @@ class Playlist(db.Model):
     if playlist_media:
       playlist_media.delete()
   
-  def get_medias(self, limit, offset=0, pending=False, last_programmed=None):
+  def get_medias(self, limit, offset=0, pending=False, last_programmed=None, lifespan=None):
     medias = self.medias
     if pending:
       medias = medias.filter('approved =', Approval.PENDING)
     else:
       medias = medias.filter('approved =', Approval.APPROVED)
+    if lifespan:
+      cutoff = datetime.datetime.now() - datetime.timedelta(days=lifespan)
+      medias = medias.filter('published >', cutoff)
     
     medias = medias.order('-published').fetch(limit=limit, offset=offset)
     medias = [p_m.media for p_m in medias]

@@ -65,7 +65,7 @@ brkn.model.Media = function(media) {
 	/**
    * @type {number|string}
    */
-  this.thumbPos = media['thumb_pos'] || 50;
+  this.thumbPos = media['thumb_pos'] || 37;
 
 	/**
    * @type {Array.<brkn.model.Comment>}

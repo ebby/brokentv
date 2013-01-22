@@ -187,6 +187,13 @@ brkn.Guide.prototype.channelNameStyle_;
 brkn.Guide.prototype.dragger_;
 
 
+/**
+ * @type {number}
+ * @private
+ */
+brkn.Guide.prototype.controllerHeight_;
+
+
 /** @inheritDoc */
 brkn.Guide.prototype.enterDocument = function() {
   goog.base(this, 'enterDocument');
@@ -196,12 +203,11 @@ brkn.Guide.prototype.enterDocument = function() {
   this.channelsEl_ = goog.dom.getElement('channels');
   this.horizon_ = 3;
   this.width_ = goog.dom.getViewportSize().width * this.horizon_;
+  this.controllerHeight_ = goog.style.getSize(goog.dom.getElement('controller')).height;
 
-  var throttle = new goog.Throttle(this.toggleGuide_, 1000, this);
   brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_GUIDE,
       function(show) {
         this.toggleGuide_(show);
-        //throttle.fire();
       }, this);
   
   brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_SIDEBAR,
@@ -352,8 +358,11 @@ brkn.Guide.prototype.enterDocument = function() {
  * @private
  */
 brkn.Guide.prototype.toggleGuide_ = function(show) {
+  var height = Math.min(this.channelsEl_.scrollHeight, 210);
   goog.dom.classes.enable(this.getElement(), 'toggled', show);
-  goog.style.setHeight(this.getElement(), show ? goog.style.getSize(this.channelsEl_).height : 40);
+  goog.style.setHeight(this.channelsEl_, show ? height : 40);
+  goog.style.setHeight(this.getElement(), show ? height + this.controllerHeight_ + 19 :
+      this.controllerHeight_);
   goog.Timer.callOnce(goog.bind(function() {
     goog.dom.classes.enable(this.getElement(), 'collapsed', !show);
     this.channelsEl_.scrollTop = goog.style.getPosition(this.currentChannel_.getElement()).y;
@@ -409,6 +418,7 @@ brkn.Guide.prototype.playAsync_ = function(media) {
       id: user.id,
       name: user.name.split(' ')[0] + '\'s Channel'
     });
+    brkn.model.Channels.getInstance().myChannel = this.myChannel_;
     var channel = new brkn.Channel(this.myChannel_, this.timeline, this.startTime_, 0,
         this.minTime_);
     channel.render(this.channelsEl_);
@@ -417,10 +427,9 @@ brkn.Guide.prototype.playAsync_ = function(media) {
   }
   var program = brkn.model.Program.async(media);
   this.myChannel_.publish(brkn.model.Channel.Action.ADD_PROGRAM, program);
-
+  this.resize_();
   brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.CHANGE_CHANNEL,
       this.myChannel_);
-  
   goog.net.XhrIo.send('/_addprogram', goog.functions.NULL(), 'POST',
       'channel_id=' + brkn.model.Channels.getInstance().myChannel.id + '&media_id=' + media.id);
 };
@@ -523,7 +532,7 @@ brkn.Guide.prototype.align_ = function(opt_setAligned, opt_offset, opt_setScroll
           [this.channelsEl_.scrollLeft, scrollTo], this.channels_.length * 100);
       goog.Timer.callOnce(goog.bind(function() {
         scrollAnim.play()
-      }, this), 50);
+      }, this), 100);
     }
   }
   
@@ -536,9 +545,11 @@ brkn.Guide.prototype.align_ = function(opt_setAligned, opt_offset, opt_setScroll
  * @private
  */
 brkn.Guide.prototype.resize_ = function() {
-  var channelsHeight = goog.style.getSize(this.channelsEl_).height;
+  var channelsHeight = Math.min(this.channelsEl_.scrollHeight, 210);
+  goog.style.setHeight(this.channelsEl_, goog.dom.classes.has(this.getElement(), 'toggled')
+      ? channelsHeight : this.controllerHeight_);
   goog.style.setHeight(this.getElement(), goog.dom.classes.has(this.getElement(), 'collapsed') ?
-      channelsHeight : channelsHeight + 40);
+      this.controllerHeight_ : channelsHeight + this.controllerHeight_ + 19);
 };
 
 

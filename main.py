@@ -110,6 +110,7 @@ def create_handlers_map():
     ('/admin/_removeprogram', admin.AdminRemoveProgramHandler),
     ('/admin/_posthumb', admin.PositionThumbHandler),
     ('/admin/storysort', admin.StorySortHandler),
+    ('/admin/setprogramming', admin.SetProgrammingHandler),
     
     # Resources
     ('/images/(.*)/(.*)', ImagesHandler),

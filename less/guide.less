@@ -11,7 +11,6 @@ div#guide {
   position: absolute;
   bottom: 0px;
   height: 40px;
-  max-height: 270px;
   overflow: hidden;
   background: #f7f7f7;
   width: 100%;
@@ -79,8 +78,8 @@ div#guide {
       width: 100%;
       position: relative;
       white-space: nowrap;
-      margin-left: @name-width - 10;
-      background: #5c5c5c url(/static/img/grad-20.png);
+      padding-left: @name-width - 10;
+      background: #7E7E7E url(/static/img/grad-flat.png);
       border-top: 1px solid #ccc;
       -webkit-box-shadow: inset 0 -3px 7px -3px rgba(0,0,0,0.2), 0 0 5px 1px rgba(0, 0, 0, .6);
          -moz-box-shadow: inset 0 -3px 7px -3px rgba(0,0,0,0.2), 0 0 5px 1px rgba(0, 0, 0, .6);
@@ -92,10 +91,9 @@ div#guide {
     }
     div.browse {
       width: 30px;
-      height: 21px;
+      height: 20px;
       margin-top: -1px;
-      box-shadow: inset -5px 0 1px -5px #F1F1F1, 0 0 1px #DEDEDE;
-      background: #5c5c5c url(/static/img/grad-20.png);
+      background: #7E7E7E url(/static/img/grad-flat.png);
       border-top: 1px solid #ccc;
       font-size: 11px;
       font-family: MuseoSans700;
@@ -105,10 +103,12 @@ div#guide {
       cursor: pointer;
       &.left {
         border-right: 1px solid #2d3446;
+        box-shadow: inset -5px 0px 2px -5px #dedede;
         left: 0;
       }
       &.right {
         border-left: 1px solid #2d3446;
+        box-shadow: inset 1px 0px 2px -1px #dedede;
         right: 0;
       }
       &:active {
@@ -130,7 +130,7 @@ div#guide {
     }
   }
   &.toggled div.channels {
-    padding-top: 22px;
+    margin-top: 22px;
     div.channel div.name {
       display: inline-block;
     }
@@ -139,7 +139,7 @@ div#guide {
       text-shadow: 1px 1px 1px rgba(0, 0, 0, .6), -1px -1px 1px rgba(0, 0, 0, .6),
           -1px 1px 1px rgba(0, 0, 0, .6), 1px -1px 1px rgba(0, 0, 0, .6);
     }
-    div.channel div.programs div.program&.clipped:hover {
+    div.channel div.programs div.program.clipped:hover {
       z-index: 1;
       width: 200px !important;
     }
@@ -149,19 +149,21 @@ div#guide {
     div.current {
       div.channel div.programs {
         background: #3d3d3d url(/static/img/grad.png);
+        margin-top: 5px;
         div.program {
           box-shadow: none;
           border-radius: 0;
           border: none;
           border-left: 1px solid #2d3446;
           padding-right: 10px;
+          margin-top: -1px;
           box-shadow: inset -1px 0 1px -1px #F1F1F1, 0 0 1px #DEDEDE;
           &:last-child {
             border-right: 1px solid #2d3446;
           }
           div.info div.title {
             position: relative;
-            top: 9px;
+            top: 8px;
             color: #f7f7f7;
             font-family: MuseoSans700;
             font-size: 11px;
@@ -183,7 +185,7 @@ div#guide {
   }
   div.channels {
     position: absolute;
-    padding-top: 2px;
+    margin-top: 2px;
     .transition(padding-top, .5s, ease);
     width: 100%;
     overflow-x: hidden;
@@ -287,13 +289,13 @@ div#guide {
 					  /*box-shadow: inset 0px 15px 30px -1px rgba(0, 0, 0, .9);*/
 					}
 					&:hover div.thumb, &.playing div.thumb {
-           -webkit-transition: opacity .6s ease, background-position 4s ease-out;
-              -moz-transition: opacity .6s ease, background-position 4s ease-out;
-                -o-transition: opacity .6s ease, background-position 4s ease-out;
-               -ms-transition: opacity .6s ease, background-position 4s ease-out;
-                   transition: opacity .6s ease, background-position 4s ease-out;
+           -webkit-transition: opacity .6s ease, background-position 3s ease-out;
+              -moz-transition: opacity .6s ease, background-position 3s ease-out;
+                -o-transition: opacity .6s ease, background-position 3s ease-out;
+               -ms-transition: opacity .6s ease, background-position 3s ease-out;
+                   transition: opacity .6s ease, background-position 3s ease-out;
             -webkit-filter: none !important;
-            opacity: 1;
+            opacity: .9;
           }
           &.clipped:hover div.thumb, &.playing div.thumb {
             .transition(background-position, 4s, ease-out);
@@ -302,8 +304,8 @@ div#guide {
 					  width: 100%;
 					  height: 100%;
 					  opacity: .2;
-					  background-size: 150% auto;
-					  background-position: center;
+					  background-size: 110% auto;
+					  background-position: 50% 37%;
 					  border-radius: 3px;
 					  &.fix-height {
               background-size: auto 100%;
@@ -409,9 +411,7 @@ div#guide {
 	        position: relative;
 	        margin-left: 6px;
 	        height: 25px;
-	        -webkit-transition: width 1s;
-			       -moz-transition: width 1s;
-			            transition: width 1s;
+	        .transition(width, 1s, ease);
 	        div.line {
 	          position: absolute;
 	          height: 4px;
@@ -419,6 +419,10 @@ div#guide {
 	        	top: 11px;
 	        	width: 100%;
 	        	box-shadow: 0px 1px 1px 0px rgba(255, 255, 255, .6);
+	        	display: none;
+            &:last-child {
+              display: inline-block;
+            }
 	          &::before {
 		          content: '';
 		          position: absolute;

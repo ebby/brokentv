@@ -49,7 +49,7 @@ brkn.model.BrowserChannel.prototype.init = function(token) {
  */
 brkn.model.BrowserChannel.prototype.onMessage_ = function(rawMessage) {
 	var message = goog.json.parse(rawMessage.data);
-	window.console.log(message);
+	goog.DEBUG && window.console.log(message);
 	switch(message.type) {
 	  case 'viewer_change':
 	    var user = brkn.model.Users.getInstance().get_or_add(message['user']);
@@ -84,6 +84,11 @@ brkn.model.BrowserChannel.prototype.onMessage_ = function(rawMessage) {
 	          var p = new brkn.model.Program(program);
 	          var channel = brkn.model.Channels.getInstance().get(message['channel_id']);
 	          channel.publish(brkn.model.Channel.Action.ADD_PROGRAM, p);
+	          var currentProgram = brkn.model.Channels.getInstance().currentChannel &&
+	              brkn.model.Channels.getInstance().currentChannel.getCurrentProgram();
+	          if (currentProgram && p.id == currentProgram.id) {
+	            brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.NEXT_PROGRAM, p);
+	          }
 	        }, this));
       break;
 	}

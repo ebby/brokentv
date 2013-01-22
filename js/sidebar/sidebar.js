@@ -130,7 +130,6 @@ brkn.Sidebar.prototype.enterDocument = function() {
     this.tabs_[tabName] = tab;
     this.tabNames_.push(tabName);
   }, this);
-  window.console.log(this.tabs_);
 
   this.onNextProgram_();
   this.fetchAndRenderStream_();
@@ -155,7 +154,6 @@ brkn.Sidebar.prototype.enterDocument = function() {
     this.tabs_['admin'] = adminTab;
     this.tabNames_.push('admin');
   }
-  window.console.log(this.tabNames_);
   
   this.updateArrow_();
 
@@ -201,12 +199,8 @@ brkn.Sidebar.prototype.enterDocument = function() {
           brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.TOGGLE_SIDEBAR,
               true);
           this.tabNav_(this.currentTab_, 'admin');
-          this.currentTab_ = 'admin';
-          this.updateArrow_(); 
         } else if (this.currentTab_ == 'admin') {
           this.tabNav_('admin', 'info');
-          this.currentTab_ = 'info';
-          this.updateArrow_(); 
         }
       }, this);
 };
@@ -264,30 +258,23 @@ brkn.Sidebar.prototype.tabNav_ = function(from, to) {
   var toScreen = goog.dom.getElementByClass(to, this.contentEl_);
   var fromIndex = goog.array.indexOf(this.tabNames_, from);
   var toIndex = goog.array.indexOf(this.tabNames_, to);
-  window.console.log('from index:' + fromIndex);
-  window.console.log('to index: ' + toIndex);
   var right = goog.array.indexOf(this.tabNames_, from) < toIndex;
-  window.console.log('going right? ' + right);
   var i = right ? 0 : this.tabNames_.length - 1;
   var condition = right ? i < this.tabNames_.length : i >= 0;
   for (i; condition; i += right ? 1 : -1) {
     var name = this.tabNames_[i];
     var tab = goog.dom.getElementByClass(name, this.contentEl_);
-
     if ((right && i > toIndex) || (!right && i < toIndex)) {
-      window.console.log('before')
       goog.style.setStyle(tab, {
         'left': '',
         'right': ''
       });
     } else if ((right && i < toIndex) || (!right && i > toIndex)) {
-      window.console.log('after')
       goog.style.setStyle(tab, {
         'left': right ? '-300px' : '',
         'right': ''
       });
     } else if (i == toIndex) {
-      window.console.log('Going to: ' + name);
       goog.style.setStyle(tab, {
         'right': right ? 0 : '',
         'left': ''
@@ -301,6 +288,7 @@ brkn.Sidebar.prototype.tabNav_ = function(from, to) {
   this.currentScreen_ = toScreen;
   goog.dom.classes.remove(this.lastScreen_, 'current');
   goog.dom.classes.add(this.currentScreen_, 'current');
+  this.updateArrow_(); 
 };
   
 
@@ -321,8 +309,7 @@ brkn.Sidebar.prototype.navigate = function(to, opt_back, opt_title) {
   if (this.lastScreen_ != to) {
     goog.style.setStyle(this.currentScreen_, {
       'left': isScreen ? 0 : '',
-      'right': '',
-      'width': isScreen ? 0 : ''
+      'right': ''
     });
     goog.style.setStyle(to, {
       'right': 0,
@@ -372,6 +359,7 @@ brkn.Sidebar.prototype.showMediaInfo = function(media) {
   if (this.info_ && media.id == this.info_.getModel().id) {
     goog.dom.classes.remove(this.toolbar_, 'back');
     this.navigate(this.info_.getElement());
+    this.tabNav_(this.currentTab_, 'info');
   } else {
     var mediaInfoEl = goog.dom.getElement('media-info');
     var mediaInfo = new brkn.sidebar.Info(media);
