@@ -18,19 +18,25 @@ class Collection(db.Model):
   last_fetch = db.DateTimeProperty()
   pending = db.IntegerProperty(default=0)
   
+  @property
+  def id(self):
+    return self.key().id()
+  
+  @classmethod
+  def add_publisher_media(cls, collection_id, publisher_id, approve_all):
+    collection = Collection.get_by_id(int(collection_id))
+    publisher = Publisher.get_by_key_name(publisher_id)
+    logging.info('FETCHING: ' + publisher.name)
+    publisher_medias = publisher.get_media_by_category(collection.keywords[0])
+    for media in publisher_medias:
+      CollectionMedia.add(collection, media, approved=(True if approve_all else None))
+  
   def fetch(self, approve_all=False):
     publishers = self.get_publishers()
-    medias = []
-
     if self.keywords:
       for publisher in publishers:
-        logging.info('FETCHING: ' + publisher.name)
-        publisher_medias = publisher.get_media_by_category(self.keywords[0])
-        for media in publisher_medias:
-          CollectionMedia.add(self, media, approved=(True if approve_all else None))
-          medias.append(media)
-    
-    return medias
+        deferred.defer(Collection.add_publisher_media, self.id, publisher.id, approve_all,
+                       _name='fetch-' + publisher.name.replace(' ', '') + '-' + str(uuid.uuid1()))
     
   def add_media(self, media, approved=False):
     CollectionMedia.add(collection=self, media=media, approved=approved)

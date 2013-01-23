@@ -14,7 +14,13 @@
         <div class="name">{$media.publisher.name}</div>
       </div>
       <div class="title">{$media.name}</div>
-      <div class="published">{$published}</div>
+      <div class="scrollable">
+        <div class="desc-link">
+          <a href="#">DESCRIPTION</a>
+          <div class="published">{$published}</div>
+        </div>
+        <div class="description">{$media.description}</div>
+      </div>
       <div class="options">
         <div class="button star"></div>
         <div class="button facebook"></div>
@@ -23,9 +29,6 @@
         <div class="button plus"></div>
       </div>
     </div>
-    {if $media.description}
-      <div class="description">{$media.description}</div>
-    {/if}
     <div class="viewers" style="display: none">
       <div class="label">SEEN BY</div>
     </div>

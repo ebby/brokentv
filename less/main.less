@@ -59,6 +59,13 @@ html, body {
   margin: 0;
   font-family: MuseoSans300;
   overflow: hidden;
+  -webkit-overflow-scroll:touch;
+}
+
+body {
+  position: fixed;
+  width: 100%;
+  height: 100%;
 }
 
 div#overlay {
@@ -74,6 +81,8 @@ div#overlay {
 a {
   text-decoration: none;
   font-family: MuseoSans700;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  -webkit-touch-callout: none;
   &:hover {
     text-decoration: underline;
   }

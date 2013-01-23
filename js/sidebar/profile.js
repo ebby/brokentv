@@ -22,6 +22,8 @@ goog.require('goog.ui.Textarea.EventType');
 brkn.sidebar.Profile = function(user) {
   goog.base(this);
   
+  this.setModel(user);
+  
   /**
    * @type {brkn.model.User}
    * @private

@@ -44,8 +44,7 @@ class Media(db.Model):
   
   @classmethod
   def add_from_url(cls, url):
-    yt_service = gdata.youtube.service.YouTubeService()
-    gdata.alt.appengine.run_on_appengine(yt_service)
+    yt_service = get_youtube_service()
     parsed_url = urlparse.urlparse(url)
     host_id = urlparse.parse_qs(parsed_url.query)['v'][0]
     entry = yt_service.GetYouTubeVideoEntry(video_id=host_id)
@@ -64,7 +63,7 @@ class Media(db.Model):
       if not media:
         name = unicode(entry.media.title.text, errors='replace')
         desc = entry.media.description.text
-        desc = unicode(desc, errors='replace') if desc else None
+        desc = unicode(desc, errors='replace').replace("\n", r" ") if desc else None
         category = entry.media.category[0].text
         category = unicode(category, errors='replace') if category else None
         media = cls(key_name=(MediaHost.YOUTUBE + id),
@@ -144,6 +143,6 @@ class Media(db.Model):
     json['host'] = self.host
     json['duration'] = self.duration
     json['published'] = self.published.isoformat()
-    json['description'] = self.description.replace("\n", r" ") if self.description and get_desc else None
+    json['description'] = self.description
     json['thumb_pos'] = self.thumb_pos
     return json

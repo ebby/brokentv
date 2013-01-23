@@ -25,11 +25,6 @@ class Programming():
   def __init__(self, fetch=None):
     fetch = True if fetch == None else fetch
     
-    self.queue = taskqueue.Queue()
-    print self.queue.fetch_statistics()
-    self.queue.purge()
-    print self.queue.fetch_statistics()
-    
     self.channels = {}
     self.publishers = {}
     self.playlists = {}
@@ -47,7 +42,8 @@ class Programming():
                                         publisher=self.publishers[properties.get('publisher')])
       self.playlists[name] = playlist
       if fetch:
-        playlist.fetch(approve_all=True)
+        deferred.defer(playlist.fetch, approve_all=True,
+                       _name='fetch-' + playlist.name.replace(' ', '') + '-' + str(uuid.uuid1()))
     
     for name, properties in inits.COLLECTIONS.iteritems():
       collection = Collection.all().filter('name =', name).get()
@@ -70,7 +66,6 @@ class Programming():
                                               playlist=self.playlists[playlist])
       self.collections[name] = collection
       if fetch:
-        print 'fetching ' + name
         collection.fetch(approve_all=True)
     
     for name, properties in inits.CHANNELS.iteritems():
@@ -85,11 +80,10 @@ class Programming():
     memcache.set('channels', simplejson.dumps([c.toJson() for c in self.channels.itervalues()]))
       
   @classmethod
-  def set_programming(cls, channel_id, duration=600, schedule_next=True,
+  def set_programming(cls, channel_id, duration=600, schedule_next=True, fetch_twitter=True,
                       queue='default', target=None):
     channel = Channel.get_by_key_name(channel_id)
     viewers = (memcache.get('channel_viewers') or {}).get(str(channel_id), [])
-    print viewers
     cols = channel.get_collections()
     all_medias = []
     backup_medias = []
@@ -124,16 +118,15 @@ class Programming():
     # Grab 10 minutes of programming
     all_medias = Programming.timed_subset(all_medias, duration)
     
-    # Find related twitter posts
-    deferred.defer(Programming.fetch_related_tweets, all_medias,
-                   _name='twitter-' + channel.name.replace(' ', '') + '-' + str(uuid.uuid1()),
-                   _queue='twitter',
-                   #_target='twitter',
-                   _countdown=30)
+    if fetch_twitter:
+      # Find related twitter posts
+      deferred.defer(Programming.fetch_related_tweets, all_medias,
+                     _name='twitter-' + channel.name.replace(' ', '') + '-' + str(uuid.uuid1()),
+                     _queue='twitter',
+                     _countdown=30)
     
     programs = []
     for media in all_medias:  
-      print 'ADDING: ' + media.name + ' last: ' + str(media.last_programmed)    
       program = Program.add_program(channel, media)
       programs.append(program)
       logging.info('ADDING: ' + media.name + ' at: ' + program.time.isoformat())

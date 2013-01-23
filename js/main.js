@@ -81,6 +81,11 @@ brkn.Main.prototype.enterDocument = function() {
   this.player_.decorate(goog.dom.getElement('stage'));
 
   this.popup_ = new brkn.Popup();
+  
+  // iPad
+//  this.getHandler().listen(document, 'touchmove', function(e) {
+//    e.preventDefault();
+//  });
 };
 
 

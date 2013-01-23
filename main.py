@@ -88,6 +88,7 @@ def create_handlers_map():
     ('/_changechannel', rpc.ChangeChannelHandler),
     ('/_comment', rpc.CommentHandler),
     ('/_comment/(.*)', rpc.CommentHandler),
+    ('/_info/(.*)', rpc.InfoHandler),
     ('/_optin', rpc.OptInHandler),
     ('/_started', rpc.StartedHandler),
     ('/_seen', rpc.SeenHandler),
@@ -109,6 +110,7 @@ def create_handlers_map():
     ('/admin/_rescheduleprogram', admin.AdminRescheduleProgramHandler),
     ('/admin/_removeprogram', admin.AdminRemoveProgramHandler),
     ('/admin/_posthumb', admin.PositionThumbHandler),
+    ('/admin/init', admin.InitProgrammingHandler),
     ('/admin/storysort', admin.StorySortHandler),
     ('/admin/setprogramming', admin.SetProgrammingHandler),
     

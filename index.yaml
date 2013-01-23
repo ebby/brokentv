@@ -1,0 +1,43 @@
+indexes:
+- kind: CollectionMedia
+  properties:
+  - name: approved
+  - name: collection
+  - name: published
+    direction: desc
+
+- kind: PlaylistMedia
+  properties:
+  - name: approved
+  - name: playlist
+  - name: published
+    direction: desc
+    
+- kind: ChannelProgram
+  properties:
+  - name: channel
+  - name: time
+    direction: desc
+    
+- kind: ChannelProgram
+  properties:
+  - name: channel
+  - name: time
+    
+- kind: UserSession
+  properties:
+  - name: user
+  - name: tune_in
+    direction: desc
+    
+- kind: UserActivity
+  properties:
+  - name: acl
+  - name: time
+    direction: desc
+    
+- kind: UserActivity
+  properties:
+  - name: user
+  - name: time
+    direction: desc

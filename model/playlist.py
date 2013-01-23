@@ -19,8 +19,7 @@ class Playlist(db.Model):
   def fetch(self, approve_all=False, max=1000):
     medias = []
     if not self.last_fetch:
-      yt_service = gdata.youtube.service.YouTubeService()
-      gdata.alt.appengine.run_on_appengine(yt_service)
+      yt_service = get_youtube_service()
       offset = 1
       while offset <= max:
         feed = yt_service.GetYouTubePlaylistVideoFeed(

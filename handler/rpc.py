@@ -103,6 +103,16 @@ class ProgramHandler(BaseHandler):
         program = Program.add_program(channel, media)
         self.response.out.write(simplejson.dumps(program.toJson(False)))
       
+class InfoHandler(BaseHandler):
+    def get(self, id):
+      media = Media.get_by_key_name(id)
+      response = {}
+      response['description'] = media.description
+      response['seen'] = media.seen_by()
+      response['comments'] = [c.toJson() for c in Comment.get_by_media(media)]
+      response['tweets'] = [t.toJson() for t in media.get_tweets()]
+      self.response.out.write(simplejson.dumps(response))
+
 class CommentHandler(BaseHandler):
     def get(self, id):
       media = Media.get_by_key_name(id)
@@ -142,7 +152,7 @@ class ActivityHandler(BaseHandler):
         activities = UserActivity.get_for_user(user, offset=int(offset))
       else:
         activities = UserActivity.get_stream(self.current_user, offset=int(offset))
-      return self.response.out.write(simplejson.dumps([a.toJson() for a in activities]))
+      self.response.out.write(simplejson.dumps([a.toJson() for a in activities]))
       
 class ChangeChannelHandler(BaseHandler):
     def post(self):

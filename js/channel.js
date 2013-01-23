@@ -137,6 +137,13 @@ brkn.Channel.prototype.viewersEl_;
  * @type {Element}
  * @private
  */
+brkn.Channel.prototype.suggestEl_;
+
+
+/**
+ * @type {Element}
+ * @private
+ */
 brkn.Channel.prototype.nameEl_;
 
 
@@ -165,6 +172,7 @@ brkn.Channel.prototype.enterDocument = function() {
   this.viewersEl_ = goog.dom.getElementByClass('viewers', this.getElement());
   this.nameEl_ = goog.dom.getElementByClass('name', this.getElement());
   this.graphEl_ = goog.dom.getElementByClass('graph', this.getElement());
+  this.suggestEl_ = goog.dom.getElementByClass('suggest', this.getElement());
   
   this.pixelsPerSecond_ = (goog.style.getSize(this.programsEl_).width - brkn.Guide.NAME_WIDTH) /
       this.timeline_;
@@ -337,7 +345,8 @@ brkn.Channel.prototype.addProgram = function(program) {
 	goog.style.setWidth(programEl, width - brkn.Channel.PROGRAM_PADDING);
 	var offset = (program.time.getTime() - this.minTime_.getTime())/1000 * this.pixelsPerSecond_;
 	goog.style.setPosition(programEl, offset);
-	goog.dom.appendChild(this.programsEl_, programEl);
+	goog.style.setPosition(this.suggestEl_, offset + width);
+	goog.dom.insertSiblingBefore(programEl, this.suggestEl_);
 	var clipped = width < 120;
 	goog.dom.classes.enable(programEl, 'clipped', clipped);
 
@@ -466,6 +475,9 @@ brkn.Channel.prototype.addViewer = function(session) {
 		goog.style.setWidth(lineEl, elapsed);
 		goog.style.setPosition(lineEl, offset);
 		goog.style.setStyle(lineEl, 'background', session.user.color);
+		this.getHandler().listen(lineEl, goog.events.EventType.CLICK, function() {
+      brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.PROFILE, session.user)
+    })
 	}
 };
 

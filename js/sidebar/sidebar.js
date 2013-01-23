@@ -75,6 +75,13 @@ brkn.Sidebar.prototype.currentMedia_;
 
 
 /**
+ * @type {brkn.sidebar.Profile}
+ * @private
+ */
+brkn.Sidebar.prototype.profile_;
+
+
+/**
  * @type {Element}
  * @private
  */
@@ -160,19 +167,35 @@ brkn.Sidebar.prototype.enterDocument = function() {
   this.getHandler()
       .listen(goog.dom.getElementByClass('back-button', this.toolbar_),
           goog.events.EventType.CLICK,
-          goog.bind(function() {
+          goog.bind(function(e) {
             goog.dom.classes.remove(this.toolbar_, 'back');
             this.navigate(this.lastScreen_);
+            e.stopPropagation();
           }, this))
       .listen(this.tabsEl_,
           goog.events.EventType.CLICK,
           goog.bind(function(e) {
+            var lastTab = this.currentTab_;
             var tab = goog.dom.getAncestorByTagNameAndClass(e.target, 'li');
             var tabName = goog.dom.classes.get(tab)[0];   
             this.tabNav_(this.currentTab_, tabName); 
             goog.dom.classes.add(tab, 'selected');
             goog.style.setPosition(goog.dom.getElementByClass('arrow', this.toolbar_),
                 goog.style.getSize(tab).width/2 + goog.style.getPosition(tab).x);
+            if (lastTab != this.currentTab_) {
+              e.stopPropagation();
+            }
+          }, this))
+      .listen(this.toolbar_,
+          goog.events.EventType.CLICK,
+          goog.bind(function(e) {
+            var tab = goog.dom.getAncestorByTagNameAndClass(e.target, 'li');
+            if ((tab && goog.dom.classes.get(tab)[0] == this.currentTab_) || !tab) {
+              var scrollAnim = new goog.fx.dom.Scroll(this.currentScreen_,
+                  [this.currentScreen_.scrollLeft, this.currentScreen_.scrollTop],
+                  [this.currentScreen_.scrollLeft, 0], 300);
+              scrollAnim.play();
+            }
           }, this));
   
   brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_SIDEBAR,
@@ -375,8 +398,12 @@ brkn.Sidebar.prototype.showMediaInfo = function(media) {
  * @param {brkn.model.User} user
  */
 brkn.Sidebar.prototype.showProfile = function(user) {
-  var profile = new brkn.sidebar.Profile(user);
-  profile.decorate(this.profileEl_);
+  if (this.profile_ && this.profile_.getModel().id == user.id &&
+      this.currentScreen_ == this.profileEl_) {
+    return;
+  }
+  this.profile_ = new brkn.sidebar.Profile(user);
+  this.profile_.decorate(this.profileEl_);
   brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NAVIGATE,
       this.profileEl_, true, user.name);
   brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.TOGGLE_SIDEBAR, true);

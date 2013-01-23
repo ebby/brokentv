@@ -118,18 +118,29 @@ class CollectionMediaHandler(BaseHandler):
       if col_media and approve is not None:
         col_media.approve(approve)
         
+class InitProgrammingHandler(BaseHandler):
+    def get(self):
+      if not self.current_user.id in constants.SUPER_ADMINS:
+        return
+      fetch = self.request.get('fetch') == 'true'
+      Programming(fetch) # Do fetch if no media
+      self.response.out.write('done')
+
 class SetProgrammingHandler(BaseHandler):
     def get(self):
       if not self.current_user.id in constants.SUPER_ADMINS:
         return
       channel_name = self.request.get('channel')
+      twitter = self.request.get('fetch') == 'true'
       duration = self.request.get('duration') or 600
       if channel_name:
         channels = Channel.all().filter('name =', channel_name).fetch(1)
       else:
         channels = Channel.get_public()
       for channel in channels:
-        Programming.set_programming(channel.id, duration=int(duration), schedule_next=False)
+        Programming.set_programming(channel.id, duration=int(duration), schedule_next=False,
+                                    fetch_twitter=twitter)
+      self.response.out.write('done')
         
 
 class AdminRemoveProgramHandler(BaseHandler):
