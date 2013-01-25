@@ -7,10 +7,17 @@
 	<div class="channel">
 	  <div class="programs-container">
 			<div class="programs">
-			  <div class="program suggest">
-			    <div class="label">Selecting next programs...</div>
-			    <a href="#">suggest</a>
-          <div class="add-program button dark">+</div>
+			  <div class="suggest">
+			    <div class="spinner">...</div>
+			    <div class="select-program">
+            <div class="select-header">SUGGEST PROGRAM</div>
+            <div class="select-content">
+              <div class="page">
+                <input type="text" class="program-input" placeholder="Paste YouTube link"/>
+                <div class="page2"></div>
+              </div>
+            </div>
+          </div>
         </div>
 			</div>
  	  </div>
@@ -50,5 +57,20 @@
     <div class="pic">
 	    <img src="{$user.picture}">
 	  </div>
+  </div>
+{/template}
+
+
+/**
+ * Select a program
+ * @param title
+ * @param thumb
+ */
+{template .confirmMedia}
+  <div class="confirm-media">
+    <div class="thumb" style="background-image:url({$thumb})"></div>
+    <div class="title">{$title}</div>
+    <div class="added">ADDED</div>
+    <div class="dark button">ADD</div>
   </div>
 {/template}

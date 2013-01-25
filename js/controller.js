@@ -48,10 +48,6 @@ brkn.Controller.prototype.enterDocument = function() {
 	this.addChild(this.guideToggle_);
 	this.guideToggle_.decorate(goog.dom.getElement('guide-toggle'));
 	this.guideToggle_.setChecked(true);
-//	goog.Timer.callOnce(goog.bind(function() {
-//	  this.guideToggle_.setChecked(false);
-//	  this.toggleGuide_();
-//	}, this), 10000);
 	
 	this.addChild(this.sidebarToggle_);
   this.sidebarToggle_.decorate(goog.dom.getElement('sidebar-toggle'));
@@ -61,13 +57,13 @@ brkn.Controller.prototype.enterDocument = function() {
   goog.style.showElement(this.adminToggle_.getElement(),
       brkn.model.Users.getInstance().currentUser.accessLevel == brkn.model.User.AccessLevel.ADMIN);
 
-  var guideThrottle = new goog.Throttle(this.toggleGuide_, 1000, this);
+  var guideThrottle = new goog.Throttle(this.throttledGuide_, 1000, this);
   
   this.getHandler()
       .listen(window, 'resize', goog.bind(this.resize, this))
   		.listen(this.guideToggle_,
   				goog.ui.Component.EventType.ACTION,
-  				goog.bind(function() {
+  				goog.bind(function(e) {
   				  guideThrottle.fire();
   				}, this))
   	  .listen(this.sidebarToggle_,
@@ -89,6 +85,8 @@ brkn.Controller.prototype.enterDocument = function() {
             this.resize();
           }, this));
   
+  brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_GUIDE,
+      this.toggleGuide_, this);
   brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_SIDEBAR,
       function(show) {
         this.sidebarToggle_.setChecked(show);
@@ -102,20 +100,28 @@ brkn.Controller.prototype.enterDocument = function() {
 /**
  * @private 
  */
-brkn.Controller.prototype.toggleGuide_ = function() {
+brkn.Controller.prototype.throttledGuide_ = function() {
   var toggled = this.guideToggle_.isChecked();
   brkn.model.Controller.getInstance().publish(
       brkn.model.Controller.Actions.TOGGLE_GUIDE,
       toggled);
-  if (toggled) {
+};
+
+
+/**
+ * @private 
+ */
+brkn.Controller.prototype.toggleGuide_ = function(show) {
+  this.guideToggle_.setChecked(show);
+  if (show) {
     goog.dom.classes.remove(this.getElement(), 'window');
   }
   goog.Timer.callOnce(goog.bind(function() {
-    goog.dom.classes.enable(this.getElement(), 'guide-toggled', toggled);
-    if (!toggled) {
+    goog.dom.classes.enable(this.getElement(), 'guide-toggled', show);
+    if (!show) {
       goog.Timer.callOnce(goog.bind(goog.dom.classes.add, this, this.getElement(), 'window'), 300);
     }
-  }, this), toggled ? 0 : 600);
+  }, this), show ? 0 : 600);
   this.resize();
 };
 

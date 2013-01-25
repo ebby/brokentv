@@ -11,6 +11,7 @@ goog.require('brkn.sidebar.MediaList');
 goog.require('brkn.sidebar.Profile');
 goog.require('brkn.sidebar.Stream');
 
+goog.require('goog.events.KeyHandler.EventType');
 goog.require('goog.fx.dom.Scroll');
 goog.require('goog.ui.Component');
 goog.require('goog.ui.Component.EventType');
@@ -131,7 +132,8 @@ brkn.Sidebar.prototype.enterDocument = function() {
   this.profileEl_ = goog.dom.getElement('profile');
   this.toolbar_ = goog.dom.getElement('toolbar');
   this.tabsEl_ = goog.dom.getElementByClass('tabs', this.getElement());
-  
+  var keyHandler = new goog.events.KeyHandler(document);
+
   goog.array.forEach(goog.dom.getChildren(this.tabsEl_), function(tab) {
     var tabName = goog.dom.classes.get(tab)[0];
     this.tabs_[tabName] = tab;
@@ -195,6 +197,13 @@ brkn.Sidebar.prototype.enterDocument = function() {
                   [this.currentScreen_.scrollLeft, this.currentScreen_.scrollTop],
                   [this.currentScreen_.scrollLeft, 0], 300);
               scrollAnim.play();
+            }
+          }, this))
+      .listen(keyHandler,
+          goog.events.KeyHandler.EventType.KEY,
+          goog.bind(function(e) {
+            if (e.ctrlKey && e.keyCode == '68') {
+              goog.dom.classes.toggle(this.getElement(), 'dark');
             }
           }, this));
   

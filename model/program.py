@@ -23,18 +23,26 @@ class Program(db.Model):
 
     memcache.set('programming', simplejson.dumps(programming))
     return programming
+  
+  @classmethod
+  @db.transactional
+  def atomic_add(cls, media, channel):
+    program = Program(media=media, channel=channel,
+                      time=channel.get_next_time().replace(microsecond=0))
+    program.put()
+    return program
       
   @classmethod
   def add_program(cls, channel, media):
     if media:
       # Microseconds break equalities when passing datetimes between front/backend
-      program = Program(media=media,
-                        channel=channel,
-                        time=channel.get_next_time().replace(microsecond=0))
-      program.put()
-      
+      program = Program.atomic_add(media=media, channel=channel)
+
       channelProgram = ChannelProgram(channel=channel, program=program, time=program.time)
       channelProgram.put()
+      
+      channel.next_time = program.time + datetime.timedelta(seconds=program.media.duration)
+      channel.put()
       
       media.last_programmed = datetime.datetime.now()
       media.programmed_count += 1

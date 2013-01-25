@@ -83,9 +83,12 @@ brkn.Main.prototype.enterDocument = function() {
   this.popup_ = new brkn.Popup();
   
   // iPad
-//  this.getHandler().listen(document, 'touchmove', function(e) {
-//    e.preventDefault();
-//  });
+  this.getHandler().listen(document.body, 'touchmove', function(e) {
+    var scrollEl = goog.dom.getAncestorByTagNameAndClass(e.target, 'div', 'ios-scroll');
+    if (!scrollEl) {
+      e.preventDefault(); 
+    }
+  });
 };
 
 

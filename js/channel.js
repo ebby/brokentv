@@ -70,13 +70,6 @@ brkn.Channel = function(model, timeline, startTime, startTimeOffset, minTime) {
 	 * @private
 	 */
 	this.startTimeOffset_ = startTimeOffset;
-
-	/**
-	 * @type {goog.ui.CustomButton}
-	 */
-	this.addProgram_ = new goog.ui.CustomButton('Add Program');
-	this.addProgram_.setSupportedState(goog.ui.Component.State.CHECKED,
-			true);
 	
 	/**
 	 * @type {Object.<number, Element>}
@@ -106,10 +99,23 @@ goog.inherits(brkn.Channel, goog.ui.Component);
 
 
 /**
+ * @type {string}
+ * @constant
+ */
+brkn.Channel.YOUTUBE_DATA = 'https://gdata.youtube.com/feeds/api/videos/%s?v=2&alt=json'
+
+
+/**
  * @type {number}
  * @constant
  */
 brkn.Channel.PROGRAM_PADDING = 12;
+
+
+/**
+ * @type {goog.ui.LabelInput}
+ */
+brkn.Channel.prototype.suggestInput_;
 
 
 /**
@@ -174,6 +180,12 @@ brkn.Channel.prototype.enterDocument = function() {
   this.graphEl_ = goog.dom.getElementByClass('graph', this.getElement());
   this.suggestEl_ = goog.dom.getElementByClass('suggest', this.getElement());
   
+  this.suggestInput_ = new goog.ui.LabelInput('Paste YouTube link');
+  this.suggestInput_.decorate(goog.dom.getElementByClass('program-input', this.getElement()));
+  var keyHandler = new goog.events.KeyHandler(this.suggestInput_.getElement());
+  var pasteHandler = new goog.events.PasteHandler(this.suggestInput_.getElement());
+  var throttle = new goog.Throttle(goog.bind(this.onSuggestInput_, this), 1000);
+
   this.pixelsPerSecond_ = (goog.style.getSize(this.programsEl_).width - brkn.Guide.NAME_WIDTH) /
       this.timeline_;
 
@@ -216,14 +228,11 @@ brkn.Channel.prototype.enterDocument = function() {
   }
   
   goog.array.forEachRight(this.getModel().viewerSessions, this.addViewer, this);
-  
-  this.addChild(this.addProgram_);
-	this.addProgram_.decorate(goog.dom.getElementByClass('add-program'));
 
 	this.getHandler()
-		.listen(this.addProgram_,
-				goog.ui.Component.EventType.ACTION,
-				goog.bind(this.onSelectProgram_, this))
+		.listen(this.suggestEl_,
+				goog.events.EventType.CLICK,
+				goog.bind(this.onSuggest_, this))
 		.listen(goog.dom.getElementByClass('name', this.getElement()),
 				goog.events.EventType.CLICK,
 				goog.bind(function() {
@@ -235,7 +244,20 @@ brkn.Channel.prototype.enterDocument = function() {
 				}, this))
 		.listen(brkn.model.Clock.getInstance().clock,
 				goog.Timer.TICK,
-				goog.bind(this.update, this));
+				goog.bind(this.update, this))
+		.listen(pasteHandler,
+        goog.events.PasteHandler.EventType.AFTER_PASTE,
+        goog.bind(this.onSuggestInput_, this))
+    .listen(keyHandler,
+        goog.events.KeyHandler.EventType.KEY,
+        goog.bind(function() {
+          if (throttle) {
+            throttle.fire();
+          }
+        }, this))
+    .listen(this.suggestInput_,
+        goog.events.EventType.FOCUS,
+        goog.bind(this.onSuggestInput_, this));
 	
 	this.getModel().subscribe(brkn.model.Channel.Action.ADD_PROGRAM, this.addProgram, this);
 	this.getModel().subscribe(brkn.model.Channel.Action.ADD_VIEWER, this.addViewer, this);
@@ -496,26 +518,80 @@ brkn.Channel.prototype.removeViewer = function(user, tuneOut) {
  * @param {Event} e
  * @private
  */
-brkn.Channel.prototype.onSelectProgram_ = function(e) {
-  e.stopPropagation();
-  e.preventDefault();
-  
-  if (this.lastHideTime_ && (goog.now() - this.lastHideTime_ < 200)) {
-    // If popup last closed this quickly, then this click most likely
-    // implies a hide event.
-    this.addProgram_.setActive(false);
-    this.addProgram_.setChecked(false);
+brkn.Channel.prototype.onSuggest_ = function(e) {
+  if (!goog.dom.classes.has(this.suggestEl_, 'show')) {
+    goog.style.setOpacity(goog.dom.getElementByClass('select-program', this.suggestEl_), 1);
+    goog.dom.classes.add(this.suggestEl_, 'show');
+    this.suggestInput_.focusAndSelect(); 
+  }
+};
+
+
+/**
+ * @param e {Event} The event
+ * @private
+ */
+brkn.Channel.prototype.onSuggestInput_ = function(e) {
+  var contentEl = goog.dom.getElementByClass('select-content', this.getElement());
+  var el = goog.dom.getElementByClass('page2', this.getElement());
+  if (goog.dom.getChildren(el).length) {
     return;
   }
 
-  brkn.model.Popup.getInstance().publish(brkn.model.Popup.Action.SELECT_PROGRAM,
-			this.addProgram_.getElement(), this.getModel());
-  brkn.model.Popup.getInstance().subscribeOnce(
-  		brkn.model.Popup.Action.ON_HIDE,
-      goog.bind(function() {
-        this.addProgram_.setChecked(false);
-        this.lastHideTime_ = goog.now();
-      }, this));
+  try {
+    var video = goog.ui.media.YoutubeModel.newInstance(this.suggestInput_.getValue());
+
+    goog.net.XhrIo.send(    
+        goog.string.subs(brkn.Channel.YOUTUBE_DATA, video.getVideoId()),
+        goog.bind(function(e){
+          var entry = goog.json.parse(e.target.getResponse())['entry'];
+          var title = entry['title']['$t'];
+          var thumb = entry['media$group']['media$thumbnail'][0]['url'];
+          soy.renderElement(el, brkn.channel.confirmMedia, {
+            title: title,
+            thumb: thumb
+          });
+          var confirmButton = new goog.ui.CustomButton('YES');
+          confirmButton.decorate(goog.dom.getElementByClass('button', el));
+          
+          var scrollAnim = new goog.fx.dom.Scroll(contentEl,
+              [0, 0], [160, 0], 300, goog.fx.easing.easeOut);
+          scrollAnim.play();
+          this.getHandler().listen(confirmButton,
+              goog.ui.Component.EventType.ACTION,
+              goog.bind(this.onSuggestProgram_, this, video));
+        }, this));
+  } catch (error) {
+    return;
+  }
+};
+
+
+/**
+ * @param {goog.ui.media.YoutubeModel} video 
+ * @private
+ */
+brkn.Channel.prototype.onSuggestProgram_ = function(video) {
+  goog.net.XhrIo.send(
+    '/_addprogram',
+    goog.bind(function(e) {
+      var response = e.target.getResponseJson();
+      if (response['id']) {
+        var newProgram = new brkn.model.Program(response);
+        this.getModel().publish(brkn.model.Channel.Action.ADD_PROGRAM, newProgram); 
+      }
+    }, this),
+    'POST',
+    'channel_id=' + this.getModel().id +'&url=' + video.getUrl());
+  goog.style.setOpacity(goog.dom.getElementByClass('button', this.suggestEl_), 0);
+  goog.style.showElement(goog.dom.getElementByClass('added', this.suggestEl_), true);
+  goog.style.setOpacity(goog.dom.getElementByClass('select-program', this.suggestEl_), 0);
+  
+  goog.Timer.callOnce(goog.bind(function() {
+    goog.dom.classes.remove(this.suggestEl_, 'show');
+    this.suggestInput_.setValue('');
+    goog.dom.getElementByClass('page2', this.getElement()).innerHTML = '';
+  }, this), 3000);
 };
 
 

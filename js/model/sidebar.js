@@ -17,6 +17,14 @@ goog.addSingletonGetter(brkn.model.Sidebar);
 
 
 /**
+ * @return {boolean}
+ */
+brkn.model.Sidebar.prototype.toggled = function() {
+  return goog.dom.classes.has(goog.dom.getElement('sidebar'), 'toggled');
+};
+
+
+/**
  * @enum {string}
  */
 brkn.model.Sidebar.Actions = {

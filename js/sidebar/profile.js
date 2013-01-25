@@ -51,6 +51,7 @@ brkn.sidebar.Profile.prototype.decorateInternal = function(el) {
   goog.base(this, 'decorateInternal', el);
 
   goog.dom.classes.add(el, 'profile');
+  goog.dom.classes.add(el, 'ios-scroll');
   soy.renderElement(el, brkn.sidebar.profile);
 };
 

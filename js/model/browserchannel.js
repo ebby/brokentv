@@ -83,11 +83,13 @@ brkn.model.BrowserChannel.prototype.onMessage_ = function(rawMessage) {
 	        goog.bind(function(program) {
 	          var p = new brkn.model.Program(program);
 	          var channel = brkn.model.Channels.getInstance().get(message['channel_id']);
-	          channel.publish(brkn.model.Channel.Action.ADD_PROGRAM, p);
-	          var currentProgram = brkn.model.Channels.getInstance().currentChannel &&
-	              brkn.model.Channels.getInstance().currentChannel.getCurrentProgram();
-	          if (currentProgram && p.id == currentProgram.id) {
-	            brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.NEXT_PROGRAM, p);
+	          if (channel) {
+  	          channel.publish(brkn.model.Channel.Action.ADD_PROGRAM, p);
+  	          var currentProgram = brkn.model.Channels.getInstance().currentChannel &&
+  	              brkn.model.Channels.getInstance().currentChannel.getCurrentProgram();
+  	          if (currentProgram && p.id == currentProgram.id) {
+  	            brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.NEXT_PROGRAM, p);
+  	          }
 	          }
 	        }, this));
       break;

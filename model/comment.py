@@ -24,7 +24,7 @@ class Comment(db.Model):
     media.comment_count += 1
     media.put()
     
-    from useractivity import *
+    from useractivity import UserActivity
     broadcast.broadcastNewActivity(UserActivity.add_comment(c.user, c))
     return c
 

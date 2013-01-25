@@ -11,7 +11,7 @@
 @import "admin.less";
 @import "profile.less";
 
-.transition (@style, @speed, ...) {
+.transition (...) {
   -webkit-transition: @arguments;
      -moz-transition: @arguments;
        -o-transition: @arguments;
@@ -59,7 +59,6 @@ html, body {
   margin: 0;
   font-family: MuseoSans300;
   overflow: hidden;
-  -webkit-overflow-scroll:touch;
 }
 
 body {
@@ -81,11 +80,18 @@ div#overlay {
 a {
   text-decoration: none;
   font-family: MuseoSans700;
-  -webkit-tap-highlight-color: rgba(0,0,0,0);
-  -webkit-touch-callout: none;
   &:hover {
     text-decoration: underline;
   }
+}
+
+div, li, a {
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  -webkit-touch-callout: none;
+}
+
+.ios-scroll {
+  -webkit-overflow-scrolling: touch;
 }
 
 

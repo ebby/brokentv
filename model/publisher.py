@@ -59,6 +59,7 @@ class Publisher(db.Model):
     return publisher
   
   def fetch(self, categories=None):
+    logging.info('FETCH')
     if self.host == MediaHost.YOUTUBE:
       yt_service = get_youtube_service()
 
@@ -81,16 +82,21 @@ class Publisher(db.Model):
         query.orderby = 'published'
         query.max_results = 50
         offset = 1
-        while offset <= 1: # Max is 1000
+        while offset <= 100: # Max is 1000
           query.start_index = offset
           feed = yt_service.YouTubeQuery(query)
           if len(feed.entry) == 0:
             break
           medias = Media.add_from_entry(feed.entry)
           for media in medias:
+            logging.info('FETCHED: ' + media.name)
             PublisherMedia.add(publisher=self, media=media)
   
           last_media = medias[-1] if isinstance(medias, list) else medias
+          
+          logging.info(self.last_fetch)
+          logging.info(last_media.toJson(False))
+          
           if self.last_fetch and last_media.published \
               and last_media.published.replace(tzinfo=None) < self.last_fetch:
             # We fetched all the latest media
@@ -117,8 +123,8 @@ class PublisherMedia(db.Model):
   
   @classmethod
   def get_medias(cls, publisher, category=None):
-    publisher_medias = PublisherMedia.all().filter('publisher =', publisher).fetch(1000)
-    medias = []
+    publisher_medias = publisher.publisherMedias.fetch(None)
+    medias = [pm.media for pm in publisher_medias]
     for p_m in publisher_medias:
       if category:
         if p_m.media.category == category:

@@ -98,8 +98,16 @@ class SessionHandler(BaseHandler):
 class ProgramHandler(BaseHandler):
     def post(self):
       channel = Channel.get_by_key_name(self.request.get('channel_id'))
-      if channel and channel.id == self.current_user.id:
-        media = Media.get_by_key_name(self.request.get('media_id'))
+      url = self.request.get('url')
+      media_id = self.request.get('media_id')
+      if channel and url:
+        # Add to pending media for user suggestion collection
+        media = Media.add_from_url(url)
+        channel.get_suggested().add_media(media)
+        self.response.out.write(simplejson.dumps({}))
+      if channel and media_id and channel.id == self.current_user.id:
+        # Add to my personal channel
+        media = Media.get_by_key_name(media_id)
         program = Program.add_program(channel, media)
         self.response.out.write(simplejson.dumps(program.toJson(False)))
       
@@ -110,7 +118,7 @@ class InfoHandler(BaseHandler):
       response['description'] = media.description
       response['seen'] = media.seen_by()
       response['comments'] = [c.toJson() for c in Comment.get_by_media(media)]
-      response['tweets'] = [t.toJson() for t in media.get_tweets()]
+      response['tweets'] = [t.to_json() for t in media.get_tweets()]
       self.response.out.write(simplejson.dumps(response))
 
 class CommentHandler(BaseHandler):

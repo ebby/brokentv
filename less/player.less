@@ -14,8 +14,15 @@
   position: absolute;
   top: 0;
   left: 0;
-  background: #181818;
+  background: transparent;
+  &.covered {
+    background: #181818;
+    div.message {
+      display: block;
+    }
+  }
   div.message {
+    display: none;
     font-size: 30px;
     color: #f7f7f7;
     position: absolute;

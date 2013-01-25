@@ -7,7 +7,7 @@
   font-size: 13px;
   text-align: center;
   padding: 3px 0;
-  box-shadow: inset 0 0 1px #F1F1F1, 0 0 1px #DEDEDE;
+  box-shadow: inset 0 0 1px rgba(255, 255, 255, 0.1), 0 0 1px rgba(255, 255, 255, 0.5);
   color: #FEFEFE;
   text-shadow: 1px 1px black;
   cursor: pointer;
@@ -44,19 +44,16 @@ div.controller {
   height: 40px;
   z-index: 100;
   background: transparent url(/static/img/grad-window.png);
-  -webkit-transition: all 0.3s ease;
-  -moz-transition: all 0.3s ease;
-  -o-transition: all 0.3s ease;
-  -ms-transition: all 0.3s ease;
-  transition: all 0.3s ease;
   border-top: 1px solid #ccc;
   pointer-events: none;
   -webkit-box-shadow: inset 0 -3px 7px -3px rgba(0, 0, 0, 0.2), 0 0 5px 0 rgba(0, 0, 0, 0.5);
   -moz-box-shadow: inset 0 -3px 7px -3px rgba(0, 0, 0, 0.2), 0 0 5px 0 rgba(0, 0, 0, 0.5);
   box-shadow: inset 0 -3px 7px -3px rgba(0, 0, 0, 0.2), 0 0 5px 0 rgba(0, 0, 0, 0.5);
-  -webkit-transition: width .5s ease;
-  -moz-transition: width .5s ease;
-  transition: width .5s ease;
+  -webkit-transition: width 0.5s ease;
+  -moz-transition: width 0.5s ease;
+  -o-transition: width 0.5s ease;
+  -ms-transition: width 0.5s ease;
+  transition: width 0.5s ease;
 }
 div.controller.window div.background {
   opacity: 0;
@@ -195,14 +192,6 @@ div.controller div.controls div.pause {
 div.controller div.controls div.go-live {
   background-image: url(/static/img/ekg.png);
 }
-div.right-grad {
-  width: 20px;
-  height: 230px;
-  position: absolute;
-  right: 0;
-  top: 20px;
-  background: url(/static/img/right-grad-20.png);
-}
 div#guide {
   position: absolute;
   bottom: 0px;
@@ -252,11 +241,6 @@ div#guide div.ticker {
   height: 45px;
   background-position: 0 -4px;
   cursor: pointer;
-  -webkit-transition: left 0.5s linear;
-  -moz-transition: left 0.5s linear;
-  -o-transition: left 0.5s linear;
-  -ms-transition: left 0.5s linear;
-  transition: left 0.5s linear;
   z-index: 110;
 }
 div#guide.collapsed div.header div.times {
@@ -348,6 +332,10 @@ div#guide.toggled div.channels div.channel div.programs div.program.clipped:hove
 }
 div#guide.collapsed div.channels {
   height: 40px;
+  overflow: hidden;
+}
+div#guide.collapsed div.channels div.channel {
+  background: #5c5c5c;
 }
 div#guide.collapsed div.channels div.current div.channel div.programs {
   background: #3d3d3d url(/static/img/grad.png);
@@ -379,6 +367,9 @@ div#guide.collapsed div.channels div.current div.channel div.programs div.progra
   background: #111;
   box-shadow: inset -1px 0 1px #000000;
   color: #ddd;
+}
+div#guide.collapsed div.channels div.suggest {
+  display: none;
 }
 div#guide.collapsed div.channels div.channel div.programs div.program div.thumb {
   display: none;
@@ -637,6 +628,7 @@ div#guide div.channels div.channel div.viewers {
   position: absolute;
   bottom: 10px;
   z-index: 1;
+  pointer-events: none;
   -webkit-transition: height .3s;
   -moz-transition: height .3s;
   transition: height .3s;
@@ -658,6 +650,8 @@ div#guide div.channels div.channel div.viewers div.viewer div.line {
   top: 11px;
   width: 100%;
   box-shadow: 0px 1px 1px 0px rgba(255, 255, 255, 0.6);
+  pointer-events: all;
+  cursor: pointer;
   display: none;
 }
 div#guide div.channels div.channel div.viewers div.viewer div.line:last-child {
@@ -706,6 +700,156 @@ div#guide div.channels div.channel div.viewers div.viewer div.username {
   left: 10px;
   top: 3px;
 }
+div#guide div.channels div.suggest {
+  position: absolute;
+  vertical-align: middle;
+  height: 100%;
+  border-radius: 5px;
+  border: 1px solid transparent;
+  padding: 1px;
+  cursor: pointer;
+  outline: none;
+}
+div#guide div.channels div.suggest div.spinner {
+  margin: 0 10px;
+  font-size: 80px;
+  line-height: 37px;
+  position: absolute;
+  -webkit-transition: margin 0.3s ease;
+  -moz-transition: margin 0.3s ease;
+  -o-transition: margin 0.3s ease;
+  -ms-transition: margin 0.3s ease;
+  transition: margin 0.3s ease;
+}
+div#guide div.channels div.suggest.show div.spinner {
+  margin: 0 50px;
+}
+div#guide div.channels div.suggest.show div.select-program {
+  display: block;
+}
+div#guide div.channels div.suggest:hover,
+div#guide div.channels div.suggest.show {
+  color: #2d2d2d;
+}
+div#guide div.channels div.select-program {
+  padding-top: 20px;
+  height: 60px;
+  background-color: #dfdfdf;
+  color: #f5f5f5;
+  border-color: #f5f5f5;
+  border-radius: 4px;
+  box-shadow: inset 0px 0px 1px 1px rgba(0, 0, 0, 0.4);
+  -webkit-transition: opacity 3s ease-out;
+  -moz-transition: opacity 3s ease-out;
+  -o-transition: opacity 3s ease-out;
+  -ms-transition: opacity 3s ease-out;
+  transition: opacity 3s ease-out;
+  display: none;
+  border-radius: 3px;
+}
+div#guide div.channels div.select-program div.select-header {
+  position: absolute;
+  top: 0;
+  left: 1px;
+  width: 162px;
+  height: 20px;
+  text-align: center;
+  background: url(/static/img/grad-flat.png);
+  border-top: 1px solid #ccc;
+  color: #fefefe;
+  text-shadow: 1px 1px black;
+  font-size: 10px;
+  font-family: MuseoSans700;
+  line-height: 20px;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+}
+div#guide div.channels div.select-program div.select-content {
+  width: 160px;
+  height: 100%;
+  margin: 1px;
+  overflow: hidden;
+}
+div#guide div.channels div.select-program div.select-content div.page {
+  width: 320px;
+  height: 58px;
+  position: relative;
+}
+div#guide div.channels div.select-program div.select-content input[type=text] {
+  width: 144px;
+  margin-top: 30px;
+  margin-left: 4px;
+  border: 1px solid #ccc;
+  box-shadow: none;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: normal;
+  line-height: 15px;
+  color: #555;
+  margin-bottom: 6px;
+  resize: none;
+  padding: 3px;
+  height: 16px;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+  outline: none;
+}
+div#guide div.channels div.select-program div.select-content div.page2 {
+  position: absolute;
+  left: 160px;
+  width: 160px;
+  height: 100%;
+  top: 0;
+  background: #f5f5f5;
+  border-radius: 6px;
+}
+div#guide div.channels div.select-program div.confirm-media {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+div#guide div.channels div.select-program div.confirm-media div.thumb {
+  background-position: center;
+  background-size: auto 110px;
+  opacity: .5;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+div#guide div.channels div.select-program div.confirm-media div.title {
+  font-size: 14px;
+  width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  color: #2d2d2d;
+  text-shadow: 1px 1px 1px white;
+  text-overflow: ellipsis;
+  margin: 3px 5px;
+  position: absolute;
+}
+div#guide div.channels div.select-program div.confirm-media div.button,
+div#guide div.channels div.select-program div.confirm-media div.added {
+  position: absolute;
+  right: 3px;
+  bottom: 4px;
+  line-height: 18px;
+  font-family: MuseoSans700;
+  font-size: 10px;
+  width: 40px;
+  color: #2d2d2d;
+  text-shadow: none;
+  -webkit-transition: opacity 0.5s ease;
+  -moz-transition: opacity 0.5s ease;
+  -o-transition: opacity 0.5s ease;
+  -ms-transition: opacity 0.5s ease;
+  transition: opacity 0.5s ease;
+}
+div#guide div.channels div.select-program div.confirm-media div.button {
+  background: #f5f5f5;
+}
 div#guide div.channels .current div.name {
   background: #181818 !important;
   box-shadow: 1px 0 3px rgba(0, 0, 0, 0.8), -3px 0px 3px 3px rgba(105, 105, 105, 0.8), 10px 0 55px -8px rgba(255, 255, 255, 0.7) !important;
@@ -752,9 +896,16 @@ div#guide .current div.program img {
   position: absolute;
   top: 0;
   left: 0;
+  background: transparent;
+}
+#stagecover.covered {
   background: #181818;
 }
+#stagecover.covered div.message {
+  display: block;
+}
 #stagecover div.message {
+  display: none;
   font-size: 30px;
   color: #f7f7f7;
   position: absolute;
@@ -931,6 +1082,32 @@ div#sidebar {
   transition: right .5s ease;
   z-index: 110;
 }
+div#sidebar.dark {
+  background: #aaaaaa url(/static/img/linen-black-70.png);
+}
+div#sidebar.dark div.stream div.activity div.text,
+div#sidebar.dark div.stream div.activity div.text,
+div#sidebar.dark div.stream div.activity div.text a,
+div#sidebar.dark div.info div.label {
+  color: #f5f5f5;
+  text-shadow: 1px 1px 1px #181818;
+}
+div#sidebar.dark div.tabbed.activity ul.tabs li.activity {
+  background: rgba(245, 245, 245, 0.8);
+}
+div#sidebar.dark div.list-media {
+  background: rgba(240, 240, 240, 0.2);
+  box-shadow: 0 0 2px 0px rgba(255, 255, 255, 0.8);
+}
+div#sidebar.dark div.list-media:active {
+  box-shadow: 0 1px 1px rgba(255, 255, 255, 0.4);
+}
+div#sidebar.dark div.info div.comments-holder div.comment,
+div#sidebar.dark div.info div.tweet-holder div.tweet {
+  background: rgba(255, 255, 255, 0.15);
+  border: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.8);
+}
 div#sidebar.toggled {
   right: 0px;
   box-shadow: inset 4px 0 6px -4px rgba(0, 0, 0, 0.7), 0 0 1px 1px rgba(146, 146, 146, 0.6);
@@ -947,7 +1124,7 @@ div#sidebar div#toolbar {
   background: #f7f7f7;
   position: relative;
   border-bottom: 2px solid #AAA;
-  box-shadow: 0 2px 3px 1px rgba(0, 0, 0, 0.4), inset 4px 2px 6px -3px rgba(0, 0, 0, 0.7), 0 0 0 1px #181818;
+  box-shadow: 0 2px 3px 1px rgba(0, 0, 0, 0.2), inset 4px 2px 6px -3px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(24, 24, 24, 0.2);
   z-index: 20;
 }
 div#sidebar div#toolbar.back ul.tabs {
@@ -985,11 +1162,11 @@ div#sidebar div#toolbar div.back div.back-title {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  -webkit-transition: all 0.3s ease;
-  -moz-transition: all 0.3s ease;
-  -o-transition: all 0.3s ease;
-  -ms-transition: all 0.3s ease;
-  transition: all 0.3s ease;
+  -webkit-transition: opacity .3s ease, width, .3s, ease;
+  -moz-transition: opacity .3s ease, width, .3s, ease;
+  -o-transition: opacity .3s ease, width, .3s, ease;
+  -ms-transition: opacity .3s ease, width, .3s, ease;
+  transition: opacity .3s ease, width, .3s, ease;
 }
 div#sidebar div#toolbar div.back div.back-button {
   width: 0;
@@ -1001,11 +1178,11 @@ div#sidebar div#toolbar div.back div.back-button {
   border: 1px solid #ccc;
   border-radius: 3px;
   cursor: pointer;
-  -webkit-transition: all 0.3s ease;
-  -moz-transition: all 0.3s ease;
-  -o-transition: all 0.3s ease;
-  -ms-transition: all 0.3s ease;
-  transition: all 0.3s ease;
+  -webkit-transition: opacity .3s ease, width, .3s, ease;
+  -moz-transition: opacity .3s ease, width, .3s, ease;
+  -o-transition: opacity .3s ease, width, .3s, ease;
+  -ms-transition: opacity .3s ease, width, .3s, ease;
+  transition: opacity .3s ease, width, .3s, ease;
 }
 div#sidebar div#toolbar div.back div.back-button:after,
 div#sidebar div#toolbar div.back div.back-button:before {
@@ -1032,7 +1209,8 @@ div#sidebar div#toolbar div.back div.back-button:before {
   margin-top: -14px;
 }
 div#sidebar div#toolbar div.back div.back-button div {
-  font-size: 12px;
+  font-size: 11px;
+  font-family: MuseoSans700;
   margin-top: 6px;
   margin-left: 6px;
   color: #7d7d7d;
@@ -1072,11 +1250,11 @@ div#sidebar div#toolbar ul.tabs li.tab div.label {
 div#sidebar div#toolbar div.arrow {
   position: absolute;
   top: 40px;
-  -webkit-transition: all 0.3s ease;
-  -moz-transition: all 0.3s ease;
-  -o-transition: all 0.3s ease;
-  -ms-transition: all 0.3s ease;
-  transition: all 0.3s ease;
+  -webkit-transition: left 0.3s ease;
+  -moz-transition: left 0.3s ease;
+  -o-transition: left 0.3s ease;
+  -ms-transition: left 0.3s ease;
+  transition: left 0.3s ease;
 }
 div#sidebar div#toolbar div.arrow:after,
 div#sidebar div#toolbar div.arrow:before {
@@ -1102,6 +1280,14 @@ div#sidebar div#toolbar div.arrow:before {
   left: 50%;
   margin-left: -13px;
 }
+div#sidebar div#toolbar div.radial-grad {
+  position: absolute;
+  width: 100%;
+  height: 20px;
+  background: url(/static/img/radial-grad.png);
+  top: 43px;
+  pointer-events: none;
+}
 div#sidebar div#sidebar-content {
   position: absolute;
   width: 100%;
@@ -1123,11 +1309,12 @@ div#sidebar div#sidebar-content div.screen {
   top: 43px;
   right: -300px;
   overflow: hidden;
-  -webkit-transition: all 0.3s ease;
-  -moz-transition: all 0.3s ease;
-  -o-transition: all 0.3s ease;
-  -ms-transition: all 0.3s ease;
-  transition: all 0.3s ease;
+  -webkit-transition: opacity .3s ease, width .3s ease, right .3s ease, left .3s ease;
+  -moz-transition: opacity .3s ease, width .3s ease, right .3s ease, left .3s ease;
+  -o-transition: opacity .3s ease, width .3s ease, right .3s ease, left .3s ease;
+  -ms-transition: opacity .3s ease, width .3s ease, right .3s ease, left .3s ease;
+  transition: opacity .3s ease, width .3s ease, right .3s ease, left .3s ease;
+  -webkit-overflow-scroll: touch;
 }
 div#sidebar div#sidebar-content div.slide {
   position: absolute;
@@ -1135,11 +1322,12 @@ div#sidebar div#sidebar-content div.slide {
   height: 100%;
   top: 43px;
   overflow: hidden;
-  -webkit-transition: all 0.3s ease;
-  -moz-transition: all 0.3s ease;
-  -o-transition: all 0.3s ease;
-  -ms-transition: all 0.3s ease;
-  transition: all 0.3s ease;
+  -webkit-transition: opacity .3s ease, width .3s ease, right .3s ease;
+  -moz-transition: opacity .3s ease, width .3s ease, right .3s ease;
+  -o-transition: opacity .3s ease, width .3s ease, right .3s ease;
+  -ms-transition: opacity .3s ease, width .3s ease, right .3s ease;
+  transition: opacity .3s ease, width .3s ease, right .3s ease;
+  -webkit-overflow-scroll: touch;
 }
 div#sidebar div#sidebar-content div.screen.current,
 div#sidebar div#sidebar-content div.slide.current {
@@ -1187,11 +1375,6 @@ div#sidebar div.comment-input {
   min-height: 31px;
   position: absolute;
   bottom: 42px;
-  -webkit-transition: all 0.5s ease;
-  -moz-transition: all 0.5s ease;
-  -o-transition: all 0.5s ease;
-  -ms-transition: all 0.5s ease;
-  transition: all 0.5s ease;
 }
 div#sidebar div.comment-input div.comment-controls {
   width: 100%;
@@ -1267,7 +1450,7 @@ div#sidebar div.comment-input div.input-holder {
   width: 100%;
   height: 100%;
   border-top: 2px solid #ccc;
-  box-shadow: 0 -2px 2px 0 rgba(0, 0, 0, 0.4), inset 4px -2px 6px -3px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(24, 24, 24, 0.3);
+  box-shadow: 0 -2px 2px 0 rgba(0, 0, 0, 0.4), inset 4px -2px 6px -3px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(24, 24, 24, 0.3);
   position: relative;
 }
 div#sidebar div.comment-input div.input-holder textarea {
@@ -1282,7 +1465,7 @@ div#sidebar div.comment-input div.input-holder textarea {
   resize: none;
   margin-left: 10px;
   margin-top: 7px;
-  margin-bottom: 5px;
+  margin-bottom: 4px;
 }
 div#sidebar div.info.current div.comment-input {
   visibility: visible;
@@ -1361,11 +1544,11 @@ div#sidebar div.list-media:hover div.media div.preview {
   background-size: auto 100%;
 }
 div#sidebar div.list-media:hover div.media div.preview div.thumb {
-  -webkit-transition: all 0.3s ease;
-  -moz-transition: all 0.3s ease;
-  -o-transition: all 0.3s ease;
-  -ms-transition: all 0.3s ease;
-  transition: all 0.3s ease;
+  -webkit-transition: opacity .3s ease, background-position .3s ease;
+  -moz-transition: opacity .3s ease, background-position .3s ease;
+  -o-transition: opacity .3s ease, background-position .3s ease;
+  -ms-transition: opacity .3s ease, background-position .3s ease;
+  transition: opacity .3s ease, background-position .3s ease;
   opacity: .7;
   background-position-y: 40% !important;
 }
@@ -1402,11 +1585,6 @@ div#sidebar div.list-media div.media {
   cursor: pointer;
   border-top-left-radius: 3px;
   border-top-right-radius: 3px;
-  -webkit-transition: all 0.3s ease;
-  -moz-transition: all 0.3s ease;
-  -o-transition: all 0.3s ease;
-  -ms-transition: all 0.3s ease;
-  transition: all 0.3s ease;
 }
 div#sidebar div.list-media div.media div.preview {
   display: inline-block;
@@ -1511,7 +1689,7 @@ div#sidebar div.list-media div.publisher {
   left: 0px;
   margin-bottom: 6px;
   border-bottom: 1px solid rgba(204, 204, 204, 0.32);
-  width: 100%;
+  width: 272px;
   padding: 3px;
   font-family: MuseoSans500;
 }
@@ -1762,6 +1940,27 @@ div.program.drag div.border {
 }
 div#sidebar div.info {
   margin-top: -2px;
+  /*
+  div.description {
+    margin-top: 1px;
+    width: 280px;
+    max-height: 60px;
+    overflow: hidden;
+    overflow-y: scroll;
+    position: relative;
+    margin-right: 5px;
+    padding: 8px 10px;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0.75);
+    border-bottom: 1px solid rgba(24, 24, 24, 0.6);
+    box-shadow: inset 0 -1px 0px 0px rgb(85, 85, 85), inset -1px -2px 0px -1px #5e5e5e,
+        0px 1px 0px 1px rgba(200, 200, 200, 0.7);
+    line-height: 18px;
+    font-family: MuseoSans100;
+    font-size: 12px;
+  }
+  */
+
 }
 div#sidebar div.info div.picture {
   display: inline-block;
@@ -1791,8 +1990,8 @@ div#sidebar div.info div.picture img.thumb.fix-height {
   height: 150%;
   width: auto;
 }
-div#sidebar div.info div.publisher {
-  left: 10px;
+div#sidebar div.info div.picture div.publisher {
+  left: 9px;
   top: 10px;
   background: rgba(0, 0, 0, 0.6);
   display: inline-block;
@@ -1800,22 +1999,25 @@ div#sidebar div.info div.publisher {
   position: absolute;
   cursor: pointer;
 }
-div#sidebar div.info div.publisher img {
+div#sidebar div.info div.picture div.publisher img {
   width: 22px;
   height: 22px;
-  border-top-left-radius: 6px;
-  border-bottom-left-radius: 6px;
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
   vertical-align: top;
   border: 1px solid transparent;
 }
-div#sidebar div.info div.publisher div.name {
+div#sidebar div.info div.picture div.publisher div.name {
   color: #f5f5f5;
   text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
   font-size: 11px;
-  font-family: MuseoSans700;
+  font-family: MuseoSans500;
   line-height: 3px;
-  margin: 0 5px;
+  margin: 0 5px 0 2px;
   display: inline-block;
+}
+div#sidebar div.info div.picture.scrolled div.publisher {
+  pointer-events: none;
 }
 div#sidebar div.info img.thumb {
   height: 70px;
@@ -1833,28 +2035,61 @@ div#sidebar div.info div.label {
   text-shadow: 1px 1px 1px white;
   font-family: MuseoSans700;
 }
+div#sidebar div.info div.scrollable {
+  height: 200px;
+  overflow-y: scroll;
+}
 div#sidebar div.info div.title {
-  position: relative;
-  left: 10px;
+  position: absolute;
+  left: 9px;
   top: 40px;
   padding-right: 10px;
   color: whiteSmoke;
   text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
   font-size: 18px;
   font-family: MuseoSans100;
-  width: 225px;
+  width: 230px;
   overflow: hidden;
   background: rgba(0, 0, 0, 0.6);
   border-radius: 3px;
   padding: 5px;
+  pointer-events: none;
+}
+div#sidebar div.info div.desc-link {
+  position: relative;
+  width: 240px;
+  margin-top: 180px;
+  font-size: 12px;
+  margin-left: 9px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #181818;
+}
+div#sidebar div.info div.desc-link a {
+  font-size: 10px;
+  color: #181818;
+  text-shadow: 1px 1px 1px white;
+  font-family: MuseoSans700;
+}
+div#sidebar div.info div.description {
+  width: 240px;
+  position: relative;
+  margin-right: 5px;
+  padding: 8px 10px;
+  color: #181818;
+  text-shadow: none;
+  line-height: 18px;
+  font-family: MuseoSans300;
+  font-size: 12px;
 }
 div#sidebar div.info div.published {
   position: absolute;
-  bottom: 10px;
-  left: 10px;
-  color: #181818;
+  right: 0;
+  top: 0;
+  color: black;
   text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.7);
-  font-size: 12px;
+  line-height: 18px;
+  font-family: MuseoSans500;
+  font-size: 10px;
 }
 div#sidebar div.info div.options {
   position: absolute;
@@ -1903,25 +2138,6 @@ div#sidebar div.info div.options div.twitter {
   background-image: url(/static/img/twitter.png);
   background-size: auto 30%;
 }
-div#sidebar div.info div.description {
-  margin-top: 1px;
-  width: 280px;
-  max-height: 60px;
-  overflow: hidden;
-  overflow-y: scroll;
-  position: relative;
-  margin-right: 5px;
-  padding: 8px 10px;
-  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
-  background: rgba(0, 0, 0, 0.75);
-  /* box-shadow: inset -1px -4px 8px -4px rgba(0, 0, 0, 0.9); */
-
-  border-bottom: 1px solid rgba(24, 24, 24, 0.6);
-  box-shadow: inset 0 -1px 0px 0px #555555, inset -1px -2px 0px -1px #5e5e5e, 0px 1px 0px 1px rgba(200, 200, 200, 0.7);
-  line-height: 18px;
-  font-family: MuseoSans100;
-  font-size: 12px;
-}
 div#sidebar div.info div.viewers {
   position: relative;
   top: 10px;
@@ -1932,11 +2148,12 @@ div#sidebar div.info div.viewers {
 div#sidebar div.info div.viewers div.viewer {
   background: #ccc;
   width: 25px;
-  height: 24px;
+  height: 25px;
   border-radius: 10px;
   box-shadow: 0px 1px 1px 0px rgba(255, 255, 255, 0.6);
   display: inline-block;
   margin-left: 9px;
+  cursor: pointer;
 }
 div#sidebar div.info div.viewers div.viewer img {
   width: 21px;
@@ -2000,20 +2217,22 @@ div#sidebar div.info div.tweet-holder div.dot-nav {
   text-align: center;
 }
 div#sidebar div.info div.tweet-holder div.dot-nav div.dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 7px;
-  background: black;
+  width: 6px;
+  height: 6px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.3);
   display: inline-block;
-  margin: 10px 5px;
+  margin: 7px 5px;
   cursor: pointer;
+  border: 1px solid rgba(0, 0, 0, 0.4);
 }
 div#sidebar div.info div.tweet-holder div.dot-nav div.dot.selected {
-  background: white;
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(255, 255, 255, 0.4);
 }
 div#sidebar div.info div.comments-holder {
   position: relative;
-  top: 35px;
+  top: 20px;
   left: 10px;
   margin-right: 20px;
   width: 280px;
@@ -2151,6 +2370,7 @@ div#sidebar div.stream div.medias {
 div#sidebar div.admin {
   margin-top: -2px;
   display: none;
+  overflow-y: scroll;
 }
 div#sidebar div.admin div.search {
   background: rgba(245, 245, 245, 0.6);
@@ -2323,10 +2543,12 @@ div#sidebar div#admin-list div.list-media div.media div.preview div.title {
   height: 30px;
   line-height: 14px;
 }
-div#sidebar div#sidebar-content div.screen.profile {
+div#sidebar div#sidebar-content div.screen.profile,
+div#sidebar div#sidebar-content div.slide.profile {
   overflow-y: scroll;
 }
-div#sidebar div#sidebar-content div.screen.profile div.content.starred {
+div#sidebar div#sidebar-content div.screen.profile div.content.starred,
+div#sidebar div#sidebar-content div.slide.profile div.content.starred {
   margin: 10px;
 }
 @font-face {
@@ -2352,6 +2574,11 @@ body {
   font-family: MuseoSans300;
   overflow: hidden;
 }
+body {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
 div#overlay {
   position: absolute;
   left: 0;
@@ -2367,4 +2594,13 @@ a {
 }
 a:hover {
   text-decoration: underline;
+}
+div,
+li,
+a {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-touch-callout: none;
+}
+.ios-scroll {
+  -webkit-overflow-scrolling: touch;
 }

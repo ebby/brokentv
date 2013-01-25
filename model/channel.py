@@ -2,6 +2,7 @@ from common import *
 
 from media import Media
 from user import User
+from collection import Collection
 
 class Channel(db.Model):
   name = db.StringProperty()
@@ -10,6 +11,8 @@ class Channel(db.Model):
   next_gen = db.DateTimeProperty() # Next programming generation time
   privacy = db.IntegerProperty(default=Privacy.PUBLIC)
   user = db.ReferenceProperty(User, collection_name='channel')
+  next_time = db.DateTimeProperty()
+  suggested = db.ReferenceProperty(Collection)
 
   @property
   def id(self):
@@ -46,17 +49,29 @@ class Channel(db.Model):
         self.current_program = c_p.program.key().id()
         return c_p.program
     return None
+  
+  def update_next_time(self):
+    last_program = self.channelPrograms.order('-time').get()
+    next_time = datetime.datetime.now()
+    if last_program:
+      next_time = last_program.program.time + datetime.timedelta(seconds=last_program.program.media.duration)
+    self.next_time = max(datetime.datetime.now(), next_time)
 
   def get_next_time(self):
-    next_time = datetime.datetime.utcnow()
-    programming = self.get_programming()
-    if len(programming):
-      last_program = programming[0]
-      next_time = last_program.time + datetime.timedelta(seconds=last_program.media.duration)
+    next_time = self.next_time or datetime.datetime.utcnow()
     return max(datetime.datetime.utcnow(), next_time)
   
   def get_collections(self):
     return [chan_col.collection for chan_col in self.channelCollections.fetch(20)]
+  
+  def get_suggested(self):
+    col = self.suggested
+    if not col:
+      col = Collection(name=self.name + ' Suggestions')
+      col.put()
+      self.suggested = col
+      self.put()
+    return col
 
   def toJson(self):
     json = {}
@@ -68,7 +83,6 @@ class Channel(db.Model):
     return json
 
 from program import *
-from collection import *
 # Collections that may play into this collection
 class ChannelCollection(db.Model):
   

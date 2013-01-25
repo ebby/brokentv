@@ -66,6 +66,7 @@ brkn.sidebar.Stream.prototype.decorateInternal = function(el) {
   el.scrollTop = 0;
 
   goog.dom.classes.add(el, 'stream');
+  goog.dom.classes.add(el, 'ios-scroll');
   this.activitiesEl_ = goog.dom.createDom('div', 'activities');
   goog.dom.appendChild(this.getElement(), this.activitiesEl_);
   

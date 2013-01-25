@@ -23,6 +23,17 @@ indexes:
   properties:
   - name: channel
   - name: time
+
+- kind: Comment
+  properties:
+  - name: media
+  - name: time
+  
+- kind: Tweet
+  properties:
+  - name: media
+  - name: time
+    direction: desc
     
 - kind: UserSession
   properties:

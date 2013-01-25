@@ -65,6 +65,7 @@ brkn.sidebar.MediaList.prototype.decorateInternal = function(el) {
 
   el.innerHTML = '';
   el.scrollTop = 0;
+  goog.dom.classes.add(this.getElement(), 'ios-scroll');
   
   if (this.description_ || this.thumbnail_) {
     var listInfoEl = soy.renderAsElement(brkn.sidebar.listInfo, {

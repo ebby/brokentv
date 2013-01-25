@@ -83,6 +83,7 @@ class Programming():
   def set_programming(cls, channel_id, duration=600, schedule_next=True, fetch_twitter=True,
                       queue='default', target=None):
     channel = Channel.get_by_key_name(channel_id)
+    channel.update_next_time()
     viewers = (memcache.get('channel_viewers') or {}).get(str(channel_id), [])
     cols = channel.get_collections()
     all_medias = []
@@ -141,7 +142,7 @@ class Programming():
     memcache.set('programming', simplejson.dumps(programming))
 
     # Schedule our next programming selection
-    if schedule_next and (not constants.DEVELOPMENT or (constants.DEVELOPMENT and len(medias))):
+    if schedule_next and len(medias):
       next_gen = (programs[-2].time - datetime.datetime.now()).seconds if len(programs) > 1 \
           else 0
       next_gen = min(next_gen,

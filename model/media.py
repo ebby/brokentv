@@ -76,7 +76,7 @@ class Media(db.Model):
                     host_views=int(entry.statistics.view_count) if entry.statistics else 0,
                     category=category)
         
-        publisher_name = entry.author[0].name.text
+        publisher_name = entry.author[0].name.text.lower()
         publisher = Publisher.add(MediaHost.YOUTUBE, publisher_name)
         PublisherMedia.add(publisher, media)
         media.put()

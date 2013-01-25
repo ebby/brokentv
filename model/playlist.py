@@ -3,7 +3,6 @@ from common import *
 from user import User
 from media import Media
 from publisher import Publisher
-from channel import Channel
 
 
 class Playlist(db.Model):

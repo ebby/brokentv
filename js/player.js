@@ -53,7 +53,13 @@ brkn.Player.prototype.enterDocument = function() {
     this.playProgram(this.currentProgram_);
   }
   
-  this.getHandler().listen(window, 'resize', this.resize);
+  this.getHandler()
+      .listen(window, 'resize', this.resize)
+      .listen(this.getElement(), goog.events.EventType.DBLCLICK, goog.bind(function() {
+        var show = !brkn.model.Sidebar.getInstance().toggled();
+        brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.TOGGLE_SIDEBAR, show);
+        brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.TOGGLE_GUIDE, show);
+      }, this));
   
   brkn.model.Channels.getInstance().subscribe(brkn.model.Channels.Actions.CHANGE_CHANNEL,
 			this.changeChannel, this);
@@ -140,7 +146,7 @@ brkn.Player.prototype.resize = function() {
   var sidebarWidth = goog.dom.classes.has(goog.dom.getElement('sidebar'), 'toggled')  ? 300 : 0;
   goog.style.setHeight(playerEl, goog.dom.getViewportSize().height - guideHeight);
   goog.style.setWidth(playerEl, goog.dom.getViewportSize().width - sidebarWidth); 
-  goog.style.setHeight(stagecover, goog.dom.getViewportSize().height - guideHeight - 40);
+  goog.style.setHeight(stagecover, goog.dom.getViewportSize().height - guideHeight);
   goog.style.setWidth(stagecover, goog.dom.getViewportSize().width - sidebarWidth);
   var messageSize = goog.style.getSize(message);
   goog.style.setStyle(message, {
@@ -236,8 +242,8 @@ brkn.Player.prototype.updateStagecover_ = function() {
   var seek = this.currentProgram_ ? (goog.now() - this.currentProgram_.time.getTime())/1000 : 0;
   if (!this.currentProgram_ || (this.currentProgram_ && seek > this.currentProgram_.media.duration)) {
     this.resize();
-    goog.style.showElement(stagecover, true);
+    goog.dom.classes.add(stagecover, 'covered');
   } else {
-    goog.style.showElement(stagecover, false);
+    goog.dom.classes.remove(stagecover, 'covered');
   }
 };

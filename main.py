@@ -50,8 +50,12 @@ class MainHandler(BaseHandler):
     def get(self):
       template_data = {}
       template_data['host_url'] = self.request.host_url
-      template_data['js_location'] = constants.JS_SOURCE
-      if not constants.DEVELOPMENT or self.request.get('css'):
+      if self.request.get('prod'):
+        template_data['js_location'] = constants.PROD_JS
+      else:
+        template_data['js_location'] = constants.JS_SOURCE
+
+      if not constants.DEVELOPMENT or self.request.get('css') or self.request.get('prod'):
         template_data['css_location'] = constants.CSS_SOURCE
 
       template_data['facebook_app_id'] = constants.FACEBOOK_APP_ID;

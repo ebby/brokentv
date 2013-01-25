@@ -6,7 +6,6 @@ goog.require('brkn.model.Tweet');
 goog.require('brkn.sidebar');
 goog.require('brkn.sidebar.CommentInput');
 
-goog.require('goog.events.KeyHandler.EventType');
 goog.require('goog.date.relative');
 goog.require('goog.fx.dom.Scroll');
 goog.require('goog.ui.Component');
@@ -60,6 +59,11 @@ brkn.sidebar.Info = function(media) {
    * @type {goog.ui.CustomButton}
    */
   this.playButton_ = new goog.ui.CustomButton('Play');
+  
+  /**
+   * @type {goog.ui.CustomButton}
+   */
+  this.plusButton_ = new goog.ui.CustomButton('Plus');
 };
 goog.inherits(brkn.sidebar.Info, goog.ui.Component);
 
@@ -140,6 +144,7 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
   this.fbButton_.decorate(goog.dom.getElementByClass('facebook', this.getElement()));
   this.twitterButton_.decorate(goog.dom.getElementByClass('twitter', this.getElement()));
   this.playButton_.decorate(goog.dom.getElementByClass('play', this.getElement()));
+  this.plusButton_.decorate(goog.dom.getElementByClass('plus', this.getElement()));
   var tweetTimer = new goog.Timer(5000);
 
   goog.net.XhrIo.send('/_info/' + this.media_.id, goog.bind(function(e) {
@@ -178,45 +183,6 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
     
     this.resize();
   }, this));
-  
-  
-//  goog.net.XhrIo.send('/_seen/' + this.media_.id, goog.bind(function(e) {
-//    var seen = /** @type {Array.<Object>} */ goog.json.parse(e.target.getResponse());
-//    goog.style.showElement(viewersEl, seen.length);
-//    goog.array.forEach(seen, function(viewer) {
-//      var viewerEl = soy.renderAsElement(brkn.sidebar.viewer, {
-//        user: brkn.model.Users.getInstance().get_or_add(viewer)
-//      });
-//      goog.dom.appendChild(viewersEl, viewerEl);
-//      this.getHandler().listen(viewerEl, goog.events.EventType.CLICK, function() {
-//        brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.PROFILE, viewer)
-//      });
-//    }, this);
-//    this.resize();
-//    
-//  }, this));
-//  
-//  var tweetTimer = new goog.Timer(5000);
-//  goog.net.XhrIo.send('/_tweet/' + this.media_.id, goog.bind(function(e) {
-//    var tweets = /** @type {Array.<Object>} */ goog.json.parse(e.target.getResponse());
-//    goog.array.forEach(tweets, function(tweet) {
-//      var t = new brkn.model.Tweet(tweet);
-//      this.addTweet_(t);
-//      this.currentDotEl_ = /** @type {Element} */ this.dotNavEl_.firstChild;
-//      goog.dom.classes.add(this.currentDotEl_, 'selected');
-//    }, this);
-//    tweets.length && tweetTimer.start();
-//  }, this));
-//  
-//  goog.net.XhrIo.send('/_comment/' + this.media_.id, goog.bind(function(e) {
-//      var comments = /** @type {Array.<Object>} */ goog.json.parse(e.target.getResponse());
-//      goog.style.showElement(goog.dom.getParentElement(this.commentsEl_), comments.length);
-//      goog.array.forEach(comments, function(comment) {
-//        var c = new brkn.model.Comment(comment);
-//        this.addComment_(c);
-//      }, this);
-//      this.resize();
-//    }, this));
   
   this.getHandler()
       .listen(window,
@@ -310,8 +276,8 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
               goog.events.EventType.SCROLL,
               goog.bind(function() {
                 var opacity = (120-scrollable.scrollTop)/100;
-                goog.style.setOpacity(publisherEl, Math.min(1, Math.max(opacity, .1)));
-                goog.style.setOpacity(titleEl, Math.min(1, Math.max(opacity, .1)));
+                goog.style.setOpacity(publisherEl, Math.min(1, Math.max(opacity, 0)));
+                goog.style.setOpacity(titleEl, Math.min(1, Math.max(opacity, 0)));
                 goog.style.setOpacity(img, Math.min(.5, Math.max(opacity, .1)));
                 goog.dom.classes.enable(picEl, 'scrolled', scrollable.scrollTop > 10);
               }, this))
