@@ -56,9 +56,23 @@ brkn.Player.prototype.enterDocument = function() {
   this.getHandler()
       .listen(window, 'resize', this.resize)
       .listen(this.getElement(), goog.events.EventType.DBLCLICK, goog.bind(function() {
-        var show = !brkn.model.Sidebar.getInstance().toggled();
-        brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.TOGGLE_SIDEBAR, show);
-        brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.TOGGLE_GUIDE, show);
+//        var show = !brkn.model.Sidebar.getInstance().toggled();
+//        brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.TOGGLE_SIDEBAR, show);
+//        brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.TOGGLE_GUIDE, show);
+        
+        goog.dom.getElementByClass('main').webkitRequestFullScreen()
+      }, this))
+      .listen(this.getElement(), goog.events.EventType.CLICK, goog.bind(function() {
+        if (this.player_) {
+          switch (this.player_.getPlayerState()) {
+            case YT.PlayerState.PLAYING:
+              this.player_.pauseVideo();
+              break;
+            case YT.PlayerState.PAUSED:
+              this.player_.playVideo();
+              break;
+          }
+        }
       }, this));
   
   brkn.model.Channels.getInstance().subscribe(brkn.model.Channels.Actions.CHANGE_CHANNEL,

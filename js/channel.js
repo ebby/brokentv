@@ -216,8 +216,6 @@ brkn.Channel.prototype.enterDocument = function() {
   	if ((programs[i].time.getTime() < this.startTime_.getTime()) &&
   			(programs[i].time.getTime() + programs[i].media.duration * 1000 > (this.startTime_.getTime() - this.timeline_*1000))) {
   		// This program is in progress
-  		var remaining = (programs[i].media.duration * 1000 +
-  				programs[i].time.getTime() - this.startTime_.getTime()) / 1000;
   		this.addProgram(programs[i]);
   	} else if (programs[i].time.getTime() > this.startTime_.getTime()) {
   		this.addProgram(programs[i]);
@@ -383,7 +381,7 @@ brkn.Channel.prototype.addProgram = function(program) {
 	this.getHandler()
 	    .listen(programEl, goog.events.EventType.MOUSEOVER, function() {
     	  var titleEl = goog.dom.getElementByClass('title', programEl);
-    	  var titleWidth = goog.style.getSize(titleEl).width;
+    	  var titleWidth = goog.style.getSize(titleEl).width + goog.style.getPosition(titleEl).x;
     	  if (titleWidth > programWidth) {
     	    goog.style.setStyle(titleEl, 'margin-left', -(titleWidth - programWidth - 10) + 'px');
     	    goog.dom.classes.add(titleEl, 'marquee');
@@ -610,6 +608,16 @@ brkn.Channel.prototype.update = function() {
   if (this.showGraph_) {
     // Update path
     this.constructPath();
+  }
+ 
+  // Potentially move title for current program
+  if (this.currentProgram_) {
+    var currentProgram = this.programs_[this.currentProgram_];
+    var delta = goog.style.getPosition(currentProgram).x +
+        goog.style.getPosition(goog.dom.getElement('guide')).x;
+    window.console.log(delta);
+    var title = goog.dom.getElementByClass('title', currentProgram);
+    goog.style.setPosition(title, delta < 0 ? -delta + 5 : 5);
   }
 
   // Update viewers

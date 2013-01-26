@@ -41,9 +41,18 @@ brkn.Controller = function() {
 goog.inherits(brkn.Controller, goog.ui.Component);
 
 
+/**
+ * @type {Element}
+ * @private
+ */
+brkn.Controller.prototype.rightEl_;
+
+
 /** @inheritDoc */
 brkn.Controller.prototype.enterDocument = function() {
   goog.base(this, 'enterDocument');
+  
+  this.rightEl_ = goog.dom.getElementByClass('right', this.getElement());
 
 	this.addChild(this.guideToggle_);
 	this.guideToggle_.decorate(goog.dom.getElement('guide-toggle'));
@@ -120,6 +129,17 @@ brkn.Controller.prototype.toggleGuide_ = function(show) {
     goog.dom.classes.enable(this.getElement(), 'guide-toggled', show);
     if (!show) {
       goog.Timer.callOnce(goog.bind(goog.dom.classes.add, this, this.getElement(), 'window'), 300);
+      // Adjust window to fit content
+      var guide = goog.dom.getElement('guide');
+      var currentPrograms = goog.dom.getElementByClass('current', guide);
+      var programs = goog.dom.getElementsByClass('program', currentPrograms);
+      var lastProgram = /** @type {Element} */ goog.array.peek(programs);
+      var viewportLeft = goog.style.getPosition(guide).x +
+          goog.style.getPosition(lastProgram).x + goog.style.getSize(lastProgram).width;
+      window.console.log(viewportLeft);
+      window.console.log(goog.dom.getViewportSize().width - viewportLeft);
+      goog.style.setWidth(this.rightEl_,
+          Math.max(100, goog.dom.getViewportSize().width - viewportLeft));
     }
   }, this), show ? 0 : 600);
   this.resize();

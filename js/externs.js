@@ -42,6 +42,10 @@ YT.Player.prototype.playVideo;
 YT.PlayerState = {};
 
 YT.PlayerState.ENDED;
+YT.PlayerState.PLAYING;
+YT.PlayerState.PAUSED;
+YT.PlayerState.CUED;
+YT.PlayerState.BUFFERING;
 
 var Raphael;
 

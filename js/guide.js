@@ -318,6 +318,7 @@ brkn.Guide.prototype.enterDocument = function() {
           var x = goog.style.getPosition(this.getElement()).x + delta;
           if (x < 0 && x > (-1 * this.width_ + goog.dom.getViewportSize().width)) {
             goog.style.setPosition(this.getElement(), x);
+            this.currentChannel_.update();
             this.channelNameStyle_.innerHTML = 'div#guide div.channels div.channel div.name' + '{left:'
                 + -x + 'px !important}';
           }

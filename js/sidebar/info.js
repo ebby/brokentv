@@ -204,6 +204,8 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
                 }, this));
           }, this))
       .listen(this.starToggle_, goog.ui.Component.EventType.ACTION, goog.bind(function() {
+            brkn.model.Medias.getInstance().publish(brkn.model.Medias.Action.STAR, this.media_,
+                this.starToggle_.isChecked());
             goog.net.XhrIo.send('/_star', undefined, 'POST', 'media_id=' + this.media_.id +
                 (!this.starToggle_.isChecked() ? '&delete=1' : ''));
           }, this))

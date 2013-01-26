@@ -1,19 +1,25 @@
 goog.provide('brkn.model.Medias');
+goog.provide('brkn.model.Medias.Action');
 
 goog.require('brkn.model.Media');
+
+goog.require('goog.pubsub.PubSub');
 
 
 
 /**
  * @constructor
+ * @extends {goog.pubsub.PubSub}
  */
 brkn.model.Medias = function() {
+  goog.base(this);
 
   /**
    * @type {Object.<string, brkn.model.Media>}
    */
   this.mediaMap_ = {};
 };
+goog.inherits(brkn.model.Medias, goog.pubsub.PubSub);
 goog.addSingletonGetter(brkn.model.Medias);
 
 
@@ -46,3 +52,9 @@ brkn.model.Medias.prototype.add = function(media) {
 };
 
 
+/**
+ * @enum {string}
+ */
+brkn.model.Medias.Action = {
+  STAR: 'star'
+};

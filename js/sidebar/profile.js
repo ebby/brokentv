@@ -2,6 +2,7 @@ goog.provide('brkn.sidebar.Profile');
 
 goog.require('soy');
 goog.require('brkn.model.Media');
+goog.require('brkn.model.Medias');
 goog.require('brkn.sidebar');
 
 goog.require('goog.events.KeyHandler.EventType');
@@ -84,6 +85,10 @@ brkn.sidebar.Profile.prototype.enterDocument = function() {
         var tabEl = goog.dom.getAncestorByTagNameAndClass(e.target, 'li');
         this.navigate_(tabEl);
       }, this));
+
+  brkn.model.Medias.getInstance().subscribe(brkn.model.Medias.Action.STAR, function(media, star) {
+    star ? this.starred_.addMedia(media) : this.starred_.removeMedia(media);
+  }, this);
 };
 
 

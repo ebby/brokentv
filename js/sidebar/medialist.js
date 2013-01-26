@@ -37,6 +37,12 @@ brkn.sidebar.MediaList = function(mediaList, opt_thumb, opt_desc) {
    * @private
    */
   this.mediaList_ = mediaList;
+  
+  /**
+   * @type {Object.<string, Element>}
+   * @private
+   */
+  this.mediaEls_ = {};
 
   /**
    * @type {?string}
@@ -59,6 +65,13 @@ brkn.sidebar.MediaList = function(mediaList, opt_thumb, opt_desc) {
 goog.inherits(brkn.sidebar.MediaList, goog.ui.Component);
 
 
+/**
+ * @type {Element}
+ * @private
+ */
+brkn.sidebar.MediaList.prototype.mediasEl_;
+
+
 /** @inheritDoc */
 brkn.sidebar.MediaList.prototype.decorateInternal = function(el) {
   goog.base(this, 'decorateInternal', el);
@@ -75,23 +88,10 @@ brkn.sidebar.MediaList.prototype.decorateInternal = function(el) {
     goog.dom.appendChild(this.getElement(), listInfoEl);
   }
 
-  var mediasEl = goog.dom.createDom('div', 'medias');
-  goog.dom.appendChild(this.getElement(), mediasEl);
+  this.mediasEl_ = goog.dom.createDom('div', 'medias');
+  goog.dom.appendChild(this.getElement(), this.mediasEl_);
 
-  goog.array.forEach(this.mediaList_, function(media) {
-    var mediaEl = soy.renderAsElement(brkn.sidebar.listMedia, {
-      media: media
-    });
-    goog.dom.appendChild(mediasEl, mediaEl);
-    if (this.isAdmin_) {
-      this.dragDropGroup_.addItem(mediaEl);
-    }
-    this.getHandler().listen(mediaEl,
-        goog.events.EventType.CLICK,
-        goog.bind(function() {
-          brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.MEDIA_INFO, media);
-        }, this));
-  }, this);
+  goog.array.forEach(this.mediaList_, this.addMedia, this);
 };
 
 
@@ -99,6 +99,40 @@ brkn.sidebar.MediaList.prototype.decorateInternal = function(el) {
 brkn.sidebar.MediaList.prototype.enterDocument = function() {
   goog.base(this, 'enterDocument');
 
+};
+
+
+/**
+ * @param {brkn.model.Media} media 
+ * @private
+ */
+brkn.sidebar.MediaList.prototype.addMedia = function(media) {
+  var mediaEl = soy.renderAsElement(brkn.sidebar.listMedia, {
+    media: media
+  });
+  goog.dom.appendChild(this.mediasEl_, mediaEl);
+  if (this.isAdmin_) {
+    this.dragDropGroup_.addItem(mediaEl);
+  }
+  this.getHandler().listen(mediaEl,
+      goog.events.EventType.CLICK,
+      goog.bind(function() {
+        brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.MEDIA_INFO, media);
+      }, this));
+  this.mediaEls_[media.id] = mediaEl;
+};
+
+
+/**
+ * @param {brkn.model.Media} media 
+ * @private
+ */
+brkn.sidebar.MediaList.prototype.removeMedia = function(media) {
+  var mediaEl = this.mediaEls_[media.id]; 
+  if (mediaEl) {
+    goog.dispose(mediaEl);
+    goog.object.remove(this.mediaEls_, media.id);
+  }
 };
 
 
