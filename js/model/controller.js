@@ -12,11 +12,21 @@ goog.require('goog.pubsub.PubSub');
 brkn.model.Controller = function() {
 	goog.base(this);
 	
+	this.playing = true;
+	
 	this.sidebarToggled = false;
+	
+	this.guideToggled = true;
 
 	this.subscribe(brkn.model.Controller.Actions.TOGGLE_SIDEBAR, function(show) {
 	  this.sidebarToggled = show;
 	}, this);
+	this.subscribe(brkn.model.Controller.Actions.TOGGLE_GUIDE, function(show) {
+    this.guideToggled = show;
+  }, this);
+	this.subscribe(brkn.model.Controller.Actions.PLAY, function(play) {
+    this.playing = play;
+  }, this);
 };
 goog.inherits(brkn.model.Controller, goog.pubsub.PubSub);
 goog.addSingletonGetter(brkn.model.Controller);
@@ -47,6 +57,8 @@ brkn.model.Controller.prototype.getPending = function() {
 brkn.model.Controller.Actions = {
 	PLAY: 'play',
 	FINISHED: 'finished',
+	MUTE: 'mute',
+	RESTART: 'restart',
 	TOGGLE_GUIDE: 'toggle-guide',
 	TOGGLE_SIDEBAR: 'toggle-sidebar',
 	TOGGLE_ADMIN: 'toggle-admin'

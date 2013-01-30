@@ -27,12 +27,12 @@
 .button.dark.goog-custom-button-active,
 .button.dark.goog-custom-button-checked,
 .button.dark:active {
-  background: #111;
+  background-color: #111;
   box-shadow: inset 0 0 1px 1px #000;
   color: #ddd;
 }
 .button.dark.goog-custom-button-disabled {
-  background: #111;
+  background-color: #111;
   box-shadow: inset 0 0 1px 1px #000;
   color: #ddd;
   cursor: default;
@@ -41,6 +41,7 @@ div.controller {
   width: 100%;
   position: fixed;
   bottom: 0;
+  left: 0;
   height: 40px;
   z-index: 100;
   background: transparent url(/static/img/grad-window.png);
@@ -104,6 +105,11 @@ div.controller div.right {
   width: 100px;
   height: 100%;
   pointer-events: all;
+  -webkit-transition: width 0.5s ease;
+  -moz-transition: width 0.5s ease;
+  -o-transition: width 0.5s ease;
+  -ms-transition: width 0.5s ease;
+  transition: width 0.5s ease;
 }
 div.controller div.right div.border {
   display: none;
@@ -186,11 +192,22 @@ div.controller div.controls div.button:first-child {
 div.controller div.controls div.restart {
   background-image: url(/static/img/restart.png);
 }
-div.controller div.controls div.pause {
+div.controller div.controls div.play {
   background-image: url(/static/img/17-pause.png);
 }
-div.controller div.controls div.go-live {
-  background-image: url(/static/img/ekg.png);
+div.controller div.controls div.play.goog-custom-button-checked {
+  background-color: transparent;
+  background-image: url(/static/img/16-play.png);
+  box-shadow: inset 0 0 1px rgba(255, 255, 255, 0.1), 0 0 1px rgba(255, 255, 255, 0.5);
+}
+div.controller div.controls div.volume {
+  background-image: url(/static/img/volume-up.png);
+  background-size: 70%;
+}
+div.controller div.controls div.volume.mute,
+div.controller div.controls div.volume.goog-custom-button-checked {
+  background-image: url(/static/img/volume-down.png);
+  background-position: 4px;
 }
 div#guide {
   position: absolute;
@@ -211,9 +228,16 @@ div#guide.aligning div.channel div.name {
   -moz-transition: none !important;
   transition: none !important;
 }
-div#guide.admin div.remove,
-div#guide.admin div.repos {
-  display: block !important;
+div#guide.drag div.channels div.channel div.programs div.program.playing div.title {
+  -webkit-transition: none;
+  -moz-transition: none;
+  -o-transition: none;
+  -ms-transition: none;
+  transition: none;
+}
+div#guide.admin div.channels div.channel div.programs div.program div.remove,
+div#guide.admin div.channels div.channel div.programs div.program div.repos {
+  display: block;
 }
 div#guide.admin div.channels div.channel div.programs div.program:hover div.thumb,
 div#guide.admin div.channels div.channel div.programs div.program.playing div.thumb {
@@ -232,28 +256,160 @@ div#guide.faded {
 div#guide.faded:hover {
   opacity: 1;
 }
-div#guide div.ticker {
+div#guide div.ticker,
+div#guide div.my-ticker {
   position: absolute;
   top: 0;
   background: url(/static/img/ticker.png) no-repeat;
-  margin-left: 183px;
+  margin-left: 180px;
   width: 30px;
   height: 45px;
   background-position: 0 -4px;
   cursor: pointer;
   z-index: 110;
+  -webkit-transition: left 1s linear;
+  -moz-transition: left 1s linear;
+  -o-transition: left 1s linear;
+  -ms-transition: left 1s linear;
+  transition: left 1s linear;
+}
+div#guide div.ticker.go-live div.go-live,
+div#guide div.my-ticker.go-live div.go-live,
+div#guide div.ticker.can-go-live:hover div.go-live,
+div#guide div.my-ticker.can-go-live:hover div.go-live {
+  opacity: 1;
+  visibility: visible;
+}
+div#guide div.ticker div.go-live,
+div#guide div.my-ticker div.go-live {
+  display: none;
+  opacity: 0;
+  visibility: hidden;
+  -webkit-transition: opacity 0.3s ease;
+  -moz-transition: opacity 0.3s ease;
+  -o-transition: opacity 0.3s ease;
+  -ms-transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease;
+  position: absolute;
+  top: 37px;
+  width: 45px;
+  padding: 5px;
+  margin-left: -14px;
+  border-radius: 3px;
+  background: #dedede;
+  box-shadow: 0 0 4px 1px rgba(0, 0, 0, 0.4), 0px 1px 0 0px rgba(0, 0, 0, 0.4);
+  font-size: 11px;
+  font-family: MuseoSans700;
+  color: #181818;
+  text-shadow: 1px 1px 1px white;
+  border: 1px solid rgba(0, 0, 0, 0.6);
+}
+div#guide div.ticker div.go-live:after,
+div#guide div.my-ticker div.go-live:after,
+div#guide div.ticker div.go-live:before,
+div#guide div.my-ticker div.go-live:before {
+  bottom: 100%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+div#guide div.ticker div.go-live:after,
+div#guide div.my-ticker div.go-live:after {
+  border-color: rgba(222, 222, 222, 0);
+  border-bottom-color: #dedede;
+  border-width: 5px;
+  left: 50%;
+  margin-left: -5px;
+}
+div#guide div.ticker div.go-live:before,
+div#guide div.my-ticker div.go-live:before {
+  border-color: rgba(204, 204, 204, 0);
+  border-bottom-color: rgba(0, 0, 0, 0.6);
+  border-width: 6px;
+  left: 50%;
+  margin-left: -6px;
+}
+div#guide div.ticker div.me,
+div#guide div.my-ticker div.me {
+  display: none;
+  opacity: 0;
+  visibility: hidden;
+  -webkit-transition: opacity 0.3s ease;
+  -moz-transition: opacity 0.3s ease;
+  -o-transition: opacity 0.3s ease;
+  -ms-transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease;
+  position: absolute;
+  top: 37px;
+  left: 3px;
+  width: 25px;
+  height: 24px;
+  border-radius: 10px;
+  box-shadow: 0 2px 0px 0px rgba(0, 0, 0, 0.5);
+}
+div#guide div.ticker div.me img,
+div#guide div.my-ticker div.me img {
+  width: 21px;
+  height: 20px;
+  margin-left: 2px;
+  margin-top: 2px;
+  border-radius: 10px;
+}
+div#guide div.ticker div.me:after,
+div#guide div.my-ticker div.me:after,
+div#guide div.ticker div.me:before,
+div#guide div.my-ticker div.me:before {
+  bottom: 96%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+div#guide div.ticker div.me:after,
+div#guide div.my-ticker div.me:after {
+  border-color: rgba(222, 222, 222, 0);
+  border-bottom-color: inherit;
+  border-width: 6px;
+  left: 50%;
+  margin-left: -7px;
+}
+div#guide div.my-ticker {
+  opacity: 0;
+  visibility: hidden;
+  -webkit-transition: opacity 0.3s ease;
+  -moz-transition: opacity 0.3s ease;
+  -o-transition: opacity 0.3s ease;
+  -ms-transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease;
+  background-image: url(/static/img/my-ticker.png);
+}
+div#guide div.my-ticker.show,
+div#guide div.my-ticker.show-me div.me {
+  opacity: 1;
+  visibility: visible;
+}
+div#guide.toggled div.ticker div.go-live {
+  display: block;
+}
+div#guide.toggled div.my-ticker div.me {
+  display: block;
 }
 div#guide.collapsed div.header div.times {
   display: none;
 }
-div#guide div.header {
+div.header {
   position: absolute;
   top: 0;
   z-index: 100;
   width: 100%;
   font-size: 10px;
 }
-div#guide div.header div.name {
+div.header div.name {
   width: 10%;
   min-width: 60px;
   border-right: 1px solid #ccc;
@@ -262,7 +418,7 @@ div#guide div.header div.name {
   display: inline-block;
   border-top: 1px solid #181818;
 }
-div#guide div.header div.times {
+div.header div.times {
   width: 100%;
   position: relative;
   white-space: nowrap;
@@ -273,11 +429,11 @@ div#guide div.header div.times {
   -moz-box-shadow: inset 0 -3px 7px -3px rgba(0, 0, 0, 0.2), 0 0 5px 1px rgba(0, 0, 0, 0.6);
   box-shadow: inset 0 -3px 7px -3px rgba(0, 0, 0, 0.2), 0 0 5px 1px rgba(0, 0, 0, 0.6);
 }
-div#guide div.header div.times div.time {
+div.header div.times div.time {
   display: inline-block;
   padding: 5px 0;
 }
-div#guide div.header div.browse {
+div.header div.browse {
   width: 30px;
   height: 20px;
   margin-top: -1px;
@@ -290,58 +446,59 @@ div#guide div.header div.browse {
   text-align: center;
   cursor: pointer;
 }
-div#guide div.header div.browse.left {
+div.header div.browse.left {
   border-right: 1px solid #2d3446;
   box-shadow: inset -5px 0px 2px -5px #dedede;
   left: 0;
 }
-div#guide div.header div.browse.right {
+div.header div.browse.right {
   border-left: 1px solid #2d3446;
   box-shadow: inset 1px 0px 2px -1px #dedede;
   right: 0;
 }
-div#guide div.header div.browse:active {
+div.header div.browse:active {
   border-top: 1px solid transparent;
   background: #111;
   box-shadow: inset 0 0 1px 1px #000;
   color: #ddd;
 }
-div#guide div.header div.browse span {
+div.header div.browse span {
   display: none;
   margin: 0 4px;
 }
-div#guide div.header div.browse.now {
+div.header div.browse.now {
   width: 60px;
 }
-div#guide div.header div.browse.now span {
+div.header div.browse.now span {
   display: inline-block;
 }
-div#guide.toggled div.channels {
-  margin-top: 22px;
-}
-div#guide.toggled div.channels div.channel div.name {
-  display: inline-block;
-}
-div#guide.toggled div.channels div.channel div.programs div.program.playing div.title {
+.toggled div.channels div.channel div.programs div.program.playing div.title {
   color: #f5f5f5;
   text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.6), -1px -1px 1px rgba(0, 0, 0, 0.6), -1px 1px 1px rgba(0, 0, 0, 0.6), 1px -1px 1px rgba(0, 0, 0, 0.6);
 }
-div#guide.toggled div.channels div.channel div.programs div.program.clipped:hover {
+.toggled div.channels div.channel div.programs div.program.clipped:hover {
   z-index: 1;
   width: 200px !important;
 }
-div#guide.collapsed div.channels {
+.collapsed div.channels {
   height: 40px;
   overflow: hidden;
+  margin-top: 2px;
 }
-div#guide.collapsed div.channels div.channel {
+.collapsed div.channels div.channel {
   background: #5c5c5c;
 }
-div#guide.collapsed div.channels div.current div.channel div.programs {
+.collapsed div.channels div.channel div.viewers {
+  display: none;
+}
+.collapsed div.channels div.channel div.name {
+  display: none;
+}
+.collapsed div.channels div.channel div.programs {
   background: #3d3d3d url(/static/img/grad.png);
   margin-top: 5px;
 }
-div#guide.collapsed div.channels div.current div.channel div.programs div.program {
+.collapsed div.channels div.channel div.programs div.program {
   box-shadow: none;
   border-radius: 0;
   border: none;
@@ -350,10 +507,10 @@ div#guide.collapsed div.channels div.current div.channel div.programs div.progra
   margin-top: -1px;
   box-shadow: inset -1px 0 1px -1px #f1f1f1, 0 0 1px #dedede;
 }
-div#guide.collapsed div.channels div.current div.channel div.programs div.program:last-child {
-  border-right: 1px solid #2d3446;
+.collapsed div.channels div.channel div.programs div.program:last-child {
+  box-shadow: none;
 }
-div#guide.collapsed div.channels div.current div.channel div.programs div.program div.info div.title {
+.collapsed div.channels div.channel div.programs div.program div.info div.title {
   position: relative;
   top: 8px;
   color: #f7f7f7;
@@ -363,20 +520,24 @@ div#guide.collapsed div.channels div.current div.channel div.programs div.progra
   padding-right: 0;
   text-overflow: ellipsis;
 }
-div#guide.collapsed div.channels div.current div.channel div.programs div.program:active {
+.collapsed div.channels div.channel div.programs div.program div.remove,
+.collapsed div.channels div.channel div.programs div.program div.repos {
+  display: none;
+}
+.collapsed div.channels div.channel div.programs div.program:active {
   background: #111;
   box-shadow: inset -1px 0 1px #000000;
   color: #ddd;
 }
-div#guide.collapsed div.channels div.suggest {
+.collapsed div.channels div.suggest {
   display: none;
 }
-div#guide.collapsed div.channels div.channel div.programs div.program div.thumb {
+.collapsed div.channels div.channel div.programs div.program div.thumb {
   display: none;
 }
-div#guide div.channels {
+div.channels {
   position: absolute;
-  margin-top: 2px;
+  margin-top: 22px;
   -webkit-transition: padding-top 0.5s ease;
   -moz-transition: padding-top 0.5s ease;
   -o-transition: padding-top 0.5s ease;
@@ -387,7 +548,7 @@ div#guide div.channels {
   overflow-y: scroll;
   font-size: 12px;
 }
-div#guide div.channels div.channel {
+div.channels div.channel {
   border-bottom: 1px solid #ccc;
   position: relative;
   background: #f7f7f7;
@@ -398,10 +559,10 @@ div#guide div.channels div.channel {
   -ms-transition: height 0.3s ease;
   transition: height 0.3s ease;
 }
-div#guide div.channels div.channel div.name {
+div.channels div.channel div.name {
   width: 200px;
   text-align: center;
-  display: none;
+  display: inline-block;
   position: absolute;
   top: 0;
   left: 0;
@@ -418,7 +579,7 @@ div#guide div.channels div.channel div.name {
   -ms-transition: left 1s ease-in-out;
   transition: left 1s ease-in-out;
 }
-div#guide div.channels div.channel div.name div.text {
+div.channels div.channel div.name div.text {
   position: relative;
   top: 50%;
   line-height: 0;
@@ -426,29 +587,29 @@ div#guide div.channels div.channel div.name div.text {
   text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
   font-size: 15px;
 }
-div#guide div.channels div.channel div.name div.suggest-program {
+div.channels div.channel div.name div.suggest-program {
   padding: 5px 0;
   display: inline-block;
   position: absolute;
   left: 5px;
   top: 10px;
 }
-div#guide div.channels div.channel div.add-program {
+div.channels div.channel div.add-program {
   display: inline-block;
   width: 25px;
   font-size: 16px;
   display: none;
 }
-div#guide div.channels div.channel div.programming {
+div.channels div.channel div.programming {
   display: inline-block;
   position: relative;
   vertical-align: top;
   width: 100%;
 }
-div#guide div.channels div.channel div.programs-container {
+div.channels div.channel div.programs-container {
   height: 80px;
 }
-div#guide div.channels div.channel div.programs {
+div.channels div.channel div.programs {
   display: inline-block;
   white-space: nowrap;
   width: 100%;
@@ -460,7 +621,7 @@ div#guide div.channels div.channel div.programs {
   margin-left: 200px;
   margin-top: 6px;
 }
-div#guide div.channels div.channel div.programs div.program {
+div.channels div.channel div.programs div.program {
   display: inline-block;
   position: absolute;
   white-space: normal;
@@ -482,25 +643,25 @@ div#guide div.channels div.channel div.programs div.program {
   -ms-transition: width 0.3s ease;
   transition: width 0.3s ease;
 }
-div#guide div.channels div.channel div.programs div.program.selected {
+div.channels div.channel div.programs div.program.selected {
   border: 1px solid rgba(0, 0, 255, 0.5);
 }
-div#guide div.channels div.channel div.programs div.program:hover div.title {
+div.channels div.channel div.programs div.program:hover div.title {
   display: block !important;
 }
-div#guide div.channels div.channel div.programs div.program:hover div.title {
+div.channels div.channel div.programs div.program:hover div.title {
   color: #f5f5f5;
   text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.6), -1px -1px 1px rgba(0, 0, 0, 0.6), -1px 1px 1px rgba(0, 0, 0, 0.6), 1px -1px 1px rgba(0, 0, 0, 0.6);
 }
-div#guide div.channels div.channel div.programs div.program div.info {
+div.channels div.channel div.programs div.program div.info {
   display: inline-block;
   width: 100%;
   height: 100%;
   /*box-shadow: inset 0px 15px 30px -1px rgba(0, 0, 0, .9);*/
 
 }
-div#guide div.channels div.channel div.programs div.program:hover div.thumb,
-div#guide div.channels div.channel div.programs div.program.playing div.thumb {
+div.channels div.channel div.programs div.program:hover div.thumb,
+div.channels div.channel div.programs div.program.playing div.thumb {
   -webkit-transition: opacity 0.6s ease, background-position 3s ease-out;
   -moz-transition: opacity 0.6s ease, background-position 3s ease-out;
   -o-transition: opacity 0.6s ease, background-position 3s ease-out;
@@ -509,15 +670,15 @@ div#guide div.channels div.channel div.programs div.program.playing div.thumb {
   -webkit-filter: none !important;
   opacity: .9;
 }
-div#guide div.channels div.channel div.programs div.program.clipped:hover div.thumb,
-div#guide div.channels div.channel div.programs div.program.playing div.thumb {
+div.channels div.channel div.programs div.program.clipped:hover div.thumb,
+div.channels div.channel div.programs div.program.playing div.thumb {
   -webkit-transition: background-position 4s ease-out;
   -moz-transition: background-position 4s ease-out;
   -o-transition: background-position 4s ease-out;
   -ms-transition: background-position 4s ease-out;
   transition: background-position 4s ease-out;
 }
-div#guide div.channels div.channel div.programs div.program div.thumb {
+div.channels div.channel div.programs div.program div.thumb {
   width: 100%;
   height: 100%;
   opacity: .2;
@@ -525,10 +686,13 @@ div#guide div.channels div.channel div.programs div.program div.thumb {
   background-position: 50% 37%;
   border-radius: 3px;
 }
-div#guide div.channels div.channel div.programs div.program div.thumb.fix-height {
+div.channels div.channel div.programs div.program div.thumb.fix-height {
   background-size: auto 100%;
 }
-div#guide div.channels div.channel div.programs div.program div.progress {
+div.channels div.channel div.programs div.program div.thumb.repeat {
+  background-size: 480px auto;
+}
+div.channels div.channel div.programs div.program div.progress {
   display: none;
   width: 0;
   height: 100%;
@@ -537,7 +701,7 @@ div#guide div.channels div.channel div.programs div.program div.progress {
   margin-top: -10px;
   border-right: 2px solid #5d5d5d;
 }
-div#guide div.channels div.channel div.programs div.program div.title {
+div.channels div.channel div.programs div.program div.title {
   left: 5px;
   top: 5px;
   color: #2d2d2d;
@@ -548,18 +712,23 @@ div#guide div.channels div.channel div.programs div.program div.title {
   white-space: nowrap;
   overflow: hidden;
   padding-right: 25px;
+  -webkit-transition: left 1s linear;
+  -moz-transition: left 1s linear;
+  -o-transition: left 1s linear;
+  -ms-transition: left 1s linear;
+  transition: left 1s linear;
 }
-div#guide div.channels div.channel div.programs div.program div.title.marquee {
-  -webkit-transition: margin-left 10s linear;
-  -moz-transition: margin-left 10s linear;
-  -o-transition: margin-left 10s linear;
-  -ms-transition: margin-left 10s linear;
-  transition: margin-left 10s linear;
+div.channels div.channel div.programs div.program div.title.marquee {
+  -webkit-transition: margin-left 10s linear, left 1s linear;
+  -moz-transition: margin-left 10s linear, left 1s linear;
+  -o-transition: margin-left 10s linear, left 1s linear;
+  -ms-transition: margin-left 10s linear, left 1s linear;
+  transition: margin-left 10s linear, left 1s linear;
 }
-div#guide div.channels div.channel div.programs div.program.current {
+div.channels div.channel div.programs div.program.current {
   background: rgba(255, 255, 255, 0.3);
 }
-div#guide div.channels div.channel div.programs div.program div.remove {
+div.channels div.channel div.programs div.program div.remove {
   display: none;
   position: absolute;
   right: 5px;
@@ -572,7 +741,7 @@ div#guide div.channels div.channel div.programs div.program div.remove {
   background-size: 80%;
   filter: invert(100%);
 }
-div#guide div.channels div.channel div.programs div.program div.repos {
+div.channels div.channel div.programs div.program div.repos {
   display: none;
   position: absolute;
   right: 5px;
@@ -584,15 +753,15 @@ div#guide div.channels div.channel div.programs div.program div.repos {
   background-position: center;
   background-size: 80%;
 }
-div#guide div.channels div.channel div.programs div.program:hover div.remove,
-div#guide div.channels div.channel div.programs div.program:hover div.repos {
+div.channels div.channel div.programs div.program:hover div.remove,
+div.channels div.channel div.programs div.program:hover div.repos {
   filter: invert(100%);
   -webkit-filter: invert(100%);
   -moz-filter: invert(100%);
   -o-filter: invert(100%);
   -ms-filter: invert(100%);
 }
-div#guide div.channels div.channel div.programs div.program div.border {
+div.channels div.channel div.programs div.program div.border {
   position: absolute;
   width: 98%;
   height: 98%;
@@ -601,7 +770,7 @@ div#guide div.channels div.channel div.programs div.program div.border {
   border-radius: 16px;
   border: 8px solid #f5f5f5;
 }
-div#guide div.channels div.channel div.graph {
+div.channels div.channel div.graph {
   display: inline-block;
   width: 100%;
   position: relative;
@@ -616,14 +785,14 @@ div#guide div.channels div.channel div.graph {
   -ms-transition: opacity 0.3s ease;
   transition: opacity 0.3s ease;
 }
-div#guide div.channels div.channel div.graph svg {
+div.channels div.channel div.graph svg {
   top: 5px;
 }
-div#guide div.channels div.channel:hover div.graph {
+div.channels div.channel:hover div.graph {
   opacity: 1;
   visibility: visible;
 }
-div#guide div.channels div.channel div.viewers {
+div.channels div.channel div.viewers {
   width: 100%;
   position: absolute;
   bottom: 10px;
@@ -633,17 +802,12 @@ div#guide div.channels div.channel div.viewers {
   -moz-transition: height .3s;
   transition: height .3s;
 }
-div#guide div.channels div.channel div.viewers div.viewer {
+div.channels div.channel div.viewers div.viewer {
   position: relative;
   margin-left: 6px;
   height: 25px;
-  -webkit-transition: width 1s ease;
-  -moz-transition: width 1s ease;
-  -o-transition: width 1s ease;
-  -ms-transition: width 1s ease;
-  transition: width 1s ease;
 }
-div#guide div.channels div.channel div.viewers div.viewer div.line {
+div.channels div.channel div.viewers div.viewer div.line {
   position: absolute;
   height: 4px;
   background: #ccc;
@@ -653,11 +817,16 @@ div#guide div.channels div.channel div.viewers div.viewer div.line {
   pointer-events: all;
   cursor: pointer;
   display: none;
+  -webkit-transition: width 1s linear;
+  -moz-transition: width 1s linear;
+  -o-transition: width 1s linear;
+  -ms-transition: width 1s linear;
+  transition: width 1s linear;
 }
-div#guide div.channels div.channel div.viewers div.viewer div.line:last-child {
+div.channels div.channel div.viewers div.viewer div.line:last-child {
   display: inline-block;
 }
-div#guide div.channels div.channel div.viewers div.viewer div.line::before {
+div.channels div.channel div.viewers div.viewer div.line::before {
   content: '';
   position: absolute;
   left: -7px;
@@ -668,7 +837,7 @@ div#guide div.channels div.channel div.viewers div.viewer div.line::before {
   background: inherit;
   box-shadow: 0px 1px 1px 0px rgba(255, 255, 255, 0.6);
 }
-div#guide div.channels div.channel div.viewers div.viewer div.line::after {
+div.channels div.channel div.viewers div.viewer div.line::after {
   content: '';
   position: absolute;
   left: -3px;
@@ -678,7 +847,7 @@ div#guide div.channels div.channel div.viewers div.viewer div.line::after {
   border-radius: 10px;
   background: white;
 }
-div#guide div.channels div.channel div.viewers div.viewer div.line div.pic {
+div.channels div.channel div.viewers div.viewer div.line div.pic {
   background: inherit;
   width: 25px;
   height: 25px;
@@ -688,20 +857,22 @@ div#guide div.channels div.channel div.viewers div.viewer div.line div.pic {
   box-shadow: 0px 1px 1px 0px rgba(255, 255, 255, 0.6);
   position: absolute;
 }
-div#guide div.channels div.channel div.viewers div.viewer div.line div.pic img {
+div.channels div.channel div.viewers div.viewer div.line div.pic img {
   width: 21px;
   height: 20px;
   margin-left: 2px;
   margin-top: 2px;
   border-radius: 10px;
 }
-div#guide div.channels div.channel div.viewers div.viewer div.username {
+div.channels div.channel div.viewers div.viewer div.username {
   position: absolute;
   left: 10px;
   top: 3px;
 }
-div#guide div.channels div.suggest {
+div.channels div.suggest {
   position: absolute;
+  top: 5px;
+  margin-left: 200px;
   vertical-align: middle;
   height: 100%;
   border-radius: 5px;
@@ -710,7 +881,7 @@ div#guide div.channels div.suggest {
   cursor: pointer;
   outline: none;
 }
-div#guide div.channels div.suggest div.spinner {
+div.channels div.suggest div.spinner {
   margin: 0 10px;
   font-size: 80px;
   line-height: 37px;
@@ -721,18 +892,18 @@ div#guide div.channels div.suggest div.spinner {
   -ms-transition: margin 0.3s ease;
   transition: margin 0.3s ease;
 }
-div#guide div.channels div.suggest.show div.spinner {
+div.channels div.suggest.show div.spinner {
   margin: 0 50px;
 }
-div#guide div.channels div.suggest.show div.select-program {
+div.channels div.suggest.show div.select-program {
   display: block;
 }
-div#guide div.channels div.suggest:hover,
-div#guide div.channels div.suggest.show {
+div.channels div.suggest:hover,
+div.channels div.suggest.show {
   color: #2d2d2d;
 }
-div#guide div.channels div.select-program {
-  padding-top: 20px;
+div.channels div.select-program {
+  padding-top: 22px;
   height: 60px;
   background-color: #dfdfdf;
   color: #f5f5f5;
@@ -745,11 +916,11 @@ div#guide div.channels div.select-program {
   -ms-transition: opacity 3s ease-out;
   transition: opacity 3s ease-out;
   display: none;
-  border-radius: 3px;
+  border-radius: 6px 6px 4px 4px;
 }
-div#guide div.channels div.select-program div.select-header {
+div.channels div.select-program div.select-header {
   position: absolute;
-  top: 0;
+  top: 1px;
   left: 1px;
   width: 162px;
   height: 20px;
@@ -761,21 +932,29 @@ div#guide div.channels div.select-program div.select-header {
   font-size: 10px;
   font-family: MuseoSans700;
   line-height: 20px;
-  border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
+  border-radius: 4px 4px 0 0;
 }
-div#guide div.channels div.select-program div.select-content {
+div.channels div.select-program div.select-header div.close {
+  width: 10px;
+  height: 10px;
+  background: url(/static/img/close-light.png) center no-repeat;
+  cursor: pointer;
+  position: absolute;
+  right: 5px;
+  top: 5px;
+}
+div.channels div.select-program div.select-content {
   width: 160px;
   height: 100%;
   margin: 1px;
   overflow: hidden;
 }
-div#guide div.channels div.select-program div.select-content div.page {
+div.channels div.select-program div.select-content div.page {
   width: 320px;
   height: 58px;
   position: relative;
 }
-div#guide div.channels div.select-program div.select-content input[type=text] {
+div.channels div.select-program div.select-content input[type=text] {
   width: 144px;
   margin-top: 30px;
   margin-left: 4px;
@@ -795,7 +974,7 @@ div#guide div.channels div.select-program div.select-content input[type=text] {
   border-radius: 2px;
   outline: none;
 }
-div#guide div.channels div.select-program div.select-content div.page2 {
+div.channels div.select-program div.select-content div.page2 {
   position: absolute;
   left: 160px;
   width: 160px;
@@ -804,12 +983,12 @@ div#guide div.channels div.select-program div.select-content div.page2 {
   background: #f5f5f5;
   border-radius: 6px;
 }
-div#guide div.channels div.select-program div.confirm-media {
+div.channels div.select-program div.confirm-media {
   position: relative;
   width: 100%;
   height: 100%;
 }
-div#guide div.channels div.select-program div.confirm-media div.thumb {
+div.channels div.select-program div.confirm-media div.thumb {
   background-position: center;
   background-size: auto 110px;
   opacity: .5;
@@ -819,7 +998,7 @@ div#guide div.channels div.select-program div.confirm-media div.thumb {
   width: 100%;
   height: 100%;
 }
-div#guide div.channels div.select-program div.confirm-media div.title {
+div.channels div.select-program div.confirm-media div.title {
   font-size: 14px;
   width: 150px;
   white-space: nowrap;
@@ -830,8 +1009,8 @@ div#guide div.channels div.select-program div.confirm-media div.title {
   margin: 3px 5px;
   position: absolute;
 }
-div#guide div.channels div.select-program div.confirm-media div.button,
-div#guide div.channels div.select-program div.confirm-media div.added {
+div.channels div.select-program div.confirm-media div.button,
+div.channels div.select-program div.confirm-media div.added {
   position: absolute;
   right: 3px;
   bottom: 4px;
@@ -847,16 +1026,16 @@ div#guide div.channels div.select-program div.confirm-media div.added {
   -ms-transition: opacity 0.5s ease;
   transition: opacity 0.5s ease;
 }
-div#guide div.channels div.select-program div.confirm-media div.button {
+div.channels div.select-program div.confirm-media div.button {
   background: #f5f5f5;
 }
-div#guide div.channels .current div.name {
+div.channels .current div.name {
   background: #181818 !important;
   box-shadow: 1px 0 3px rgba(0, 0, 0, 0.8), -3px 0px 3px 3px rgba(105, 105, 105, 0.8), 10px 0 55px -8px rgba(255, 255, 255, 0.7) !important;
   z-index: 2 !important;
   cursor: default !important;
 }
-div#guide div.channels .current div.name:after {
+div.channels .current div.name:after {
   left: 100%;
   border: solid transparent;
   content: " ";
@@ -865,21 +1044,21 @@ div#guide div.channels .current div.name:after {
   position: absolute;
   pointer-events: none;
 }
-div#guide div.channels .current div.name:after {
+div.channels .current div.name:after {
   border-left-color: #181818;
   border-width: 15px;
   top: 50%;
   margin-top: -15px;
 }
-div#guide div.channels div.offline div.channel {
+div.channels div.offline div.channel {
   height: 0;
   border: none;
 }
-div#guide .current div.program,
-div#guide div.program:hover {
+.current div.program,
+div.program:hover {
   opacity: 1 !important;
 }
-div#guide .current div.program img {
+.current div.program img {
   -webkit-filter: blur(1px) !important;
 }
 #ytplayer {
@@ -893,6 +1072,11 @@ div#guide .current div.program img {
 #stagecover {
   width: 100%;
   height: 100%;
+  -webkit-transition: width 0.5s ease;
+  -moz-transition: width 0.5s ease;
+  -o-transition: width 0.5s ease;
+  -ms-transition: width 0.5s ease;
+  transition: width 0.5s ease;
   position: absolute;
   top: 0;
   left: 0;
@@ -911,6 +1095,64 @@ div#guide .current div.program img {
   position: absolute;
   left: 50%;
   top: 50%;
+}
+#stagecover div.fullscreen,
+#stagecover div.expand {
+  width: 25px;
+  height: 25px;
+  border-radius: 4px;
+  position: absolute;
+  cursor: pointer;
+  opacity: 0;
+  -webkit-transition: opacity 0.1s ease;
+  -moz-transition: opacity 0.1s ease;
+  -o-transition: opacity 0.1s ease;
+  -ms-transition: opacity 0.1s ease;
+  transition: opacity 0.1s ease;
+}
+#stagecover div.fullscreen {
+  background: rgba(150, 150, 150, 0.8) url(/static/img/fullscreen.png) center no-repeat;
+  background-size: 70%;
+  right: 40px;
+  top: 10px;
+}
+#stagecover div.fullscreen.full {
+  background-image: url(/static/img/closescreen.png);
+}
+#stagecover div.expand {
+  background: rgba(150, 150, 150, 0.8) url(/static/img/expand.png) center no-repeat;
+  background-size: 70%;
+  right: 10px;
+  top: 10px;
+}
+#stagecover:hover div.fullscreen,
+#stagecover:hover div.expand {
+  opacity: .6;
+}
+#stagecover:hover div.fullscreen:hover,
+#stagecover:hover div.expand:hover {
+  opacity: .9;
+}
+#stagecover div.play,
+#stagecover div.pause {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 100px;
+  height: 100px;
+  margin-left: -50px;
+  margin-top: -50px;
+  background: rgba(0, 0, 0, 0.5) no-repeat center;
+  border-radius: 6px;
+  opacity: .6;
+}
+#stagecover div.play {
+  background-image: url(/static/img/16-play-dark.png);
+  background-size: 10%;
+}
+#stagecover div.pause {
+  background-image: url(/static/img/17-pause-dark.png);
+  background-size: 15%;
 }
 div#popup {
   width: 260px;
@@ -1350,11 +1592,17 @@ div#sidebar div#sidebar-content div.media-list div.list-info > div {
   display: none;
   vertical-align: top;
 }
+div#sidebar div#sidebar-content div.media-list div.list-info div.picture-cell {
+  width: 60px;
+}
 div#sidebar div#sidebar-content div.media-list div.list-info div.picture {
   width: 60px;
   box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.8);
   background: rgba(0, 0, 0, 0.65);
   border-radius: 3px;
+}
+div#sidebar div#sidebar-content div.media-list div.list-info div.picture:active {
+  box-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);
 }
 div#sidebar div#sidebar-content div.media-list div.list-info div.picture img {
   width: 60px;
@@ -1364,6 +1612,10 @@ div#sidebar div#sidebar-content div.media-list div.list-info div.picture img {
 div#sidebar div#sidebar-content div.media-list div.list-info div.description {
   font-size: 12px;
   padding-left: 10px;
+  color: #181818;
+  text-shadow: 1px 1px 1px white;
+  font-family: MuseoSans500;
+  font-size: 13px;
 }
 div#sidebar div#sidebar-content div.media-list div.medias {
   margin: 10px;
@@ -1426,7 +1678,7 @@ div#sidebar div.comment-input div.comment-controls div.comment-button.add-commen
   background-color: rgba(255, 255, 255, 0.8);
 }
 div#sidebar div.comment-input div.comment-controls div.comment-button.goog-custom-button-checked div.check {
-  background-image: url(/static/img/check@2x.png);
+  background-image: url(/static/img/check-2x.png);
   background-repeat: no-repeat;
   background-size: 10px;
   background-position: 75px 5px;
@@ -1446,7 +1698,7 @@ div#sidebar div.comment-input div.comment-controls div.comment-button div.check 
   top: 0;
 }
 div#sidebar div.comment-input div.input-holder {
-  background: #f7f7f7;
+  background: #f7f7f7 url(/static/img/light-grad.png);
   width: 100%;
   height: 100%;
   border-top: 2px solid #ccc;
@@ -2072,6 +2324,7 @@ div#sidebar div.info div.desc-link a {
 }
 div#sidebar div.info div.description {
   width: 240px;
+  min-height: 150px;
   position: relative;
   margin-right: 5px;
   padding: 8px 10px;
@@ -2116,19 +2369,19 @@ div#sidebar div.info div.options div.button.goog-custom-button-checked {
   background-color: rgba(80, 80, 80, 0.6);
 }
 div#sidebar div.info div.options div.play {
-  background-image: url(/static/img/16-play@2x.png);
+  background-image: url(/static/img/16-play-2x.png);
   background-size: auto 30%;
 }
 div#sidebar div.info div.options div.plus {
-  background-image: url(/static/img/13-plus@2x.png);
+  background-image: url(/static/img/13-plus-2x.png);
   background-size: auto 30%;
 }
 div#sidebar div.info div.options div.star {
-  background-image: url(/static/img/28-star@2x.png);
+  background-image: url(/static/img/28-star-2x.png);
   background-size: auto 30%;
 }
 div#sidebar div.info div.options div.star.goog-custom-button-checked {
-  background-image: url(/static/img/28-star-yellow@2x.png);
+  background-image: url(/static/img/28-star-yellow-2x.png);
 }
 div#sidebar div.info div.options div.facebook {
   background-image: url(/static/img/facebook.png);
@@ -2578,6 +2831,9 @@ body {
   position: fixed;
   width: 100%;
   height: 100%;
+  /* for iphone only
+  -webkit-user-select: none; */
+
 }
 div#overlay {
   position: absolute;

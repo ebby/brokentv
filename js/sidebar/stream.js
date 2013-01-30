@@ -78,8 +78,8 @@ brkn.sidebar.Stream.prototype.decorateInternal = function(el) {
     this.addActivity_(activity)
   }, this);
   brkn.model.Users.getInstance().subscribe(brkn.model.Users.Action.NEW_ACTIVITY, function(activity) {
-    if (this.uid_ == activity.user.id ||
-        (!this.uid_ && activity.user.id != brkn.model.Users.getInstance().currentUser.id)) {
+    if (this.uid_ == activity['user']['id'] ||
+        (!this.uid_ && activity['user']['id'] != brkn.model.Users.getInstance().currentUser.id)) {
       this.addActivity_(activity, true);
     }
   }, this);
@@ -115,22 +115,23 @@ brkn.sidebar.Stream.prototype.addActivity_ = function(activity, opt_insertTop) {
   
   var activityEl;
   var medias = [];
-  switch(activity.type) {
+  switch(activity['type']) {
     case 'session':
       var channel = brkn.model.Channels.getInstance().get(activity['session']['channel_id'])
       medias = activity['session']['media']
       activityEl = soy.renderAsElement(brkn.sidebar.sessionActivity, {
         user: user,
-        activity: activity,
         channel: channel,
-        time: goog.date.relative.format(time.getTime())
+        time: goog.date.relative.format(time.getTime()),
+        session: activity['session']
       });
       break
     case 'comment':
       medias = [activity['comment']['media']]
+      var comment = new brkn.model.Comment(activity['comment']);
       activityEl = soy.renderAsElement(brkn.sidebar.commentActivity, {
         user: user,
-        activity: activity,
+        comment: comment,
         time: goog.date.relative.format(time.getTime())
       });
       break

@@ -3,16 +3,25 @@ from common import *
 def get_session(current_user):
   data = {}
 
+  # RETREIVE CHANNELS AND PROGRAMMING
   channels = None
-  cached_channels = simplejson.loads(memcache.get('channels') or '{}')
+  cached_channels = memcache.get('channels') or []
   if not len(cached_channels):
     # No cached channels, attempt to fetch
     channels = Channel.get_public()
     cached_channels = [c.toJson() for c in channels]
-    memcache.set('channels', simplejson.dumps(cached_channels))
-    
+    memcache.set('channels', cached_channels)
+
   cached_programming = simplejson.loads(memcache.get('programming') or '{}')
-  if not len(cached_programming):
+  new_programming = False
+  for channel in cached_channels:
+    next_time = iso8601.parse_date(channel['next_time']).replace(tzinfo=None) \
+        if channel['next_time'] else None
+    if not next_time or next_time < datetime.datetime.now():
+      # Kick our programming backend off. It shuts down when users leave.
+      programming.Programming.set_programming(channel['id'], queue='programming', kickoff=True)
+      new_programming = True
+  if not len(cached_programming) or new_programming:
     # No cached programming, attempt to fetch
     channels = channels or Channel.get_public()
     cached_programming = Program.get_current_programs(channels)
@@ -29,16 +38,11 @@ def get_session(current_user):
   data['channels'] = cached_channels
   data['programs'] = cached_programming
  
+  # CREATE BROWSER CHANNEL
   token = browserchannel.create_channel(current_user.id)
   data['token'] = token
-
-  client = memcache.Client()
-  current_viewers = simplejson.loads(memcache.get('current_viewers') or '{}')
-  if not current_user.id in current_viewers:
-    current_viewers[current_user.id] = token
-    memcache.set('current_viewers', simplejson.dumps(current_viewers))
-
-  data['current_viewers'] = current_viewers
+    
+  # MAKE SURE WE HAVE CHANNELS
   channels = channels or Channel.get_public()
   current_channel = channels[0] if len(channels) else None
   assert current_channel != None, 'NO CHANNELS IN DATABASE'
@@ -49,18 +53,27 @@ def get_session(current_user):
     current_channel = Channel.get_by_key_name(user_sessions[0].channel.key().name())
 
   if len(user_sessions) and not user_sessions[0].tune_out:
-    user_sessions[0].tune_out = user_sessions[0].tune_in + datetime.timedelta(seconds=180)
-    user_sessions[0].put()
+    session = user_sessions[0] 
+    session.tune_out = session.tune_in + datetime.timedelta(seconds=180)
+    session.put()
 
   if len(user_sessions) and user_sessions[0].tune_out and \
       (datetime.datetime.now() - user_sessions[0].tune_out).seconds < 180:
-    user_sessions[0].tune_out = None
-    user_sessions[0].put()
+    session = user_sessions[0] 
+    session.tune_out = None
+    session.put()
   else:
-    UserSession.new(current_user, current_channel)
+    session = UserSession.new(current_user, current_channel)
+    
+  # TRACK ALL USERS
+  def add_viewer(current_viewers, uid, session):
+    current_viewers[uid] = session
+    return current_viewers
+  current_viewers = memcache_cas('current_viewers', add_viewer, current_user.id, session.toJson())
   
-  # Track current viewers by channel, useful for audience catering
+  # Track current viewers by channel, useful for audience tailoring
   channel_viewers = memcache.get('channel_viewers') or {}
+  set = False
   if not channel_viewers.get(current_channel.id) or \
       current_user.id not in channel_viewers[current_channel.id]:
     client = memcache.Client()
@@ -75,16 +88,19 @@ def get_session(current_user):
       memcache.set('channel_viewers', channel_viewers)
 
   # Grab sessions for current_users (that we care about)
-  viewer_sessions = []
-  for uid in current_viewers:
-    user_sessions = UserSession.get_by_user(User.get_by_key_name(uid))
-    if len(user_sessions):
-      viewer_sessions.append(user_sessions[0].toJson())
+  # TODO cache last session for each user
+  viewer_sessions = [session.toJson()]
+  for uid,sess in [tuple for tuple in current_viewers.iteritems() if tuple[0] in current_user.friends]:
+    viewer_sessions.append(sess)
   data['viewer_sessions'] = viewer_sessions
 
+  # ME
   user_obj = current_user.toJson()
   user_obj['current_channel'] = current_channel.id
   data['current_user'] = user_obj
+
+  broadcast.broadcastViewerChange(current_user, None, current_channel.id,
+                                  session.key().id(), session.tune_in.isoformat());
   return data
 
 class SessionHandler(BaseHandler):

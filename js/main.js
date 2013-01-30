@@ -65,8 +65,10 @@ brkn.Main.prototype.popup_;
 brkn.Main.prototype.decorateInternal = function(element) {
   goog.base(this, 'decorateInternal', element);
   
-  var mainEl = soy.renderAsElement(brkn.main.main,
-      { admin: brkn.model.Users.getInstance().currentUser.isAdmin() });
+  var mainEl = soy.renderAsElement(brkn.main.main, {
+    user: brkn.model.Users.getInstance().currentUser,
+    admin: brkn.model.Users.getInstance().currentUser.isAdmin()
+  });
   goog.dom.insertChildAt(element, mainEl, 0);
 };
 
@@ -80,7 +82,7 @@ brkn.Main.prototype.enterDocument = function() {
   this.sidebar_.decorate(goog.dom.getElement('sidebar'));
   this.player_.decorate(goog.dom.getElement('stage'));
 
-  this.popup_ = new brkn.Popup();
+  // this.popup_ = new brkn.Popup();
   
   // iPad
   this.getHandler().listen(document.body, 'touchmove', function(e) {

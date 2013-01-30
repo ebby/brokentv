@@ -139,6 +139,13 @@ brkn.Guide.prototype.tickerEl_;
  * @type {Element}
  * @private
  */
+brkn.Guide.prototype.myTickerEl_;
+
+
+/**
+ * @type {Element}
+ * @private
+ */
 brkn.Guide.prototype.channelsEl_;
 
 
@@ -199,6 +206,8 @@ brkn.Guide.prototype.enterDocument = function() {
   goog.base(this, 'enterDocument');
 
   this.tickerEl_ = goog.dom.getElement('ticker');
+  this.myTickerEl_ = goog.dom.getElement('my-ticker');
+  var goLiveEl = goog.dom.getElement('go-live');
   this.headerEl_ = goog.dom.getElement('header');
   this.channelsEl_ = goog.dom.getElement('channels');
   this.horizon_ = 3;
@@ -278,16 +287,41 @@ brkn.Guide.prototype.enterDocument = function() {
     .listen(brkn.model.Clock.getInstance().clock,
         goog.Timer.TICK,
         goog.bind(function() {
-          var elapsed = (goog.now() - this.minTime_.getTime())/1000 * this.pixelsPerSecond_;
-
+          var currentProgram = brkn.model.Channels.getInstance().currentChannel &&
+              brkn.model.Channels.getInstance().currentChannel.getCurrentProgram();
+          var myCurrentProgram = brkn.model.Player.getInstance().getCurrentProgram();
+          var myCurrentProgress = brkn.model.Player.getInstance().getProgress()*1000;
+          
+          var elapsed = Math.round((goog.now() - this.minTime_.getTime())/1000 *
+              this.pixelsPerSecond_);
+          var myElapsed = myCurrentProgram && myCurrentProgress ?
+              Math.round((myCurrentProgram.time.getTime() +
+              myCurrentProgress - this.minTime_.getTime())/1000 *
+              this.pixelsPerSecond_) : elapsed;
           this.updateNowButtons_();
           if (elapsed + goog.dom.getViewportSize().width > this.width_ -
               (brkn.model.Controller.getInstance().sidebarToggled ? 300 : 0)) {
             this.expand_();
           }
+          
           goog.style.setPosition(this.tickerEl_, elapsed);
+          goog.style.setPosition(this.myTickerEl_, myElapsed);
+          goog.style.showElement(this.tickerEl_, !!currentProgram);
+          goog.style.showElement(this.myTickerEl_, !!myCurrentProgram);
+          goog.dom.classes.enable(this.tickerEl_, 'go-live', Math.abs(myElapsed - elapsed) > 40);
+          goog.dom.classes.enable(this.tickerEl_, 'can-go-live', Math.abs(myElapsed - elapsed) > 15);
+          goog.dom.classes.enable(this.myTickerEl_, 'show', Math.abs(myElapsed - elapsed) > 15);
+          goog.dom.classes.enable(this.myTickerEl_, 'show-me', Math.abs(myElapsed - elapsed) > 15);
+
           this.align_();
         }, this))
+    .listen(goLiveEl, goog.events.EventType.CLICK, goog.bind(function() {
+      brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.CHANGE_CHANNEL,
+          this.currentChannel_.getModel());
+      brkn.model.Controller.getInstance().publish(
+          brkn.model.Controller.Actions.PLAY,
+          true);
+    }, this))
     .listen(window, goog.events.EventType.RESIZE, goog.bind(this.align_, this))
     .listen(this.channelsEl_, goog.events.EventType.SCROLL,
         goog.bind(this.align_, this, undefined, undefined, true))
@@ -353,7 +387,6 @@ brkn.Guide.prototype.enterDocument = function() {
 };
 
 
-
 /**
  * @param {boolean} show
  * @private
@@ -361,10 +394,10 @@ brkn.Guide.prototype.enterDocument = function() {
 brkn.Guide.prototype.toggleGuide_ = function(show) {
   var height = Math.min(this.channelsEl_.scrollHeight, 210);
   goog.dom.classes.enable(this.getElement(), 'toggled', show);
-  goog.style.setHeight(this.channelsEl_, show ? height : 40);
   goog.style.setHeight(this.getElement(), show ? height + this.controllerHeight_ + 19 :
       this.controllerHeight_);
   goog.Timer.callOnce(goog.bind(function() {
+    goog.style.setHeight(this.channelsEl_, show ? height : 40);
     goog.dom.classes.enable(this.getElement(), 'collapsed', !show);
     this.channelsEl_.scrollTop = goog.style.getPosition(this.currentChannel_.getElement()).y;
     this.resize_();
@@ -509,7 +542,9 @@ brkn.Guide.prototype.align_ = function(opt_setAligned, opt_offset, opt_setScroll
   this.scrolled_ = opt_setAligned != undefined ? !!opt_setScrolled : this.aligned_;
   this.guideOffset_ = this.aligned_ ? 0 : opt_offset ? this.guideOffset_ + opt_offset : this.guideOffset_;
   //var program = brkn.model.Channels.getInstance().currentChannel.getCurrentProgram(this.guideOffset_);
-  var program = this.cursor_[0].getCurrentProgram(this.guideOffset_);
+  var program = this.aligned_ ? brkn.model.Player.getInstance().getCurrentProgram() :
+      this.cursor_[0].getCurrentProgram(this.guideOffset_);
+  //var program = brkn.model.Player.getInstance().getCurrentProgram();
   this.cursor_[1] = program;
   if ((this.aligned_ || opt_offset) && program) {
     var elapsed = (goog.now() - this.minTime_.getTime())/1000 * this.pixelsPerSecond_;
@@ -531,8 +566,14 @@ brkn.Guide.prototype.align_ = function(opt_setAligned, opt_offset, opt_setScroll
       var scrollAnim = new goog.fx.dom.Scroll(this.channelsEl_,
           [this.channelsEl_.scrollLeft, this.channelsEl_.scrollTop],
           [this.channelsEl_.scrollLeft, scrollTo], this.channels_.length * 100);
+      this.getHandler().listen(scrollAnim, goog.fx.Animation.EventType.END, goog.bind(function() {
+        // Forced value just in case.
+        goog.Timer.callOnce(goog.bind(function() {
+          this.channelsEl_.scrollTop = scrollTo;
+        }, this));
+      }, this));
       goog.Timer.callOnce(goog.bind(function() {
-        scrollAnim.play()
+        scrollAnim.play();
       }, this), 100);
     }
   }

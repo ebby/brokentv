@@ -38,7 +38,7 @@ brkn.model.Session = function(id, user, channel, tuneIn, opt_tuneOut) {
 	this.tuneIn = tuneIn;
 	
 	/**
-	 * @type {goog.date.DateTime}
+	 * @type {?goog.date.DateTime}
 	 * @private
 	 */
 	this.tuneOut = opt_tuneOut || null;

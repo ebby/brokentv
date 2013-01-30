@@ -35,7 +35,7 @@ class Programming():
       self.publishers[publisher.name] = publisher
       
     for name, properties in inits.PLAYLISTS.iteritems():
-      playlist = Playlist.get_or_insert('youtube' + properties.get('youtube'),
+      playlist = Playlist.get_or_insert('youtube' + properties.get('youtube').lower(),
                                         name=name,
                                         host='youtube',
                                         host_id=properties.get('youtube'),
@@ -77,14 +77,15 @@ class Programming():
         chan_col = ChannelCollection.add(channel=channel, collection=col)
     
     # Cache the channels
-    memcache.set('channels', simplejson.dumps([c.toJson() for c in self.channels.itervalues()]))
+    memcache.set('channels', [c.toJson(get_programming=False) for c in self.channels.itervalues()])
       
   @classmethod
   def set_programming(cls, channel_id, duration=600, schedule_next=True, fetch_twitter=True,
-                      queue='default', target=None):
+                      queue='programming', target=None, kickoff=False):
     channel = Channel.get_by_key_name(channel_id)
     channel.update_next_time()
     viewers = (memcache.get('channel_viewers') or {}).get(str(channel_id), [])
+    onlineUsers = memcache.get('web_channels') or {}
     cols = channel.get_collections()
     all_medias = []
     backup_medias = []
@@ -140,13 +141,21 @@ class Programming():
     programming[channel_id] = Programming.cutoff_programs(programming.get(channel_id), 1800) + \
         [p.toJson(fetch_channel=False, media_desc=False) for p in programs]
     memcache.set('programming', simplejson.dumps(programming))
+    
+    # Update channel's next_time
+    channels = memcache.get('channels') or []
+    for i,c in enumerate(channels):
+      if c['id'] == channel_id:
+        channels[i] = channel.toJson(get_programming=False)
+    memcache.set('channels', channels)
 
     # Schedule our next programming selection
-    if schedule_next and len(medias):
+    if schedule_next and (kickoff or (len(medias) and len(onlineUsers.keys()))):
       next_gen = (programs[-2].time - datetime.datetime.now()).seconds if len(programs) > 1 \
           else 0
       next_gen = min(next_gen,
                      reduce(lambda x, y: x + y, [p.media.duration for p in programs], 0))
+      next_gen = min(next_gen, duration - 120)
       logging.info('COUNTDOWN FOR ' + channel.name + ': ' + str(next_gen))
       deferred.defer(Programming.set_programming, channel.key().name(),
                      _name=channel.name.replace(' ', '') + '-' + str(uuid.uuid1()),
@@ -239,7 +248,9 @@ class Programming():
       for tweet in tweepy.Cursor(api.search, q=media.host_id, rpp=100, result_type="recent",
                                  include_entities=True, lang="en").items():
         total += 1
-        Tweet.add_from_result(tweet, media)
+        if not tweet.from_user.lower() in constants.TWITTER_USER_BLACKLIST and not \
+            any(phrase in tweet.text.lower() for phrase in constants.TWITTER_PHRASE_BLACKLIST):
+          Tweet.add_from_result(tweet, media)
       media.last_twitter_fetch = datetime.datetime.now()
       media.put()
       logging.info(str(total) + ' TWEETS FETCHED')
@@ -272,8 +283,10 @@ class Programming():
   @classmethod
   def clear(cls):
     channels = Channel.all().fetch(None)
+    memcache.delete('channels')
     memcache.delete('programming')
     for c in channels:
+      c.next_time = None
       c.programming = []
       c.put()
     for model in ['Program', 'ChannelProgram']:

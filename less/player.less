@@ -11,6 +11,7 @@
 #stagecover {
   width: 100%;
   height: 100%;
+  .transition(width, .5s, ease);
   position: absolute;
   top: 0;
   left: 0;
@@ -28,5 +29,55 @@
     position: absolute;
     left: 50%;
     top: 50%;
+  }
+  div.fullscreen, div.expand {
+    width: 25px;
+    height: 25px;
+    border-radius: 4px;
+    position: absolute;
+    cursor: pointer;
+    opacity: 0;
+    .transition(opacity, .1s, ease);
+  }
+  div.fullscreen {
+    background: rgba(150, 150, 150, .8) url(/static/img/fullscreen.png) center no-repeat;
+    background-size: 70%;
+    right: 40px;
+    top: 10px;
+    &.full {
+      background-image: url(/static/img/closescreen.png);
+    }
+  }
+  div.expand {
+    background: rgba(150, 150, 150, .8) url(/static/img/expand.png) center no-repeat;
+    background-size: 70%;
+    right: 10px;
+    top: 10px;
+  }
+  &:hover div.fullscreen, &:hover div.expand {
+    opacity:.6;
+    &:hover {
+      opacity: .9;
+    }
+  }
+  div.play, div.pause {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 100px;
+    height: 100px;
+    margin-left: -50px;
+    margin-top: -50px;
+    background: rgba(0, 0, 0, .5) no-repeat center;
+    border-radius: 6px;
+    opacity: .6;
+  }
+  div.play {
+    background-image: url(/static/img/16-play-dark.png);
+    background-size: 10%;
+  }
+  div.pause {
+    background-image: url(/static/img/17-pause-dark.png);
+    background-size: 15%;
   }
 }

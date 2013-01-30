@@ -118,7 +118,7 @@
 
 
 /**
- * @param activity
+ * @param session
  * @param? channel
  * @param user
  * @param time
@@ -130,7 +130,7 @@
     </div>
     <div class="text">
       <a class="user" href="#">{$user.name}</a>{sp}
-      {if $activity.session.tune_out}watched{else}is watching{/if}
+      {if $session.tune_out}watched{else}is watching{/if}
       {if $channel}{sp}<a href="#">{$channel.name}</a>{/if}
       <div class="timestamp">{$time}</div>
     </div>
@@ -140,7 +140,7 @@
 
 
 /**
- * @param activity
+ * @param comment
  * @param user
  * @param time
  */
@@ -151,7 +151,7 @@
     </div>
     <div class="text">
       <a class="user" href="#">{$user.name}</a>{sp}
-      "{$activity.comment.text}"
+      "{$comment.text}"
       <div class="timestamp">{$time}</div>
     </div>
     <div class="medias"></div>
@@ -162,11 +162,14 @@
 /**
  * @param thumbnail
  * @param description
+ * @param link
  */
 {template .listInfo}
   <div class="list-info">
-    <div class="picture" {if $thumbnail}style="display:table-cell"{/if}>
-      <img class="thumb" src="{$thumbnail}">
+    <div class="picture-cell" {if $thumbnail}style="display:table-cell"{/if}>
+      {if $link}<a href="{$link}" target="_blank">{/if}<div class="picture">
+        <img class="thumb" src="{$thumbnail}">
+      </div>{if $link}</a>{/if}
     </div>
     <div class="description" {if $description}style="display:table-cell"{/if}>{$description}</div>
   </div>

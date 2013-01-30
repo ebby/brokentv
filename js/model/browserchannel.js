@@ -56,7 +56,9 @@ brkn.model.BrowserChannel.prototype.onMessage_ = function(rawMessage) {
 	    var channel = brkn.model.Channels.getInstance().get(message['channel_id']);
 	    var time = goog.date.fromIsoString(message['time'] + 'Z');
 	    var session = new brkn.model.Session(message['session_id'], user, channel, time);
-	    user.currentSession.tuneOut = time;
+	    if (user.currentSession) {
+	      user.currentSession.tuneOut = time; 
+	    }
 	    user.currentSession = session;
 	    channel.publish(brkn.model.Channel.Action.ADD_VIEWER, session);
 	    break;
@@ -87,9 +89,15 @@ brkn.model.BrowserChannel.prototype.onMessage_ = function(rawMessage) {
   	          channel.publish(brkn.model.Channel.Action.ADD_PROGRAM, p);
   	          var currentProgram = brkn.model.Channels.getInstance().currentChannel &&
   	              brkn.model.Channels.getInstance().currentChannel.getCurrentProgram();
-  	          if (currentProgram && p.id == currentProgram.id) {
-  	            brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.NEXT_PROGRAM, p);
+  	          if (!currentProgram) {
+  	            // If no current programming, change to this channel.
+  	            brkn.model.Channels.getInstance().publish(
+  	                brkn.model.Channels.Actions.CHANGE_CHANNEL, channel);
   	          }
+//  	          if (currentProgram && p.id == currentProgram.id) {
+//  	            // If this program is now on, play it.
+//  	            brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.NEXT_PROGRAM, p);
+//  	          }
 	          }
 	        }, this));
       break;

@@ -271,7 +271,7 @@ brkn.Sidebar.prototype.onNextProgram_ = function(opt_program) {
  */
 brkn.Sidebar.prototype.onChangeChannel_ = function(opt_channel) {
   var channel = opt_channel || brkn.model.Channels.getInstance().currentChannel;
-  this.currentMedia_ = channel.getCurrentProgram().media;
+  this.currentMedia_ = channel.getCurrentProgram() && channel.getCurrentProgram().media;
   if (this.currentMedia_) {
     // In case the channel is empty
     goog.dispose(this.info_);
@@ -371,13 +371,15 @@ brkn.Sidebar.prototype.navigate = function(to, opt_back, opt_title) {
 
 
 /**
- * @param {Array.<brkn.model.Media>} medias
  * @param {string} name
+ * @param {?Array.<brkn.model.Media>=} opt_medias
+ * @param {?string=} opt_url
  * @param {?string=} opt_thumb
  * @param {?string=} opt_desc
+ * @param {?string=} opt_link
  */
-brkn.Sidebar.prototype.showMediaList = function(medias, name, opt_thumb, opt_desc) {
-  var mediaList = new brkn.sidebar.MediaList(medias, opt_thumb, opt_desc);
+brkn.Sidebar.prototype.showMediaList = function(name, opt_medias, opt_url, opt_thumb, opt_desc, opt_link) {
+  var mediaList = new brkn.sidebar.MediaList(opt_medias, opt_url, opt_thumb, opt_desc, opt_link);
   mediaList.decorate(this.mediaListEl_);
   brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NAVIGATE,
       this.mediaListEl_, true, name, opt_thumb, opt_desc);

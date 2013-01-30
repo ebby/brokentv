@@ -73,13 +73,14 @@ class Channel(db.Model):
       self.put()
     return col
 
-  def toJson(self):
+  def toJson(self, get_programming=False):
     json = {}
     json['id'] = self.key().name()
     json['name'] = self.name
-    json['programming'] = [p.toJson(False) for p in self.get_programming()]
-    json['current_program'] = Program.get_by_id(self.current_program).toJson(False) if self.current_program else None
+    if get_programming:
+      json['programming'] = [p.toJson(False) for p in self.get_programming()]
     json['my_channel'] = self.privacy == Privacy.PRIVATE
+    json['next_time'] = self.next_time.isoformat() if self.next_time else datetime.datetime.now().isoformat()
     return json
 
 from program import *

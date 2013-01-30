@@ -1,5 +1,6 @@
 goog.provide('brkn.model.Media');
 
+goog.require('brkn.model.Publisher');
 goog.require('goog.pubsub.PubSub');
 
 
@@ -45,7 +46,7 @@ brkn.model.Media = function(media) {
   /**
    * @type {Object}
    */
-  this.publisher = media['publisher'];
+  this.publisher = new brkn.model.Publisher(media['publisher']);
   
   /**
    * @type {goog.date.DateTime}
@@ -56,6 +57,21 @@ brkn.model.Media = function(media) {
 	 * @type {string}
 	 */
 	this.thumbnail = 'http://i.ytimg.com/vi/' + this.hostId + '/0.jpg';
+	
+	/**
+   * @type {string}
+   */
+  this.thumbnail1 = 'http://i.ytimg.com/vi/' + this.hostId + '/1.jpg';
+  
+  /**
+   * @type {string}
+   */
+  this.thumbnail2 = 'http://i.ytimg.com/vi/' + this.hostId + '/2.jpg';
+  
+  /**
+   * @type {string}
+   */
+  this.thumbnail3 = 'http://i.ytimg.com/vi/' + this.hostId + '/3.jpg';
 
 	/**
 	 * @type {goog.math.Size}

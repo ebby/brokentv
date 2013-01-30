@@ -61,11 +61,11 @@ class Media(db.Model):
       id = urlparse.parse_qs(content_url.query)['v'][0]
       media = Media.get_by_key_name(MediaHost.YOUTUBE + id)
       if not media:
-        name = unicode(entry.media.title.text, errors='replace')
+        name = entry.media.title.text.decode('utf-8')
         desc = entry.media.description.text
-        desc = unicode(desc, errors='replace').replace("\n", r" ") if desc else None
+        desc = desc.decode('utf-8').replace("\n", r" ") if desc else None
         category = entry.media.category[0].text
-        category = unicode(category, errors='replace') if category else None
+        category = category.decode('utf-8') if category else None
         media = cls(key_name=(MediaHost.YOUTUBE + id),
                     type=MediaType.VIDEO,
                     host_id=id,

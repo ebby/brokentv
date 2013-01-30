@@ -50,10 +50,13 @@ class MainHandler(BaseHandler):
     def get(self):
       template_data = {}
       template_data['host_url'] = self.request.host_url
-      if self.request.get('prod'):
-        template_data['js_location'] = constants.PROD_JS
+      if self.request.get('prod') or not constants.DEVELOPMENT:
+        template_data['js_location'] = constants.PROD_SIMPLE_JS if self.request.get('simple') \
+            else constants.PROD_JS
+      elif self.request.get('adv'): 
+        template_data['js_location'] = constants.ADV_JS
       else:
-        template_data['js_location'] = constants.JS_SOURCE
+        template_data['js_location'] = constants.SIMPLE_JS
 
       if not constants.DEVELOPMENT or self.request.get('css') or self.request.get('prod'):
         template_data['css_location'] = constants.CSS_SOURCE

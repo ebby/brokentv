@@ -231,6 +231,13 @@ brkn.Channel.prototype.enterDocument = function() {
 		.listen(this.suggestEl_,
 				goog.events.EventType.CLICK,
 				goog.bind(this.onSuggest_, this))
+		.listen(goog.dom.getElementByClass('close', this.suggestEl_),
+        goog.events.EventType.CLICK,
+        goog.bind(function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          this.onCloseSuggest_();
+        }, this))
 		.listen(goog.dom.getElementByClass('name', this.getElement()),
 				goog.events.EventType.CLICK,
 				goog.bind(function() {
@@ -333,10 +340,12 @@ brkn.Channel.prototype.addProgram = function(program) {
 	  'class': 'program',
 	  'id': program.id
 	});
+	var width = program.media.duration * this.pixelsPerSecond_;
 	var showAdmin = this.isAdmin_ &&
 	    (program.time.getTime() + program.media.duration*1000) > goog.now();
 	soy.renderElement(programEl, brkn.channel.program, {
 		program: program,
+		repeat: width > 600,
 		admin: showAdmin
 	});
 	this.programs_[program.id] = programEl;
@@ -361,12 +370,11 @@ brkn.Channel.prototype.addProgram = function(program) {
     goog.dom.classes.enable(programEl, 'stretched', program.media.thumbSize.height > 360);
   });
 
-	var width = program.media.duration * this.pixelsPerSecond_;
 	goog.style.setWidth(programEl, width - brkn.Channel.PROGRAM_PADDING);
 	var offset = (program.time.getTime() - this.minTime_.getTime())/1000 * this.pixelsPerSecond_;
 	goog.style.setPosition(programEl, offset);
 	goog.style.setPosition(this.suggestEl_, offset + width);
-	goog.dom.insertSiblingBefore(programEl, this.suggestEl_);
+	goog.dom.appendChild(this.programsEl_, programEl);
 	var clipped = width < 120;
 	goog.dom.classes.enable(programEl, 'clipped', clipped);
 
@@ -377,13 +385,17 @@ brkn.Channel.prototype.addProgram = function(program) {
 	var programWidth = goog.dom.classes.has(programEl, 'clipped') ? 200 :
 	    goog.style.getSize(programEl).width;
 
+	var titleEl = goog.dom.getElementByClass('title', programEl);
+	var titleWidth = goog.style.getSize(titleEl).width;
 	// Marquee text and pan
 	this.getHandler()
 	    .listen(programEl, goog.events.EventType.MOUSEOVER, function() {
-    	  var titleEl = goog.dom.getElementByClass('title', programEl);
-    	  var titleWidth = goog.style.getSize(titleEl).width + goog.style.getPosition(titleEl).x;
-    	  if (titleWidth > programWidth) {
-    	    goog.style.setStyle(titleEl, 'margin-left', -(titleWidth - programWidth - 10) + 'px');
+	      if (!brkn.model.Controller.getInstance().guideToggled) {
+	        return;
+	      }
+    	  var titleOffset = titleWidth + goog.style.getPosition(titleEl).x;
+    	  if (titleOffset > programWidth) {
+    	    goog.style.setStyle(titleEl, 'margin-left', -(titleOffset - programWidth - 10) + 'px');
     	    goog.dom.classes.add(titleEl, 'marquee');
     	  }
     	  if (!this.adminMode_) {
@@ -392,7 +404,9 @@ brkn.Channel.prototype.addProgram = function(program) {
     	  }
     	})
     	.listen(programEl, goog.events.EventType.MOUSEOUT, function() {
-        var titleEl = goog.dom.getElementByClass('title', programEl);
+    	  if (!brkn.model.Controller.getInstance().guideToggled) {
+          return;
+        }
         goog.style.setStyle(titleEl, 'margin-left', '');
         goog.dom.classes.remove(titleEl, 'marquee');
         if (!this.adminMode_) {
@@ -472,33 +486,32 @@ brkn.Channel.prototype.onRescheduleProgram_ = function(programId, newTime) {
  * @param {brkn.model.Session} session The session to display
  */
 brkn.Channel.prototype.addViewer = function(session) {
-  if (brkn.model.Users.getInstance().currentUser.id == session.user.id && !goog.DEBUG) {
-    return;
-  }
-	var userEl = this.viewers_[session.user.id];
-	if (!userEl) {
-		userEl = goog.dom.createDom('div', 'viewer');
-		goog.dom.appendChild(this.viewersEl_, userEl);
-		this.viewers_[session.user.id] = userEl;
-	}
+  if (brkn.model.Users.getInstance().currentUser.id != session.user.id || goog.DEBUG) {
+    var userEl = this.viewers_[session.user.id];
+    if (!userEl) {
+      userEl = goog.dom.createDom('div', 'viewer');
+      goog.dom.appendChild(this.viewersEl_, userEl);
+      this.viewers_[session.user.id] = userEl;
+    }
 
-	if (this.getModel().getCurrentProgram() &&
-	    (!session.tuneOut || session.tuneOut.getTime() > this.minTime_.getTime())) {
-		var lineEl = soy.renderAsElement(brkn.channel.line, {
-			user: session.user
-		});
-		goog.dom.appendChild(userEl, lineEl);
-		var tuneInTime = Math.max(session.tuneIn.getTime(), this.minTime_.getTime());
-		var offset = (tuneInTime - this.minTime_.getTime()) / 1000 *
-		    this.pixelsPerSecond_ + brkn.Guide.NAME_WIDTH;
-    var elapsed = (goog.now() - tuneInTime) / 1000 * this.pixelsPerSecond_;
-		goog.style.setWidth(lineEl, elapsed);
-		goog.style.setPosition(lineEl, offset);
-		goog.style.setStyle(lineEl, 'background', session.user.color);
-		this.getHandler().listen(lineEl, goog.events.EventType.CLICK, function() {
-      brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.PROFILE, session.user)
-    })
-	}
+    if (this.getModel().getCurrentProgram() &&
+        (!session.tuneOut || session.tuneOut.getTime() > this.minTime_.getTime())) {
+      var lineEl = soy.renderAsElement(brkn.channel.line, {
+        user: session.user
+      });
+      goog.dom.appendChild(userEl, lineEl);
+      var tuneInTime = Math.max(session.tuneIn.getTime(), this.minTime_.getTime());
+      var offset = (tuneInTime - this.minTime_.getTime()) / 1000 *
+          this.pixelsPerSecond_ + brkn.Guide.NAME_WIDTH;
+      var elapsed = (goog.now() - tuneInTime) / 1000 * this.pixelsPerSecond_;
+      goog.style.setWidth(lineEl, elapsed);
+      goog.style.setPosition(lineEl, offset);
+      goog.style.setStyle(lineEl, 'background', session.user.color);
+      this.getHandler().listen(lineEl, goog.events.EventType.CLICK, function() {
+        brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.PROFILE, session.user)
+      })
+    }
+  }
 };
 
 
@@ -522,6 +535,16 @@ brkn.Channel.prototype.onSuggest_ = function(e) {
     goog.dom.classes.add(this.suggestEl_, 'show');
     this.suggestInput_.focusAndSelect(); 
   }
+};
+
+
+/**
+ * @private
+ */
+brkn.Channel.prototype.onCloseSuggest_ = function() {
+  goog.dom.classes.remove(this.suggestEl_, 'show');
+  this.suggestInput_.setValue('');
+  goog.dom.getElementByClass('page2', this.getElement()).innerHTML = '';
 };
 
 
@@ -586,9 +609,7 @@ brkn.Channel.prototype.onSuggestProgram_ = function(video) {
   goog.style.setOpacity(goog.dom.getElementByClass('select-program', this.suggestEl_), 0);
   
   goog.Timer.callOnce(goog.bind(function() {
-    goog.dom.classes.remove(this.suggestEl_, 'show');
-    this.suggestInput_.setValue('');
-    goog.dom.getElementByClass('page2', this.getElement()).innerHTML = '';
+    this.onCloseSuggest_();
   }, this), 3000);
 };
 
@@ -615,9 +636,8 @@ brkn.Channel.prototype.update = function() {
     var currentProgram = this.programs_[this.currentProgram_];
     var delta = goog.style.getPosition(currentProgram).x +
         goog.style.getPosition(goog.dom.getElement('guide')).x;
-    window.console.log(delta);
     var title = goog.dom.getElementByClass('title', currentProgram);
-    goog.style.setPosition(title, delta < 0 ? -delta + 5 : 5);
+    goog.style.setPosition(title, delta < 5 ? -delta + 10 : 5);
   }
 
   // Update viewers
@@ -625,7 +645,13 @@ brkn.Channel.prototype.update = function() {
 		if (this.getModel().getCurrentProgram() && !session.tuneOut && this.viewers_[session.user.id]) {
 			var tuneInTime = Math.max(session.tuneIn.getTime(), this.minTime_.getTime());
 			var width = goog.style.getSize(this.programsEl_).width;
-			var elapsed = (goog.now() - tuneInTime)/1000 * this.pixelsPerSecond_;
+			var elapsed = Math.floor((goog.now() - tuneInTime)/1000 * this.pixelsPerSecond_);
+			var myCurrentProgram = brkn.model.Player.getInstance().getCurrentProgram();
+			if (session.user.id == brkn.model.Users.getInstance().currentUser.id && myCurrentProgram) {
+			  elapsed = Math.floor((myCurrentProgram.time.getTime() +
+            brkn.model.Player.getInstance().getProgress()*1000 - tuneInTime)/1000 *
+            this.pixelsPerSecond_);
+			}
 			goog.style.setWidth(this.viewers_[session.user.id].lastChild, elapsed);
 		}
 	}, this);

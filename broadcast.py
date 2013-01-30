@@ -16,7 +16,7 @@ def broadcastViewerChange(user, last_channel_id, channel_id, session_id, time):
   response['channel_id'] = channel_id
   response['time'] = time
   response['session_id'] = session_id
-  channels = simplejson.loads(memcache.get('web_channels') or '{}')
+  channels = memcache.get('web_channels') or {}
   for client in channels.iterkeys():
     webchannel.send_message(client, simplejson.dumps(response))
     
@@ -24,7 +24,7 @@ def broadcastNewComment(comment):
   response = {}
   response['type'] = 'new_comment'
   response['comment'] = comment.toJson()
-  channels = simplejson.loads(memcache.get('web_channels') or '{}')
+  channels = memcache.get('web_channels') or {}
   for client in channels.iterkeys():
     webchannel.send_message(client, simplejson.dumps(response))
     
@@ -32,7 +32,7 @@ def broadcastNewActivity(activity):
   response = {}
   response['type'] = 'new_activity'
   response['activity'] = activity.toJson()
-  channels = simplejson.loads(memcache.get('web_channels') or '{}')
+  channels = memcache.get('web_channels') or {}
   for client in channels.iterkeys():
     if client in activity.acl or client == activity.user.id:
       webchannel.send_message(client, simplejson.dumps(response))
@@ -42,7 +42,7 @@ def broadcastProgramChanges(channel, programs):
   response['type'] = 'update_programs'
   response['channel_id'] = channel.id
   response['programs'] = [p.toJson(False, False) for p in programs]
-  channels = simplejson.loads(memcache.get('web_channels') or '{}')
+  channels = memcache.get('web_channels') or {}
   for client in channels.iterkeys():
     webchannel.send_message(client, simplejson.dumps(response))
     
@@ -53,6 +53,6 @@ def broadcastNewPrograms(channel, programs):
   response['type'] = 'new_programs'
   response['channel_id'] = channel.id
   response['programs'] = [p.toJson(False) for p in programs]
-  channels = simplejson.loads(memcache.get('web_channels') or '{}')
+  channels = memcache.get('web_channels') or {}
   for client in channels.iterkeys():
     webchannel.send_message(client, simplejson.dumps(response))

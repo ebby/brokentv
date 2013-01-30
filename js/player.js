@@ -3,6 +3,9 @@ goog.provide('brkn.Player');
 goog.require('brkn.model.Channels');
 goog.require('brkn.model.Player');
 
+goog.require('goog.fx.AnimationSerialQueue');
+goog.require('goog.fx.dom');
+goog.require('goog.fx.easing');
 goog.require('goog.ui.Component');
 goog.require('goog.ui.Component.EventType');
 goog.require('goog.ui.CustomButton');
@@ -46,6 +49,9 @@ brkn.Player.prototype.enterDocument = function() {
   this.currentChannel_ = brkn.model.Channels.getInstance().currentChannel;
   this.currentProgram_ = this.currentChannel_ && this.currentChannel_.getCurrentProgram();
   var seek = this.currentProgram_ ? (goog.now() - this.currentProgram_.time.getTime())/1000 : 0;
+  this.fullscreenEl_ = goog.dom.getElementByClass('fullscreen', this.getElement());
+  var expandEl = goog.dom.getElementByClass('expand', this.getElement());
+  goog.style.showElement(this.fullscreenEl_, this.supportsFullScreen_());
   
   this.updateStagecover_();
   
@@ -54,22 +60,31 @@ brkn.Player.prototype.enterDocument = function() {
   }
   
   this.getHandler()
-      .listen(window, 'resize', this.resize)
-      .listen(this.getElement(), goog.events.EventType.DBLCLICK, goog.bind(function() {
-//        var show = !brkn.model.Sidebar.getInstance().toggled();
-//        brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.TOGGLE_SIDEBAR, show);
-//        brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.TOGGLE_GUIDE, show);
-        
-        goog.dom.getElementByClass('main').webkitRequestFullScreen()
+      .listen(window, 'resize', goog.bind(this.resize, this))
+      .listen(this.fullscreenEl_, goog.events.EventType.CLICK, goog.bind(function(e) {
+        if (goog.dom.classes.toggle(this.fullscreenEl_, 'full')) {
+          var mainEl = goog.dom.getElementByClass('main');
+          mainEl.requestFullScreen && mainEl.requestFullScreen();
+          mainEl.webkitRequestFullScreen && mainEl.webkitRequestFullScreen();
+          mainEl.mozRequestFullScreen && mainEl.mozRequestFullScreen();
+        } else {
+          document.cancelFullScreen && document.cancelFullScreen();
+          document.webkitCancelFullScreen && document.webkitCancelFullScreen();
+          document.mozCancelFullScreen && document.mozCancelFullScreen();
+        }
+        e.stopPropagation();
+        e.preventDefault();
       }, this))
+      .listen(this.getElement(), goog.events.EventType.DBLCLICK, goog.bind(this.toggleExpand_, this))
+      .listen(expandEl, goog.events.EventType.CLICK, goog.bind(this.toggleExpand_, this))
       .listen(this.getElement(), goog.events.EventType.CLICK, goog.bind(function() {
         if (this.player_) {
           switch (this.player_.getPlayerState()) {
             case YT.PlayerState.PLAYING:
-              this.player_.pauseVideo();
+              brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.PLAY, false);
               break;
             case YT.PlayerState.PAUSED:
-              this.player_.playVideo();
+              brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.PLAY, true);
               break;
           }
         }
@@ -91,10 +106,65 @@ brkn.Player.prototype.enterDocument = function() {
       }, this);
   brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_GUIDE,
       function(show) {
-        goog.Timer.callOnce(this.resize);
+        goog.Timer.callOnce(goog.bind(this.resize, this));
+      }, this);
+  brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.PLAY,
+      function(play) {
+        play ? this.player_.playVideo() : this.player_.pauseVideo();
+        var el = goog.dom.getElementByClass(play ? 'play' : 'pause', this.getElement());
+        var queue = new goog.fx.AnimationSerialQueue();
+        queue.add(new goog.fx.dom.FadeInAndShow(el, 250, goog.fx.easing.easeOut));
+        queue.add(new goog.fx.dom.FadeOutAndHide(el, 250, goog.fx.easing.easeIn));
+        queue.play();
+      }, this);
+  brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.MUTE,
+      function(mute) {
+        this.player_ && (mute ? this.player_.mute() : this.player_.unMute());
+      }, this);
+  brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.RESTART,
+      function() {
+        this.player_.seekTo(0);
       }, this);
   
   this.resize();
+};
+
+
+/**
+ * Supports full screen
+ * @return {boolean}
+ * @private
+ * @suppress {checkTypes}
+ */
+brkn.Player.prototype.supportsFullScreen_ = function() {
+  var mainEl = goog.dom.getElementByClass('main');
+  return !!(mainEl.requestFullScreen || mainEl.webkitRequestFullScreen ||
+      mainEl.mozRequestFullScreen);
+};
+
+
+/**
+ * @return {boolean}
+ * @private
+ * @suppress {checkTypes}
+ */
+brkn.Player.prototype.isFullScreen_ = function() {
+  return this.supportsFullScreen_ &&
+      (document.fullScreen || document.webkitIsFullScreen || document.mozfullScreen);
+};
+
+
+/**
+ * Toggle UI expansion
+ * @param {Event} e
+ * @private
+ */
+brkn.Player.prototype.toggleExpand_ = function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  var show = !brkn.model.Sidebar.getInstance().toggled();
+  brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.TOGGLE_SIDEBAR, show);
+  brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.TOGGLE_GUIDE, show);
 };
 
 
@@ -104,6 +174,7 @@ brkn.Player.prototype.enterDocument = function() {
  */
 brkn.Player.prototype.playProgram = function(program) {
   var seek = (goog.now() - program.time.getTime())/1000;
+  brkn.model.Player.getInstance().setCurrentProgram(program);
   this.play(program.media, seek);
 };
 
@@ -117,12 +188,12 @@ brkn.Player.prototype.playProgram = function(program) {
 brkn.Player.prototype.play = function(media, seek, opt_tries) {
   var retry = 1000;
 
-  if (!this.player_) {
+  if (!this.player_ || !this.player_.loadVideoById) {
     this.player_ = new YT.Player('ytplayer', {
-      height: goog.dom.getViewportSize().height - 40,
-      width: goog.dom.getViewportSize().width,
-      videoId: media.hostId,
-      playerVars: {
+      'height': goog.dom.getViewportSize().height - 40,
+      'width': goog.dom.getViewportSize().width,
+      'videoId': media.hostId,
+      'playerVars': {
         'autoplay': 1,
         'controls': 0,
         'showinfo': 0,
@@ -130,12 +201,13 @@ brkn.Player.prototype.play = function(media, seek, opt_tries) {
         'start': seek,
         'modestbranding': 1
       },
-      events: {
+      'events': {
           'onStateChange': goog.bind(this.playerStateChange_, this),
           'onReady': goog.bind(this.onPlayerReady_, this),
           'onError': goog.bind(this.onPlayerError_, this)
         }
       });
+    brkn.model.Player.getInstance().setPlayer(this.player_);
   } else {
     this.player_.loadVideoById(media.hostId, seek);
     goog.Timer.callOnce(goog.bind(function() {
@@ -167,6 +239,7 @@ brkn.Player.prototype.resize = function() {
     'margin-left': -messageSize.width/2 + 'px',
     'margin-top': -messageSize.height/2 + 'px'
   });
+  goog.dom.classes.enable(this.fullscreenEl_, 'full', this.isFullScreen_());
 };
 
 
@@ -213,6 +286,7 @@ brkn.Player.prototype.playerStateChange_ = function(event) {
       brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.NEXT_PROGRAM,
           nextProgram);
     } else {
+      brkn.model.Player.getInstance().setCurrentProgram(null);
       brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.CHANGE_CHANNEL,
           brkn.model.Channels.getInstance().findOnline());
       if (this.asyncMedia_) {
@@ -233,7 +307,7 @@ brkn.Player.prototype.playerStateChange_ = function(event) {
 brkn.Player.prototype.onPlayerReady_ = function(event) {
   // Do a health check
   goog.Timer.callOnce(goog.bind(function() {
-    if (this.player_ && !this.player_.getPlayerState()) {
+    if (this.player_ && (!this.player_.getPlayerState || !this.player_.getPlayerState())) {
       this.playProgram(this.currentProgram_);
     }
   }, this), 1000);

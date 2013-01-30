@@ -2,6 +2,7 @@
 
 /**
  * Tucked away here for security 
+ * @param user
  * @param admin
  */
 {template .main}
@@ -10,6 +11,10 @@
     <div id="ytplayer"></div>
     <div id="stagecover">
       <div class="message">This channel is currently offline.</div>
+      <div class="fullscreen"></div>
+      <div class="expand"></div>
+      <div class="play" style="display: none"></div>
+      <div class="pause" style="display: none"></div>
     </div>
   </div>
   <div id="guide" class="guide toggled">
@@ -21,7 +26,14 @@
         <div id="now-right" class="right browse"><span>NOW </span>&#x25B6;</div>
       </div>
     </div>
-    <div id="ticker" class="ticker"></div>
+    <div id="my-ticker" class="my-ticker" style="display:none">
+      <div class="me" style="background:{$user.color};border-color:{$user.color};">
+        <img src="{$user.picture}"/>
+      </div>
+    </div>
+    <div id="ticker" class="ticker">
+      <div id="go-live" class="go-live">GO LIVE</div>
+    </div>
   </div>
   <div id="controller" class="controller guide-toggled">
     <div class="background"></div>
@@ -29,8 +41,8 @@
       <div id="guide-toggle" class="guide-toggle dark button">GUIDE</div>
       <div class="controls">
         <div class="restart dark button"></div>
-        <div class="pause dark button"></div>
-        <div class="go-live dark button"></div>
+        <div class="play dark button"></div>
+        <div class="volume dark button"></div>
       </div>
       <div class="border"></div>
     </div>
@@ -67,7 +79,7 @@
       <div id="stream" class="screen stream"></div>
       <div id="my-profile" class="screen profile"></div>
       <div id="admin" class="screen admin"></div>
-      <div id="media-list" class="slide media-list"><div class="medias"></div></div>
+      <div id="media-list" class="slide media-list"></div>
       {if $admin}
         <div id="admin-list" class="slide admin-list"></div>
       {/if}

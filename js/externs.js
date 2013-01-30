@@ -34,7 +34,17 @@ YT.Player.prototype.loadVideoById = function(id, opt_seek) {};
  */
 YT.Player.prototype.getPlayerState;
 
+/**
+ * @return {number}
+ */
+YT.Player.prototype.getCurrentTime;
+
+YT.Player.prototype.loadVideoById;
 YT.Player.prototype.playVideo;
+YT.Player.prototype.pauseVideo;
+YT.Player.prototype.seekTo;
+YT.Player.prototype.mute;
+YT.Player.prototype.unMute;
 
 /** 
  * enum {string} 

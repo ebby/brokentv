@@ -10,6 +10,7 @@ class Tweet(db.Model):
   text = db.TextProperty()
   time = db.DateTimeProperty()
   handle = db.StringProperty()
+  name = db.StringProperty()
   user_id = db.IntegerProperty()
   picture_url = db.StringProperty()
   picture_url_https = db.StringProperty()
@@ -23,7 +24,8 @@ class Tweet(db.Model):
                                user=user,
                                text=db.Text(result.text),
                                time=result.created_at,
-                               handle=result.from_user_name,
+                               handle=result.from_user,
+                               name=result.from_user_name,
                                user_id=result.from_user_id,
                                picture_url=result.profile_image_url,
                                picture_url_https=result.profile_image_url_https)

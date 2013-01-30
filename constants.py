@@ -14,22 +14,36 @@ TWITTER_ACCESS_TOKEN = '423216326-IuRUPJRwLtdPRW9a9etVSVZy5EuWHsjXo3a4BOBT'
 TWITTER_TOKEN_SECRET = 'y02WSt6kTqhaB6kALBBp5B2fqu1KQLUpAYiUl7qs'
 TWITTER_CALLBACK = 'http://local.broken.tv:8011/_twitter/callback'
 
+TWITTER_USER_BLACKLIST = [
+  'vodionews',
+  'unlimitnews',
+  'thevideotweets',
+  'irishchronicle'                    
+]
+
+TWITTER_PHRASE_BLACKLIST = [
+  'i liked a'                   
+]
+
 GDATA_KEY = 'AIzaSyAUF3ESL0wYUuSWmOezgZclQFpNGZNBePw'
 
 CSS_SOURCE =  '/static/css/main.css'
 
 PROD_JS = '/static/js/brkn-min.js'
-DEV_JS = '//localhost:9810/compile?id=brokentv&mode=simple&pretty-print=true'
+PROD_SIMPLE_JS = '/static/js/brkn-simple-min.js'
+ADV_JS = '//localhost:9810/compile?id=brokentv&mode=advanced&pretty-print=true'
+SIMPLE_JS = '//localhost:9810/compile?id=brokentv&mode=simple&pretty-print=true'
 
 if DEVELOPMENT:
   FACEBOOK_APP_ID = "164212930331128"
   FACEBOOK_APP_SECRET = "fd15a6f75af1cc786177f2c9e74f7424"
-  JS_SOURCE = DEV_JS
+  JS_SOURCE = SIMPLE_JS
   GDATA_CLIENT = '882797508644-e6cmb7g9pta07sbn0sajcrb7600hgd6n.apps.googleusercontent.com'
 else :
   FACEBOOK_APP_ID = "131936020298013"
   FACEBOOK_APP_SECRET = "d69567a45ca1a5313c06c5b615555227"
   JS_SOURCE = PROD_JS
+  SIMPLE_JS = PROD_SIMPLE_JS
   GDATA_CLIENT = '882797508644-8pm4lrn1h8dq0sfaabac3m6b6uismfav.apps.googleusercontent.com'
 
 class AccessLevel:

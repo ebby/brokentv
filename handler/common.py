@@ -7,6 +7,7 @@ import math
 import oauth
 import os.path
 import re
+import programming
 import simplejson
 import jinja2
 import urlparse
@@ -26,3 +27,16 @@ from google.appengine.ext.webapp import util
 
 from basehandler import BaseHandler
 from model import *
+
+def memcache_cas(key, op, *args):
+  set = False
+  client = memcache.Client()
+  for i in range(3): # Retry loop
+    data = client.gets(key) or {}
+    data = op(data, *args)
+    set = client.cas(key, data)
+    if set:
+       break
+  if not set:
+    memcache.set(key, data)
+  return data

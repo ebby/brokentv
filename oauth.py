@@ -94,22 +94,6 @@ def get_oauth_client(service, key, secret, callback_url):
     raise Exception, "Unknown OAuth service %s" % service
 
 
-class AuthToken(db.Model):
-  """Auth Token.
-
-  A temporary auth token that we will use to authenticate a user with a
-  third party website. (We need to store the data while the user visits
-  the third party website to authenticate themselves.)
-
-  TODO: Implement a cron to clean out old tokens periodically.
-  """
-
-  service = db.StringProperty(required=True)
-  token = db.StringProperty(required=True)
-  secret = db.StringProperty(required=True)
-  created = db.DateTimeProperty(auto_now_add=True)
-
-
 class OAuthClient():
 
   def __init__(self, service_name, consumer_key, consumer_secret, request_url,
@@ -227,19 +211,7 @@ class OAuthClient():
     auth_secret = memcache.get(self._get_memcache_auth_key(auth_token))
 
     if not auth_secret:
-      result = AuthToken.gql("""
-        WHERE
-          service = :1 AND
-          token = :2
-        LIMIT
-          1
-      """, self.service_name, auth_token).get()
-
-      if not result:
-        logging.error("The auth token %s was not found in our db" % auth_token)
-        raise Exception, "Could not find Auth Token in database"
-      else:
-        auth_secret = result.secret
+      logging.error("The auth token %s is missing from memcache" % auth_token)
 
     response = self.make_request(self.access_url,
                                  token=auth_token,
@@ -270,13 +242,7 @@ class OAuthClient():
     auth_token = result["token"]
     auth_secret = result["secret"]
 
-    # Save the auth token and secret in our database.
-    auth = AuthToken(service=self.service_name,
-                     token=auth_token,
-                     secret=auth_secret)
-    auth.put()
-
-    # Add the secret to memcache as well.
+    # Add the secret to memcache.
     memcache.set(self._get_memcache_auth_key(auth_token), auth_secret,
                  time=20*60)
 

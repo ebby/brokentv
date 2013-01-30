@@ -191,17 +191,12 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
       .listen(publisherEl,
           goog.events.EventType.CLICK,
           goog.bind(function() {
-            goog.net.XhrIo.send(
-                '/admin/_media/publisher/' + this.media_.publisher.id,
-                goog.bind(function(e) {
-                  var medias = /** @type {Array.<Object>} */ goog.json.parse(e.target.getResponse());
-                  medias = goog.array.map(medias, function(m) {
-                    return new brkn.model.Media(m);
-                  });
-                  brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.MEDIA_LIST,
-                      medias, this.media_.publisher.name, this.media_.publisher.picture,
-                      this.media_.publisher.description);
-                }, this));
+            brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.MEDIA_LIST,
+                this.media_.publisher.name, undefined,
+                '/admin/_media/publisher/' + this.media_.publisher['id'],
+                this.media_.publisher.picture,
+                this.media_.publisher.description,
+                this.media_.publisher.link);
           }, this))
       .listen(this.starToggle_, goog.ui.Component.EventType.ACTION, goog.bind(function() {
             brkn.model.Medias.getInstance().publish(brkn.model.Medias.Action.STAR, this.media_,
@@ -283,7 +278,7 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
                 goog.style.setOpacity(img, Math.min(.5, Math.max(opacity, .1)));
                 goog.dom.classes.enable(picEl, 'scrolled', scrollable.scrollTop > 10);
               }, this))
-      .listen(goog.dom.getElementByClass('desc-link'),
+      .listen(goog.dom.getElementByClass('desc-link', this.getElement()),
           goog.events.EventType.CLICK,
           goog.bind(function() {
             var scrolled = goog.dom.classes.toggle(picEl, 'scrolled');
@@ -300,6 +295,9 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
  * @private
  */
 brkn.sidebar.Info.prototype.toDot_ = function(dotEl) {
+  if (!dotEl) {
+    return;
+  }
   this.currentDotEl_ && goog.dom.classes.remove(this.currentDotEl_, 'selected');
   this.currentDotEl_ = dotEl;
   goog.dom.classes.add(this.currentDotEl_, 'selected');
