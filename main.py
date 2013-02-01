@@ -41,6 +41,7 @@ from google.appengine.ext.webapp import util
 from basehandler import BaseHandler
 from model import *
 from handler import *
+from namemodels import *
 
 jinja_environment = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
@@ -64,6 +65,21 @@ class MainHandler(BaseHandler):
       template_data['facebook_app_id'] = constants.FACEBOOK_APP_ID;
       path = os.path.join(os.path.dirname(__file__), 'templates/home.html')
       self.response.out.write(template.render(path, template_data))
+      
+class NameStormHandler(BaseHandler):
+    def get(self):
+      data = {}
+      data['syllables'] = simplejson.dumps([s.name for s in Syllable.all().order('-name').fetch(None)])
+      data['suggestions'] = simplejson.dumps([s.name for s in Suggestion.all().order('-name').fetch(None)])
+      path = os.path.join(os.path.dirname(__file__), 'templates/namestorm.html')
+      self.response.out.write(template.render(path, data))
+    def post(self, action='sug'):
+      value = self.request.get('value')
+      if action == 'sug':
+        Suggestion.get_or_insert(value, name=value)
+      if action == 'syl':
+        Syllable.get_or_insert(value, name=value)
+      self.response.out.write('')
 
 class ImagesHandler(webapp2.RequestHandler):
     def get(self, entity, id):
@@ -132,7 +148,10 @@ def create_handlers_map():
     ('/cron/fetch', cron.FetchHandler),
     
     # Pages
-    ('/', MainHandler)
+    ('/', MainHandler),
+    ('/namestorm', NameStormHandler),
+    ('/namestorm/(syl)', NameStormHandler),
+    ('/namestorm/(sug)', NameStormHandler)
   ]
 
 def create_application():
