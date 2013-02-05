@@ -12,6 +12,7 @@ import simplejson
 import jinja2
 import urlparse
 import webapp2
+import uuid
 
 from constants import *
 

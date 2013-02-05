@@ -123,7 +123,7 @@ brkn.Main.init = function(response, channelToken, channels, programs,
 
 brkn.Main.auth = function() {  
   FB.getLoginStatus(function(response) {
-    if (response.status === 'connected') {
+    if (response['status'] === 'connected') {
       brkn.Main.getSessionAndInit(response);
     } else {
       // not_logged_in
@@ -147,7 +147,7 @@ brkn.Main.login = function() {
   goog.events.listen(fbLogin, goog.events.EventType.CLICK, function() {
     goog.dom.classes.add(fbLogin, 'disabled');
     FB.login(function(response) {
-      if (response.authResponse) {
+      if (response['authResponse']) {
         // connected
         brkn.Main.getSessionAndInit(response);
       } else {
@@ -177,7 +177,7 @@ brkn.Main.getSessionAndInit = function(response) {
           brkn.Main.notAuthorized();
         }
       }, 'POST');
-}
+};
 
 brkn.Main.notAuthorized = function() {
   var oken = goog.dom.getElement('oken');

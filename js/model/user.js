@@ -16,12 +16,12 @@ brkn.model.User = function(user) {
 	/**
 	 * @type {number}
 	 */
-	this.id = user.id;
+	this.id = user['id'];
 	
 	/**
 	 * @type {string}
 	 */
-	this.name = user.name;
+	this.name = user['name'];
 	
 	/**
    * @type {brkn.model.Session}

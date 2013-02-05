@@ -19,8 +19,11 @@ def get_session(current_user):
         if channel['next_time'] else None
     if not next_time or next_time < datetime.datetime.now():
       # Kick our programming backend off. It shuts down when users leave.
-      programming.Programming.set_programming(channel['id'], queue='programming', kickoff=True)
-      new_programming = True
+      #programming.Programming.set_programming(channel['id'], queue='programming', kickoff=True)
+      #new_programming = True
+      deferred.defer(programming.Programming.set_programming, channel['id'],
+                     _name=channel['name'].replace(' ', '') + '-' + str(uuid.uuid1()),
+                     _queue='programming')
   if not len(cached_programming) or new_programming:
     # No cached programming, attempt to fetch
     channels = channels or Channel.get_public()
@@ -173,10 +176,10 @@ class ActivityHandler(BaseHandler):
       offset = self.request.get('offset') or 0
       if uid:
         user = User.get_by_key_name(uid)
-        activities = UserActivity.get_for_user(user, offset=int(offset))
+        activities = UserActivity.get_for_user(user, offset=int(offset)) if user else []
       else:
         activities = UserActivity.get_stream(self.current_user, offset=int(offset))
-      self.response.out.write(simplejson.dumps([a.toJson() for a in activities]))
+      self.response.out.write(simplejson.dumps([a.toJson() for a in activities if a.user]))
       
 class ChangeChannelHandler(BaseHandler):
     def post(self):

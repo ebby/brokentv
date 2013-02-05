@@ -8,6 +8,7 @@ class Publisher(db.Model):
   name = db.StringProperty()
   host = db.StringProperty(default=MediaHost.YOUTUBE)
   host_id = db.StringProperty()
+  channel_id = db.StringProperty()
   picture = db.BlobProperty()
   link = db.StringProperty()
   description = db.TextProperty()
@@ -62,8 +63,10 @@ class Publisher(db.Model):
     logging.info('FETCH')
     if self.host == MediaHost.YOUTUBE:
       yt_service = get_youtube_service()
+      youtube3 = get_youtube3_service()
 
-      if not self.last_fetch or datetime.datetime.now() - self.last_fetch > datetime.timedelta(hours=3):
+      #if not self.last_fetch or datetime.datetime.now() - self.last_fetch > datetime.timedelta(hours=3):
+      if not self.channel_id:
         try:
           user_entry = yt_service.GetYouTubeUserEntry(username=self.host_id)
         except Exception as e:
@@ -73,8 +76,35 @@ class Publisher(db.Model):
         self.picture = db.Blob(picture.content)
         self.description = user_entry.content.text
         self.link = user_entry.link[0].href
+        self.channel_id = re.search('/channel/(.*)', self.link).groups()[0]
         self.put()
 
+      next_page_token = ''
+      while next_page_token is not None:
+        search_response = youtube3.search().list(
+          channelId=self.channel_id,
+          part="id",
+          pageToken=next_page_token
+        ).execute()
+        search_ids = ''
+        for item in search_response.get('items', []):
+          search_ids += item['id']['videoId'] + ','
+        videos_response = youtube3.videos().list(
+          id=search_ids,
+          part="id,snippet,topicDetails,contentDetails,statistics"
+        ).execute()
+        logging.info(videos_response.get("items", [])[0])
+        medias = Media.add_from_snippet(videos_response.get("items", []))
+        for media in medias:
+          logging.info('FETCHED: ' + media.name)
+          PublisherMedia.add(publisher=self, media=media)
+
+        
+        next_page_token = search_response.get('tokenPagination', {}).get('nextPageToken')
+          
+
+        
+        '''
         query = gdata.youtube.service.YouTubeVideoQuery()
         query.author = self.host_id
         if categories:
@@ -82,7 +112,7 @@ class Publisher(db.Model):
         query.orderby = 'published'
         query.max_results = 50
         offset = 1
-        while offset <= 100: # Max is 1000
+        while offset <= 1 if constants.DEVELOPMENT else 100: # Max is 1000
           query.start_index = offset
           feed = yt_service.YouTubeQuery(query)
           if len(feed.entry) == 0:
@@ -103,6 +133,7 @@ class Publisher(db.Model):
             logging.info('UP TO DATE')
             break
           offset += len(medias)
+        '''
 
         self.last_fetch = datetime.datetime.now()
         self.put()

@@ -31,18 +31,34 @@
         outline: none;
         box-shadow: 0 3px 3px -3px rgba(0, 0, 0, .5);
       }
-      #name {
+      #name1 {
         font-size: 75px;
         line-height: 105px;
-        width: 700px;
+        width: 350px;
         height: 100px;
         position: absolute;
         left: 50%;
         top: 50%;
         margin-top: -150px;
         margin-left: -350px; 
-        text-align: center;
+        text-align: right;
         border-bottom: 4px solid #181818;
+      }
+      #name2 {
+        font-size: 75px;
+        line-height: 105px;
+        width: 350px;
+        height: 100px;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        margin-top: -150px;
+        margin-left: 00px; 
+        text-align: left;
+        border-bottom: 4px solid #181818;
+      }
+      #name1.green, #name2.green {
+        background: rgba(0, 255, 0, .1);
       }
       input:hover, input:focus {
         box-shadow: 0 0 0 1px #ccc, 0 3px 4px -2px rgba(0, 0, 0, .5);
@@ -197,7 +213,8 @@
   </head>
   <body>
     <div id="main">
-	    <input id="name" type="text" placeholder="Type or Kerfuffl..."/>
+	    <input id="name1" type="text" />
+	    <input id="name2" type="text" />
 	    <div id="kerf" class="button">Kerfufflebl&#235;rgen!</div>
 	    <div id="add" class="button">+</div>
     </div>
@@ -254,11 +271,20 @@
         mash();
       };
 
+      var name1 = document.getElementById('name1');
+      var name2 = document.getElementById('name2');
+      name1.onclick = function() {
+        name1.className = name1.className ? '' : 'green'
+      };
+      name2.onclick = function() {
+        name2.className = name2.className ? '' : 'green'
+      };
+
       document.getElementById('add').onclick = function() {
         if (!sugToggled) {
           toggleSidebar('suggestions');
         }
-        var suggestion = document.getElementById('name').value;
+        var suggestion = document.getElementById('name1').value + document.getElementById('name2').value ;
 	      if (suggestions.indexOf(suggestion) == -1) {
 	        suggestions.push(suggestion);
 	        addSug(suggestion);
@@ -308,9 +334,21 @@
       }
 
       function mash() {
-        var syl1 = syllables[Math.floor(Math.random() * syllables.length)];
-        var syl2 = syllables[Math.floor(Math.random() * syllables.length)];
-        document.getElementById('name').value = syl1 + syl2;
+        var syl1 = name1.className && name1.value ? name1.value : syllables[Math.floor(Math.random() * syllables.length)];
+        var syl2 = name2.className && name2.value ? name2.value : syllables[Math.floor(Math.random() * syllables.length)];
+        window.console.log(syl1)
+        window.console.log(syl2)
+        var tries = 0;
+        while ((syl1 + syl2).length > 7 && tries < 20) {
+          if (name2.className) {
+            syl1 = syllables[Math.floor(Math.random() * syllables.length)];
+          } else {
+            syl2 = syllables[Math.floor(Math.random() * syllables.length)];
+          }
+          tries++;
+        }
+        document.getElementById('name1').value = syl1;
+        document.getElementById('name2').value = syl2;
       };
 
       for (var i = 0; i < syllables.length; i++) {

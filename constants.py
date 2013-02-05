@@ -26,6 +26,8 @@ TWITTER_PHRASE_BLACKLIST = [
 ]
 
 GDATA_KEY = 'AIzaSyAUF3ESL0wYUuSWmOezgZclQFpNGZNBePw'
+YOUTUBE_API_SERVICE_NAME = "youtube"
+YOUTUBE_API_VERSION = "v3"
 
 CSS_SOURCE =  '/static/css/main.css'
 
@@ -39,13 +41,14 @@ if DEVELOPMENT:
   FACEBOOK_APP_SECRET = "fd15a6f75af1cc786177f2c9e74f7424"
   JS_SOURCE = SIMPLE_JS
   GDATA_CLIENT = '882797508644-e6cmb7g9pta07sbn0sajcrb7600hgd6n.apps.googleusercontent.com'
+  CLIENT_SECRETS_FILE = "client_secrets_dev.json"
 else :
   FACEBOOK_APP_ID = "131936020298013"
   FACEBOOK_APP_SECRET = "d69567a45ca1a5313c06c5b615555227"
   JS_SOURCE = PROD_JS
   SIMPLE_JS = PROD_SIMPLE_JS
   GDATA_CLIENT = '882797508644-8pm4lrn1h8dq0sfaabac3m6b6uismfav.apps.googleusercontent.com'
-
+  CLIENT_SECRETS_FILE = "client_secrets_prod.json"
 class AccessLevel:
   WAITLIST = 0
   USER = 1

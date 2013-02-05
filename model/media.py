@@ -51,6 +51,30 @@ class Media(db.Model):
     return Media.add_from_entry([entry])[0]
   
   @classmethod
+  def add_from_snippet(cls, items):
+    from publisher import Publisher
+    from publisher import PublisherMedia
+    
+    medias = []
+    for item in items:
+      id = item['id']
+      media = Media.get_by_key_name(MediaHost.YOUTUBE + id)
+      if not media:
+        duration = re.search('PT((.*)M)?(.*)S', item['contentDetails']['duration']).groups()
+        media = cls(key_name=(MediaHost.YOUTUBE + id),
+                    type=MediaType.VIDEO,
+                    host_id=id,
+                    name=item['snippet']['title'].decode('utf-8'),
+                    published=iso8601.parse_date(item['snippet']['publishedAt']).replace(tzinfo=None),
+                    duration=float(60*(duration[1] or 0) + float(duration[2] or 0)),
+                    description=item['snippet']['publishedAt'].decode('utf-8').replace("\n", r" "),
+                    host_views=int(item['statistics']['viewCount']) if item['statistics']['viewCount'] else 0)
+        media.put()
+      medias.append(media)
+    return medias
+        
+  
+  @classmethod
   def add_from_entry(cls, entries):
     from publisher import Publisher
     from publisher import PublisherMedia
