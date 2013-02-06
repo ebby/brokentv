@@ -105,19 +105,6 @@
 
 
 /**
- * @param media
- * @param published
- */
-{template .media}
-  <div class="media">
-    <img src="{$media.thumbnail}" class="thumb">
-    <div class="title">{$media.name}</div>
-    <div class="published">{$published}</div>
-  </div>
-{/template}
-
-
-/**
  * @param session
  * @param? channel
  * @param user
@@ -205,19 +192,25 @@
  */
 {template .admin}
   <div class="admin">
-    <div class="search">
-      <input type="text" />
-    </div>
-    <div class="results">
-    </div>
-    <div class="section">
-      <div class="label">COLLECTIONS</div>
-      <div class="collections"></div>
-    </div>
-    <div class="section">
-      <div class="label">PLAYLISTS</div>
-      <div class="playlists"></div>
-    </div>
+    <div class="scrollable ios-scroll">
+      <div class="search">
+        <input type="text" />
+      </div>
+      <div class="results">
+      </div>
+      <div class="section" style="display:none">
+        <div class="label">CHANNELS</div>
+        <div class="admin-channels"></div>
+      </div>
+      <div class="section" style="display:none">
+        <div class="label">CURRENT TOPICS</div>
+        <div class="topics"></div>
+      </div>
+      <div class="section" style="display:none">
+        <div class="label">COLLECTIONS</div>
+        <div class="collections"></div>
+      </div>
+    <div class="scroll-area">
   </div>
 {/template}
 
@@ -260,6 +253,19 @@
 
 
 /**
+ * @param channel
+ */
+{template .channel}
+  <div class="channel">
+    <div class="title">{$channel.name}</div>
+    {if $channel.pending}
+      <div class="pending">{$channel.pending}</div>
+    {/if}
+  </div>
+{/template}
+
+
+/**
  * @param collection
  */
 {template .collection}
@@ -267,6 +273,20 @@
     <div class="title">{$collection.name}</div>
     {if $collection.pending}
       <div class="pending">{$collection.pending}</div>
+    {/if}
+  </div>
+{/template}
+
+
+/**
+ * @param topic
+ * @param pending
+ */
+{template .topic}
+  <div class="topic">
+    <div class="title">{$topic}</div>
+    {if $pending}
+      <div class="pending">{$pending}</div>
     {/if}
   </div>
 {/template}

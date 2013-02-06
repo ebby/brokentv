@@ -29,6 +29,10 @@ class Media(db.Model):
   comment_count = db.IntegerProperty(default=0)
   programmed_count = db.IntegerProperty(default=0)
 
+  @property
+  def id(self):
+    return self.key().name()
+
   @classmethod
   def get(cls, id):
     media = Media.get_by_id(id)
@@ -51,25 +55,43 @@ class Media(db.Model):
     return Media.add_from_entry([entry])[0]
   
   @classmethod
-  def add_from_snippet(cls, items):
+  def add_from_snippet(cls, items, collection=None, approve=False):
     from publisher import Publisher
     from publisher import PublisherMedia
+    from collection import CollectionMedia
+    from topic import Topic
+    from topic import TopicMedia
+    from topic import TopicCollectionMedia
     
     medias = []
     for item in items:
       id = item['id']
       media = Media.get_by_key_name(MediaHost.YOUTUBE + id)
-      if not media:
-        duration = re.search('PT((.*)M)?(.*)S', item['contentDetails']['duration']).groups()
+      if not media or True:
+        logging.info(item)
+        duration = re.search('PT((\d*)H)?((\d*)M)?((\d*)S)?', item['contentDetails']['duration']).groups()
+        duration = float(3600*float(duration[1] or 0) + 60*float(duration[3] or 0) + float(duration[5] or 0))
         media = cls(key_name=(MediaHost.YOUTUBE + id),
                     type=MediaType.VIDEO,
                     host_id=id,
                     name=item['snippet']['title'].decode('utf-8'),
                     published=iso8601.parse_date(item['snippet']['publishedAt']).replace(tzinfo=None),
-                    duration=float(60*(duration[1] or 0) + float(duration[2] or 0)),
+                    duration=duration,
                     description=item['snippet']['publishedAt'].decode('utf-8').replace("\n", r" "),
                     host_views=int(item['statistics']['viewCount']) if item['statistics']['viewCount'] else 0)
         media.put()
+
+        if collection:
+          CollectionMedia.add(collection, media, approved=(True if approve else None))
+        
+        for topic_id in item['topicDetails']['topicIds']:
+          topic = Topic.add(topic_id)
+          logging.info(topic.name)
+          TopicMedia.add(topic, media)
+          if collection:
+            logging.info(collection.name)
+            TopicCollectionMedia.add(topic, collection, media)
+
       medias.append(media)
     return medias
         

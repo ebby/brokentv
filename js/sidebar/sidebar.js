@@ -64,6 +64,12 @@ brkn.Sidebar = function() {
    * @type {Array}
    */
   this.tabNames_ = [];
+
+  /**
+   * @type {Array.<Array>}
+   * @private
+   */
+  this.screens_ = [];
 };
 goog.inherits(brkn.Sidebar, goog.ui.Component);
 
@@ -80,13 +86,6 @@ brkn.Sidebar.prototype.currentMedia_;
  * @private
  */
 brkn.Sidebar.prototype.profile_;
-
-
-/**
- * @type {Element}
- * @private
- */
-brkn.Sidebar.prototype.lastScreen_;
 
 
 /**
@@ -170,8 +169,9 @@ brkn.Sidebar.prototype.enterDocument = function() {
       .listen(goog.dom.getElementByClass('back-button', this.toolbar_),
           goog.events.EventType.CLICK,
           goog.bind(function(e) {
-            goog.dom.classes.remove(this.toolbar_, 'back');
-            this.navigate(this.lastScreen_);
+            var backScreenArr = this.screens_.shift();
+            this.navigate(backScreenArr[0], true, backScreenArr[1]);
+            this.updateArrow_();
             e.stopPropagation();
           }, this))
       .listen(this.tabsEl_,
@@ -316,9 +316,9 @@ brkn.Sidebar.prototype.tabNav_ = function(from, to) {
   }
 
   this.currentTab_ = to;  
-  this.lastScreen_ = this.currentScreen_;
+  goog.array.insertAt(this.screens_, [this.currentScreen_, ''], 0);
+  goog.dom.classes.remove(this.currentScreen_, 'current');
   this.currentScreen_ = toScreen;
-  goog.dom.classes.remove(this.lastScreen_, 'current');
   goog.dom.classes.add(this.currentScreen_, 'current');
   this.updateArrow_(); 
 };
@@ -330,28 +330,12 @@ brkn.Sidebar.prototype.tabNav_ = function(from, to) {
  * @param {?string=} opt_title Title of the navigated section
  */
 brkn.Sidebar.prototype.navigate = function(to, opt_back, opt_title) {
-  if (opt_title) {
-    goog.dom.setTextContent(goog.dom.getElementByClass('back-title', this.toolbar_), opt_title);
-  }
   if (to == this.currentScreen_) {
     return;
   }
   
   var isScreen = goog.dom.classes.has(this.currentScreen_, 'screen');
-  if (this.lastScreen_ != to) {
-    goog.style.setStyle(this.currentScreen_, {
-      'left': isScreen ? 0 : '',
-      'right': ''
-    });
-    goog.style.setStyle(to, {
-      'right': 0,
-      'left': ''
-    });
-    this.lastScreen_ = this.currentScreen_;
-    this.currentScreen_ = to;
-    goog.dom.classes.remove(this.lastScreen_, 'current');
-    goog.dom.classes.add(this.currentScreen_, 'current');
-  } else {
+  if (opt_back) {
     goog.style.setStyle(this.currentScreen_, {
       'left': '',
       'right': 0
@@ -364,9 +348,26 @@ brkn.Sidebar.prototype.navigate = function(to, opt_back, opt_title) {
     goog.dom.classes.remove(this.currentScreen_, 'current');
     goog.dom.classes.add(to, 'current');
     this.currentScreen_ = to;
-    this.lastScreen_ = null;
+  } else {
+    goog.style.setStyle(this.currentScreen_, {
+      'left': isScreen ? 0 : '',
+      'right': ''
+    });
+    goog.style.setStyle(to, {
+      'right': 0,
+      'left': ''
+    });
+    goog.array.insertAt(this.screens_, [this.currentScreen_,
+        goog.dom.getTextContent(goog.dom.getElementByClass('back-title', this.toolbar_))], 0);
+    goog.dom.classes.remove(this.currentScreen_, 'current');
+    this.currentScreen_ = to;
+    goog.dom.classes.add(this.currentScreen_, 'current');
   }
-  goog.dom.classes.enable(this.toolbar_, 'back', !!opt_back);
+  goog.dom.classes.enable(this.toolbar_, 'back', goog.dom.classes.has(this.currentScreen_, 'slide'));
+  if (opt_title) {
+    goog.dom.setTextContent(goog.dom.getElementByClass('back-title', this.toolbar_), opt_title);
+  }
+  
 };
 
 
@@ -382,7 +383,7 @@ brkn.Sidebar.prototype.showMediaList = function(name, opt_medias, opt_url, opt_t
   var mediaList = new brkn.sidebar.MediaList(opt_medias, opt_url, opt_thumb, opt_desc, opt_link);
   mediaList.decorate(this.mediaListEl_);
   brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NAVIGATE,
-      this.mediaListEl_, true, name, opt_thumb, opt_desc);
+      this.mediaListEl_, false, name, opt_thumb, opt_desc);
 };
 
 
@@ -392,14 +393,17 @@ brkn.Sidebar.prototype.showMediaList = function(name, opt_medias, opt_url, opt_t
 brkn.Sidebar.prototype.showMediaInfo = function(media) {
   if (this.info_ && media.id == this.info_.getModel().id) {
     goog.dom.classes.remove(this.toolbar_, 'back');
-    this.navigate(this.info_.getElement());
+    var lastScreen = this.screens_[0][0];
+    while (goog.dom.classes.has(lastScreen, 'slide')) {
+      lastScreen = this.screens_.shift();
+    }
     this.tabNav_(this.currentTab_, 'info');
   } else {
     var mediaInfoEl = goog.dom.getElement('media-info');
     var mediaInfo = new brkn.sidebar.Info(media);
     mediaInfo.decorate(mediaInfoEl);
     brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NAVIGATE,
-        mediaInfoEl, true, media.name);
+        mediaInfoEl, false, media.name);
   }
   brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.TOGGLE_SIDEBAR, true);
 };
@@ -416,7 +420,7 @@ brkn.Sidebar.prototype.showProfile = function(user) {
   this.profile_ = new brkn.sidebar.Profile(user);
   this.profile_.decorate(this.profileEl_);
   brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NAVIGATE,
-      this.profileEl_, true, user.name);
+      this.profileEl_, false, user.name);
   brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.TOGGLE_SIDEBAR, true);
 };
 

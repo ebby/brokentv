@@ -1324,6 +1324,9 @@ div#sidebar {
   transition: right .5s ease;
   z-index: 110;
 }
+div#sidebar div.scrollable {
+  width: 300px;
+}
 div#sidebar.dark {
   background: #aaaaaa url(/static/img/linen-black-70.png);
 }
@@ -2620,18 +2623,18 @@ div#sidebar div.stream div.activity div.text div.timestamp {
 div#sidebar div.stream div.medias {
   margin: 10px;
 }
-div#sidebar div.admin {
+div#sidebar div#sidebar-content div.admin {
   margin-top: -2px;
   display: none;
   overflow-y: scroll;
 }
-div#sidebar div.admin div.search {
+div#sidebar div#sidebar-content div.admin div.search {
   background: rgba(245, 245, 245, 0.6);
   width: 100%;
   height: 35px;
   border-bottom: 1px solid rgba(112, 108, 108, 0.7);
 }
-div#sidebar div.admin div.search input[type=text] {
+div#sidebar div#sidebar-content div.admin div.search input[type=text] {
   height: auto;
   border-radius: 3px;
   width: 280px;
@@ -2644,18 +2647,18 @@ div#sidebar div.admin div.search input[type=text] {
   margin-top: 7px;
   margin-bottom: 5px;
 }
-div#sidebar div.admin div.section {
+div#sidebar div#sidebar-content div.admin div.section {
   position: relative;
   margin: 10px;
 }
-div#sidebar div.admin div.section div.label {
+div#sidebar div#sidebar-content div.admin div.section div.label {
   font-size: 10px;
   color: #181818;
   margin-bottom: 7px;
   text-shadow: 1px 1px 1px white;
   font-family: MuseoSans700;
 }
-div#sidebar div.admin div.playlists div.playlist {
+div#sidebar div#sidebar-content div.admin div.playlists div.playlist {
   position: relative;
   width: 99%;
   background: rgba(0, 0, 0, 0.65);
@@ -2665,16 +2668,16 @@ div#sidebar div.admin div.playlists div.playlist {
   cursor: pointer;
   font-family: MuseoSans500;
 }
-div#sidebar div.admin div.playlists div.playlist:first-child {
+div#sidebar div#sidebar-content div.admin div.playlists div.playlist:first-child {
   border-top-left-radius: 3px;
   border-top-right-radius: 3px;
 }
-div#sidebar div.admin div.playlists div.playlist:last-child {
+div#sidebar div#sidebar-content div.admin div.playlists div.playlist:last-child {
   border-bottom-left-radius: 3px;
   border-bottom-right-radius: 3px;
   box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.8);
 }
-div#sidebar div.admin div.playlists div.playlist div.title {
+div#sidebar div#sidebar-content div.admin div.playlists div.playlist div.title {
   position: relative;
   left: 5px;
   top: 5px;
@@ -2684,7 +2687,15 @@ div#sidebar div.admin div.playlists div.playlist div.title {
   line-height: 27px;
   height: 36px;
 }
-div#sidebar div.admin div.collections div.collection {
+div#sidebar div#sidebar-content div.admin div.collections div.collection,
+div#sidebar div#sidebar-content div.admin div.admin-channels div.collection,
+div#sidebar div#sidebar-content div.admin div.topics div.collection,
+div#sidebar div#sidebar-content div.admin div.collections div.channel,
+div#sidebar div#sidebar-content div.admin div.admin-channels div.channel,
+div#sidebar div#sidebar-content div.admin div.topics div.channel,
+div#sidebar div#sidebar-content div.admin div.collections div.topic,
+div#sidebar div#sidebar-content div.admin div.admin-channels div.topic,
+div#sidebar div#sidebar-content div.admin div.topics div.topic {
   position: relative;
   width: 99%;
   background: rgba(0, 0, 0, 0.65);
@@ -2694,16 +2705,40 @@ div#sidebar div.admin div.collections div.collection {
   cursor: pointer;
   font-family: MuseoSans500;
 }
-div#sidebar div.admin div.collections div.collection:first-child {
+div#sidebar div#sidebar-content div.admin div.collections div.collection:first-child,
+div#sidebar div#sidebar-content div.admin div.admin-channels div.collection:first-child,
+div#sidebar div#sidebar-content div.admin div.topics div.collection:first-child,
+div#sidebar div#sidebar-content div.admin div.collections div.channel:first-child,
+div#sidebar div#sidebar-content div.admin div.admin-channels div.channel:first-child,
+div#sidebar div#sidebar-content div.admin div.topics div.channel:first-child,
+div#sidebar div#sidebar-content div.admin div.collections div.topic:first-child,
+div#sidebar div#sidebar-content div.admin div.admin-channels div.topic:first-child,
+div#sidebar div#sidebar-content div.admin div.topics div.topic:first-child {
   border-top-left-radius: 3px;
   border-top-right-radius: 3px;
 }
-div#sidebar div.admin div.collections div.collection:last-child {
+div#sidebar div#sidebar-content div.admin div.collections div.collection:last-child,
+div#sidebar div#sidebar-content div.admin div.admin-channels div.collection:last-child,
+div#sidebar div#sidebar-content div.admin div.topics div.collection:last-child,
+div#sidebar div#sidebar-content div.admin div.collections div.channel:last-child,
+div#sidebar div#sidebar-content div.admin div.admin-channels div.channel:last-child,
+div#sidebar div#sidebar-content div.admin div.topics div.channel:last-child,
+div#sidebar div#sidebar-content div.admin div.collections div.topic:last-child,
+div#sidebar div#sidebar-content div.admin div.admin-channels div.topic:last-child,
+div#sidebar div#sidebar-content div.admin div.topics div.topic:last-child {
   border-bottom-left-radius: 3px;
   border-bottom-right-radius: 3px;
   box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.8);
 }
-div#sidebar div.admin div.collections div.collection div.title {
+div#sidebar div#sidebar-content div.admin div.collections div.collection div.title,
+div#sidebar div#sidebar-content div.admin div.admin-channels div.collection div.title,
+div#sidebar div#sidebar-content div.admin div.topics div.collection div.title,
+div#sidebar div#sidebar-content div.admin div.collections div.channel div.title,
+div#sidebar div#sidebar-content div.admin div.admin-channels div.channel div.title,
+div#sidebar div#sidebar-content div.admin div.topics div.channel div.title,
+div#sidebar div#sidebar-content div.admin div.collections div.topic div.title,
+div#sidebar div#sidebar-content div.admin div.admin-channels div.topic div.title,
+div#sidebar div#sidebar-content div.admin div.topics div.topic div.title {
   position: relative;
   left: 5px;
   top: 5px;
@@ -2713,7 +2748,15 @@ div#sidebar div.admin div.collections div.collection div.title {
   line-height: 27px;
   height: 36px;
 }
-div#sidebar div.admin div.collections div.collection div.pending {
+div#sidebar div#sidebar-content div.admin div.collections div.collection div.pending,
+div#sidebar div#sidebar-content div.admin div.admin-channels div.collection div.pending,
+div#sidebar div#sidebar-content div.admin div.topics div.collection div.pending,
+div#sidebar div#sidebar-content div.admin div.collections div.channel div.pending,
+div#sidebar div#sidebar-content div.admin div.admin-channels div.channel div.pending,
+div#sidebar div#sidebar-content div.admin div.topics div.channel div.pending,
+div#sidebar div#sidebar-content div.admin div.collections div.topic div.pending,
+div#sidebar div#sidebar-content div.admin div.admin-channels div.topic div.pending,
+div#sidebar div#sidebar-content div.admin div.topics div.topic div.pending {
   width: 20px;
   height: 20px;
   background: red;

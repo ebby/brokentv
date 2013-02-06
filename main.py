@@ -125,7 +125,8 @@ def create_handlers_map():
 
     # Admin
     ('/admin/_add/collection/(.*)', admin.AddToCollectionHandler),
-    ('/admin/_collections', admin.CollectionsHandler),
+    ('/admin/_channels', admin.ChannelsHandler),
+    ('/admin/_collections/(.*)', admin.CollectionsHandler),
     ('/admin/_media/collection', admin.CollectionMediaHandler),
     ('/admin/_media/collection/(.*)', admin.CollectionMediaHandler),
     ('/admin/_media/publisher/(.*)', rpc.PublisherMediaHandler),
@@ -133,6 +134,7 @@ def create_handlers_map():
     ('/admin/_rescheduleprogram', admin.AdminRescheduleProgramHandler),
     ('/admin/_removeprogram', admin.AdminRemoveProgramHandler),
     ('/admin/_posthumb', admin.PositionThumbHandler),
+    ('/admin/_topicmedias/(.*)', admin.TopicMediaHandler),
     ('/admin/init', admin.InitProgrammingHandler),
     ('/admin/storysort', admin.StorySortHandler),
     ('/admin/setprogramming', admin.SetProgrammingHandler),

@@ -167,7 +167,7 @@ brkn.sidebar.AdminList.prototype.enterDocument = function() {
         this.navigate_(tabEl);
       }, this))
       this.getHandler().listen(this.getElement(), goog.events.EventType.SCROLL, goog.bind(function(e) {
-        if (!fetchInProgress && !this.finished_[this.currentTab_] &&
+        if (this.collectionId_ && !fetchInProgress && !this.finished_[this.currentTab_] &&
             this.getElement().scrollTop + goog.dom.getViewportSize().height >
             this.getElement().scrollHeight - this.getElement().clientTop) {
           fetchInProgress = true;
@@ -211,7 +211,7 @@ brkn.sidebar.AdminList.prototype.resize = function() {
  */
 brkn.sidebar.AdminList.prototype.fetchLink_ = function(input) {
   var url = goog.string.linkify.findFirstUrl(input);
-  if (url) {
+  if (this.collectionId_ && url) {
     this.input_.disabled = 'disabled';
     goog.net.XhrIo.send(
         'admin/_add/collection/' + this.collectionId_,
@@ -251,7 +251,7 @@ brkn.sidebar.AdminList.prototype.navigate_ = function(tabEl) {
     goog.dom.classes.enable(this.tabsEl_.parentElement, tab, goog.dom.classes.has(tabEl, tab));
     this.currentTab_ = goog.dom.classes.has(tabEl, tab) ? tab : this.currentTab_;
   }, this);
-  if (!this.all_) {
+  if (this.collectionId_ && !this.all_) {
     goog.net.XhrIo.send(
         '/admin/_media/collection/' + this.collectionId_,
         goog.bind(function(e) {
@@ -357,6 +357,7 @@ brkn.sidebar.AdminList.prototype.onAddProgram_ = function(channel, media) {
  * @private
  */
 brkn.sidebar.AdminList.prototype.approval_ = function(media, approve, mediaEl) {
+  var collectionId = media.collectionId || this.collectionId_;
   goog.net.XhrIo.send(
       'admin/_media/collection',
       goog.bind(function() {
@@ -366,13 +367,11 @@ brkn.sidebar.AdminList.prototype.approval_ = function(media, approve, mediaEl) {
         }, 300);
         brkn.model.Controller.getInstance().setPending(
             (/** @type {string}*/ brkn.model.Controller.getInstance().getPending() - 1));
-        if (this.pendingEl_) {
-          goog.dom.setTextContent(this.pendingEl_,
-              (/** @type {string} */ goog.dom.getTextContent(this.pendingEl_) - 1));
-        }
+        brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.APPROVED, media,
+            collectionId);
       }, this),
       'POST',
-      'col=' + this.collectionId_ + '&media=' + media.id + '&approve=' + approve);
+      'col=' + collectionId + '&media=' + media.id + '&approve=' + approve);
 };
 
 

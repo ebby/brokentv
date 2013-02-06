@@ -23,10 +23,6 @@ class Publisher(db.Model):
     pub_medias = PublisherMedia.all().filter('publisher =', self) \
         .fetch(limit=limit, offset=offset)
     return [p_m.media for p_m in pub_medias]
-
-  def get_media_by_category(self, category):
-    self.fetch([category])
-    return PublisherMedia.get_medias(self, category)
   
   def toJson(self):
     json = {}
@@ -39,34 +35,17 @@ class Publisher(db.Model):
   
   @classmethod
   def add(self, host, host_id, name=None):
-    publisher = Publisher.get_by_key_name(host+host_id)
-    if not publisher:
-#      yt_service = get_youtube_service()
-#      try:
-#        user_entry = yt_service.GetYouTubeUserEntry(username=host_id)
-#      except Exception as e:
-#        logging.info(e)
-#        return
-#      picture = urlfetch.fetch(user_entry.thumbnail.url)
-#      publisher = Publisher.get_or_insert(key_name=host+host_id,
-#                                          host_id=host_id,
-#                                          name=(name or user_entry.title.text),
-#                                          picture=db.Blob(picture.content),
-#                                          description=user_entry.content.text,
-#                                          link=user_entry.link[0].href)
-      publisher = Publisher.get_or_insert(key_name=host+host_id,
-                                          host_id=host_id,
-                                          name=name)
+    publisher = Publisher.get_or_insert(key_name=host+host_id,
+                                        host_id=host_id,
+                                        name=name)
     return publisher
   
-  def fetch(self, categories=None):
+  def fetch(self, collection=None, approve_all=False):
     logging.info('FETCH')
-    if self.host == MediaHost.YOUTUBE:
-      yt_service = get_youtube_service()
-      youtube3 = get_youtube3_service()
 
-      #if not self.last_fetch or datetime.datetime.now() - self.last_fetch > datetime.timedelta(hours=3):
+    if self.host == MediaHost.YOUTUBE:
       if not self.channel_id:
+        yt_service = get_youtube_service()
         try:
           user_entry = yt_service.GetYouTubeUserEntry(username=self.host_id)
         except Exception as e:
@@ -79,27 +58,30 @@ class Publisher(db.Model):
         self.channel_id = re.search('/channel/(.*)', self.link).groups()[0]
         self.put()
 
+      youtube3 = get_youtube3_service()
       next_page_token = ''
       while next_page_token is not None:
         search_response = youtube3.search().list(
           channelId=self.channel_id,
-          part="id",
-          pageToken=next_page_token
+          part='id',
+          order='date',
+          pageToken=next_page_token,
+          publishedAfter=self.last_fetch.isoformat('T') + 'Z' if self.last_fetch else '1970-01-01T00:00:00Z',
+          maxResults=10
         ).execute()
         search_ids = ''
         for item in search_response.get('items', []):
-          search_ids += item['id']['videoId'] + ','
+          if item['id']['kind'] == 'youtube#video':
+            search_ids += item['id']['videoId'] + ','
         videos_response = youtube3.videos().list(
           id=search_ids,
           part="id,snippet,topicDetails,contentDetails,statistics"
         ).execute()
-        logging.info(videos_response.get("items", [])[0])
-        medias = Media.add_from_snippet(videos_response.get("items", []))
+        medias = Media.add_from_snippet(videos_response.get("items", []), collection=collection,
+                                        approve=approve_all)
         for media in medias:
           logging.info('FETCHED: ' + media.name)
           PublisherMedia.add(publisher=self, media=media)
-
-        
         next_page_token = search_response.get('tokenPagination', {}).get('nextPageToken')
           
 

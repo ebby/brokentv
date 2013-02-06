@@ -16,12 +16,12 @@ brkn.model.Media = function(media) {
 	/**
    * @type {string}
    */
-  this.id = media.id;
+  this.id = media['id'];
 
 	/**
 	 * @type {string}
 	 */
-	this.name = media.name;
+	this.name = media['name'];
 	
 	/**
 	 * @type {string}
@@ -36,12 +36,12 @@ brkn.model.Media = function(media) {
 	/**
 	 * @type {number}
 	 */
-	this.duration = media.duration;
+	this.duration = media['duration'];
 	
 	/**
    * @type {string}
    */
-  this.description = media.description;
+  this.description = media['description'];
   
   /**
    * @type {Object}
@@ -87,6 +87,11 @@ brkn.model.Media = function(media) {
    * @type {Array.<brkn.model.Comment>}
    */
   this.comments = [];
+
+  /**
+   * @type {string}
+   */
+  this.collectionId = media['collection_id'];
   
   this.subscribe(brkn.model.Media.Actions.ADD_COMMENT, this.addComment, this);
 };

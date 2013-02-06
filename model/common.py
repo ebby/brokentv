@@ -31,3 +31,10 @@ def get_youtube_service():
 def get_youtube3_service():
   return build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION,
                developerKey=GDATA_KEY)
+  
+def get_freebase_topic(topic_id):
+  service_url = 'https://www.googleapis.com/freebase/v1/topic'
+  params = {'key': GDATA_KEY}
+  url = service_url + topic_id + '?' + urllib.urlencode(params)
+  response = simplejson.loads(urllib.urlopen(url).read())
+  return response

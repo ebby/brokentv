@@ -26,9 +26,7 @@ class Collection(db.Model):
     collection = Collection.get_by_id(int(collection_id))
     publisher = Publisher.get_by_key_name(publisher_id)
     logging.info('FETCHING: ' + publisher.name)
-    publisher_medias = publisher.get_media_by_category(collection.keywords[0])
-    for media in publisher_medias:
-      CollectionMedia.add(collection, media, approved=(True if approve_all else None))
+    publisher_medias = publisher.fetch(collection=collection, approve_all=approve_all)
   
   def fetch(self, approve_all=False):
     publishers = self.get_publishers()

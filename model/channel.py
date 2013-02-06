@@ -10,9 +10,9 @@ class Channel(db.Model):
   keywords = db.StringListProperty()
   next_gen = db.DateTimeProperty() # Next programming generation time
   privacy = db.IntegerProperty(default=Privacy.PUBLIC)
-  user = db.ReferenceProperty(User, collection_name='channel')
   next_time = db.DateTimeProperty()
   suggested = db.ReferenceProperty(Collection)
+  user = db.ReferenceProperty(User, collection_name='channel')
 
   @property
   def id(self):
@@ -62,7 +62,7 @@ class Channel(db.Model):
     return max(datetime.datetime.utcnow(), next_time)
   
   def get_collections(self):
-    return [chan_col.collection for chan_col in self.channelCollections.fetch(20)]
+    return [chan_col.collection for chan_col in self.collections.fetch(20)]
   
   def get_suggested(self):
     col = self.suggested
@@ -88,7 +88,7 @@ from program import *
 class ChannelCollection(db.Model):
   
   collection = db.ReferenceProperty(Collection, collection_name='channels')
-  channel = db.ReferenceProperty(Channel, collection_name='channelCollections')
+  channel = db.ReferenceProperty(Channel, collection_name='collections')
   
   @classmethod
   def get_channels(cls, collection):
@@ -110,3 +110,7 @@ class ChannelCollection(db.Model):
       collection_channel = ChannelCollection(collection=collection, channel=channel)
       collection_channel.put()
     return collection_channel
+
+class ChannelAdmins(db.Model):
+  channel = db.ReferenceProperty(Channel, collection_name='admins')
+  admin = db.ReferenceProperty(User, collection_name='channels')

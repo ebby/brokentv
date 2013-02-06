@@ -25,9 +25,11 @@ TWITTER_PHRASE_BLACKLIST = [
   'i liked a'                   
 ]
 
-GDATA_KEY = 'AIzaSyAUF3ESL0wYUuSWmOezgZclQFpNGZNBePw'
-YOUTUBE_API_SERVICE_NAME = "youtube"
-YOUTUBE_API_VERSION = "v3"
+GDATA_KEY = 'AIzaSyCpfny9wZHLA9t6nIPEYonWc4Qkix5IEhw'
+YOUTUBE_API_SERVICE_NAME = 'youtube'
+YOUTUBE_API_VERSION = 'v3'
+FREEBASE_API_SERVICE_NAME = 'freebase'
+FREEBASE_API_VERSION = 'v1'
 
 CSS_SOURCE =  '/static/css/main.css'
 

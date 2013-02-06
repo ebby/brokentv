@@ -39,7 +39,6 @@ class StorySortHandler(BaseHandler):
             
       for media in medias:
         media.have_seen = Programming.have_seen(media, viewers)
-        
 
       # Don't repeat the same program within an hour
       medias = [c for c in medias if not c.last_programmed or
@@ -69,8 +68,7 @@ class AdminAddProgramHandler(BaseHandler):
       media = Media.get_by_key_name(self.request.get('media'))
       program = Program.add_program(channel, media)
       self.response.out.write(simplejson.dumps(program.toJson(False)))
-     
-      
+        
 class AddToCollectionHandler(BaseHandler):
     def post(self, id):
       col = Collection.get_by_id(int(id))
@@ -93,12 +91,21 @@ class AddToCollectionHandler(BaseHandler):
         self.response.out.write(simplejson.dumps(response))
 
 class CollectionsHandler(BaseHandler):
-    def get(self):
-      if (self.current_user.id in constants.SUPER_ADMINS):
-        cols = Collection.all().fetch(100)
-      else:
-        cols = Collection.all().filter('admins =', self.current_user.id).fetch(100)
-      self.response.out.write(simplejson.dumps([c.toJson() for c in cols]))
+    def get(self, channel_id):
+      channel = Channel.get_by_key_name(channel_id)
+      cols = channel.collections.fetch(None)
+      self.response.out.write(simplejson.dumps([cc.collection.toJson() for cc in cols]))
+      
+
+class TopicMediaHandler(BaseHandler):
+    def get(self, channel_id):
+      offset = self.request.get('offset') or 0
+
+      channel = Channel.get_by_key_name(channel_id)
+      cols = [cc.collection for cc in channel.collections.fetch(None)]
+      topics = TopicCollectionMedia.get_for_collections(cols)
+      self.response.out.write(simplejson.dumps(topics))
+      
       
 class CollectionMediaHandler(BaseHandler):
     def get(self, col_id):
@@ -106,8 +113,9 @@ class CollectionMediaHandler(BaseHandler):
       pending = self.request.get('pending') == '1'
       offset = self.request.get('offset') or 0
       res = {}
-      res['medias'] = [m.toJson() for m in col.get_medias(20, pending=pending, offset=int(offset))]
+      medias = [m.toJson() for m in col.get_medias(20, pending=pending, offset=int(offset))]
       res['playlists'] = [p.toJson() for p in col.get_playlists()]
+      res['medias'] = medias
       self.response.out.write(simplejson.dumps(res))
    
     def post(self):
@@ -115,6 +123,9 @@ class CollectionMediaHandler(BaseHandler):
       col = Collection.get_by_id(int(self.request.get('col')))
       media = Media.get_by_key_name(self.request.get('media'))
       col_media = col.collectionMedias.filter('media =', media).get()
+      tcms = TopicCollectionMedia.all().filter('collection =', col).filter('media =', media).fetch(None)
+      for tcm in tcms:
+        tcm.delete()
       if col_media and approve is not None:
         col_media.approve(approve)
         
@@ -141,7 +152,23 @@ class SetProgrammingHandler(BaseHandler):
         Programming.set_programming(channel.id, duration=int(duration), schedule_next=False,
                                     fetch_twitter=twitter)
       self.response.out.write('done')
-        
+
+class ChannelsHandler(BaseHandler):
+    def get(self):
+      channels = []
+      if self.current_user.id in SUPER_ADMINS:
+        channels = Channel.all().fetch(None)
+      else:
+        channels = [ca.admin for ca in self.current_user.channels]
+      self.response.out.write(simplejson.dumps([c.toJson() for c in channels if c.privacy == Privacy.PUBLIC]))
+      
+    def post(self):
+      if self.current_user.id in SUPER_ADMINS:
+        channel = Channel.get_by_key_name(self.request.get('channel_id'))
+        admin = User.get_by_key_name(self.request.get('uid'))
+        ca = ChannelAdmin(channel=channel, admin=admin)
+        ca.put()
+        self.response.out.write('done')
 
 class AdminRemoveProgramHandler(BaseHandler):
     def post(self):
