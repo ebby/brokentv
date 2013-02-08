@@ -84,13 +84,14 @@ class Media(db.Model):
         if collection:
           CollectionMedia.add(collection, media, approved=(True if approve else None))
         
-        for topic_id in item['topicDetails']['topicIds']:
-          topic = Topic.add(topic_id)
-          logging.info(topic.name)
-          TopicMedia.add(topic, media)
-          if collection:
-            logging.info(collection.name)
-            TopicCollectionMedia.add(topic, collection, media)
+        if item.get('topicDetails'):
+          for topic_id in item['topicDetails']['topicIds']:
+            topic = Topic.add(topic_id)
+            logging.info(topic.name)
+            TopicMedia.add(topic, media)
+            if collection:
+              logging.info(collection.name)
+              TopicCollectionMedia.add(topic, collection, media)
 
       medias.append(media)
     return medias

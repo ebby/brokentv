@@ -22,14 +22,13 @@ goog.require('goog.ui.Textarea.EventType');
  * @param {string} collectionId
  * @param {Array.<brkn.model.Media>} pending
  * @param {Array.<Object>} playlists
- * @param {?Element=} opt_pendingEl
  * @param {?string=} opt_thumb
  * @param {?string=} opt_desc
  * @constructor
  * @extends {goog.ui.Component}
  */
 brkn.sidebar.AdminList = function(collectionId, pending, playlists,
-    opt_pendingEl, opt_thumb, opt_desc) {
+    opt_thumb, opt_desc) {
   goog.base(this);
 
   /**
@@ -61,12 +60,6 @@ brkn.sidebar.AdminList = function(collectionId, pending, playlists,
    * @private
    */
   this.playlists_ = playlists;
-
-  /**
-   * @type {?Element}
-   * @private
-   */
-  this.pendingEl_ = opt_pendingEl || null;
   
   /**
    * @type {?string}

@@ -18,17 +18,25 @@ class Topic(db.Model):
   @classmethod
   def add(cls, id):
     topic = Topic.get_by_key_name(id)
-    if not topic or True:
+    if not topic:
       topic_response = get_freebase_topic(id)
-      properties = topic_response['property']
-      topic = Topic(key_name=id,
-                    name=properties['/type/object/name']['values'][0]['text'],
-                    type=properties['/type/object/type']['values'][0]['text'],
-                    type_id=properties['/type/object/type']['values'][0]['id'],
-                    description=properties['/common/topic/article']['values'][0]['property']\
-                        ['/common/document/text']['values'][0]['value']) if \
-                        properties['/common/topic/article'] else None
-      topic.put()
+      properties = topic_response.get('property')
+      if properties:
+        description = ''
+        if properties.get('/common/topic/article') and \
+            properties['/common/topic/article']['values'][0]['property'].get('/common/document/text'):
+          description = properties['/common/topic/article']['values'][0]['property'] \
+                          ['/common/document/text']['values'][0]['value']
+          
+        topic = Topic(key_name=id,
+                      name=properties['/type/object/name']['values'][0]['text'],
+                      type=properties['/type/object/type']['values'][0]['text'],
+                      type_id=properties['/type/object/type']['values'][0]['id'],
+                      description=description)
+        topic.put()
+      else:
+        topic = Topic(key_name=id)
+        topic.put()
     return topic
 
 

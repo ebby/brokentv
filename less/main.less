@@ -11,6 +11,15 @@
 @import "admin.less";
 @import "profile.less";
 
+.noselect () {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
 .transition (...) {
   -webkit-transition: @arguments;
      -moz-transition: @arguments;
@@ -59,6 +68,7 @@ html, body {
   margin: 0;
   font-family: MuseoSans300;
   overflow: hidden;
+  .noselect();
 }
 
 body {

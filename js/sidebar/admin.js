@@ -121,8 +121,7 @@ brkn.sidebar.Admin.prototype.enterDocument = function() {
                 medias = goog.array.map(medias, function(m) {
                   return new brkn.model.Media(m);
                 });
-                var adminList = new brkn.sidebar.AdminList('', medias, [],
-                    goog.dom.getElementByClass('pending', topicEl));
+                var adminList = new brkn.sidebar.AdminList('', medias, []);
                 adminList.decorate(adminListEl);
                 brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NAVIGATE,
                     adminListEl, false, topic);
@@ -172,8 +171,7 @@ brkn.sidebar.Admin.prototype.enterDocument = function() {
                       return new brkn.model.Media(m);
                     });
                     var playlists = /** @type {Array.<Object>} */ res['playlists'];
-                    var adminList = new brkn.sidebar.AdminList(col.id, medias, playlists,
-                        goog.dom.getElementByClass('pending', colEl));
+                    var adminList = new brkn.sidebar.AdminList(col.id, medias, playlists);
                     adminList.decorate(adminListEl);
                     brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NAVIGATE,
                         adminListEl, false, col.name);
