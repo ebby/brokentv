@@ -132,6 +132,9 @@ class CollectionMedia(db.Model):
   def approve(self, approved):
     self.approved = Approval.APPROVED if approved else Approval.REJECTED
     self.put()
+    for tcm in self.topic_media.fetch(None):
+      tcm.approved = Approval.APPROVED if approved else Approval.REJECTED
+      tcm.put()
     Collection.incr_pending(self.collection.key(), -1)
 
 class CollectionPlaylist(db.Model):

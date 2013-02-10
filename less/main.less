@@ -20,6 +20,13 @@
   user-select: none;
 }
 
+.animation (...) {
+  animation: @arguments;
+  -moz-animation: @arguments; /* Firefox */
+  -webkit-animation: @arguments; /* Safari and Chrome */
+  -o-animation: @arguments; /* Opera */
+}
+
 .transition (...) {
   -webkit-transition: @arguments;
      -moz-transition: @arguments;

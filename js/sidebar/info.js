@@ -284,7 +284,7 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
             var scrolled = goog.dom.classes.toggle(picEl, 'scrolled');
             var scrollAnim = new goog.fx.dom.Scroll(scrollable,
                 [scrollable.scrollLeft, scrollable.scrollTop],
-                [scrollable.scrollLeft, (scrolled ? 180 : 0)], 300);
+                [scrollable.scrollLeft, (scrolled ? 130 : 0)], 300);
             scrollAnim.play();
           }, this));
 };

@@ -283,8 +283,7 @@ brkn.sidebar.AdminList.prototype.addPlaylist_ = function(playlist) {
 brkn.sidebar.AdminList.prototype.addMedia_ = function(parent, media, opt_top) {
   var mediaEl = soy.renderAsElement(brkn.sidebar.adminMedia, {
     media: media,
-    published: media.published.getMonth() + '/' + media.published.getDate() + '/' +
-        media.published.getYear() + ' ' + media.published.toUsTimeString()
+    published: media.getPublishDate()
   });
   if (opt_top) {
     goog.dom.insertChildAt(parent, mediaEl, 0);

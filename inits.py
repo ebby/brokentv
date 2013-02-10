@@ -93,10 +93,10 @@ PUBLISHERS = {
 
 
 PLAYLISTS = {
-#  'Vice Interviews': {
-#    'youtube': 'PLA8098C06012E9B51',
-#    'publisher': 'Vice'                  
-#  }
+  'Vice Interviews': {
+    'youtube': 'PLA8098C06012E9B51',
+    'publisher': 'Vice'                  
+  }
 }
 
 '''
@@ -111,47 +111,56 @@ COLLECTIONS = {
     'lifespan': 2,
     'publishers': ['The New York Times',
                    'ABC News',
+                   'The Weather Channel',
                    'CNN',
+                   'Vice',
                    'Slate',
+                   'New Left Media',
+                   'BuzzFeed',
                    'Wall Street Journal',
                    'Ora TV',
+                   'PBS',
+                   'The Onion',
+                   'The New Yorker',
+                   'The Guardian',
+                   'Huffington Post',
                    'Buzz60']
   },
-#  'Creative Arts': {
-#    'keywords': ['Entertainment'],
-#    'publishers': ['Cool Hunting']
-#  },
-#  'Fashion': {
-#    'keywords': ['Entertainment', 'Howto'],
-#    'publishers': ['Buzz60', 'The New York Times', 'The New Yorker', 'FashionTV']     
-#  },
-#  'TED': {
-#    'keywords': ['Education', 'Howto'],
-#    'publishers': ['TED']     
-#  },
-#  'News Magazines': {
-#    'keywords': ['News'],
-#    'publishers': ['Vice'],
-#    'playlists': ['Vice Interviews'],
-#    'lifespan': 3
-#  },
+  'Creative Arts': {
+    'keywords': ['Entertainment'],
+    'publishers': ['Cool Hunting']
+  },
+  'Fashion': {
+    'keywords': ['Entertainment', 'Howto'],
+    'publishers': ['Buzz60', 'The New York Times', 'The New Yorker', 'FashionTV']     
+  },
+  'TED': {
+    'keywords': ['Education', 'Howto'],
+    'publishers': ['TED']     
+  },
+  'News Magazines': {
+    'keywords': ['News'],
+    'publishers': ['Vice'],
+    'playlists': ['Vice Interviews'],
+    'lifespan': 3
+  },
 }
 
 CHANNELS = {
   'Broken News': {
     'keywords': ['News'],
-    'collections': ['Top News Stories']
+    'collections': ['Top News Stories', 'News Magazines']
   },
-#  'CREATE': {
-#    'keywords': ['Entertainment'],
-#    'collections': ['Creative Arts']         
-#  },
-#  'Gotham Style': {
-#    'keywords': ['Entertainment', 'Howto'],
-#    'collections': ['Fashion']                   
-#  },
-#  'Inspire Me': {
-#    'keywords': ['Education', 'Howto'],
-#    'collections': ['TED']                   
-#  }
+  'CREATE': {
+    'keywords': ['Entertainment'],
+    'collections': ['Creative Arts']         
+  },
+  'Gotham Style': {
+    'keywords': ['Entertainment', 'Howto'],
+    'collections': ['Fashion']                   
+  },
+  'Inspire Me': {
+    'keywords': ['Education', 'Howto'],
+    'collections': ['TED']                   
+  }
 }

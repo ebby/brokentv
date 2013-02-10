@@ -96,6 +96,33 @@ class CollectionsHandler(BaseHandler):
       cols = channel.collections.fetch(None)
       self.response.out.write(simplejson.dumps([cc.collection.toJson() for cc in cols]))
       
+    def post(self):
+      channel_id = self.request.get('cid')
+      name = self.request.get('name')
+      if channel_id and name:
+        channel = Channel.get_by_key_name(channel_id)
+        collection = Collection(name=name)
+        collection.put()
+        ChannelCollection.add(channel=channel, collection=collection)
+        self.response.out.write(simplejson.dumps(collection.toJson()))
+        
+    def delete(self, id):
+      if id:
+        collection = Collection.get_by_id(int(id))
+        for cm in collection.collectionMedias.fetch(None):
+          cm.delete()
+        for cp in collection.publishers.fetch(None):
+          cp.delete()
+        for cp in collection.playlists.fetch(None):
+          cp.delete()
+        for cc in collection.collections.fetch(None):
+          cc.delete()
+        for cc in collection.channels.fetch(None):
+          cc.delete()
+        for tcm in collection.topic_medias.fetch(None):
+          tcm.delete()
+        collection.delete()
+        self.response.out.write(simplejson.dumps({'deleted': True}))
 
 class TopicMediaHandler(BaseHandler):
     def get(self, channel_id):
@@ -105,7 +132,6 @@ class TopicMediaHandler(BaseHandler):
       cols = [cc.collection for cc in channel.collections.fetch(None)]
       topics = TopicCollectionMedia.get_for_collections(cols)
       self.response.out.write(simplejson.dumps(topics))
-      
       
 class CollectionMediaHandler(BaseHandler):
     def get(self, col_id):
@@ -123,11 +149,28 @@ class CollectionMediaHandler(BaseHandler):
       col = Collection.get_by_id(int(self.request.get('col')))
       media = Media.get_by_key_name(self.request.get('media'))
       col_media = col.collectionMedias.filter('media =', media).get()
-      tcms = TopicCollectionMedia.all().filter('collection =', col).filter('media =', media).fetch(None)
-      for tcm in tcms:
-        tcm.delete()
+      tcms = TopicCollectionMedia.all().filter('collection_media =', col_media).fetch(None)
       if col_media and approve is not None:
         col_media.approve(approve)
+        
+class FetchHandler(BaseHandler):
+    def post(self):
+      if self.request.get('col_id'):
+        col = Collection.get_by_id(int(self.request.get('col')))
+        if self.current_user.id in constants.SUPER_ADMINS or self.current_user.id in col.admin:
+          col.fetch(False)
+      elif self.request.get('channel_id'):
+        channel = Channel.get_by_key_name(self.request.get('channel_id'))
+        if self.current_user.id in constants.SUPER_ADMINS or self.current_user in channel.admins.fetch(None):
+          for cc in channel.collections.fetch(None):
+            cc.collection.fetch(False)
+            
+class ProgramHandler(BaseHandler):
+    def post(self):
+      if self.request.get('channel_id'):
+        channel = Channel.get_by_key_name(self.request.get('channel_id'))
+        if self.current_user.id in constants.SUPER_ADMINS or self.current_user in channel.admins.fetch(None):
+          Programming.set_programming(channel.id, queue='programming')
         
 class InitProgrammingHandler(BaseHandler):
     def get(self):
@@ -163,12 +206,41 @@ class ChannelsHandler(BaseHandler):
       self.response.out.write(simplejson.dumps([c.toJson() for c in channels if c.privacy == Privacy.PUBLIC]))
       
     def post(self):
-      if self.current_user.id in SUPER_ADMINS:
+      if self.current_user.id in SUPER_ADMINS and self.request.get('uid'):
         channel = Channel.get_by_key_name(self.request.get('channel_id'))
         admin = User.get_by_key_name(self.request.get('uid'))
         ca = ChannelAdmin(channel=channel, admin=admin)
         ca.put()
         self.response.out.write('done')
+      elif self.current_user.id in SUPER_ADMINS:
+        name = self.request.get('name')
+        if name:
+          channel = Channel.get_or_insert(key_name=Channel.make_key(name), name=name)
+          if channel.online:
+            Programming.set_programming(channel.id, queue='programming')
+          self.response.out.write(simplejson.dumps(channel.toJson()))
+          
+    def delete(self, id):
+      if self.current_user.id in SUPER_ADMINS and id:
+        channel = Channel.get_by_key_name(id)
+        for cc in channel.collections.fetch(None):
+          cc.delete()
+        for cp in channel.programs.fetch(None):
+          cp.delete()
+        for session in UserSession.all().filter('channel =', channel).fetch(None):
+          session.delete()
+        channel.delete()
+        self.response.out.write(simplejson.dumps({ 'deleted': True }))
+          
+class ChannelOnlineHandler(BaseHandler):
+    def post(self, cid):
+      channel = Channel.get_by_key_name(cid)
+      if self.current_user.id in SUPER_ADMINS or self.current_user in channel.admins.fetch(None):
+        channel.online = (self.request.get('online') == '1' or self.request.get('online') == 'true')
+        channel.put()
+        if channel.online:
+            Programming.set_programming(channel.id, queue='programming')
+        self.response.out.write(simplejson.dumps(channel.toJson()))
 
 class AdminRemoveProgramHandler(BaseHandler):
     def post(self):

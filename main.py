@@ -126,7 +126,12 @@ def create_handlers_map():
     # Admin
     ('/admin/_add/collection/(.*)', admin.AddToCollectionHandler),
     ('/admin/_channels', admin.ChannelsHandler),
+    ('/admin/_channels/(.*)', admin.ChannelsHandler),
+    ('/admin/_channel/online/(.*)', admin.ChannelOnlineHandler),
+    ('/admin/_collections', admin.CollectionsHandler),
     ('/admin/_collections/(.*)', admin.CollectionsHandler),
+    ('/admin/_fetch', admin.FetchHandler),
+    ('/admin/_program', admin.ProgramHandler),
     ('/admin/_media/collection', admin.CollectionMediaHandler),
     ('/admin/_media/collection/(.*)', admin.CollectionMediaHandler),
     ('/admin/_media/publisher/(.*)', rpc.PublisherMediaHandler),

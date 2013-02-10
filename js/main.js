@@ -212,18 +212,23 @@ brkn.Main.getSessionAndInit = function(response) {
   var fbLogin = goog.dom.getElement('fb-login');
   var staticContent = goog.dom.getElement('static-content');
   
+  goog.dom.classes.add(fbLogin, 'disabled');
+  goog.dom.classes.add(fbLogin, 'spin');
   goog.net.XhrIo.send('/_session',
       function(e) {
         if (e.target.getStatus() == 200) {
-          goog.dom.classes.remove(fbLogin, 'show');
-          goog.dom.classes.add(staticContent, 'hide');
-          goog.Timer.callOnce(function() {
-            goog.dom.classes.add(goog.dom.getElement('login'), 'hide');
-          }, 0);
-
           var data = e.target.getResponseJson();
           brkn.Main.init(response, data['token'], data['channels'], data['programs'],
               data['current_user'], data['viewer_sessions']);
+          
+          goog.Timer.callOnce(function() {
+            goog.dom.classes.add(staticContent, 'hide');
+            goog.dom.classes.add(goog.dom.getElement('login'), 'hide');
+            goog.dom.classes.remove(fbLogin, 'spin');
+            goog.Timer.callOnce(function() {
+              goog.style.showElement(goog.dom.getElement('login'), false);
+            }, 600);
+          }, 600);
         } else {
           brkn.Main.notAuthorized();
         }

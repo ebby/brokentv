@@ -189,12 +189,13 @@
 
 
 /**
+ * @param? inputText
  */
 {template .admin}
   <div class="admin">
     <div class="scrollable ios-scroll">
       <div class="search">
-        <input type="text" />
+        <input type="text" class="input" {if $inputText}placeholder="{$inputText}"{/if}/>
       </div>
       <div class="results">
       </div>
@@ -256,8 +257,15 @@
  * @param channel
  */
 {template .channel}
-  <div class="channel">
+  <div class="channel{sp}{if $channel.online}on{else}off{/if}">
     <div class="title">{$channel.name}</div>
+    <div class="controls">
+      <div class="fetch dark button">FETCH</div>
+      <div class="program dark button">PROG.</div>
+      <div class="remove dark button">x</div>
+      <div class="on dark button">ON</div>
+      <div class="off dark button">OFF</div>
+    </div>
     {if $channel.pending}
       <div class="pending">{$channel.pending}</div>
     {/if}
@@ -271,9 +279,13 @@
 {template .collection}
   <div class="collection">
     <div class="title">{$collection.name}</div>
-    {if $collection.pending}
-      <div class="pending">{$collection.pending}</div>
-    {/if}
+    <div class="controls">
+      {if $collection.pending}
+        <div class="pending">{$collection.pending}</div>
+      {/if}
+      <div class="fetch dark button">FETCH</div>
+      <div class="button dark remove">x</div>
+    </div>
   </div>
 {/template}
 
@@ -285,9 +297,11 @@
 {template .topic}
   <div class="topic">
     <div class="title">{$topic}</div>
-    {if $pending}
-      <div class="pending">{$pending}</div>
-    {/if}
+    <div class="controls">
+      {if $pending}
+        <div class="pending">{$pending}</div>
+      {/if}
+    </div>
   </div>
 {/template}
 

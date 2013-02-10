@@ -61,6 +61,7 @@ class TopicCollectionMedia(db.Model):
   topic = db.ReferenceProperty(Topic, collection_name='collection_medias')
   collection = db.ReferenceProperty(Collection, collection_name='topic_medias')
   media = db.ReferenceProperty(Media)
+  collection_media = db.ReferenceProperty(CollectionMedia, 'topic_medias')
   approved = db.IntegerProperty(default=Approval.PENDING)
   
   @classmethod
@@ -69,24 +70,20 @@ class TopicCollectionMedia(db.Model):
     for col in cols:
       tcms = col.topic_medias.fetch(None)
       for tcm in tcms:
-        media = tcm.media.toJson()
-        media['collection_id'] = tcm.collection.id
-        if not topics.get(tcm.topic.name):
-          topics[tcm.topic.name] = [media]
-        else:
-          topics[tcm.topic.name] = topics.get(tcm.topic.name).append(media)
+        if tcm.collection_media.approved == Approval.PENDING:
+          media = tcm.media.toJson()
+          media['collection_id'] = tcm.collection.id
+          if not topics.get(tcm.topic.name):
+            topics[tcm.topic.name] = [media]
+          else:
+            topics[tcm.topic.name] = topics.get(tcm.topic.name).append(media)
     return topics
 
   @classmethod
-  def add(cls, topic, collection, media, approved=None):
-    tcm = TopicCollectionMedia.get_or_insert(
-        topic.id + str(collection.id) + media.id,
-        topic=topic,
-        collection=collection,
-        media=media)
-    
-#      else:
-#        Topic.incr_pending(collection.key())
+  def add(cls, topic, collection_media):
+    tcm = TopicCollectionMedia.get_or_insert(topic.id + str(collection_media.collection.id) + collection_media.media.id,
+                                             collection=collection_media.collection, topic=topic, media=collection_media.media,
+                                             collection_media=collection_media)
     return tcm
   
 

@@ -17,7 +17,7 @@ class Program(db.Model):
 
     for channel in channels:
       programs = [x.program for x in
-                  channel.channelPrograms.filter('time >', cutoff).order('time').fetch(None)]
+                  channel.programs.filter('time >', cutoff).order('time').fetch(None)]
       
       programming[channel.id] = [p.toJson(fetch_channel=False, media_desc=False) for p in programs]
 
@@ -86,6 +86,6 @@ class Program(db.Model):
     return json
 
 class ChannelProgram(db.Model):
-  channel = db.ReferenceProperty(Channel, collection_name='channelPrograms')
+  channel = db.ReferenceProperty(Channel, collection_name='programs')
   program = db.ReferenceProperty(Program, collection_name='channelPrograms')
   time = db.DateTimeProperty()

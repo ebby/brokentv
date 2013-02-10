@@ -139,6 +139,8 @@ class PublisherMedia(db.Model):
     publisher_medias = publisher.publisherMedias.fetch(None)
     medias = [pm.media for pm in publisher_medias]
     for p_m in publisher_medias:
+      if not p_m.media:
+        p_m.delete()
       if category:
         if p_m.media.category == category:
           medias.append(p_m.media)

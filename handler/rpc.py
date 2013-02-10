@@ -28,7 +28,6 @@ def get_session(current_user):
     # No cached programming, attempt to fetch
     channels = channels or Channel.get_public()
     cached_programming = Program.get_current_programs(channels)
-    memcache.set('programming', simplejson.dumps(cached_programming))
 
   # Tack on the user's private channel if it exists, and programming
   user_channel = current_user.channel.get()
@@ -133,12 +132,13 @@ class ProgramHandler(BaseHandler):
 class InfoHandler(BaseHandler):
     def get(self, id):
       media = Media.get_by_key_name(id)
-      response = {}
-      response['description'] = media.description
-      response['seen'] = media.seen_by()
-      response['comments'] = [c.toJson() for c in Comment.get_by_media(media)]
-      response['tweets'] = [t.to_json() for t in media.get_tweets()]
-      self.response.out.write(simplejson.dumps(response))
+      if media:
+        response = {}
+        response['description'] = media.description
+        response['seen'] = media.seen_by()
+        response['comments'] = [c.toJson() for c in Comment.get_by_media(media)]
+        response['tweets'] = [t.to_json() for t in media.get_tweets()]
+        self.response.out.write(simplejson.dumps(response))
 
 class CommentHandler(BaseHandler):
     def get(self, id):

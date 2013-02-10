@@ -13,6 +13,7 @@ class Channel(db.Model):
   next_time = db.DateTimeProperty()
   suggested = db.ReferenceProperty(Collection)
   user = db.ReferenceProperty(User, collection_name='channel')
+  online = db.BooleanProperty(default=False)
 
   @property
   def id(self):
@@ -24,7 +25,7 @@ class Channel(db.Model):
 
   @classmethod
   def get_public(cls):
-    return Channel.all().filter('privacy =', Privacy.PUBLIC).fetch(None)
+    return Channel.all().filter('privacy =', Privacy.PUBLIC).filter('online =', True).fetch(None)
 
   @classmethod
   def get_all(cls):
@@ -51,7 +52,7 @@ class Channel(db.Model):
     return None
   
   def update_next_time(self):
-    last_program = self.channelPrograms.order('-time').get()
+    last_program = self.programs.order('-time').get()
     next_time = datetime.datetime.now()
     if last_program:
       next_time = last_program.program.time + datetime.timedelta(seconds=last_program.program.media.duration)
@@ -79,6 +80,7 @@ class Channel(db.Model):
     json['name'] = self.name
     if get_programming:
       json['programming'] = [p.toJson(False) for p in self.get_programming()]
+    json['online'] = self.online
     json['my_channel'] = self.privacy == Privacy.PRIVATE
     json['next_time'] = self.next_time.isoformat() if self.next_time else datetime.datetime.now().isoformat()
     return json

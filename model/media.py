@@ -68,30 +68,27 @@ class Media(db.Model):
       id = item['id']
       media = Media.get_by_key_name(MediaHost.YOUTUBE + id)
       if not media or True:
-        logging.info(item)
         duration = re.search('PT((\d*)H)?((\d*)M)?((\d*)S)?', item['contentDetails']['duration']).groups()
         duration = float(3600*float(duration[1] or 0) + 60*float(duration[3] or 0) + float(duration[5] or 0))
         media = cls(key_name=(MediaHost.YOUTUBE + id),
                     type=MediaType.VIDEO,
                     host_id=id,
-                    name=item['snippet']['title'].decode('utf-8'),
+                    name=item['snippet']['title'],
                     published=iso8601.parse_date(item['snippet']['publishedAt']).replace(tzinfo=None),
                     duration=duration,
-                    description=item['snippet']['publishedAt'].decode('utf-8').replace("\n", r" "),
+                    description=item['snippet']['description'].replace("\n", r" ") if item['snippet']['description'] else '',
                     host_views=int(item['statistics']['viewCount']) if item['statistics']['viewCount'] else 0)
         media.put()
 
         if collection:
-          CollectionMedia.add(collection, media, approved=(True if approve else None))
+          collection_media = CollectionMedia.add(collection, media, approved=(True if approve else None))
         
         if item.get('topicDetails'):
           for topic_id in item['topicDetails']['topicIds']:
             topic = Topic.add(topic_id)
-            logging.info(topic.name)
             TopicMedia.add(topic, media)
             if collection:
-              logging.info(collection.name)
-              TopicCollectionMedia.add(topic, collection, media)
+              TopicCollectionMedia.add(topic, collection_media)
 
       medias.append(media)
     return medias
@@ -190,6 +187,6 @@ class Media(db.Model):
     json['host'] = self.host
     json['duration'] = self.duration
     json['published'] = self.published.isoformat()
-    json['description'] = self.description
+    json['description'] = self.description if get_desc else ''
     json['thumb_pos'] = self.thumb_pos
     return json

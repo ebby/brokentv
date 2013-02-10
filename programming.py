@@ -139,7 +139,7 @@ class Programming():
 
     # Add new programs to filtered, current programs
     programming[channel_id] = Programming.cutoff_programs(programming.get(channel_id), 1800) + \
-        [p.toJson(fetch_channel=False, media_desc=False) for p in programs]
+        [p.toJson(fetch_channel=False, fetch_media=True, media_desc=False) for p in programs]
     memcache.set('programming', simplejson.dumps(programming))
     
     # Update channel's next_time
@@ -150,7 +150,7 @@ class Programming():
     memcache.set('channels', channels)
 
     # Schedule our next programming selection
-    if schedule_next and (kickoff or (len(medias) and len(onlineUsers.keys()))):
+    if schedule_next and (kickoff or (len(all_medias) and len(onlineUsers.keys()))):
       next_gen = (programs[-2].time - datetime.datetime.now()).seconds if len(programs) > 1 \
           else 0
       next_gen = min(next_gen,
@@ -298,6 +298,24 @@ class Programming():
           time.sleep(0.5)
       except Exception, e:
         pass
+      
+  @classmethod
+  def clear_model(cls, model):
+    channels = Channel.all().fetch(None)
+    memcache.delete('channels')
+    memcache.delete('programming')
+    for c in channels:
+      c.next_time = None
+      c.programming = []
+      c.put()
+    try:
+      while True:
+        q = db.GqlQuery("SELECT __key__ FROM " + model)
+        assert q.count()
+        db.delete(q.fetch(200))
+        time.sleep(0.5)
+    except Exception, e:
+      pass
       
 class StartHandler(webapp2.RequestHandler):
   def get(self):
