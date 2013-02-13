@@ -148,6 +148,9 @@ div#guide {
       display: block;
     }
   }
+  &.collapsed div.ticker, &.collapsed div.my-ticker {
+    display: none;
+  }
   &.collapsed div.header div.times {
       display: none;
     }
@@ -298,7 +301,7 @@ div#guide {
     div.channel {
       border-bottom: 1px solid #ccc;
       position: relative;
-      background: #f7f7f7;
+      background: #f7f7f7 url(/static/img/content-texture.png);
       overflow: hidden;
       .transition(height, .3s, ease);
       div.name {

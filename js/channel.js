@@ -94,6 +94,12 @@ brkn.Channel = function(model, timeline, startTime, startTimeOffset, minTime) {
    * @private
    */
   this.pixelsPerSecond_;
+  
+  /**
+   * @type {number}
+   * @private
+   */
+  this.changeTime_ = 6;
 };
 goog.inherits(brkn.Channel, goog.ui.Component);
 
@@ -180,11 +186,30 @@ brkn.Channel.prototype.enterDocument = function() {
   this.graphEl_ = goog.dom.getElementByClass('graph', this.getElement());
   this.suggestEl_ = goog.dom.getElementByClass('suggest', this.getElement());
   
-  this.suggestInput_ = new goog.ui.LabelInput('Paste YouTube link');
-  this.suggestInput_.decorate(goog.dom.getElementByClass('program-input', this.getElement()));
-  var keyHandler = new goog.events.KeyHandler(this.suggestInput_.getElement());
-  var pasteHandler = new goog.events.PasteHandler(this.suggestInput_.getElement());
-  var throttle = new goog.Throttle(goog.bind(this.onSuggestInput_, this), 1000);
+  if (!this.getModel().myChannel) {
+    this.suggestInput_ = new goog.ui.LabelInput('Paste YouTube link');
+    this.suggestInput_.decorate(goog.dom.getElementByClass('program-input', this.getElement()));
+    var keyHandler = new goog.events.KeyHandler(this.suggestInput_.getElement());
+    var pasteHandler = new goog.events.PasteHandler(this.suggestInput_.getElement());
+    var throttle = new goog.Throttle(goog.bind(this.onSuggestInput_, this), 1000);
+    this.getHandler()
+        .listen(pasteHandler,
+            goog.events.PasteHandler.EventType.AFTER_PASTE,
+            goog.bind(this.onSuggestInput_, this))
+        .listen(keyHandler,
+            goog.events.KeyHandler.EventType.KEY,
+            goog.bind(function() {
+              if (throttle) {
+                throttle.fire();
+              }
+            }, this))
+        .listen(this.suggestInput_,
+            goog.events.EventType.FOCUS,
+            goog.bind(this.onSuggestInput_, this));
+  } else {
+    goog.style.showElement(this.suggestEl_, false);
+  }
+  
 
   this.pixelsPerSecond_ = (goog.style.getSize(this.programsEl_).width - brkn.Guide.NAME_WIDTH) /
       this.timeline_;
@@ -205,7 +230,7 @@ brkn.Channel.prototype.enterDocument = function() {
     
     var raphael = Raphael(this.graphEl_, '100%', 60);
     //var c = graph.path("M0,0").attr({fill: "none", "stroke-width": 1, "stroke-linecap": "round"});
-    this.graph_ = raphael.path("M0,0").attr({stroke: "none", opacity: .8, fill: '#5d5d5d'/*Raphael.getColor(1)*/});
+    this.graph_ = raphael.path("M0,0").attr({stroke: "none", opacity: .8, fill: '#5d5d5d'});
   }
   
   // Color the name
@@ -249,20 +274,7 @@ brkn.Channel.prototype.enterDocument = function() {
 				}, this))
 		.listen(brkn.model.Clock.getInstance().clock,
 				goog.Timer.TICK,
-				goog.bind(this.update, this))
-		.listen(pasteHandler,
-        goog.events.PasteHandler.EventType.AFTER_PASTE,
-        goog.bind(this.onSuggestInput_, this))
-    .listen(keyHandler,
-        goog.events.KeyHandler.EventType.KEY,
-        goog.bind(function() {
-          if (throttle) {
-            throttle.fire();
-          }
-        }, this))
-    .listen(this.suggestInput_,
-        goog.events.EventType.FOCUS,
-        goog.bind(this.onSuggestInput_, this));
+				goog.bind(this.update, this));
 	
 	this.getModel().subscribe(brkn.model.Channel.Action.ADD_PROGRAM, this.addProgram, this);
 	this.getModel().subscribe(brkn.model.Channel.Action.ADD_VIEWER, this.addViewer, this);
@@ -272,7 +284,10 @@ brkn.Channel.prototype.enterDocument = function() {
 	brkn.model.Channels.getInstance().subscribe(brkn.model.Channels.Actions.NEXT_PROGRAM,
 	    this.updateCurrentProgram_, this);
 	brkn.model.Channels.getInstance().subscribe(brkn.model.Channels.Actions.CHANGE_CHANNEL,
-      this.updateCurrentProgram_, this);
+      function() {
+	      this.changeTime_ = 0;
+	      this.updateCurrentProgram_();
+	    }, this);
 	brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_ADMIN,
       function(show) {
         this.adminMode_ = show;
@@ -427,7 +442,7 @@ brkn.Channel.prototype.addProgram = function(program) {
         function(e) {
           var percent = goog.style.getStyle(img, 'background-position').split(' ')[1];
           percent = percent.substring(0, percent.length - 1);
-          program.media.thumbPos = percent;
+          program.media.thumbPos = (/** @type {number} */ percent);
           goog.net.XhrIo.send(
               '/admin/_posthumb',
               goog.functions.NULL(),
@@ -517,11 +532,12 @@ brkn.Channel.prototype.addViewer = function(session) {
 
 /**
  * @param {brkn.model.User} user The user to display
- * @param {goog.date.DateTime} tuneOut The tune-in time
  */
-brkn.Channel.prototype.removeViewer = function(user, tuneOut) {
-	// Simply stop updating element.
-	goog.object.remove(this.viewers_, user.id);
+brkn.Channel.prototype.removeViewer = function(user) {
+  if (this.viewers_[user.id]) {
+    goog.dom.removeNode(this.viewers_[user.id])
+  	goog.object.remove(this.viewers_, user.id);
+  } 
 };
 
 
@@ -632,12 +648,14 @@ brkn.Channel.prototype.update = function() {
   }
  
   // Potentially move title for current program
-  if (this.currentProgram_) {
+  if (this.currentProgram_ && this.changeTime_ > 1) {
     var currentProgram = this.programs_[this.currentProgram_];
     var delta = goog.style.getPosition(currentProgram).x +
         goog.style.getPosition(goog.dom.getElement('guide')).x;
     var title = goog.dom.getElementByClass('title', currentProgram);
     goog.style.setPosition(title, delta < 5 ? -delta + 10 : 5);
+  } else {
+    this.changeTime_++;
   }
 
   // Update viewers

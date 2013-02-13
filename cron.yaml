@@ -1,5 +1,5 @@
 cron:
 - description: publisher fetch
   url: /cron/fetch
-  schedule: every 12 hours
+  schedule: every 4 hours
   target: youtube

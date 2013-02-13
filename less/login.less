@@ -8,6 +8,9 @@ div#login {
   z-index: 10000;
   overflow-x: hidden;
   overflow-y: scroll;
+  border-bottom: 1px solid rgba(0, 0, 0, .8);
+  box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.59),
+      inset 0 -3px 1px 0px rgba(255, 255, 255, 0.5), 0 0 2px 1px rgba(0, 0,0,.5);
   &.hide {
     .transition(top, .6s, ease-in);
     overflow: hidden;
@@ -91,32 +94,44 @@ div#login {
           height: 100%;
           background: url(/static/img/57-power-2x.png) no-repeat;
           background-size: 30px;
-          background-position: 20px;
+          background-position: 20px 19px;
         }
       }
       &.spin div.power div.bg {
         .animation(spin, 3s, infinite, linear);
       }
-      div.label {
+      div.label, div.loading {
         font-family: MuseoSans500;
         display: inline-block;
         vertical-align: top;
         text-align: center;
         position: relative;
-        left: 30px;
-        top: 13px;
-        font-size: 26px;
+        left: 37px;
+        top: 15px;
+        font-size: 24px;
+      }
+      div.loading {
+        display: none;
+        top: 24px;
+        left: 25px;
+        font-size: 22px;
       }
       div.with-fb {
         font-family: MuseoSans300;
-        position: relative;
+        position: absolute;
         width: 80px;
         font-size: 11px;
-        top: -30px;
+        top: 40px;
         margin: auto;
         vertical-align: top;
-        left: 112px;
+        left: 113px;
         display: inline-block;
+      }
+      &.spin div.loading {
+        display: inline-block;
+      }
+      &.spin div.label, &.spin div.with-fb {
+        display: none;
       }
       div.waitlist {
         display: none;

@@ -30,6 +30,8 @@ class PubsubHandler(webapp.RequestHandler):
 
     update_list = []
     logging.info('Found %d entries', len(data.entries))
+    if len(data.entries):
+      logging.info(data.entries[0])
     for entry in data.entries:
       if hasattr(entry, 'content'):
         # This is Atom.

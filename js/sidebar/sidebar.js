@@ -152,6 +152,7 @@ brkn.Sidebar.prototype.enterDocument = function() {
     this.currentScreen_ = goog.dom.getElement('stream');
     this.currentTab_ = 'stream';
   }
+  this.screens_ = [this.currentScreen_, '']
   goog.dom.classes.add(this.currentScreen_, 'current');
   
   if (this.isAdmin_) {
@@ -394,7 +395,7 @@ brkn.Sidebar.prototype.showMediaInfo = function(media) {
   if (this.info_ && media.id == this.info_.getModel().id) {
     goog.dom.classes.remove(this.toolbar_, 'back');
     var lastScreen = this.screens_[0][0];
-    while (goog.dom.classes.has(lastScreen, 'slide')) {
+    while (lastScreen && goog.dom.classes.has(lastScreen, 'slide')) {
       lastScreen = this.screens_.shift();
     }
     this.tabNav_(this.currentTab_, 'info');

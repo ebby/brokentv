@@ -150,6 +150,17 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
   goog.net.XhrIo.send('/_info/' + this.media_.id, goog.bind(function(e) {
     var response = goog.json.parse(e.target.getResponse());
     
+    // Description
+    if (response['description']) {
+      goog.dom.setTextContent(goog.dom.getElementByClass('description', this.getElement()),
+          response['description']);
+    } else {
+      goog.style.showElement(goog.dom.getElementByClass('desc-link', this.getElement()),
+          false);
+      goog.style.showElement(goog.dom.getElementByClass('scrollable', this.getElement()),
+          false);
+    }
+    
     // Viewers
     var seen = /** @type {Array.<Object>} */ response['seen'];
     goog.style.showElement(viewersEl, seen.length);
@@ -284,7 +295,7 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
             var scrolled = goog.dom.classes.toggle(picEl, 'scrolled');
             var scrollAnim = new goog.fx.dom.Scroll(scrollable,
                 [scrollable.scrollLeft, scrollable.scrollTop],
-                [scrollable.scrollLeft, (scrolled ? 130 : 0)], 300);
+                [scrollable.scrollLeft, (scrolled ? 170 : 0)], 300);
             scrollAnim.play();
           }, this));
 };

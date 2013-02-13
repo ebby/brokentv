@@ -399,8 +399,8 @@ brkn.Guide.prototype.toggleGuide_ = function(show) {
   goog.Timer.callOnce(goog.bind(function() {
     goog.style.setHeight(this.channelsEl_, show ? height : 40);
     goog.dom.classes.enable(this.getElement(), 'collapsed', !show);
-    this.channelsEl_.scrollTop = goog.style.getPosition(this.currentChannel_.getElement()).y;
     this.resize_();
+    this.channelsEl_.scrollTop = goog.style.getPosition(this.currentChannel_.getElement()).y;
   }, this), show ? 0 : 800);
   this.align_(true, undefined, false);
   show && this.resize_();
@@ -484,7 +484,9 @@ brkn.Guide.prototype.updateNowButtons_ = function(opt_hide) {
       goog.style.getPosition(this.getElement()).x - viewWidth || opt_hide));
   goog.dom.classes.enable(nowLeft, 'now', !!(-elapsed >
       goog.style.getPosition(this.getElement()).x + brkn.Guide.NAME_WIDTH || opt_hide));
-  goog.style.showElement(nowRight, this.cursor_[0].hasNextProgram(this.guideOffset_));
+  goog.style.showElement(nowRight, this.cursor_[0].hasNextProgram(this.guideOffset_) ||
+      (this.cursor_[1].time.getTime()/1000 + this.cursor_[1].media.duration) *
+      this.pixelsPerSecond_ < goog.style.getSize(this.getElement()).width);
   goog.style.showElement(nowLeft, this.cursor_[0].hasPrevProgram(this.guideOffset_));
 };
 

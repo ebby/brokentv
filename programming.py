@@ -70,7 +70,8 @@ class Programming():
     
     for name, properties in inits.CHANNELS.iteritems():
       channel = Channel.get_or_insert(key_name=Channel.make_key(name),
-                                      name=name, keywords=properties['keywords'])
+                                      name=name, keywords=properties['keywords'],
+                                      online=True)
       self.channels[channel.id] = channel
       for col_name in properties['collections']:
         col = self.collections[col_name]
@@ -112,6 +113,7 @@ class Programming():
       all_medias += medias
     
     if not len(all_medias):
+      logging.info('BACKUP MEDIAS: ' + str(len(backup_medias)))
       all_medias = backup_medias
     
     # StorySort algorithm

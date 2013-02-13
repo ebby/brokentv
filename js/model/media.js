@@ -79,9 +79,9 @@ brkn.model.Media = function(media) {
 	this.thumbSize = new goog.math.Size(480, 360);
 	
 	/**
-   * @type {number|string}
+   * @type {number}
    */
-  this.thumbPos = media['thumb_pos'] || 37;
+  this.thumbPos = (/** @type {number} */ media['thumb_pos']) || 37;
 
 	/**
    * @type {Array.<brkn.model.Comment>}

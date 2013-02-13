@@ -65,5 +65,7 @@ brkn.model.Player.prototype.getProgress = function() {
  * @enum {string}
  */
 brkn.model.Player.Actions = {
-  PLAY_ASYNC: 'play-async'
+  PLAY_ASYNC: 'play-async',
+  PLAYING: 'playing',
+  NO_MEDIA: 'no-media'
 };
