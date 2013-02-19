@@ -104,6 +104,12 @@ brkn.sidebar.MediaList.prototype.mediasEl_;
  */
 brkn.sidebar.MediaList.prototype.scrollable_;
 
+/**
+ * @type {Element}
+ * @private
+ */
+brkn.sidebar.MediaList.prototype.spinner_;
+
 
 /** @inheritDoc */
 brkn.sidebar.MediaList.prototype.decorateInternal = function(el) {
@@ -111,8 +117,7 @@ brkn.sidebar.MediaList.prototype.decorateInternal = function(el) {
 
   el.innerHTML = '';
   el.scrollTop = 0;
-  this.scrollable_ = goog.dom.createDom('div', 'ios-scroll');
-  goog.dom.appendChild(this.getElement(), this.scrollable_);
+  goog.dom.classes.add(this.getElement(), 'ios-scroll');
   
   if (this.description_ || this.thumbnail_) {
     var listInfoEl = soy.renderAsElement(brkn.sidebar.listInfo, {
@@ -120,17 +125,27 @@ brkn.sidebar.MediaList.prototype.decorateInternal = function(el) {
       description: this.description_,
       link: this.link_
     });
-    goog.dom.appendChild(this.scrollable_, listInfoEl);
+    goog.dom.appendChild(this.getElement(), listInfoEl);
     this.infoHeight_ = goog.style.getSize(listInfoEl).height;
   }
+  
+  this.spinner_ = goog.dom.createDom('div', 'loading',
+      goog.dom.createDom('div', 'loading-spinner'));
+  goog.dom.appendChild(this.getElement(), this.spinner_);
+  goog.style.showElement(this.spinner_, false);
 
   this.mediasEl_ = goog.dom.createDom('div', 'medias');
-  goog.dom.appendChild(this.scrollable_, this.mediasEl_);
+  goog.dom.appendChild(this.getElement(), this.mediasEl_);
+  
+  this.getHandler().listen(window, 'resize',
+      goog.partial(goog.Timer.callOnce, goog.bind(this.resize, this)));
   
   if (this.url_) {
+    goog.style.showElement(this.spinner_, true);
     goog.net.XhrIo.send(
         this.url_,
         goog.bind(function(e) {
+          goog.style.showElement(this.spinner_, false);
           var medias = /** @type {Array.<Object>} */ goog.json.parse(e.target.getResponse());
           medias = goog.array.map(medias, function(m) {
             return new brkn.model.Media(m);
@@ -172,7 +187,8 @@ brkn.sidebar.MediaList.prototype.addMedia = function(media) {
  * @private
  */
 brkn.sidebar.MediaList.prototype.resize = function() {
-  goog.style.setHeight(this.scrollable_, this.mediasHeight_ + this.infoHeight_ + 65);
+  goog.style.setHeight(this.getElement(), goog.dom.getViewportSize().height - 40 -
+      (goog.dom.getAncestorByClass(this.getElement(), 'tabbed') ? 30 : 0));
 };
 
 

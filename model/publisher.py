@@ -41,7 +41,7 @@ class Publisher(db.Model):
     return publisher
   
   def fetch(self, collection=None, approve_all=False):
-    logging.info('FETCH')
+    medias = []
 
     if self.host == MediaHost.YOUTUBE:
       if not self.channel_id:
@@ -83,42 +83,14 @@ class Publisher(db.Model):
           logging.info('FETCHED: ' + media.name)
           PublisherMedia.add(publisher=self, media=media)
         next_page_token = search_response.get('tokenPagination', {}).get('nextPageToken')
-          
 
-        
-        '''
-        query = gdata.youtube.service.YouTubeVideoQuery()
-        query.author = self.host_id
-        if categories:
-          query.categories = categories
-        query.orderby = 'published'
-        query.max_results = 50
-        offset = 1
-        while offset <= 1 if constants.DEVELOPMENT else 100: # Max is 1000
-          query.start_index = offset
-          feed = yt_service.YouTubeQuery(query)
-          if len(feed.entry) == 0:
-            break
-          medias = Media.add_from_entry(feed.entry)
-          for media in medias:
-            logging.info('FETCHED: ' + media.name)
-            PublisherMedia.add(publisher=self, media=media)
-  
-          last_media = medias[-1] if isinstance(medias, list) else medias
-          
-          logging.info(self.last_fetch)
-          logging.info(last_media.toJson(False))
-          
-          if self.last_fetch and last_media.published \
-              and last_media.published.replace(tzinfo=None) < self.last_fetch:
-            # We fetched all the latest media
-            logging.info('UP TO DATE')
-            break
-          offset += len(medias)
-        '''
-
-        self.last_fetch = datetime.datetime.now()
-        self.put()
+      if len(medias):
+        email = email.Email(email.Message.FETCH)
+        for uid in constants.SUPER_ADMINS:
+          user = User.get_by_key_name(uid)
+          email.send([user.email])
+      self.last_fetch = datetime.datetime.now()
+      self.put()
 
 class PublisherMedia(db.Model):
   publisher = db.ReferenceProperty(Publisher, collection_name='publisherMedias')

@@ -115,7 +115,7 @@ brkn.model.Channels.prototype.loadViewersFromJson = function(viewerSessions) {
 				    goog.date.fromIsoString(session['tune_out'] + 'Z') : null;
 				var newSession = new brkn.model.Session(session['id'], u, channel, tuneIn, tuneOut);
 				u.currentSession = newSession;
-				channel.viewerSessions.push(newSession);
+				channel && channel.viewerSessions.push(newSession);
 			}, this));
 };
 

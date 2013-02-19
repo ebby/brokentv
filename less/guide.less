@@ -7,9 +7,13 @@ div#guide {
   background: #f7f7f7;
   width: 100%;
   color: #ccc;
-  -webkit-transition: height .5s ease, opacity .5s ease, left 1s ease-in-out;
-     -moz-transition: height .5s ease, opacity .5s ease, left 5s ease-in-out;
-          transition: height .5s ease, opacity .5s ease, left 5s ease-in-out;
+  .transition(e('height .5s ease, opacity .5s ease'));
+  &.toggled {
+    .transition(e('height .5s ease, opacity .5s ease, left 1s ease-in-out'));
+  }
+  &.collapsed {
+    .transition(e('height .5s ease, opacity .5s ease, left 1s ease-in-out'));
+  }
   
   &.drag, &.drag div.channel div.name, &.aligning div.channel div.name {
     -webkit-transition: none !important;
@@ -19,7 +23,7 @@ div#guide {
   &.drag div.channels div.channel div.programs div.program.playing div.title {
     .transition(none);
   }
-  &.admin div.channels div.channel div.programs div.program {
+  &.admin.toggled div.channels div.channel div.programs div.program {
     div.remove, div.repos {
       display: block;
     }
@@ -37,6 +41,7 @@ div#guide {
     }
   }
   div.ticker, div.my-ticker {
+    display: none;
     position: absolute;
     top: 0;
     background: url(/static/img/ticker.png) no-repeat;
@@ -148,8 +153,8 @@ div#guide {
       display: block;
     }
   }
-  &.collapsed div.ticker, &.collapsed div.my-ticker {
-    display: none;
+  &.toggled div.ticker, &.toggled div.my-ticker {
+    display: block;
   }
   &.collapsed div.header div.times {
       display: none;
@@ -441,7 +446,7 @@ div#guide {
 						white-space: nowrap;
 						overflow: hidden;
 						padding-right: 25px;
-						.transition(left, 1s, linear);
+						.transition(left, .1s, linear);
 						&.marquee {
 						  .transition(e('margin-left 10s linear, left 1s linear'));
 						}

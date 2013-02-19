@@ -56,6 +56,14 @@ brkn.model.Player.prototype.getCurrentProgram = function() {
 /**
  * @return {number}
  */
+brkn.model.Player.prototype.getCurrentTime = function() {
+  return this.player_ && this.player_.getCurrentTime ? this.player_.getCurrentTime() : 0;
+};
+
+
+/**
+ * @return {number}
+ */
 brkn.model.Player.prototype.getProgress = function() {
   return this.player_ && this.player_.getCurrentTime ? this.player_.getCurrentTime() : 0;
 };

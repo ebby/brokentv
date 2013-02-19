@@ -189,7 +189,8 @@ brkn.sidebar.AdminList.prototype.enterDocument = function() {
               }, this));
         }
       }, this));
-      
+   
+  this.resize();
 };
 
 

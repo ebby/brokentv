@@ -70,12 +70,16 @@ brkn.sidebar.Stream.prototype.decorateInternal = function(el) {
   this.activitiesEl_ = goog.dom.createDom('div', 'activities');
   goog.dom.appendChild(this.getElement(), this.activitiesEl_);
   
-  var spinner = goog.dom.createDom('div', 'spinner', 'Loading more');
+//  var loading = goog.dom.createDom('div', 'loading', goog.dom.createDom('div', 'loading-spinner'));
+//  goog.dom.appendChild(this.getElement(), loading);
+  
+  var spinner = goog.dom.createDom('div', 'spinner');
   goog.dom.appendChild(this.getElement(), spinner);
   goog.style.showElement(spinner, false);
   
   goog.array.forEach(this.activities_, function(activity) {
-    this.addActivity_(activity)
+    this.addActivity_(activity);
+    //goog.style.showElement(loading, false);
   }, this);
   brkn.model.Users.getInstance().subscribe(brkn.model.Users.Action.NEW_ACTIVITY, function(activity) {
     if (this.uid_ == activity['user']['id'] ||
@@ -84,24 +88,28 @@ brkn.sidebar.Stream.prototype.decorateInternal = function(el) {
     }
   }, this);
   
-  this.getHandler().listen(this.getElement(), goog.events.EventType.SCROLL, goog.bind(function(e) {
-    if (!this.finished_ && this.getElement().scrollTop + goog.dom.getViewportSize().height >
-        this.getElement().scrollHeight - 60) {
-      goog.style.showElement(spinner, true);
-      goog.net.XhrIo.send(
-          '/_activity' + (this.uid_ ? '/' + this.uid_ : '') + '?offset=' + this.count_,
-          goog.bind(function(e) {
-            var activities = /** @type {Array.<Object>} */ e.target.getResponseJson();
-            this.finished_ = !activities.length;
-            goog.dom.classes.enable(spinner, 'finished', this.finished_);
-            goog.style.showElement(spinner, this.finished_);
-            goog.array.forEach(activities, function(activity) {
-              this.addActivity_(activity);
-            }, this);
-            
-          }, this));
-    }
-  }, this));
+  this.getHandler()
+      .listen(this.getElement(), goog.events.EventType.SCROLL, goog.bind(function(e) {
+        if (!this.finished_ && this.getElement().scrollTop + goog.dom.getViewportSize().height >
+            this.getElement().scrollHeight - 60) {
+          goog.style.showElement(spinner, true);
+          goog.net.XhrIo.send(
+              '/_activity' + (this.uid_ ? '/' + this.uid_ : '') + '?offset=' + this.count_,
+              goog.bind(function(e) {
+                var activities = /** @type {Array.<Object>} */ e.target.getResponseJson();
+                this.finished_ = !activities.length;
+                goog.dom.classes.enable(spinner, 'finished', this.finished_);
+                goog.style.showElement(spinner, this.finished_);
+                goog.array.forEach(activities, function(activity) {
+                  this.addActivity_(activity);
+                  this.count_++;
+                }, this);
+                
+              }, this));
+        }
+      }, this))
+     .listen(window, 'resize', goog.partial(goog.Timer.callOnce, goog.bind(this.resize, this)));
+  this.resize();
 };
 
 /**
@@ -169,5 +177,10 @@ brkn.sidebar.Stream.prototype.addActivity_ = function(activity, opt_insertTop) {
     goog.dom.appendChild(this.activitiesEl_, (/** @type {Node} */ activityEl)); 
   }
   goog.Timer.callOnce(goog.partial(goog.dom.classes.add, activityEl, 'show'));
-  this.count_++;
+};
+
+
+brkn.sidebar.Stream.prototype.resize = function() {
+  goog.style.setHeight(this.getElement(), goog.dom.getViewportSize().height - 40 -
+      (goog.dom.getAncestorByClass(this.getElement(), 'tabbed') ? 40 : 10));
 };

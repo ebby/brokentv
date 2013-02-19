@@ -18,17 +18,29 @@
   background: transparent;
   &.covered {
     background: #181818;
+    .transition(e('width .5s ease, height .5s ease'));
     div.message {
       display: block;
     }
   }
   div.message {
     display: none;
-    font-size: 30px;
+    font-size: 24px;
+    font-family: MuseoSans100;
     color: #f7f7f7;
     position: absolute;
     left: 50%;
     top: 50%;
+    div.spinner {
+      position: absolute;
+      left: 50%;
+      margin-left: -100px;
+      bottom: -150px;
+      background: url(/static/img/spinner.gif) no-repeat center;
+      background-size: 80px;
+      width: 200px;
+      height: 220px;
+    }
   }
   div.fullscreen, div.expand {
     width: 25px;

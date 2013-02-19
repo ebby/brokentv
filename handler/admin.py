@@ -247,6 +247,8 @@ class AdminRemoveProgramHandler(BaseHandler):
       program = Program.get_by_id(int(self.request.get('program')))
       channel = program.channel;
       effected = program.remove()
+      # Update memcache
+      Program.get_current_programs([channel])
       broadcastProgramChanges(channel, effected)
       
 class AdminRescheduleProgramHandler(BaseHandler):
@@ -255,4 +257,6 @@ class AdminRescheduleProgramHandler(BaseHandler):
       new_time = datetime.datetime.fromtimestamp(float(self.request.get('time')))
       channel = program.channel;
       effected = program.reschedule(new_time)
+      # Update memcache
+      Program.get_current_programs([channel])
       #broadcastProgramChanges(channel, effected)

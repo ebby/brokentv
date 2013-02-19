@@ -238,7 +238,7 @@
       <div class="pending-content content pending"></div>
       <div class="all-content content all"></div>
       <div class="playlists-content content playlists"></div>
-      <div class="spinner" style="display:none">Loading More</div>
+      <div class="spinner" style="display:none"></div>
   </div>
 {/template}
 
@@ -318,9 +318,13 @@
         <div class="label">STARRED</div>
       </li>
     </ul>
-    <div class="activity-content content activity"></div>
-    <div class="starred-content content starred"></div>
-    <div class="spinner" style="display:none">Loading More</div>
+    <div class="activity-content content activity">
+      <div class="loading loading-activity"><div class="loading-spinner"></div></div>
+    </div>
+    <div class="starred-content content starred">
+      <div class="loading loading-starred"><div class="loading-spinner"></div></div>
+    </div>
+    <div class="spinner" style="display:none"></div>
   </div>
 {/template}
 

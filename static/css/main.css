@@ -120,6 +120,91 @@ div.controller div.right div.border {
   left: -6px;
   top: 0;
 }
+div.controller div.progress {
+  width: 100%;
+  height: 2px;
+  border-bottom: 2px solid #f5f5f5;
+  box-shadow: inset 0 -1px 1px 0 #cccccc, 0 0 2px 1px rgba(88, 88, 88, 0.3);
+  position: absolute;
+  top: 27px;
+  pointer-events: all;
+  left: 205px;
+  cursor: pointer;
+  border-radius: 300px;
+}
+div.controller div.progress div.elapsed {
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 0;
+  height: 3px;
+  background: #B7432E;
+  box-shadow: inset 0 -1px 1px 0 rgba(255, 255, 255, 0.2);
+  border-radius: 300px;
+  -webkit-transition: width 1s linear;
+  -moz-transition: width 1s linear;
+  -o-transition: width 1s linear;
+  -ms-transition: width 1s linear;
+  transition: width 1s linear;
+}
+div.controller div.progress div.seek {
+  position: absolute;
+  bottom: 0px;
+  width: 1px;
+  height: 3px;
+  background: #B7432E;
+  opacity: 0.9;
+  right: 0;
+  cursor: pointer;
+  box-shadow: 0px 0 6px 2px rgba(255, 255, 255, 0.2);
+}
+div.controller div.progress div.title {
+  position: absolute;
+  left: 0;
+  top: -18px;
+  font-size: 11px;
+  font-family: MuseoSans100;
+  color: #f5f5f5;
+  text-shadow: 1px 1px 1px #181818;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80%;
+}
+div.controller div.progress div.current-time {
+  position: absolute;
+  right: 40px;
+  top: -18px;
+  font-size: 11px;
+  font-family: MuseoSans100;
+  color: #f5f5f5;
+  text-shadow: 1px 1px 1px #181818;
+}
+div.controller div.progress div.duration {
+  position: absolute;
+  right: 0;
+  top: -18px;
+  font-size: 11px;
+  font-family: MuseoSans100;
+  color: #f5f5f5;
+  text-shadow: 1px 1px 1px #181818;
+}
+div.controller:hover div.progress div.seek {
+  -webkit-transition: all 0.3s ease;
+  -moz-transition: all 0.3s ease;
+  -o-transition: all 0.3s ease;
+  -ms-transition: all 0.3s ease;
+  transition: all 0.3s ease;
+  opacity: 1;
+  width: 10px;
+  height: 10px;
+  border-radius: 10px;
+  bottom: -3px;
+  right: -3px;
+  margin-left: -4px;
+  box-shadow: 0px 0px 1px 1px rgba(255, 255, 255, 0.9);
+  z-index: 2;
+}
 div.controller div.button.guide-toggle {
   position: absolute;
   top: 4px;
@@ -191,6 +276,7 @@ div.controller div.controls div.button:first-child {
 }
 div.controller div.controls div.restart {
   background-image: url(/static/img/restart.png);
+  background-size: 50%;
 }
 div.controller div.controls div.play {
   background-image: url(/static/img/17-pause.png);
@@ -202,12 +288,12 @@ div.controller div.controls div.play.goog-custom-button-checked {
 }
 div.controller div.controls div.volume {
   background-image: url(/static/img/volume-up.png);
-  background-size: 70%;
+  background-size: 50%;
 }
 div.controller div.controls div.volume.mute,
 div.controller div.controls div.volume.goog-custom-button-checked {
   background-image: url(/static/img/volume-down.png);
-  background-position: 4px;
+  background-position: 9px;
 }
 div#guide {
   position: absolute;
@@ -217,9 +303,25 @@ div#guide {
   background: #f7f7f7;
   width: 100%;
   color: #ccc;
-  -webkit-transition: height 0.5s ease, opacity 0.5s ease, left 1s ease-in-out;
-  -moz-transition: height 0.5s ease, opacity 0.5s ease, left 5s ease-in-out;
-  transition: height 0.5s ease, opacity 0.5s ease, left 5s ease-in-out;
+  -webkit-transition: height .5s ease, opacity .5s ease;
+  -moz-transition: height .5s ease, opacity .5s ease;
+  -o-transition: height .5s ease, opacity .5s ease;
+  -ms-transition: height .5s ease, opacity .5s ease;
+  transition: height .5s ease, opacity .5s ease;
+}
+div#guide.toggled {
+  -webkit-transition: height .5s ease, opacity .5s ease, left 1s ease-in-out;
+  -moz-transition: height .5s ease, opacity .5s ease, left 1s ease-in-out;
+  -o-transition: height .5s ease, opacity .5s ease, left 1s ease-in-out;
+  -ms-transition: height .5s ease, opacity .5s ease, left 1s ease-in-out;
+  transition: height .5s ease, opacity .5s ease, left 1s ease-in-out;
+}
+div#guide.collapsed {
+  -webkit-transition: height .5s ease, opacity .5s ease, left 1s ease-in-out;
+  -moz-transition: height .5s ease, opacity .5s ease, left 1s ease-in-out;
+  -o-transition: height .5s ease, opacity .5s ease, left 1s ease-in-out;
+  -ms-transition: height .5s ease, opacity .5s ease, left 1s ease-in-out;
+  transition: height .5s ease, opacity .5s ease, left 1s ease-in-out;
 }
 div#guide.drag,
 div#guide.drag div.channel div.name,
@@ -235,12 +337,12 @@ div#guide.drag div.channels div.channel div.programs div.program.playing div.tit
   -ms-transition: none;
   transition: none;
 }
-div#guide.admin div.channels div.channel div.programs div.program div.remove,
-div#guide.admin div.channels div.channel div.programs div.program div.repos {
+div#guide.admin.toggled div.channels div.channel div.programs div.program div.remove,
+div#guide.admin.toggled div.channels div.channel div.programs div.program div.repos {
   display: block;
 }
-div#guide.admin div.channels div.channel div.programs div.program:hover div.thumb,
-div#guide.admin div.channels div.channel div.programs div.program.playing div.thumb {
+div#guide.admin.toggled div.channels div.channel div.programs div.program:hover div.thumb,
+div#guide.admin.toggled div.channels div.channel div.programs div.program.playing div.thumb {
   -webkit-transition: opacity 0.6s ease;
   -moz-transition: opacity 0.6s ease;
   -o-transition: opacity 0.6s ease;
@@ -258,6 +360,7 @@ div#guide.faded:hover {
 }
 div#guide div.ticker,
 div#guide div.my-ticker {
+  display: none;
   position: absolute;
   top: 0;
   background: url(/static/img/ticker.png) no-repeat;
@@ -399,9 +502,9 @@ div#guide.toggled div.ticker div.go-live {
 div#guide.toggled div.my-ticker div.me {
   display: block;
 }
-div#guide.collapsed div.ticker,
-div#guide.collapsed div.my-ticker {
-  display: none;
+div#guide.toggled div.ticker,
+div#guide.toggled div.my-ticker {
+  display: block;
 }
 div#guide.collapsed div.header div.times {
   display: none;
@@ -716,11 +819,11 @@ div.channels div.channel div.programs div.program div.title {
   white-space: nowrap;
   overflow: hidden;
   padding-right: 25px;
-  -webkit-transition: left 1s linear;
-  -moz-transition: left 1s linear;
-  -o-transition: left 1s linear;
-  -ms-transition: left 1s linear;
-  transition: left 1s linear;
+  -webkit-transition: left 0.1s linear;
+  -moz-transition: left 0.1s linear;
+  -o-transition: left 0.1s linear;
+  -ms-transition: left 0.1s linear;
+  transition: left 0.1s linear;
 }
 div.channels div.channel div.programs div.program div.title.marquee {
   -webkit-transition: margin-left 10s linear, left 1s linear;
@@ -1088,17 +1191,33 @@ div.program:hover {
 }
 #stagecover.covered {
   background: #181818;
+  -webkit-transition: width .5s ease, height .5s ease;
+  -moz-transition: width .5s ease, height .5s ease;
+  -o-transition: width .5s ease, height .5s ease;
+  -ms-transition: width .5s ease, height .5s ease;
+  transition: width .5s ease, height .5s ease;
 }
 #stagecover.covered div.message {
   display: block;
 }
 #stagecover div.message {
   display: none;
-  font-size: 30px;
+  font-size: 24px;
+  font-family: MuseoSans100;
   color: #f7f7f7;
   position: absolute;
   left: 50%;
   top: 50%;
+}
+#stagecover div.message div.spinner {
+  position: absolute;
+  left: 50%;
+  margin-left: -100px;
+  bottom: -150px;
+  background: url(/static/img/spinner.gif) no-repeat center;
+  background-size: 80px;
+  width: 200px;
+  height: 220px;
 }
 #stagecover div.fullscreen,
 #stagecover div.expand {
@@ -1776,13 +1895,30 @@ div#sidebar div.tabbed.starred div.starred {
 div#sidebar div.tabbed.starred ul.tabs li.starred {
   background: rgba(245, 245, 245, 0.6);
 }
+div#sidebar div.loading {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 90px;
+  height: 90px;
+  margin-left: -45px;
+  margin-top: -45px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 6px;
+}
+div#sidebar div.loading div.loading-spinner {
+  background: url(/static/img/spinner2.gif) no-repeat center;
+  background-size: 50px;
+  width: 90px;
+  height: 90px;
+}
 div#sidebar div.list-media {
   margin-bottom: 10px;
   border-radius: 3px;
   position: relative;
   background: rgba(50, 50, 50, 0.85);
   border: 1px solid #333;
-  box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 0 1px 0px rgba(0, 0, 0, 0.8);
   color: #f5f5f5;
   text-shadow: 1px 1px 1px #181818;
   opacity: 0;
@@ -1831,13 +1967,16 @@ div#sidebar div.list-media:active {
   box-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);
 }
 div#sidebar div.list-media:active div.publisher {
-  margin-bottom: 5px;
+  margin-bottom: 3px;
+}
+div#sidebar div.list-media:last-child:active div.publisher {
+  margin-bottom: 4px;
 }
 div#sidebar div.list-media div.media {
   white-space: normal;
   overflow: hidden;
   vertical-align: middle;
-  height: 50px;
+  height: 48px;
   color: #999;
   text-shadow: 1px 1px 1px white;
   margin-top: -1px;
@@ -1946,8 +2085,9 @@ div#sidebar div.list-media div.publisher {
   position: relative;
   top: 3px;
   left: 0px;
-  margin-bottom: 6px;
-  border-bottom: 1px solid rgba(204, 204, 204, 0.32);
+  margin-bottom: 4px;
+  /* border-bottom: 1px solid rgba(204, 204, 204, 0.32); */
+
   width: 272px;
   padding: 3px;
   font-family: MuseoSans500;
@@ -2396,7 +2536,7 @@ div#sidebar div.info {
 div#sidebar div.info div.picture {
   display: inline-block;
   width: 300px;
-  height: 199px;
+  height: 200px;
   position: relative;
   overflow: hidden;
   background: #f5f5f5;
@@ -2489,7 +2629,7 @@ div#sidebar div.info div.title {
 div#sidebar div.info div.desc-link {
   position: relative;
   width: 240px;
-  margin-top: 180px;
+  margin-top: 181px;
   font-size: 12px;
   margin-left: 9px;
   padding-bottom: 5px;
@@ -2525,7 +2665,7 @@ div#sidebar div.info div.published {
 }
 div#sidebar div.info div.options {
   position: absolute;
-  top: 2px;
+  top: 0;
   right: -2px;
   box-shadow: -1px 0 1px 0px rgba(200, 200, 200, 0.6);
 }
@@ -2728,10 +2868,10 @@ div#sidebar div.stream {
 }
 div#sidebar div.stream div.spinner {
   width: 100%;
-  height: 95px;
+  height: 35px;
   text-align: center;
-  background: rgba(0, 0, 0, 0.6);
-  margin-top: -50px;
+  background: url(/static/img/spinner2.gif) no-repeat center 5px;
+  background-size: 50px;
   line-height: 40px;
   -webkit-transition: height 0.3s linear;
   -moz-transition: height 0.3s linear;
@@ -2740,10 +2880,9 @@ div#sidebar div.stream div.spinner {
   transition: height 0.3s linear;
 }
 div#sidebar div.stream div.spinner.finished {
-  height: 0;
-}
-div#sidebar div.stream div.activities {
-  padding-bottom: 30px;
+  height: 1px;
+  opacity: 0;
+  visibility: hidden;
 }
 div#sidebar div.stream div.activity {
   position: relative;
@@ -3054,13 +3193,14 @@ div#sidebar div#admin-list div.list-media div.media div.preview div.title {
   height: 30px;
   line-height: 14px;
 }
-div#sidebar div#sidebar-content div.screen.profile,
-div#sidebar div#sidebar-content div.slide.profile {
-  overflow-y: scroll;
-}
 div#sidebar div#sidebar-content div.screen.profile div.content.starred,
 div#sidebar div#sidebar-content div.slide.profile div.content.starred {
+  overflow-y: scroll;
+}
+div#sidebar div#sidebar-content div.screen.profile div.content.starred div.medias,
+div#sidebar div#sidebar-content div.slide.profile div.content.starred div.medias {
   margin: 10px;
+  padding-bottom: 10px;
 }
 @font-face {
   font-family: 'MuseoSans100';

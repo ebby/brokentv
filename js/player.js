@@ -29,6 +29,13 @@ brkn.Player.prototype.player_;
 
 
 /**
+ * @type {string}
+ * @private
+ */
+brkn.Player.prototype.playerState_;
+
+
+/**
  * @type {brkn.model.Program}
  * @private
  */
@@ -42,6 +49,26 @@ brkn.Player.prototype.currentProgram_;
 brkn.Player.prototype.currentChannel_;
 
 
+/**
+ * @type {Element}
+ * @private
+ */
+brkn.Player.prototype.stagecover_;
+
+
+/**
+ * @type {Element}
+ * @private
+ */
+brkn.Player.prototype.message_;
+
+/**
+ * @type {Element}
+ * @private
+ */
+brkn.Player.prototype.spinner_;
+
+
 /** @inheritDoc */
 brkn.Player.prototype.enterDocument = function() {
   goog.base(this, 'enterDocument');
@@ -52,6 +79,9 @@ brkn.Player.prototype.enterDocument = function() {
   this.fullscreenEl_ = goog.dom.getElementByClass('fullscreen', this.getElement());
   var expandEl = goog.dom.getElementByClass('expand', this.getElement());
   goog.style.showElement(this.fullscreenEl_, this.supportsFullScreen_());
+  this.stagecover_ = goog.dom.getElement('stagecover');
+  this.message_ = goog.dom.getElementByClass('message', this.stagecover_);
+  this.spinner_ = goog.dom.getElementByClass('spinner', this.stagecover_);
   
   this.updateStagecover_();
 
@@ -80,7 +110,7 @@ brkn.Player.prototype.enterDocument = function() {
       .listen(this.getElement(), goog.events.EventType.DBLCLICK, goog.bind(this.toggleExpand_, this))
       .listen(expandEl, goog.events.EventType.CLICK, goog.bind(this.toggleExpand_, this))
       .listen(this.getElement(), goog.events.EventType.CLICK, goog.bind(function() {
-        if (this.player_) {
+        if (this.player_ && this.player_.getPlayerState) {
           switch (this.player_.getPlayerState()) {
             case YT.PlayerState.PLAYING:
               brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.PLAY, false);
@@ -197,7 +227,8 @@ brkn.Player.prototype.play = function(media, opt_tries) {
         'controls': 0,
         'showinfo': 0,
         'iv_load_policy': 3,
-        'modestbranding': 1
+        'modestbranding': 1,
+        'wmode': 'opaque'
       },
       'events': {
           'onStateChange': goog.bind(this.playerStateChange_, this),
@@ -226,7 +257,7 @@ brkn.Player.prototype.resize = function() {
   var stagecover = goog.dom.getElement('stagecover');
   var message = goog.dom.getElementByClass('message', stagecover)
   var guideHeight = goog.dom.getElement('guide').style.height;
-  guideHeight = guideHeight.substring(0, guideHeight.length - 2)
+  guideHeight = guideHeight.substring(0, guideHeight.length - 2);
   var sidebarWidth = goog.dom.classes.has(goog.dom.getElement('sidebar'), 'toggled')  ? 300 : 0;
   goog.style.setHeight(playerEl, goog.dom.getViewportSize().height - guideHeight);
   goog.style.setWidth(playerEl, goog.dom.getViewportSize().width - sidebarWidth); 
@@ -271,11 +302,15 @@ brkn.Player.prototype.playAsync_ = function(media) {
  * @param {Event} event
  */
 brkn.Player.prototype.playerStateChange_ = function(event) {
+  this.playerState_ = event.data;
+  this.updateStagecover_();
+  window.console.log(this.playerState_)
   switch (event.data) {
     case YT.PlayerState.CUED:
       var seek = (goog.now() - this.currentProgram_.time.getTime())/1000;
       this.player_.seekTo(seek);
       this.player_.playVideo();
+      brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.PLAY, true);
       break;
     case YT.PlayerState.PLAYING:
       brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.PLAYING);
@@ -303,7 +338,6 @@ brkn.Player.prototype.playerStateChange_ = function(event) {
               'media_id=' + this.currentProgram_.media.id);
         }
       }
-  	  this.updateStagecover_();
   	  break;
 	}
 };
@@ -338,16 +372,33 @@ brkn.Player.prototype.onPlayerError_ = function(event) {
 
 
 /**
+ * @param {?string=} opt_message
  * @private
  */
-brkn.Player.prototype.updateStagecover_ = function() {
+brkn.Player.prototype.updateStagecover_ = function(opt_message) {
   var stagecover = goog.dom.getElement('stagecover');
   var seek = this.currentProgram_ ? (goog.now() - this.currentProgram_.time.getTime())/1000 : 0;
   if (!this.currentProgram_ || (this.currentProgram_ && seek > this.currentProgram_.media.duration)) {
-    this.resize();
     brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.NO_MEDIA);
+    goog.dom.setTextContent((/** @type {Element} */ this.message_.firstChild),
+        brkn.Player.Messages.OFFLINE);
+    goog.style.showElement(this.spinner_, false);
+    goog.dom.classes.add(stagecover, 'covered');
+  } else if (this.playerState_ != YT.PlayerState.PLAYING &&
+      this.playerState_ != YT.PlayerState.PAUSED) {
+    goog.dom.setTextContent((/** @type {Element} */ this.message_.firstChild),
+        brkn.Player.Messages.LOADING);
+    goog.style.showElement(this.spinner_, true);
     goog.dom.classes.add(stagecover, 'covered');
   } else {
+    goog.style.showElement(this.spinner_, false);
     goog.dom.classes.remove(stagecover, 'covered');
   }
+  this.resize();
+};
+
+
+brkn.Player.Messages = {
+  OFFLINE: 'THIS CHANNEL IS CURRENTLY OFFLINE',
+  LOADING: 'LOADING STORY'
 };

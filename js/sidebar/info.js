@@ -163,15 +163,19 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
     
     // Viewers
     var seen = /** @type {Array.<Object>} */ response['seen'];
-    goog.style.showElement(viewersEl, seen.length);
+ 
     goog.array.forEach(seen, function(viewer) {
-      var viewerEl = soy.renderAsElement(brkn.sidebar.viewer, {
-        user: brkn.model.Users.getInstance().get_or_add(viewer)
-      });
-      goog.dom.appendChild(viewersEl, viewerEl);
-      this.getHandler().listen(viewerEl, goog.events.EventType.CLICK, function() {
-        brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.PROFILE, viewer)
-      });
+      var user = brkn.model.Users.getInstance().get_or_add(viewer);
+      if (user.id != brkn.model.Users.getInstance().currentUser.id) {
+        goog.style.showElement(viewersEl, true);
+        var viewerEl = soy.renderAsElement(brkn.sidebar.viewer, {
+          user: user
+        });
+        goog.dom.appendChild(viewersEl, viewerEl);
+        this.getHandler().listen(viewerEl, goog.events.EventType.CLICK, function() {
+          brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.PROFILE, viewer)
+        });
+      }
     }, this);
     
     // Tweets

@@ -4,20 +4,24 @@
  * Tucked away here for security 
  * @param user
  * @param admin
+ * @param guide
  */
 {template .main}
 <div class="main">
   <div id="stage" class="stage">
     <div id="ytplayer"></div>
     <div id="stagecover">
-      <div class="message">This channel is currently offline.</div>
+      <div class="message">
+        <span></span>
+        <div class="spinner" style="display:none"></div>
+      </div>
       <div class="fullscreen"></div>
       <div class="expand"></div>
       <div class="play" style="display: none"></div>
       <div class="pause" style="display: none"></div>
     </div>
   </div>
-  <div id="guide" class="guide toggled">
+  <div id="guide" class="guide{if $guide}{sp}toggled{else}{sp}collapsed{/if}">
     <div id="channels" class="channels"></div>
     <div class="right-grad"></div>
     <div class="header" id="header">
@@ -35,7 +39,7 @@
       <div id="go-live" class="go-live">GO LIVE</div>
     </div>
   </div>
-  <div id="controller" class="controller guide-toggled">
+  <div id="controller" class="controller{if $guide}{sp}guide-toggled{/if}">
     <div class="background"></div>
     <div class="left">
       <div id="guide-toggle" class="guide-toggle dark button">GUIDE</div>
@@ -52,6 +56,14 @@
       </div>
       <div id="sidebar-toggle" class="sidebar-toggle dark button"></div>
       <div class="border"></div>
+    </div>
+    <div class="progress" style="display: none">
+      <div class="elapsed">
+        <div class="seek"></div>
+      </div>
+      <div class="title"></div>
+      <div class="current-time"></div>
+      <div class="duration"></div>
     </div>
   </div>
   <div id="sidebar">

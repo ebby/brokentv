@@ -65,10 +65,11 @@ brkn.Main.prototype.popup_;
 /** @inheritDoc */
 brkn.Main.prototype.decorateInternal = function(element) {
   goog.base(this, 'decorateInternal', element);
-  
+
   var mainEl = soy.renderAsElement(brkn.main.main, {
     user: brkn.model.Users.getInstance().currentUser,
-    admin: brkn.model.Users.getInstance().currentUser.isAdmin()
+    admin: brkn.model.Users.getInstance().currentUser.isAdmin(),
+    guide: !brkn.model.Channels.getInstance().currentChannel.myChannel
   });
   goog.dom.insertChildAt(element, mainEl, 0);
 };
@@ -246,6 +247,21 @@ brkn.Main.notAuthorized = function() {
   goog.dom.classes.add(fbLogin, 'show');
   goog.dom.classes.add(fbLogin, 'waitlist');
 };
+
+
+String.prototype.toHHMMSS = function () {
+  var sec_numb    = parseInt(this, 10);
+  var hours   = Math.floor(sec_numb / 3600);
+  var minutes = Math.floor((sec_numb - (hours * 3600)) / 60);
+  var seconds = sec_numb - (hours * 3600) - (minutes * 60);
+
+  if (hours   < 10) {hours   = hours;}
+  if (minutes < 10) {minutes = (hours ? '0' : '')+minutes;}
+  if (seconds < 10) {seconds = "0"+seconds;}
+  var time    = (hours ? hours + ':' : '') + (minutes ? minutes+':' : '') + seconds;
+  return time;
+}
+
 
 goog.exportSymbol('brkn.Main.staticInit', brkn.Main.staticInit);
 goog.exportSymbol('brkn.Main.auth', brkn.Main.auth);

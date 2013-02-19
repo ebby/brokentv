@@ -635,8 +635,7 @@ brkn.Channel.prototype.onSuggestProgram_ = function(video) {
  */
 brkn.Channel.prototype.update = function() {
   // Hide if no content
-  var hide = !this.getModel().programming.length ||
-      (this.getModel().myChannel && !this.getModel().getCurrentProgram());
+  var hide = !this.getModel().programming.length;
   goog.dom.classes.enable(this.getElement(), 'offline', hide);
   if (!this.getModel().programming.length) {
     return;
@@ -648,7 +647,7 @@ brkn.Channel.prototype.update = function() {
   }
  
   // Potentially move title for current program
-  if (this.currentProgram_ && this.changeTime_ > 1) {
+  if (this.currentProgram_ && this.changeTime_ > 2) {
     var currentProgram = this.programs_[this.currentProgram_];
     var delta = goog.style.getPosition(currentProgram).x +
         goog.style.getPosition(goog.dom.getElement('guide')).x;

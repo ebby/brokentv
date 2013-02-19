@@ -64,4 +64,3 @@ var Raphael;
  * @param {?number=} opt_brightness
  */
 Raphael.getColor = function(opt_brightness) {};
-

@@ -51,6 +51,7 @@ class MainHandler(BaseHandler):
     def get(self):
       template_data = {}
       template_data['host_url'] = self.request.host_url
+      template_data['hostname'] = 'xylocast' if 'xylocast' in self.request.host_url else 'xylovision'
       if self.request.get('prod') or not constants.DEVELOPMENT:
         template_data['js_location'] = constants.PROD_SIMPLE_JS if self.request.get('simple') \
             else constants.PROD_JS
