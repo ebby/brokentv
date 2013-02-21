@@ -30,7 +30,7 @@ class UserSession(db.Model):
     return s_m
   
   def end_session(self):
-    tune_out = datetime.datetime.now()
+    self.tune_out = datetime.datetime.now()
     self.put()
     
     # Track user activity

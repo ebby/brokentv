@@ -1745,6 +1745,7 @@ div#sidebar div#sidebar-content div.media-list div.list-info div.description {
 }
 div#sidebar div#sidebar-content div.media-list div.medias {
   margin: 10px;
+  padding-bottom: 5px;
 }
 div#sidebar div.comment-input {
   visibility: hidden;
@@ -1913,7 +1914,7 @@ div#sidebar div.loading div.loading-spinner {
   height: 90px;
 }
 div#sidebar div.list-media {
-  margin-bottom: 10px;
+  margin-bottom: 4px;
   border-radius: 3px;
   position: relative;
   background: rgba(50, 50, 50, 0.85);
@@ -2186,7 +2187,7 @@ div#login div#static-content div.title {
   text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.9);
 }
 div#login div#static-content div.subtitle {
-  font-size: 17px;
+  font-size: 19px;
   position: absolute;
   top: 70px;
   padding: 30px 0;
@@ -2899,6 +2900,38 @@ div#sidebar div.stream div.activity {
 div#sidebar div.stream div.activity.show {
   opacity: 1;
 }
+div#sidebar div.stream div.activity.digest.comment div.text {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+div#sidebar div.stream div.activity.digest div.text {
+  left: 10px;
+  margin-bottom: 5px;
+  padding-bottom: 8px;
+}
+div#sidebar div.stream div.activity.digest div.text span {
+  font-family: MuseoSans700;
+}
+div#sidebar div.stream div.activity.digest div.users {
+  margin-left: 10px;
+}
+div#sidebar div.stream div.activity.digest div.users div.picture {
+  position: relative;
+  display: inline-block;
+  margin-left: 4px;
+  margin-bottom: 4px;
+}
+div#sidebar div.stream div.activity.digest div.comment {
+  margin-bottom: 3px;
+}
+div#sidebar div.stream div.activity.digest div.comment div.text {
+  left: 50px;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+}
+div#sidebar div.stream div.activity.digest div.medias {
+  margin-top: 3px;
+}
 div#sidebar div.stream div.activity div.picture {
   position: absolute;
   background: #ccc;
@@ -2923,7 +2956,6 @@ div#sidebar div.stream div.activity div.text {
   min-height: 20px;
   width: 240px;
   padding-bottom: 13px;
-  margin-bottom: 15px;
   font-family: MuseoSans500;
 }
 div#sidebar div.stream div.activity div.text a {

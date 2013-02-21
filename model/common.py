@@ -39,3 +39,30 @@ def get_freebase_topic(topic_id):
   url = service_url + topic_id + '?' + urllib.urlencode(params)
   response = simplejson.loads(urllib.urlopen(url).read())
   return response
+
+def fetch_youtube_channel(channel_id, collection=None, approve_all=False):
+    medias = []
+    youtube3 = get_youtube3_service()
+    next_page_token = ''
+    while next_page_token is not None:
+      search_response = youtube3.search().list(
+        channelId=channel_id,
+        part='id',
+        order='date',
+        pageToken=next_page_token,
+        publishedAfter=self.last_fetch.isoformat('T') + 'Z' if self.last_fetch else '1970-01-01T00:00:00Z',
+        maxResults=10
+      ).execute()
+      search_ids = ''
+      for item in search_response.get('items', []):
+        if item['id']['kind'] == 'youtube#video':
+          search_ids += item['id']['videoId'] + ','
+      videos_response = youtube3.videos().list(
+        id=search_ids,
+        part="id,snippet,topicDetails,contentDetails,statistics"
+      ).execute()
+      medias = Media.add_from_snippet(videos_response.get("items", []), collection=collection,
+                                      approve=approve_all)
+      next_page_token = search_response.get('tokenPagination', {}).get('nextPageToken')
+
+    return medias

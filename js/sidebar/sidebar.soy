@@ -105,42 +105,71 @@
 
 
 /**
- * @param session
+ * @param tunedOut
  * @param? channel
- * @param user
+ * @param users
  * @param time
  */
 {template .sessionActivity}
-  <div class="activity">
-    <div class="picture" style="background:{$user.color}">
-      <img src="{$user.picture}"/>
-    </div>
-    <div class="text">
-      <a class="user" href="#">{$user.name}</a>{sp}
-      {if $session.tune_out}watched{else}is watching{/if}
-      {if $channel}{sp}<a href="#">{$channel.name}</a>{/if}
-      <div class="timestamp">{$time}</div>
-    </div>
+  <div class="activity{if $users.length > 1}{sp}digest{/if}">
+    {if $users.length > 1}
+      <div class="text">
+        <span>{$users.length} friends{sp}</span>
+        {if $tunedOut}watched{else}are watching{/if}
+        {if $channel}{sp}<a href="#">{$channel.name}</a>{/if}
+        <div class="timestamp">{$time}</div>
+      </div>
+      <div class="users">
+        {foreach $user in $users}
+          <div class="picture" style="background:{$user.color}">
+            <img src="{$user.picture}"/>
+          </div>
+        {/foreach}
+      </div>
+    {/if}
+    {if $users.length == 1}
+      <div class="picture" style="background:{$users[0].color}">
+        <img src="{$users[0].picture}"/>
+      </div>
+      <div class="text">
+        <a class="user" href="#">{$users[0].name}</a>{sp}
+        {if $tunedOut}watched{else}is watching{/if}
+        {if $channel}{sp}<a href="#">{$channel.name}</a>{/if}
+        <div class="timestamp">{$time}</div>
+      </div>
+    {/if}
     <div class="medias"></div>
   </div>
 {/template}
 
 
 /**
- * @param comment
- * @param user
- * @param time
+ * @param users
+ * @param comments
  */
 {template .commentActivity}
-  <div class="activity">
-    <div class="picture" style="background:{$user.color}">
-      <img src="{$user.picture}"/>
-    </div>
-    <div class="text">
-      <a class="user" href="#">{$user.name}</a>{sp}
-      "{$comment.text}"
-      <div class="timestamp">{$time}</div>
-    </div>
+  <div class="comment activity{if $comments.length > 1}{sp}digest{/if}">
+    {if $comments.length > 1}
+      <div class="text">
+        {if $users.length == 1}
+          <a class="user" href="#">{$users[0].name}{sp}</a> discussed this story.
+        {else}
+          <span>{$users.length} friends{sp}</span> discussed this story.
+        {/if}
+      </div>
+    {/if}
+    {foreach $comment in $comments}
+      <div class="comment">
+        <div class="picture" style="background:{$comment.user.color}">
+          <img src="{$comment.user.picture}"/>
+        </div>
+        <div class="text">
+          <a class="user" href="#">{$comment.user.name}</a>{sp}
+          "{$comment.text}"
+          <div class="timestamp">{$comment.relativeTime}</div>
+        </div>
+      </div>
+    {/foreach}
     <div class="medias"></div>
   </div>
 {/template}

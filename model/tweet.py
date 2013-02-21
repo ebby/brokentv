@@ -10,7 +10,7 @@ class Tweet(db.Model):
   text = db.TextProperty()
   time = db.DateTimeProperty()
   handle = db.StringProperty()
-  name = db.StringProperty()
+  name = db.TextProperty()
   user_id = db.IntegerProperty()
   picture_url = db.StringProperty()
   picture_url_https = db.StringProperty()

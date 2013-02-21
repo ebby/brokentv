@@ -26,9 +26,14 @@ brkn.model.Comment = function(comment) {
    * @private
    */
   this.text = comment['text'];
-  
+
   /**
    * @type {goog.date.DateTime}
    */
   this.time = goog.date.fromIsoString(comment.time + 'Z');
+
+  /**
+   * @type {string}
+   */
+  this.relativeTime = goog.date.relative.format(this.time.getTime());
 };

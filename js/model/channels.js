@@ -122,12 +122,14 @@ brkn.model.Channels.prototype.loadViewersFromJson = function(viewerSessions) {
 
 /**
  * @param {brkn.model.Channel} channel New channel
+ * @param {?boolean=} opt_forced Forced channel change, not by user
  */
-brkn.model.Channels.prototype.changeChannel = function(channel) {
+brkn.model.Channels.prototype.changeChannel = function(channel, opt_forced) {
   if (channel) {
     this.lastChannel = this.currentChannel;
     this.currentChannel = channel;
-    goog.net.XhrIo.send('/_changechannel', goog.functions.NULL(), 'POST', 'channel=' + channel.id);
+    goog.net.XhrIo.send('/_changechannel', goog.functions.NULL(), 'POST',
+        'channel=' + channel.id + (opt_forced ? '&forced=1' : ''));
   }
 };
 

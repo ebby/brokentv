@@ -31,7 +31,7 @@ class Programming():
     self.collections = {}
     
     for name, properties in inits.PUBLISHERS.iteritems():
-      publisher = Publisher.add('youtube', host_id=properties['youtube'], name=name)
+      publisher = Publisher.add('youtube', host_id=properties['youtube'].lower(), name=name)
       self.publishers[publisher.name] = publisher
       
     for name, properties in inits.PLAYLISTS.iteritems():
@@ -153,8 +153,12 @@ class Programming():
 
     # Schedule our next programming selection
     if schedule_next and (kickoff or (len(all_medias) and len(onlineUsers.keys()))):
-      next_gen = (programs[-2].time - datetime.datetime.now()).seconds if len(programs) > 1 \
-          else 0
+      if len(programs) > 1:
+        next_gen = (programs[-2].time - datetime.datetime.now()).seconds
+      elif len(programs) == 1:
+        next_gen = programs[0].media.duration / 2
+      else:
+        next_gen = 0
       next_gen = min(next_gen,
                      reduce(lambda x, y: x + y, [p.media.duration for p in programs], 0))
       next_gen = min(next_gen, duration - 120)

@@ -586,7 +586,7 @@ brkn.Guide.prototype.expand_ = function() {
   this.width_ += this.timeslotWidth_;
   goog.style.setWidth(this.getElement(), this.width_);
   this.timeslots_++;
-  //this.maxTime_.add(new goog.date.Interval(0, 0, 0, 0, this.interval_ * newSlots));
+  this.maxTime_.add(new goog.date.Interval(0, 0, 0, 0, this.interval_ * newSlots));
   this.timeline = this.timeslots_ * this.interval_ * 60;
 };
 

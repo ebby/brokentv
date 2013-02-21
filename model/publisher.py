@@ -34,10 +34,11 @@ class Publisher(db.Model):
     return json
   
   @classmethod
-  def add(self, host, host_id, name=None):
+  def add(self, host, host_id, name=None, channel_id=None):
     publisher = Publisher.get_or_insert(key_name=host+host_id,
                                         host_id=host_id,
-                                        name=name)
+                                        name=name,
+                                        channel_id=channel_id)
     return publisher
   
   def fetch(self, collection=None, approve_all=False):
@@ -84,11 +85,11 @@ class Publisher(db.Model):
           PublisherMedia.add(publisher=self, media=media)
         next_page_token = search_response.get('tokenPagination', {}).get('nextPageToken')
 
-      if len(medias):
-        email = email.Email(email.Message.FETCH)
-        for uid in constants.SUPER_ADMINS:
-          user = User.get_by_key_name(uid)
-          email.send([user.email])
+#      if len(medias):
+#        email = email.Email(email.Message.FETCH)
+#        for uid in constants.SUPER_ADMINS:
+#          user = User.get_by_key_name(uid)
+#          email.send([user.email])
       self.last_fetch = datetime.datetime.now()
       self.put()
 

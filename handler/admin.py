@@ -241,6 +241,16 @@ class ChannelOnlineHandler(BaseHandler):
         if channel.online:
             Programming.set_programming(channel.id, queue='programming')
         self.response.out.write(simplejson.dumps(channel.toJson()))
+        
+class RemovePublisher(BaseHandler):
+    def get(self, id):
+      publisher = Publisher.get_by_key_name(id)
+      if publisher:
+        for pm in publisher.publisherMedias:
+          pm.delete()
+        publisher.delete()
+      self.response.out.write('done')
+      
 
 class AdminRemoveProgramHandler(BaseHandler):
     def post(self):

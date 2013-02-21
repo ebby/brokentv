@@ -11,6 +11,7 @@ class Collection(db.Model):
   
   name = db.StringProperty()
   keywords = db.StringListProperty(default=[])
+  channel_id = db.StringProperty()
   hashtags = db.StringListProperty(default=[])
   admins = db.StringListProperty(default=[])
   lifespan = db.IntegerProperty() # Age of allowed content in days
@@ -27,8 +28,19 @@ class Collection(db.Model):
     publisher = Publisher.get_by_key_name(publisher_id)
     logging.info('FETCHING: ' + publisher.name)
     publisher_medias = publisher.fetch(collection=collection, approve_all=approve_all)
+    
+  @classmethod
+  def add_channel_media(cls, collection_id, approve_all):
+    collection = Collection.get_by_id(int(collection_id))
+    logging.info('FETCHING: ' + collection.name)
+    medias = fetch_youtube_channel(collection.channel_id, collection=collection,
+                                   approve_all=approve_all)
   
   def fetch(self, approve_all=False):
+    if self.channel_id:
+      deferred.defer(Collection.add_channel_media, self.id, approve_all,
+                     _name='fetch-' + collection.name.replace(' ', '') + '-' + str(uuid.uuid1()))
+    
     publishers = self.get_publishers()
     if self.keywords:
       for publisher in publishers:

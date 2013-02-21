@@ -55,17 +55,22 @@ def get_session(current_user):
     current_channel = Channel.get_by_key_name(user_sessions[0].channel.key().name())
 
   if len(user_sessions) and not user_sessions[0].tune_out:
-    session = user_sessions[0] 
-    session.tune_out = session.tune_in + datetime.timedelta(seconds=180)
-    session.put()
-
-  if len(user_sessions) and user_sessions[0].tune_out and \
+    # Kill it, create new
+    user_sessions[0].delete()
+    session = UserSession.new(current_user, current_channel)
+    # End it artificially
+    #session = user_sessions[0] 
+    #session.tune_out = session.tune_in + datetime.timedelta(seconds=180)
+    #session.put()
+  elif len(user_sessions) and user_sessions[0].tune_out and \
       (datetime.datetime.now() - user_sessions[0].tune_out).seconds < 180:
+    # Re-purpose last session (typically if the user refreshed)
     session = user_sessions[0] 
     session.tune_out = None
     session.put()
   else:
     session = UserSession.new(current_user, current_channel)
+    logging.info('NEW SESSION ' + str(session.toJson()))
     
   # TRACK ALL USERS
   def add_viewer(current_viewers, uid, session):
@@ -183,7 +188,8 @@ class ActivityHandler(BaseHandler):
       
 class ChangeChannelHandler(BaseHandler):
     def post(self):
-      channel_id = self.request.get('channel')  
+      channel_id = self.request.get('channel')
+      forced = self.request.get('forced') == '1' # Forced by the client
       channel = Channel.get_by_key_name(channel_id)
       if not channel and channel_id == self.current_user.id:
         # Create private user channel
@@ -200,44 +206,52 @@ class ChangeChannelHandler(BaseHandler):
         remove_user = True
         
         if (datetime.datetime.now() - user_sessions[0].tune_in).seconds < 30:
-          if len(user_sessions) > 1 and user_sessions[1].channel == channel:
+          logging.info(channel.id)
+          logging.info(user_sessions[0].channel.id)
+          logging.info(user_sessions[1].channel.id)
+          if len(user_sessions) > 1 and user_sessions[1].channel.id == channel.id:
             # If they switched to another channel, then switched back.
             session = user_sessions[1]
             session.tune_out = None
             session.put()
+            user_sessions[0].delete()
           else:
+            # Re-purpose last session
             session = user_sessions[0]
             session.tune_in = datetime.datetime.now()
             session.channel = channel
             session.put()
         else:
+          # End last session
           user_sessions[0].end_session()
+          # New session for new channel
+          session = UserSession.new(self.current_user, channel)
           
+        if not forced:
           # Track the media opt-out behavior
           last_channel = Channel.get_by_key_name(last_channel_id)
           last_program = last_channel.get_current_program()
           if last_program:
             Media.add_opt_out(last_program.media.key().name(), self.current_user.id)
-
-        # New session for new channel
+      else:
         session = UserSession.new(self.current_user, channel)
         
-        # Track current viewers by channel, useful for audience catering
-        client = memcache.Client()
-        for i in range(3):
-          channel_viewers = client.gets('channel_viewers') or {}
-          if remove_user and self.current_user.id in channel_viewers.get(last_channel_id, []):
-            # Remove user from channel
-            channel_viewers[last_channel_id].remove(self.current_user.id)
-          channel_viewers[channel_id] = channel_viewers.get(channel_id, []) + [self.current_user.id]
-          set = client.cas('channel_viewers', channel_viewers)
-        if not set:
-          memcache.set('channel_viewers', channel_viewers)
-        
-        # Track the media opt-in behavior
-        current_program = channel.get_current_program()
-        if current_program:
-          Media.add_opt_in(current_program.media.key().name(), self.current_user.id)
+      # Track current viewers by channel, useful for audience catering
+      client = memcache.Client()
+      for i in range(3):
+        channel_viewers = client.gets('channel_viewers') or {}
+        if remove_user and self.current_user.id in channel_viewers.get(last_channel_id, []):
+          # Remove user from channel
+          channel_viewers[last_channel_id].remove(self.current_user.id)
+        channel_viewers[channel_id] = channel_viewers.get(channel_id, []) + [self.current_user.id]
+        set = client.cas('channel_viewers', channel_viewers)
+      if not set:
+        memcache.set('channel_viewers', channel_viewers)
+      
+      # Track the media opt-in behavior
+      current_program = channel.get_current_program()
+      if current_program:
+        Media.add_opt_in(current_program.media.key().name(), self.current_user.id)
 
       broadcast.broadcastViewerChange(self.current_user, last_channel_id, channel_id,
                                       session.key().id(), session.tune_in.isoformat());

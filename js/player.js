@@ -304,7 +304,6 @@ brkn.Player.prototype.playAsync_ = function(media) {
 brkn.Player.prototype.playerStateChange_ = function(event) {
   this.playerState_ = event.data;
   this.updateStagecover_();
-  window.console.log(this.playerState_)
   switch (event.data) {
     case YT.PlayerState.CUED:
       var seek = (goog.now() - this.currentProgram_.time.getTime())/1000;
@@ -330,7 +329,7 @@ brkn.Player.prototype.playerStateChange_ = function(event) {
       } else {
         brkn.model.Player.getInstance().setCurrentProgram(null);
         brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.CHANGE_CHANNEL,
-            brkn.model.Channels.getInstance().findOnline());
+            brkn.model.Channels.getInstance().findOnline(), true);
         if (this.asyncMedia_) {
           this.asyncMedia_ = null;
         } else {
