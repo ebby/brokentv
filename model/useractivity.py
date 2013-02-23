@@ -37,8 +37,8 @@ class UserActivity(db.Model):
   def get_stream(cls, user, offset=0):
     u_a = UserActivity.all()
     if not constants.DEVELOPMENT:
-      u_a.filter('acl =', user.id)
-    u_a.order('-time').fetch(10, offset)
+      u_a = u_a.filter('acl =', user.id)
+    u_a = u_a.order('-time').fetch(30, offset)
     return u_a
 
   @classmethod

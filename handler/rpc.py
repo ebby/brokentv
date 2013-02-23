@@ -70,7 +70,6 @@ def get_session(current_user):
     session.put()
   else:
     session = UserSession.new(current_user, current_channel)
-    logging.info('NEW SESSION ' + str(session.toJson()))
     
   # TRACK ALL USERS
   def add_viewer(current_viewers, uid, session):
@@ -105,6 +104,10 @@ def get_session(current_user):
   user_obj = current_user.toJson()
   user_obj['current_channel'] = current_channel.id
   data['current_user'] = user_obj
+
+  # Update login
+  current_user.last_login = datetime.datetime.now()
+  current_user.put()
 
   broadcast.broadcastViewerChange(current_user, None, current_channel.id,
                                   session.key().id(), session.tune_in.isoformat());

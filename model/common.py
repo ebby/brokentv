@@ -1,7 +1,7 @@
 import broadcast
 import constants
 import datetime
-import email
+import emailer
 import gdata.youtube
 import gdata.youtube.service
 import gdata.alt.appengine

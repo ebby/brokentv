@@ -55,6 +55,27 @@ class StorySortHandler(BaseHandler):
       path = os.path.join(os.path.dirname(__file__), '../templates/storysort.html')
       self.response.out.write(template.render(path, template_data))
 
+class UsersHandler(BaseHandler):
+    def get(self, id=None):
+      offset = self.request.get('offset') or 0
+      if id:
+        users = [User.get_by_key_name(id)]
+        self.response.out.write(simplejson.dumps(user.toJson()))
+      else:
+        users = User.all().fetch(20, offset)
+        self.response.out.write(simplejson.dumps([u.toJson(admin=True) for u in users]))
+
+class AccessLevelHandler(BaseHandler):
+    def post(self):
+      user = User.get_by_key_name(self.request.get('uid'))
+      access_level = int(self.request.get('level'))
+      if user.access_level == 0 and access_level == 1:
+        welcome_email = emailer.Email(emailer.Message.WELCOME)
+        welcome_email.send(user)
+      user.access_level = access_level
+      user.put()
+      self.response.out.write('')
+
 class PositionThumbHandler(BaseHandler):
     def post(self):
       media = Media.get_by_key_name(self.request.get('media'))

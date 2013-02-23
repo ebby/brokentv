@@ -1,0 +1,40 @@
+{namespace brkn.admin}
+
+/** */
+{template .users}
+  <div class="users">
+    <div class="header">
+      <div class="pic">USER</div>
+      <div class="access">
+        ACCESS LEVEL
+      </div>
+      <div class="location" href="#">LOCATION</div>
+      <div class="last-login">LAST LOGIN</div>
+      <div class="session-count">SESSION COUNT</div>
+      <div class="ave-session">AVE SESSION</div>
+    </div>
+    <div class="user-list">
+  </div>
+{/template}
+
+/**
+ * @param user
+ * @param lastLogin
+ */
+{template .user}
+  <div class="user" id="{$user.id}">
+    <div class="pic">
+      <img src="{$user.picture}">
+    </div>
+    <a class="name" target="_blank" href="{$user.url}">{$user.name}</a>
+    <div class="controls access">
+      <div class="button dark 2{if $user.accessLevel == 2}{sp}selected{/if}">ADMIN</div>
+      <div class="button dark 1{if $user.accessLevel == 1}{sp}selected{/if}">USER</div>
+      <div class="button dark 0{if $user.accessLevel == 0}{sp}selected{/if}">NONE</div>
+    </div>
+    <a class="location" href="#">{$user.location}</a>
+    <div class="last-login">{$lastLogin}</div>
+    <div class="session-count">{$user.sessionCount}</div>
+    <div class="ave-session">{$user.aveSession}</div>
+  </div>
+{/template}

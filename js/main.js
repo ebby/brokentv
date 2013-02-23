@@ -6,6 +6,7 @@ goog.require('brkn.Player');
 goog.require('brkn.Popup');
 goog.require('brkn.Sidebar');
 goog.require('brkn.main');
+goog.require('brkn.model.Analytics');
 goog.require('brkn.model.BrowserChannel');
 goog.require('brkn.model.Channels');
 goog.require('brkn.model.Clock');
@@ -16,6 +17,7 @@ goog.require('goog.fx.dom.Scroll');
 goog.require('goog.fx.dom.FadeOutAndHide');
 goog.require('goog.ui.Component');
 goog.require('goog.ui.media.YoutubeModel');
+
 
 
 /**
@@ -117,6 +119,8 @@ brkn.Main.init = function(response, channelToken, channels, programs,
 	
 	var main = new brkn.Main(channelToken);
 	main.decorate(document.body);
+	
+	brkn.model.Analytics.getInstance().login();
 };
 
 brkn.Main.staticInit = function() {
@@ -174,6 +178,8 @@ brkn.Main.staticInit = function() {
     }
   });
   goog.events.listen(window, goog.events.EventType.RESIZE, goog.partial(resize, true));
+  
+  brkn.model.Analytics.getInstance().init();
 };
 
 
@@ -265,3 +271,5 @@ String.prototype.toHHMMSS = function () {
 
 goog.exportSymbol('brkn.Main.staticInit', brkn.Main.staticInit);
 goog.exportSymbol('brkn.Main.auth', brkn.Main.auth);
+
+goog.DEBUG && goog.exportSymbol('brkn.Admin.init', brkn.Admin.init);

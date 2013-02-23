@@ -66,7 +66,31 @@ class MainHandler(BaseHandler):
       template_data['facebook_app_id'] = constants.FACEBOOK_APP_ID;
       path = os.path.join(os.path.dirname(__file__), 'templates/home.html')
       self.response.out.write(template.render(path, template_data))
-      
+
+class AdminHandler(BaseHandler):
+    def get(self):
+      logging.info(self.current_user.id in constants.SUPER_ADMINS)
+      if not self.current_user.id in constants.SUPER_ADMINS:
+        self.redirect('/')
+      template_data = {}
+      if not constants.DEVELOPMENT or self.request.get('css') or self.request.get('prod'):
+        template_data['css_location'] = constants.ADMIN_CSS_SOURCE
+      template_data['js_location'] = constants.ADMIN_JS_SOURCE
+      path = os.path.join(os.path.dirname(__file__), 'templates/admin.html')
+      self.response.out.write(template.render(path, template_data))
+
+class StatsHandler(BaseHandler):
+    def get(self):
+      logging.info(self.current_user.id in constants.SUPER_ADMINS)
+      if not self.current_user.id in constants.SUPER_ADMINS:
+        self.redirect('/')
+      template_data = {}
+      if not constants.DEVELOPMENT or self.request.get('css') or self.request.get('prod'):
+        template_data['css_location'] = constants.STATS_CSS_SOURCE
+      template_data['js_location'] = constants.STATS_JS_SOURCE
+      path = os.path.join(os.path.dirname(__file__), 'templates/stats.html')
+      self.response.out.write(template.render(path, template_data))
+
 class NameStormHandler(BaseHandler):
     def get(self):
       data = {}
@@ -125,6 +149,7 @@ def create_handlers_map():
     ('/_twitter/callback', rpc.TwitterCallbackHandler),
 
     # Admin
+    ('/admin/_access', admin.AccessLevelHandler),
     ('/admin/_add/collection/(.*)', admin.AddToCollectionHandler),
     ('/admin/_channels', admin.ChannelsHandler),
     ('/admin/_channels/(.*)', admin.ChannelsHandler),
@@ -142,6 +167,8 @@ def create_handlers_map():
     ('/admin/_removepublisher/(.*)', admin.RemovePublisher),
     ('/admin/_posthumb', admin.PositionThumbHandler),
     ('/admin/_topicmedias/(.*)', admin.TopicMediaHandler),
+    ('/admin/_users/(.*)', admin.UsersHandler),
+    ('/admin/_users', admin.UsersHandler),
     ('/admin/init', admin.InitProgrammingHandler),
     ('/admin/storysort', admin.StorySortHandler),
     ('/admin/setprogramming', admin.SetProgrammingHandler),
@@ -158,6 +185,8 @@ def create_handlers_map():
     
     # Pages
     ('/', MainHandler),
+    ('/admin', AdminHandler),
+    ('/stats', StatsHandler),
     ('/namestorm', NameStormHandler),
     ('/namestorm/(syl)', NameStormHandler),
     ('/namestorm/(sug)', NameStormHandler)

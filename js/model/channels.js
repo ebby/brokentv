@@ -130,6 +130,7 @@ brkn.model.Channels.prototype.changeChannel = function(channel, opt_forced) {
     this.currentChannel = channel;
     goog.net.XhrIo.send('/_changechannel', goog.functions.NULL(), 'POST',
         'channel=' + channel.id + (opt_forced ? '&forced=1' : ''));
+    brkn.model.Analytics.getInstance().changeChannel(channel, this.lastChannel);
   }
 };
 

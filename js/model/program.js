@@ -25,20 +25,20 @@ brkn.model.Program = function(opt_program, opt_media) {
 	 * @type {string}
 	 * @private
 	 */
-	this.id = program ? program.id : media.id;
+	this.id = program ? program['id'] : media.id;
 	
 	/**
 	 * @type {?brkn.model.Media}
 	 * @private
 	 */
-	this.media = program ? new brkn.model.Media(program.media) : media;
+	this.media = program ? new brkn.model.Media(program['media']) : media;
 	brkn.model.Medias.getInstance().add(this.media);
 
 	/**
 	 * @type {?goog.date.DateTime}
 	 * @private
 	 */
-	this.time = program ? goog.date.fromIsoString(program.time + 'Z') :
+	this.time = program ? goog.date.fromIsoString(program['time'] + 'Z') :
 	    new goog.date.DateTime();
 };
 goog.inherits(brkn.model.Program, goog.pubsub.PubSub);

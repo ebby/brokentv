@@ -24,6 +24,10 @@ brkn.model.Player = function() {
    * @private
    */
   this.currentProgram_;
+
+  this.subscribe(brkn.model.Player.Actions.PLAY_ASYNC, function(media) {
+    brkn.model.Analytics.getInstance().playAsync(media);
+  }, this);
 };
 goog.inherits(brkn.model.Player, goog.pubsub.PubSub);
 goog.addSingletonGetter(brkn.model.Player);

@@ -6,6 +6,9 @@ class User(db.Model):
     access_level = db.IntegerProperty(default=AccessLevel.WAITLIST)
     created = db.DateTimeProperty(auto_now_add=True)
     updated = db.DateTimeProperty(auto_now=True)
+    last_login = db.DateTimeProperty()
+    session_count = db.IntegerProperty(default=0)
+    ave_session = db.FloatProperty(default=0.0)
     name = db.StringProperty(required=True)
     profile_url = db.StringProperty()
     email = db.StringProperty()
@@ -31,11 +34,15 @@ class User(db.Model):
     def get_by_twitter_id(cls, id):
       return User.all().filter('twitter_id =', id).get()
 
-    def toJson(self):
+    def toJson(self, admin=False):
       json = {}
       json['id'] = self.id
       json['name'] = self.name
       json['profile_url'] = self.profile_url
       json['location'] = self.location
       json['access_level'] = self.access_level
+      if admin:
+        json['last_login'] = self.last_login.isoformat() if self.last_login else None
+        json['session_count'] = self.session_count if self.session_count else 0
+        json['ave_session'] = self.ave_session if self.ave_session else 0
       return json

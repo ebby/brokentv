@@ -1,3 +1,4 @@
+@import "functions.less";
 @import "buttons.less";
 @import "controller.less";
 @import "guide.less";
@@ -8,47 +9,8 @@
 @import "drag.less";
 @import "info.less";
 @import "stream.less";
-@import "admin.less";
+@import "main-admin.less";
 @import "profile.less";
-
-.noselect () {
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
-
-.animation (...) {
-  animation: @arguments;
-  -moz-animation: @arguments; /* Firefox */
-  -webkit-animation: @arguments; /* Safari and Chrome */
-  -o-animation: @arguments; /* Opera */
-}
-
-.transition (...) {
-  -webkit-transition: @arguments;
-     -moz-transition: @arguments;
-       -o-transition: @arguments;
-      -ms-transition: @arguments;
-          transition: @arguments;
-}
-
-.transform (...) {
-  transform:@arguments;
-  -ms-transform:@arguments;
-  -moz-transform:@arguments;
-  -webkit-transform:@arguments;
-  -o-transform:@arguments;
-}
-
-.alternate () {
-  animation-direction:alternate;
-  -moz-animation-direction:alternate; /* Firefox */
-  -webkit-animation-direction:alternate; /* Safari and Chrome */
-  -o-animation-direction:alternate; /* Opera */
-}
 
 @font-face {
   font-family: 'MuseoSans100';

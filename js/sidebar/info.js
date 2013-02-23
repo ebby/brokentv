@@ -347,6 +347,8 @@ brkn.sidebar.Info.prototype.onAddComment_ = function(e) {
       'description': this.media_.description
     }, function(response) {});
   }
+  
+  brkn.model.Analytics.getInstance().comment(this.media_.id, e.facebook, e.twitter);
 };
 
 
@@ -415,15 +417,17 @@ brkn.sidebar.Info.prototype.onFacebookButton_ = function() {
       {
         method: 'feed',
         name: this.media_.name,
-        link: 'http://www.broken.tv',
+        link: 'http://www.xylovision.com',
         picture: this.media_.thumbnail,
-        caption: 'on Broken.TV',
+        caption: 'on XYLO',
         description: this.media_.description
       },
       function(response) {
         goog.style.showElement(goog.dom.getElement('overlay'), false);
       }
     );
+  
+  brkn.model.Analytics.getInstance().share(this.media_.id, true, false);
 };
 
 
@@ -431,11 +435,13 @@ brkn.sidebar.Info.prototype.onFacebookButton_ = function() {
  * @private
  */
 brkn.sidebar.Info.prototype.onTwitterButton_ = function() {
-  var url = 'https://twitter.com/share?url=www.broken.tv&text=I\'m watching ' + this.media_.name;
-  var newWindow = window.open(url,'Tweet','height=300,width=550');
+  var url = 'https://twitter.com/share?url=www.xylovision.com&text=I\'m watching ' + this.media_.name;
+  var newWindow = window.open(url,'Tweet','height=320,width=550');
   newWindow.moveTo(screen.width/2-225,
       screen.height/2-150)
   newWindow.focus();
+
+  brkn.model.Analytics.getInstance().share(this.media_.id, false, true);
 };
 
 

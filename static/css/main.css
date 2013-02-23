@@ -2015,6 +2015,7 @@ div#sidebar div.list-media div.media div.preview div.title {
   line-height: 20px;
   position: absolute;
   overflow: hidden;
+  margin-right: 10px;
   font-family: MuseoSans300;
 }
 div#sidebar div.list-media div.media div.preview div.title.marquee {
@@ -2119,8 +2120,8 @@ div#sidebar div.list-media div.duration {
 div#login {
   width: 100%;
   height: 100%;
-  background: #181818 url(/static/img/homepage-upper.jpg);
-  background-position: center;
+  background: #181818 url(/static/img/homepage-4.jpg);
+  background-position: center -50px;
   background-size: cover;
   position: absolute;
   z-index: 10000;
@@ -2861,6 +2862,7 @@ div#sidebar div.info div.comments-holder div.comment div.timestamp {
   font-size: 10px;
 }
 div#sidebar div.stream {
+  overflow-x: hidden;
   overflow-y: scroll !important;
   padding-top: 10px;
   width: 100%;
@@ -2901,8 +2903,8 @@ div#sidebar div.stream div.activity.show {
   opacity: 1;
 }
 div#sidebar div.stream div.activity.digest.comment div.text {
-  margin-bottom: 0;
-  padding-bottom: 0;
+  margin-bottom: 8px;
+  padding-bottom: 0px;
 }
 div#sidebar div.stream div.activity.digest div.text {
   left: 10px;
@@ -2927,10 +2929,11 @@ div#sidebar div.stream div.activity.digest div.comment {
 div#sidebar div.stream div.activity.digest div.comment div.text {
   left: 50px;
   margin-bottom: 10px;
-  padding-bottom: 10px;
+  padding-bottom: 15px;
+  width: 240px;
 }
 div#sidebar div.stream div.activity.digest div.medias {
-  margin-top: 3px;
+  margin-top: 13px;
 }
 div#sidebar div.stream div.activity div.picture {
   position: absolute;
@@ -2954,7 +2957,7 @@ div#sidebar div.stream div.activity div.text {
   left: 50px;
   top: 0px;
   min-height: 20px;
-  width: 240px;
+  width: 280px;
   padding-bottom: 13px;
   font-family: MuseoSans500;
 }
@@ -3087,7 +3090,7 @@ div#sidebar div#sidebar-content div.admin div.channel:hover div.controls div.pro
 div#sidebar div#sidebar-content div.admin div.channel:hover div.controls div.remove {
   display: inline-block;
 }
-div#sidebar div#sidebar-content div.admin div.channel:hover div.channel.on div.on,
+div#sidebar div#sidebar-content div.admin div.channel.on div.on,
 div#sidebar div#sidebar-content div.admin div.channel.off div.off {
   pointer-events: none;
   background-color: #111;

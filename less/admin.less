@@ -1,236 +1,192 @@
-div#sidebar div#sidebar-content div.admin {
-  margin-top: -2px;
-  display: none;
-  overflow-y: scroll;
-  div.search {
-    background: rgba(245, 245, 245, 0.6);
-    width: 100%;
-    height: 35px;
-    border-bottom: 1px solid rgba(112, 108, 108, 0.7);
-    input[type=text] {
-      height: auto;
-      border-radius: 3px;
-      width: 280px;
-      font-size: 13px;
-      min-height: 16px;
-      outline: none;
-      border: 1px solid #CCC;
-      resize: none;
-      margin-left: 8px;
-      margin-top: 7px;
-      margin-bottom: 5px;
-    }
+@import "functions.less";
+@import "buttons.less";
+
+@font-face {
+  font-family: 'MuseoSans100';
+  src: url('/static/webfonts/museosans/100.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'MuseoSans300';
+  src: url('/static/webfonts/museosans/300.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'MuseoSans500';
+  src: url('/static/webfonts/museosans/500.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'MuseoSans700';
+  src: url('/static/webfonts/museosans/700.woff') format('woff');
+}
+
+html, body {
+  background: #f5f5f5 url(/static/img/content-texture.png);
+  margin: 0;
+  font-family: MuseoSans300;
+  font-size: 12px;
+}
+
+body {
+  overflow: hidden;
+}
+
+a {
+  text-decoration: none;
+  font-family: MuseoSans300;
+  font-size: 12px;
+  color: white;
+  text-shadow: 1px 1px 1px #181818;
+  &:hover {
+    text-decoration: underline;
   }
-  div.section {
-    position: relative;
+}
+
+div#header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 40px;
+  background: #5c5c5c url(/static/img/grad.png);
+  .box-shadow(e('inset 0 -3px 7px -3px rgba(0,0,0,0.2), 0 0 5px 0 rgba(0, 0, 0, .5)'));
+  div.logo {
+    font-family: MuseoSans700;
+    font-size: 16px;
+    color: #f5f5f5;
     margin: 10px;
-    div.label {
-      font-size: 10px;
-      color: #181818;
-      margin-bottom: 7px;
-      text-shadow: 1px 1px 1px white;
-      font-family: MuseoSans700;
-    }
-  }
-  div.playlists {
-    div.playlist {
-      position: relative;
-      width: 99%;
-      background: rgba(0, 0, 0, 0.65);
-      border: 1px solid #333;
-      overflow: hidden;
-      box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.8),
-          0 3px 1px -1px rgba(255, 255, 255, 0.6);
-      cursor: pointer;
-      font-family: MuseoSans500;
-      &:first-child {
-        border-top-left-radius: 3px;
-        border-top-right-radius: 3px;
-      }
-      &:last-child {
-        border-bottom-left-radius: 3px;
-        border-bottom-right-radius: 3px;
-        box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.8);
-      }
-      div.title {
-        position: relative;
-        left: 5px;
-        top: 5px;
-        font-size: 13px;
-        width: 240px;
-        color: white;
-        line-height: 27px;
-        height: 36px;
-      } 
-    }
-  }
-  div.controls {
-    position: absolute;
-    right: 4px;
-    top: 4px;
-    div.button {
-      border-radius: 0;
-      margin-left: -1px;
-      width: 30px;
-      height: 20px;
-      font-size: 11px;
-      line-height: 20px;
-      border-color: #181818;
-      background-repeat: no-repeat;
-      background-position: center;
-    }
-    >div:last-child {
-      border-top-right-radius: 3px;
-      border-bottom-right-radius: 3px;
-      -webkit-border-top-right-radius: 3px;
-      -webkit-border-bottom-right-radius: 3px;
-    }
-    >div:first-child {
-      border-top-left-radius: 3px;
-      border-bottom-left-radius: 3px;
-      -webkit-border-top-left-radius: 3px;
-      -webkit-border-bottom-left-radius: 3px;
-    }
-    div.pending {
-      width: 25px;
-      height: 20px;
-      background: red;
-      color: white;
-      font-size: 11px;
-      text-align: center;
-      line-height: 20px;
-      border: 1px solid #460000;
-      display: inline-block;
-      padding: 3px 0;
-    }
-    div.fetch, div.program {
-      display: none;
-      width: 45px;
-    }
-  }
-  div.channel div.controls div.remove {
-    display: none;
-  }
-  div.channel:hover div.controls {
-    div.fetch, div.program, div.remove {
-      display: inline-block;
-    }
-  }
-  div.channel:hover
-  div.channel.on div.on, div.channel.off div.off {
-    pointer-events: none;
-    background-color: #111;
-    box-shadow: inset 0 0 1px 1px #000;
-    color: #ddd;
-    cursor: default;
-  }
-  div.collections, div.admin-channels, div.topics {
-    div.collection, div.channel, div.topic {
-      position: relative;
-      width: 99%;
-      background: rgba(0, 0, 0, 0.65);
-      border: 1px solid #333;
-      overflow: hidden;
-      box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.8),
-          0 3px 1px -1px rgba(255, 255, 255, 0.6);
-      cursor: pointer;
-      font-family: MuseoSans500;
-      &:first-child {
-        border-top-left-radius: 3px;
-        border-top-right-radius: 3px;
-      }
-      &:last-child {
-        border-bottom-left-radius: 3px;
-        border-bottom-right-radius: 3px;
-        box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.8);
-      }
-      div.title {
-        position: relative;
-        left: 5px;
-        top: 5px;
-        font-size: 13px;
-        width: 240px;
-        color: white;
-        line-height: 27px;
-        height: 36px;
-      }
+    text-shadow: 1px 1px 1px #181818;
+    span {
+      font-family: MuseoSans100;
     }
   }
 }
-div#sidebar div#admin-list {
-  overflow-y: scroll !important;
-  
-  div.tabbed {
-    div.content {
-      margin: 10px;
-    }
-    &.pending {
-      div.pending {
-        display: block;
-      }
-      ul.tabs li.pending {
-        background: rgba(245, 245, 245, 0.6);
-      }
-    }
-    &.all {
-      div.all {
-        display: block;
-      }
-      ul.tabs li.all {
-        background: rgba(245, 245, 245, 0.6);
-      }
-    }
-    &.playlists {
-      div.playlists {
-        display: block;
-      }
-      ul.tabs li.playlists {
-        background: rgba(245, 245, 245, 0.6);
-      }
+
+div#content {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow-y: scroll;
+}
+
+div.users {
+  margin: 10px auto;
+  margin-top: 50px;
+  width: 900px;
+  div.header {
+    font-size: 11px;
+    position: relative;
+    height: 45px;
+    margin-left: 10px;
+    .pic, .access {
+      top: 18px;
     }
   }
-  div.spinner {
-    width: 100%;
-    height: 43px;
-    text-align: center;
-    background: rgba(0, 0, 0, 0.6);
-    line-height: 40px;
+  div.user-list {
+    box-shadow: inset 0 0 2px 1px rgba(0, 0, 0, .3);
+    margin: 0 10px;
+    border-radius: 3px;
+  }
+  div.user {
+    background: rgba(0, 0, 0, .5);
+    border-bottom: 1px solid rgba(0, 0, 0, .3);
+    height: 50px;
+    position: relative;
+    color: white;
+    text-shadow: 1px 1px 1px #181818;
+    &:last-child {
+      border-bottom-right-radius: 3px;
+      border-bottom-left-radius: 3px;
+      -webkit-border-bottom-right-radius: 3px;
+      -webkit-border-bottom-left-radius: 3px;
+      border-bottom: none;
+    }
+    &:first-child {
+      border-top-left-radius: 3px;
+      border-top-right-radius: 3px;
+      -webkit-border-top-left-radius: 3px;
+      -webkit-border-top-right-radius: 3px;
+    }
+  }
+  .pic {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    img {
+      width: 40px;
+      height: 40px;
+      border-radius: 3px;
+      box-shadow: 0 0 1px 1px rgba(0, 0, 0, .4);
+    }
+  }
+  .name {
+    position: absolute;
+    top: 18px;
+    left: 55px;
+    width: 150px;
     overflow: hidden;
-    .transition(height, .3s, linear);
-    &.finished {
-      height: 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .access {
+    position: absolute;
+    left: 210px;
+    top: 11px;
+  }
+  .location {
+    position: absolute;
+    left: 390px;
+    top: 18px;
+  }
+  .last-login {
+    position: absolute;
+    left: 550px;
+    top: 18px;
+  }
+  .session-count {
+    position: absolute;
+    left: 700px;
+    top: 18px;
+  }
+  .ave-session {
+    position: absolute;
+    left: 800px;
+    top: 18px;
+  }
+}
+
+div.controls {
+  display: inline-block;
+  div.button {
+    border-radius: 0;
+    margin-left: -1px;
+    width: 50px;
+    height: 20px;
+    font-size: 11px;
+    line-height: 20px;
+    border-color: #181818;
+    background: rgba(0, 0, 0, .4);
+    &.selected {
+      pointer-events: none;
+      background-color: #111;
+      box-shadow: inset 0 0 1px 1px #000;
+      color: #ddd;
+      cursor: default;
     }
   }
-  div.list-info {
-    margin: 10px;
-    display: table;
-    table-layout: fixed;
-    border-collapse: collapse;
-    width: 280px;
-  
-    > div {
-      display: none;
-      vertical-align: top;
-    }
-    div.picture{
-      width: 60px;
-      img {
-        width: 60px;
-        height: 60px;
-        box-shadow: 0 0 2px 1px rgba(255, 255, 255, .3), 0 0 1px 2px rgba(0, 0, 0, 0.7);
-        border-radius: 3px;
-      }
-    }
-    div.description {
-      font-size: 12px;
-      padding-left: 10px;
-    }
+  >div:last-child {
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+    -webkit-border-top-right-radius: 3px;
+    -webkit-border-bottom-right-radius: 3px;
   }
-  div.list-media {
-    div.media div.preview div.title {
-      margin-right: 60px;
-      height: 30px;
-      line-height: 14px;
-    }
+  >div:first-child {
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+    -webkit-border-top-left-radius: 3px;
+    -webkit-border-bottom-left-radius: 3px;
   }
 }

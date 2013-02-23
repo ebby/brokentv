@@ -1,5 +1,6 @@
 goog.provide('brkn.model.User');
 
+goog.require('goog.date');
 goog.require('goog.pubsub.PubSub');
 
 
@@ -23,6 +24,16 @@ brkn.model.User = function(user) {
 	 */
 	this.name = user['name'];
 	
+	/**
+   * @type {string}
+   */
+  this.url = user['profile_url'];
+  
+  /**
+   * @type {string}
+   */
+  this.location = user['location'] || '';
+
 	/**
    * @type {brkn.model.Session}
    */
@@ -48,7 +59,22 @@ brkn.model.User = function(user) {
    * @type {Array.<Object>}
    * @private
    */
-  this.activities = []
+  this.activities = [];
+
+  /**
+   * @type {?goog.date.DateTime}
+   */
+  this.lastLogin = user['last_login'] ? goog.date.fromIsoString(user['last_login'] + 'Z') : null;
+
+  /**
+   * @type {number}
+   */
+  this.sessionCount = user['session_count'];
+  
+  /**
+   * @type {number}
+   */
+  this.aveSession = user['ave_session'];
 };
 goog.inherits(brkn.model.User, goog.pubsub.PubSub);
 
@@ -70,6 +96,20 @@ brkn.model.User.prototype.getActivities = function() {
     return aTime.getTime() <= bTime.getTime() ? 1 : -1;
   });
   return this.activities;
+};
+
+
+/**
+ * @param {?boolean=} opt_time Show the time 
+ * @return {string} Last login date as a readable string
+ */
+brkn.model.User.prototype.getLastLogin = function (opt_time) {
+  if (!this.lastLogin) {
+    return 'Never';
+  }
+  var date = (this.lastLogin.getMonth() + 1) + '/' + this.lastLogin.getDate() + '/' +
+      this.lastLogin.getYear();
+  return opt_time ? date + ' ' + this.lastLogin.toUsTimeString() : date
 };
 
 

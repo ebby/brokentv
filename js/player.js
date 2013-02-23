@@ -315,12 +315,7 @@ brkn.Player.prototype.playerStateChange_ = function(event) {
       brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.PLAYING);
       break;
     case YT.PlayerState.ENDED:
-  	  goog.net.XhrIo.send(
-  	      '/_seen',
-  	      goog.functions.NULL(),
-  	      'POST',
-  	      'media_id=' + this.currentProgram_.media.id +
-  	      '&session_id=' + brkn.model.Users.getInstance().currentUser.currentSession.id);
+  	  brkn.model.Users.getInstance().currentUser.currentSession.seen(this.currentProgram_.media);
   	  
   	  var nextProgram = brkn.model.Channels.getInstance().currentChannel.getCurrentProgram();
   	  if (nextProgram) {

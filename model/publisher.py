@@ -1,6 +1,7 @@
 from common import *
 
 from media import Media
+from user import User
 
 class Publisher(db.Model):
   YOUTUBE_USER = 'https://gdata.youtube.com/feeds/api/users/%s/uploads?alt=json'
@@ -85,11 +86,11 @@ class Publisher(db.Model):
           PublisherMedia.add(publisher=self, media=media)
         next_page_token = search_response.get('tokenPagination', {}).get('nextPageToken')
 
-#      if len(medias):
-#        email = email.Email(email.Message.FETCH)
-#        for uid in constants.SUPER_ADMINS:
-#          user = User.get_by_key_name(uid)
-#          email.send([user.email])
+      if len(medias):
+        msg = emailer.Email(emailer.Message.FETCH, data={'count': len(medias)})
+        for uid in constants.SUPER_ADMINS:
+          user = User.get_by_key_name(uid)
+          msg.send(user)
       self.last_fetch = datetime.datetime.now()
       self.put()
 

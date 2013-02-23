@@ -32,5 +32,6 @@ inbound_services:
 
 builtins:
 - deferred: on
+- appstats: on
 
   

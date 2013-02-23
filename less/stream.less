@@ -1,4 +1,5 @@
 div#sidebar div.stream {
+  overflow-x: hidden;
   overflow-y: scroll !important;
   padding-top: 10px;
   width: 100%;
@@ -30,8 +31,8 @@ div#sidebar div.stream {
     }
     &.digest {
       &.comment div.text {
-        margin-bottom: 0;
-        padding-bottom: 0;
+        margin-bottom: 8px;
+        padding-bottom: 0px;
       }
       div.text {
         left: 10px;
@@ -55,11 +56,12 @@ div#sidebar div.stream {
         div.text {
           left: 50px;
           margin-bottom: 10px;
-          padding-bottom: 10px;
+          padding-bottom: 15px;
+          width: 240px;
         }
       }
       div.medias {
-        margin-top: 3px; 
+        margin-top: 13px; 
       }
     }
     div.picture {
@@ -84,7 +86,7 @@ div#sidebar div.stream {
       left: 50px;
       top: 0px;
       min-height: 20px;
-      width: 240px;
+      width: 280px;
       padding-bottom: 13px;
       font-family: MuseoSans500;
       a {

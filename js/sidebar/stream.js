@@ -51,6 +51,11 @@ brkn.sidebar.Stream = function(activities, opt_uid) {
   /**
    * @type {Object}
    */
+  this.fetched_ = [];
+  
+  /**
+   * @type {Object}
+   */
   this.channelDigest_ = [];
   
   /**
@@ -91,20 +96,15 @@ brkn.sidebar.Stream.prototype.decorateInternal = function(el) {
   goog.dom.appendChild(this.getElement(), spinner);
   goog.style.showElement(spinner, false);
   
-  if (this.uid_) {
-    goog.array.forEach(this.activities_, function(activity) {
-      this.count_++;
-      this.addActivity_(activity);
-    }, this);
-    brkn.model.Users.getInstance().subscribe(brkn.model.Users.Action.NEW_ACTIVITY, function(activity) {
-      if (this.uid_ == activity['user']['id'] ||
-          (!this.uid_ && activity['user']['id'] != brkn.model.Users.getInstance().currentUser.id)) {
-        this.addActivity_(activity, undefined, undefined, true);
-      }
-    }, this);
-  } else {
-    this.digest_(this.activities_);
-  }
+
+  this.digest_(this.activities_);
+  
+  brkn.model.Users.getInstance().subscribe(brkn.model.Users.Action.NEW_ACTIVITY, function(activity) {
+    if (this.uid_ == activity['user']['id'] ||
+        (!this.uid_ && activity['user']['id'] != brkn.model.Users.getInstance().currentUser.id)) {
+      this.addActivity_(activity, undefined, undefined, true);
+    }
+  }, this);
   
   this.getHandler()
       .listen(this.getElement(), goog.events.EventType.SCROLL, goog.bind(function(e) {
@@ -114,18 +114,16 @@ brkn.sidebar.Stream.prototype.decorateInternal = function(el) {
           goog.net.XhrIo.send(
               '/_activity' + (this.uid_ ? '/' + this.uid_ : '') + '?offset=' + this.count_,
               goog.bind(function(e) {
+                if (this.fetched_[e.target.getLastUri()]) {
+                  // Prevents multiple responses, which happens for some reason unknown.
+                  return;
+                }
+                this.fetched_[e.target.getLastUri()] = true;
                 var activities = /** @type {Array.<Object>} */ e.target.getResponseJson();
                 this.finished_ = !activities.length;
                 goog.dom.classes.enable(spinner, 'finished', this.finished_);
                 goog.style.showElement(spinner, this.finished_);
-                if (this.uid_) {
-                  goog.array.forEach(activities, function(activity) {
-                    this.addActivity_(activity);
-                    this.count_++;
-                  }, this);
-                } else {
-                  this.digest_(activities);
-                }
+                this.digest_(activities);
               }, this));
         }
       }, this))
@@ -141,7 +139,7 @@ brkn.sidebar.Stream.prototype.decorateInternal = function(el) {
 brkn.sidebar.Stream.prototype.digest_ = function(activities) {
   this.channelDigest_ = [];
   this.mediaDigest_ = [];
-  goog.array.forEach(this.activities_, function(activity) {
+  goog.array.forEach(activities, function(activity) {
     this.count_++;
     // Group sessions by channel and comments by media
     switch(activity['type']) {
@@ -153,9 +151,9 @@ brkn.sidebar.Stream.prototype.digest_ = function(activities) {
         break;
       case 'comment':
         var comment = activity['comment']
-        var comments = goog.object.get(this.mediaDigest_, comment['media'], []);
+        var comments = goog.object.get(this.mediaDigest_, comment['media']['id'], []);
         comments.push(comment);
-        this.mediaDigest_[comment['media']] = comments;
+        this.mediaDigest_[comment['media']['id']] = comments;
         break;
     };
   }, this);
@@ -230,7 +228,8 @@ brkn.sidebar.Stream.prototype.addActivity_ = function(opt_activity, opt_digest, 
       }
       activityEl = soy.renderAsElement(brkn.sidebar.commentActivity, {
         comments: comments.reverse(),
-        users: users
+        users: users,
+        media: medias[0]
       });
       break
     default:
@@ -246,15 +245,30 @@ brkn.sidebar.Stream.prototype.addActivity_ = function(opt_activity, opt_digest, 
     'element': activityEl
   }, insertAt);
 
-//  this.getHandler()
-//    .listen(goog.dom.getElementByClass('user', activityEl),
-//        goog.events.EventType.CLICK, function() {
-//          brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.PROFILE, user)
-//    })
-//    .listen(goog.dom.getElementByClass('picture', activityEl),
-//        goog.events.EventType.CLICK, function() {
-//          brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.PROFILE, user)
-//        });
+  this.getHandler().listen(activityEl, goog.events.EventType.CLICK, function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    var a = goog.dom.getAncestorByTagNameAndClass(e.target, 'a')
+    var href = a ? a.href : null;
+    if (href) {
+      var matches = href.match('#(.*):(.*)');
+      switch(matches[1]) {
+        case 'user':
+          var user = brkn.model.Users.getInstance().get(matches[2]);
+          brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.PROFILE, user);
+          break;
+        case 'channel':
+          var channel = brkn.model.Channels.getInstance().get(matches[2]);
+          brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.CHANGE_CHANNEL,
+              channel);
+          break;
+        case 'info':
+          var media = brkn.model.Medias.getInstance().get(matches[2]);
+          brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.MEDIA_INFO, media);
+          break;
+      }
+    }
+  });
 
   var mediasEl = goog.dom.getElementByClass('medias', activityEl);
   goog.array.forEach(medias, function(m) {
@@ -270,8 +284,10 @@ brkn.sidebar.Stream.prototype.addActivity_ = function(opt_activity, opt_digest, 
 
   if (opt_insertTop) {
     goog.dom.insertChildAt(this.activitiesEl_, (/** @type {Node} */ activityEl), 0);
-  } else {
+  } else if (digest) {
     goog.dom.insertChildAt(this.activitiesEl_, (/** @type {Node} */ activityEl), insertAt);
+  } else {
+    goog.dom.appendChild(this.activitiesEl_, (/** @type {Node} */ activityEl));
   }
   goog.Timer.callOnce(goog.partial(goog.dom.classes.add, activityEl, 'show'));
 };

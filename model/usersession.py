@@ -33,8 +33,14 @@ class UserSession(db.Model):
     self.tune_out = datetime.datetime.now()
     self.put()
     
+    # Update some user stats
+    tally = self.user.ave_session * self.user.session_count
+    self.user.session_count += 1
+    self.user.ave_session = float((tally + (self.tune_out - self.tune_in).seconds) / self.user.session_count)
+    self.user.put()
+    
     # Track user activity
-    if self.sessionMedias.get():
+    if self.sessionMedias.get() and self.channel.privacy != Privacy.PRIVATE:
       from useractivity import UserActivity
       broadcast.broadcastNewActivity(UserActivity.add_session(self.user, self))
 
