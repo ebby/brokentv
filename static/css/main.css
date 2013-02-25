@@ -2145,29 +2145,18 @@ div#sidebar div.list-media div.duration {
 }
 div#sidebar div.tweet-holder {
   position: relative;
-  top: 20px;
   width: 300px;
 }
 div#sidebar div.tweet-holder div.label {
   margin-left: 10px;
 }
-div#sidebar div.tweet-holder div.tweets {
-  white-space: nowrap;
-  overflow: hidden;
-}
 div#sidebar div.tweet-holder div.tweet {
   position: relative;
-  width: 280px;
-  white-space: normal;
-  display: inline-block;
-  border-radius: 3px;
   background: rgba(0, 0, 0, 0.65);
   border: 1px solid #333;
-  margin: 0 9px;
   padding-bottom: 20px;
   overflow: hidden;
   box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.8);
-  vertical-align: middle;
 }
 div#sidebar div.tweet-holder div.tweet img {
   width: 28px;
@@ -2183,7 +2172,7 @@ div#sidebar div.tweet-holder div.tweet div.text {
   top: 3px;
   font-size: 13px;
   line-height: 16px;
-  width: 240px;
+  width: 230px;
 }
 div#sidebar div.tweet-holder div.tweet div.text a {
   color: #f5f5f5;
@@ -2221,43 +2210,35 @@ div#sidebar div.comments-holder div.comments {
   -moz-transition: height .5s ease;
   transition: height .5s ease;
 }
-div#sidebar div.comments-holder div.no-comments {
-  background: rgba(255, 255, 255, 0.2);
-  border: 1px solid #919191;
-  box-shadow: inset 0 0 2px 0px rgba(0, 0, 0, 0.2);
-  border-radius: 3px;
-  font-size: 12px;
-  text-align: center;
-  color: #181818;
-  text-shadow: 1px 1px 1px white;
-  padding: 10px;
-  margin: 0 10px;
-  font-family: MuseoSans500;
-  cursor: pointer;
-}
 div#sidebar div.comments-holder.top-grad div.top-grad,
 div#sidebar div.comments-holder.bottom-grad div.bottom-grad {
   display: block;
 }
 div#sidebar div.comments-holder div.top-grad {
   display: none;
-  width: 283px;
+  width: 282px;
   height: 10px;
   position: absolute;
   top: 20px;
   background: url(/static/img/radial-grad.png) no-repeat center;
-  left: 8px;
-  border-top: 2px solid rgba(0, 0, 0, 0.4);
+  left: 9px;
+  border-top: 2px solid rgba(0, 0, 0, 0.6);
+  -webkit-box-shadow: 0 -3px 3px -1px rgba(0, 0, 0, 0.2);
+  -moz-box-shadow: 0 -3px 3px -1px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 -3px 3px -1px rgba(0, 0, 0, 0.2);
 }
 div#sidebar div.comments-holder div.bottom-grad {
   display: none;
-  width: 283px;
+  width: 282px;
   height: 10px;
   position: absolute;
   bottom: -1px;
   background: url(/static/img/radial-grad-up.png) no-repeat center;
-  left: 8px;
-  border-bottom: 2px solid rgba(0, 0, 0, 0.4);
+  left: 9px;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.6);
+  -webkit-box-shadow: 0 3px 3px -1px rgba(0, 0, 0, 0.2);
+  -moz-box-shadow: 0 3px 3px -1px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 3px 3px -1px rgba(0, 0, 0, 0.2);
 }
 div#sidebar div.comments-holder div.comment {
   position: relative;
@@ -2302,6 +2283,20 @@ div#sidebar div.comments-holder div.comment div.timestamp {
   bottom: 3px;
   right: 5px;
   font-size: 10px;
+}
+div#sidebar div.no-comments {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid #919191;
+  box-shadow: inset 0 0 2px 0px rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+  font-size: 12px;
+  text-align: center;
+  color: #181818;
+  text-shadow: 1px 1px 1px white;
+  padding: 10px;
+  margin: 0 10px;
+  font-family: MuseoSans500;
+  cursor: pointer;
 }
 div#login {
   width: 100%;
@@ -2926,8 +2921,21 @@ div#sidebar div.info div.viewers div.viewer img {
   margin-top: 2px;
   border-radius: 10px;
 }
-div#sidebar div.info div.comments-holder {
+div#sidebar div.info div.comments-holder,
+div#sidebar div.info div.tweet-holder {
   top: 20px;
+}
+div#sidebar div.info div.tweet-holder div.tweets {
+  white-space: nowrap;
+  overflow: hidden;
+}
+div#sidebar div.info div.tweet-holder div.tweet {
+  width: 280px;
+  display: inline-block;
+  border-radius: 3px;
+  vertical-align: middle;
+  margin: 0 9px;
+  white-space: normal;
 }
 div#sidebar div.stream {
   overflow-x: hidden;
@@ -3296,6 +3304,11 @@ div#sidebar div#admin-list div.list-media div.media div.preview div.title {
   height: 30px;
   line-height: 14px;
 }
+div#sidebar div#sidebar-content div.screen.profile div.no-comments,
+div#sidebar div#sidebar-content div.slide.profile div.no-comments {
+  margin-top: 10px;
+  cursor: default;
+}
 div#sidebar div#sidebar-content div.screen.profile div.content.starred,
 div#sidebar div#sidebar-content div.slide.profile div.content.starred {
   overflow-y: scroll;
@@ -3305,17 +3318,42 @@ div#sidebar div#sidebar-content div.slide.profile div.content.starred div.medias
   margin: 10px;
   padding-bottom: 10px;
 }
+div#sidebar div#conversation div.no-comments {
+  margin-top: 10px;
+}
 div#sidebar div#conversation div.comments-holder {
+  height: 100%;
   overflow-y: scroll;
   overflow-x: hidden;
 }
 div#sidebar div#conversation div.comments-holder div.comments {
-  overflow: auto;
+  overflow: hidden;
 }
 div#sidebar div#conversation div.tweet-holder {
-  padding: 10px 0;
+  height: 100%;
   overflow-y: scroll;
   overflow-x: hidden;
+}
+div#sidebar div#conversation div.tweet-holder div.tweets {
+  margin: 10px;
+  overflow-x: scroll;
+  -webkit-transition: height 0.5s ease;
+  -moz-transition: height 0.5s ease;
+  -o-transition: height 0.5s ease;
+  -ms-transition: height 0.5s ease;
+  transition: height 0.5s ease;
+}
+div#sidebar div#conversation div.tweet-holder div.tweet {
+  border-radius: 0;
+}
+div#sidebar div#conversation div.tweet-holder div.tweet:first-child {
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+div#sidebar div#conversation div.tweet-holder div.tweet:last-child {
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+  box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.8);
 }
 @font-face {
   font-family: 'MuseoSans100';

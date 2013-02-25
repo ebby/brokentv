@@ -390,7 +390,6 @@ brkn.Sidebar.prototype.navigate = function(to, opt_back, opt_title) {
  * @param {?boolean=} opt_twitter
  */
 brkn.Sidebar.prototype.showConversation = function(media, opt_comments, opt_tweets, opt_twitter) {
-  window.console.log('SHOW CONVO');
   var conversation = new brkn.sidebar.Conversation(media, opt_comments, opt_tweets, opt_twitter);
   conversation.decorate(this.conversationEl_);
   brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NAVIGATE,

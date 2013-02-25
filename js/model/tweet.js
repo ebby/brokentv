@@ -6,12 +6,19 @@ goog.provide('brkn.model.Tweet');
  * @constructor
  */
 brkn.model.Tweet = function(tweet) {
+  window.console.log(tweet);
   /**
    * @type {number}
    * @private
    */
   this.id = tweet['id'];
- 
+
+  /**
+   * @type {?brkn.model.User}
+   * @private
+   */
+  this.user = tweet['user'] && brkn.model.Users.getInstance().get_or_add(tweet['user']);
+
   /**
    * @type {string}
    * @private

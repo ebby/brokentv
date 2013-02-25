@@ -5,6 +5,7 @@
  * @param user
  * @param admin
  * @param guide
+ * @param sidebar
  */
 {template .main}
 <div class="main">
@@ -39,7 +40,9 @@
       <div id="go-live" class="go-live">GO LIVE</div>
     </div>
   </div>
-  <div id="controller" class="controller{if $guide}{sp}guide-toggled{/if}">
+  <div id="controller" class="controller
+      {if $guide}{sp}guide-toggled{else}{sp}collapsed{sp}window{/if}
+      {if $sidebar}{sp}sidebar-toggled{/if}">
     <div class="background"></div>
     <div class="left">
       <div id="guide-toggle" class="guide-toggle dark button">GUIDE</div>
@@ -66,7 +69,7 @@
       <div class="duration"></div>
     </div>
   </div>
-  <div id="sidebar">
+  <div id="sidebar" {if $sidebar}class="toggled"{/if}>
     <div id="toolbar">
       <div class="back">
         <div class="back-button"><div>BACK</div></div>

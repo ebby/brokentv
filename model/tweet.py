@@ -51,4 +51,5 @@ class Tweet(db.Model):
     json['handle'] = self.handle
     json['picture'] = self.picture_url
     json['time'] = self.time.isoformat()
+    json['user'] = self.user.toJson() if self.user else None
     return json

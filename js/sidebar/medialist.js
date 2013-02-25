@@ -98,17 +98,26 @@ goog.inherits(brkn.sidebar.MediaList, goog.ui.Component);
  */
 brkn.sidebar.MediaList.prototype.mediasEl_;
 
+
 /**
  * @type {Element}
  * @private
  */
 brkn.sidebar.MediaList.prototype.scrollable_;
 
+
 /**
  * @type {Element}
  * @private
  */
 brkn.sidebar.MediaList.prototype.spinner_;
+
+
+/**
+ * @type {Element}
+ * @private
+ */
+brkn.sidebar.MediaList.prototype.noActivitiesEl_;
 
 
 /** @inheritDoc */
@@ -133,6 +142,12 @@ brkn.sidebar.MediaList.prototype.decorateInternal = function(el) {
       goog.dom.createDom('div', 'loading-spinner'));
   goog.dom.appendChild(this.getElement(), this.spinner_);
   goog.style.showElement(this.spinner_, false);
+
+  if (goog.dom.classes.has(this.getElement(), 'starred')) {
+    this.noActivitiesEl_ = goog.dom.createDom('div', 'no-comments',
+        'Stories you love will be here.');
+    goog.dom.appendChild(this.getElement(), this.noActivitiesEl_);
+  }
 
   this.mediasEl_ = goog.dom.createDom('div', 'medias');
   goog.dom.appendChild(this.getElement(), this.mediasEl_);
@@ -167,6 +182,8 @@ brkn.sidebar.MediaList.prototype.decorateInternal = function(el) {
  * @private
  */
 brkn.sidebar.MediaList.prototype.addMedia = function(media) {
+  this.noActivitiesEl_ && goog.style.showElement(this.noActivitiesEl_, false);
+
   var mediaEl = soy.renderAsElement(brkn.sidebar.listMedia, {
     media: media
   });

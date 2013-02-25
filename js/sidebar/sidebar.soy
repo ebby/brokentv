@@ -33,7 +33,7 @@
       <div class="label">SEEN BY</div>
     </div>
     <div class="tweet-holder" style="display:none">
-      <div class="label">LATEST TWEETS</div>
+      <div class="label"><a class="tweets-link">LATEST TWEETS</a></div>
       <div class="tweets"></div>
       <div class="dot-nav"></div>
     </div>
@@ -64,7 +64,11 @@
  */
 {template .tweet}
   <div class="tweet">
-    <img src="{$tweet.picture}"/>
+    {if $tweet.user}
+      <a href="#user:{$tweet.user.id}"><img src="{$tweet.picture}"/></a>
+    {else}
+      <img src="{$tweet.picture}"/>
+    {/if}
     <div class="text">
       <a target="_blank" href="http://www.twitter.com/{$tweet.handle}/status/{$tweet.id}">
         {$tweet.handle}

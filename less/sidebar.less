@@ -694,28 +694,18 @@ div#sidebar {
   }
   div.tweet-holder {
     position: relative;
-    top: 20px;
     width: 300px;
     div.label {
       margin-left: 10px;
     }
-    div.tweets {
-      white-space: nowrap;
-      overflow: hidden;
-    }
     div.tweet {
       position: relative;
-      width: 280px;
-      white-space: normal;
-      display: inline-block;
-      border-radius: 3px;
       background: rgba(0, 0, 0, 0.65);
       border: 1px solid #333;
-      margin: 0 9px;
       padding-bottom: 20px;
       overflow: hidden;
       box-shadow: 0 0 2px 0px rgba(0, 0, 0, .8);
-      vertical-align: middle;
+      
       img {
         width: 28px;
         height: 28px;
@@ -733,7 +723,7 @@ div#sidebar {
         top: 3px;
         font-size: 13px;
         line-height: 16px;
-        width: 240px;
+        width: 230px;
       }
       div.timestamp {
         position: absolute;
@@ -769,42 +759,30 @@ div#sidebar {
          -moz-transition: height .5s ease;
               transition: height .5s ease;
     }
-    div.no-comments {
-      background: rgba(255,255,255,.2);
-      border: 1px solid #919191;
-      box-shadow: inset 0 0 2px 0px rgba(0, 0, 0, 0.2);
-      border-radius: 3px;
-      font-size: 12px;
-      text-align: center;
-      color: #181818;
-      text-shadow: 1px 1px 1px white;
-      padding: 10px;
-      margin: 0 10px;
-      font-family: MuseoSans500;
-      cursor: pointer;
-    }
     &.top-grad div.top-grad, &.bottom-grad div.bottom-grad {
       display: block;
     }
     div.top-grad {
       display: none;
-      width: 283px;
+      width: 282px;
       height: 10px;
       position: absolute;
       top: 20px;
       background: url(/static/img/radial-grad.png) no-repeat center;
-      left: 8px;
-      border-top: 2px solid rgba(0, 0, 0, 0.4);
+      left: 9px;
+      border-top: 2px solid rgba(0, 0, 0, 0.6);
+      .box-shadow(0, -3px, 3px, -1px, rgba(0, 0,0, .2));
     }
     div.bottom-grad {
       display: none;
-      width: 283px;
+      width: 282px;
       height: 10px;
       position: absolute;
       bottom: -1px;
       background: url(/static/img/radial-grad-up.png) no-repeat center;
-      left: 8px;
-      border-bottom: 2px solid rgba(0, 0, 0, 0.4);
+      left: 9px;
+      border-bottom: 2px solid rgba(0, 0, 0, 0.6);
+      .box-shadow(0, 3px, 3px, -1px, rgba(0, 0,0, .2));
     }
     div.comment {
       position: relative;
@@ -850,5 +828,19 @@ div#sidebar {
         font-size: 10px;
       }
     }
+  }
+  div.no-comments {
+    background: rgba(255,255,255,.2);
+    border: 1px solid #919191;
+    box-shadow: inset 0 0 2px 0px rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+    font-size: 12px;
+    text-align: center;
+    color: #181818;
+    text-shadow: 1px 1px 1px white;
+    padding: 10px;
+    margin: 0 10px;
+    font-family: MuseoSans500;
+    cursor: pointer;
   }
 }

@@ -669,7 +669,8 @@ brkn.Channel.prototype.update = function() {
             brkn.model.Player.getInstance().getProgress()*1000 - tuneInTime)/1000 *
             this.pixelsPerSecond_);
 			}
-			goog.style.setWidth(this.viewers_[session.user.id].lastChild, elapsed);
+			this.viewers_[session.user.id].lastChild &&
+			    goog.style.setWidth(this.viewers_[session.user.id].lastChild, elapsed);
 		}
 	}, this);
 	goog.style.getPosition(this.viewersEl_); // Refresh DOM

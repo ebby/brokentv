@@ -71,7 +71,8 @@ brkn.Main.prototype.decorateInternal = function(element) {
   var mainEl = soy.renderAsElement(brkn.main.main, {
     user: brkn.model.Users.getInstance().currentUser,
     admin: brkn.model.Users.getInstance().currentUser.isAdmin(),
-    guide: !brkn.model.Channels.getInstance().currentChannel.myChannel
+    guide: false, //!brkn.model.Channels.getInstance().currentChannel.myChannel
+    sidebar: true
   });
   goog.dom.insertChildAt(element, mainEl, 0);
 };
@@ -86,7 +87,6 @@ brkn.Main.prototype.enterDocument = function() {
   this.sidebar_.decorate(goog.dom.getElement('sidebar'));
   this.player_.decorate(goog.dom.getElement('stage'));
 
-  // this.popup_ = new brkn.Popup();
   
   // iPad
   this.getHandler().listen(document.body, 'touchmove', function(e) {
@@ -100,23 +100,25 @@ brkn.Main.prototype.enterDocument = function() {
     var a = goog.dom.getAncestorByTagNameAndClass(e.target, 'a')
     var href = a ? a.href : null;
     if (href) {
-      e.preventDefault();
-      e.stopPropagation();
       var matches = href.match('#(.*):(.*)');
-      switch(matches[1]) {
-        case 'user':
-          var user = brkn.model.Users.getInstance().get(matches[2]);
-          brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.PROFILE, user);
-          break;
-        case 'channel':
-          var channel = brkn.model.Channels.getInstance().get(matches[2]);
-          brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.CHANGE_CHANNEL,
-              channel);
-          break;
-        case 'info':
-          var media = brkn.model.Medias.getInstance().get(matches[2]);
-          brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.MEDIA_INFO, media);
-          break;
+      if (matches && matches.length) {
+        e.preventDefault();
+        e.stopPropagation();
+        switch(matches[1]) {
+          case 'user':
+            var user = brkn.model.Users.getInstance().get(matches[2]);
+            brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.PROFILE, user);
+            break;
+          case 'channel':
+            var channel = brkn.model.Channels.getInstance().get(matches[2]);
+            brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.CHANGE_CHANNEL,
+                channel);
+            break;
+          case 'info':
+            var media = brkn.model.Medias.getInstance().get(matches[2]);
+            brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.MEDIA_INFO, media);
+            break;
+        }
       }
     }
   });

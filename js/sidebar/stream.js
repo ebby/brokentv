@@ -80,6 +80,13 @@ goog.inherits(brkn.sidebar.Stream, goog.ui.Component);
 brkn.sidebar.Stream.prototype.activitiesEl_;
 
 
+/**
+ * @type {Element}
+ * @private
+ */
+brkn.sidebar.Stream.prototype.noActivitiesEl_;
+
+
 /** @inheritDoc */
 brkn.sidebar.Stream.prototype.decorateInternal = function(el) {
   goog.base(this, 'decorateInternal', el);
@@ -95,6 +102,10 @@ brkn.sidebar.Stream.prototype.decorateInternal = function(el) {
   var spinner = goog.dom.createDom('div', 'spinner');
   goog.dom.appendChild(this.getElement(), spinner);
   goog.style.showElement(spinner, false);
+  
+  this.noActivitiesEl_ = goog.dom.createDom('div', 'no-comments', this.uid_ ?
+      'Your activity will appear here.': 'Friends\'s activity will appear here.');
+  goog.dom.appendChild(this.getElement(), this.noActivitiesEl_);
   
 
   this.digest_(this.activities_);
@@ -179,6 +190,8 @@ brkn.sidebar.Stream.prototype.digest_ = function(activities) {
  */
 brkn.sidebar.Stream.prototype.addActivity_ = function(opt_activity, opt_digest, opt_type,
     opt_insertTop) {
+  goog.style.showElement(this.noActivitiesEl_, false);
+
   var activity = opt_activity || null;
   var digest = opt_digest || null;
   var type = activity ? activity['type'] : opt_type;

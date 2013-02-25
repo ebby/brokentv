@@ -221,7 +221,21 @@ div#sidebar div.info {
       }
     }
   }
-  div.comments-holder {
+  div.comments-holder, div.tweet-holder {
     top: 20px;
+  }
+  div.tweet-holder {
+    div.tweets {
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    div.tweet {
+      width: 280px;
+      display: inline-block;
+      border-radius: 3px;
+      vertical-align: middle;
+      margin: 0 9px;
+      white-space: normal;
+    }
   }
 }

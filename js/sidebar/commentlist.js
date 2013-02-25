@@ -74,27 +74,35 @@ brkn.sidebar.CommentList.prototype.scrollable_;
 brkn.sidebar.CommentList.prototype.spinner_;
 
 
+/**
+ * @type {Element}
+ * @private
+ */
+brkn.sidebar.CommentList.prototype.noCommentsEl_;
+
+
 /** @inheritDoc */
 brkn.sidebar.CommentList.prototype.decorateInternal = function(el) {
   goog.base(this, 'decorateInternal', el);
-
-  window.console.log(this.tweets_);
   
   el.innerHTML = '';
   el.scrollTop = 0;
   goog.dom.classes.add(this.getElement(), 'ios-scroll');
-  
+
   this.spinner_ = goog.dom.createDom('div', 'loading',
       goog.dom.createDom('div', 'loading-spinner'));
   goog.dom.appendChild(this.getElement(), this.spinner_);
   goog.style.showElement(this.spinner_, false);
 
+  this.noCommentsEl_ = goog.dom.createDom('div', 'no-comments', 'Start the conversation.');
+  goog.dom.appendChild(this.getElement(), this.noCommentsEl_);
+
   this.commentsEl_ = goog.dom.createDom('div', 'comments tweets');
   goog.dom.appendChild(this.getElement(), this.commentsEl_);
-  
-  this.getHandler().listen(window, 'resize',
-      goog.partial(goog.Timer.callOnce, goog.bind(this.resize, this)));
-  
+
+  this.getHandler()
+      .listen(window, 'resize', goog.partial(goog.Timer.callOnce, goog.bind(this.resize, this)));
+
   if (this.comments_.length) {
     goog.array.forEach(this.comments_, function(comment) {
       this.addComment_(comment);
@@ -147,6 +155,7 @@ brkn.sidebar.CommentList.prototype.decorateInternal = function(el) {
  * @private
  */
 brkn.sidebar.CommentList.prototype.addTweet_ = function(tweet, opt_first) {
+  goog.style.showElement(this.noCommentsEl_, false);
   var tweetEl = soy.renderAsElement(brkn.sidebar.tweet, {
     tweet: tweet,
     timestamp: goog.date.relative.format(tweet.time.getTime())
@@ -168,6 +177,7 @@ brkn.sidebar.CommentList.prototype.addTweet_ = function(tweet, opt_first) {
  * @private
  */
 brkn.sidebar.CommentList.prototype.addComment_ = function(comment) {
+  goog.style.showElement(this.noCommentsEl_, false);
   var commentEl = soy.renderAsElement(brkn.sidebar.comment, {
     comment: comment,
     timestamp: goog.date.relative.format(comment.time.getTime())
@@ -185,8 +195,8 @@ brkn.sidebar.CommentList.prototype.addComment_ = function(comment) {
  * @private
  */
 brkn.sidebar.CommentList.prototype.resize = function(opt_extra, opt_commentInput) {
-  var extra = (opt_commentInput ? 40 : 0) + (opt_extra || 0);
-  goog.style.setHeight(this.getElement(), goog.dom.getViewportSize().height - 84 - extra -
+  var extra = opt_extra || 0;
+  goog.style.setHeight(this.getElement(), goog.dom.getViewportSize().height - 55 - extra -
       (goog.dom.getAncestorByClass(this.getElement(), 'tabbed') ? 30 : 0));
 };
 

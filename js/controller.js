@@ -138,10 +138,11 @@ brkn.Controller.prototype.enterDocument = function() {
 
 	this.addChild(this.guideToggle_);
 	this.guideToggle_.decorate(goog.dom.getElement('guide-toggle'));
-	this.guideToggle_.setChecked(!brkn.model.Channels.getInstance().currentChannel.myChannel);
+	this.guideToggle_.setChecked(goog.dom.classes.has(this.getElement(), 'guide-toggled'));
 	
 	this.addChild(this.sidebarToggle_);
   this.sidebarToggle_.decorate(goog.dom.getElement('sidebar-toggle'));
+  this.sidebarToggle_.setChecked(goog.dom.classes.has(this.getElement(), 'sidebar-toggled'));
   
   this.addChild(this.restartButton_);
   this.restartButton_.decorate(goog.dom.getElementByClass('restart', this.getElement()));
@@ -224,6 +225,8 @@ brkn.Controller.prototype.enterDocument = function() {
 
   brkn.model.Player.getInstance().subscribe(brkn.model.Player.Actions.PLAY_ASYNC,
       this.setAsync_, this);
+  brkn.model.Player.getInstance().subscribe(brkn.model.Player.Actions.PLAYING,
+      this.resize, this);
   brkn.model.Channels.getInstance().subscribe(brkn.model.Channels.Actions.CHANGE_CHANNEL,
       function() {
         goog.dom.classes.remove(this.getElement(), 'window');
@@ -300,8 +303,9 @@ brkn.Controller.prototype.toggleGuide_ = function(show) {
 
 /**
  * Resize
+ * @param {?boolean=} opt_window
  */
-brkn.Controller.prototype.resize = function() {
+brkn.Controller.prototype.resize = function(opt_window) {
   goog.style.setWidth(this.getElement(), goog.dom.getViewportSize().width -
       (this.sidebarToggle_.isChecked() ? 300 : 0));
   
@@ -323,9 +327,9 @@ brkn.Controller.prototype.resize = function() {
       goog.style.setWidth(this.rightEl_, rightWidth);
     }
     goog.Timer.callOnce(goog.bind(function() {
-      goog.dom.classes.enable(this.getElement(), 'window',
-          goog.dom.classes.has(this.getElement(), 'collapsed') && !!lastProgram &&
-          width < goog.dom.getViewportSize().width - 203);
+      goog.dom.classes.enable(this.getElement(), 'window', opt_window || 
+          (goog.dom.classes.has(this.getElement(), 'collapsed') && !!lastProgram &&
+          width < goog.dom.getViewportSize().width - 203));
     }, this), 400);
   } else if (brkn.model.Player.getInstance().getCurrentProgram()) {
     goog.style.showElement(this.progressEl_, true);

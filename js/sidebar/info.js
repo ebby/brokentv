@@ -263,6 +263,14 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
           brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.CONVERSATION,
               this.media_, this.comments_, this.tweets_);
         }, this))
+      .listen(goog.dom.getElementByClass('tweets-link', this.getElement()),
+        goog.events.EventType.CLICK,
+        goog.bind(function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.CONVERSATION,
+              this.media_, this.comments_, this.tweets_, true);
+        }, this))
       .listen(this.commentInput_,
           goog.events.EventType.FOCUS,
           goog.bind(function(e) {
@@ -466,7 +474,7 @@ brkn.sidebar.Info.prototype.addComment_ = function(comment) {
  */
 brkn.sidebar.Info.prototype.resize = function(opt_extra) {
   var extra = opt_extra + 10 || 10;
-  if (this.commentsEl_) {
+  if (this.commentsEl_ && this.commentsEl_.parentElement) {
     goog.style.setStyle(this.commentsEl_, 'max-height', goog.dom.getViewportSize().height -
         goog.style.getPosition(this.commentsEl_.parentElement).y - 100 - extra + 'px');
   }

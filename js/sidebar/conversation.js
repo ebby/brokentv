@@ -117,7 +117,8 @@ brkn.sidebar.Conversation.prototype.enterDocument = function() {
       .listen(this.commentInput_,
           goog.events.EventType.FOCUS,
           goog.bind(function(e) {
-            this.resize(brkn.sidebar.CommentInput.COMMENT_CONTROLS_HEIGHT, true);
+            this.commentList_.resize(brkn.sidebar.CommentInput.COMMENT_CONTROLS_HEIGHT, true);
+            this.tweetList_.resize(brkn.sidebar.CommentInput.COMMENT_CONTROLS_HEIGHT, true);
           }, this))
       .listen(this.commentInput_,
           'resize',
@@ -136,9 +137,31 @@ brkn.sidebar.Conversation.prototype.enterDocument = function() {
               this.commentInput_.setFocused(false);
               this.commentInput_.collapse();
               goog.dom.classes.has(this.getElement().firstChild, 'comments') ?
-                  this.commentList_.resize(0, true) : this.tweetList_.resize(0, true);
+                  this.commentList_.resize(brkn.sidebar.CommentInput.INPUT_HEIGHT, true) :
+                  this.tweetList_.resize(brkn.sidebar.CommentInput.INPUT_HEIGHT, true);
+            }
+          }, this))
+      .listen(goog.dom.getElementByClass('no-comments', this.getElement()),
+          goog.events.EventType.CLICK,
+          goog.bind(function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.commentInput_.setFocused(true);
+          }, this))
+      .listen(window,
+          goog.events.EventType.CLICK,
+          goog.bind(function(e) {
+            if (!goog.dom.getAncestorByClass(e.target, 'comment-input') &&
+                !this.commentInput_.getValue()) {
+              this.commentInput_.setFocused(false);
+              if (this.commentInput_.collapse()) {
+                this.commentList_.resize(brkn.sidebar.CommentInput.INPUT_HEIGHT);
+                this.tweetList_.resize(brkn.sidebar.CommentInput.INPUT_HEIGHT);
+              }
             }
           }, this));
+  this.commentList_.resize(brkn.sidebar.CommentInput.INPUT_HEIGHT);
+  this.tweetList_.resize(brkn.sidebar.CommentInput.INPUT_HEIGHT);
 };
 
 

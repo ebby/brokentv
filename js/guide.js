@@ -225,7 +225,7 @@ brkn.Guide.prototype.enterDocument = function() {
         this.align_(false, undefined, true);
       }, this);
   
-  this.toggleGuide_(!brkn.model.Channels.getInstance().currentChannel.myChannel);
+  this.toggleGuide_(goog.dom.classes.has(this.getElement(), 'toggled'));
 
   // Set start time
   this.startTime_ = new goog.date.DateTime();
