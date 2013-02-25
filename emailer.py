@@ -12,14 +12,14 @@ class Email():
     self.sendgrid = sendgrid.Sendgrid('username', 'password', secure=True) if sendgrid else None
     
     path = os.path.join(os.path.dirname(__file__), 'templates/emails/' + message['template'])
-    body = template.render(path, data)
+    html = template.render(path, data)
 
     if self.sendgrid:
       # make a message object
-      self.message = sendgrid.Message("ebby@xylovision.com", message['subject'], body)
+      self.message = sendgrid.Message("ebby@xylovision.com", message['subject'], html)
     else:
       self.message = mail.EmailMessage(sender="XYLO <ebby@xylovision.com>",
-                                       subject=message['subject'], body=body)
+                                       subject=message['subject'], html=html)
 
 
   def send(self, recipient):

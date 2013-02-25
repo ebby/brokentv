@@ -69,7 +69,6 @@ class MainHandler(BaseHandler):
 
 class AdminHandler(BaseHandler):
     def get(self):
-      logging.info(self.current_user.id in constants.SUPER_ADMINS)
       if not self.current_user.id in constants.SUPER_ADMINS:
         self.redirect('/')
       template_data = {}

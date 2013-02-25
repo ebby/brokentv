@@ -95,6 +95,31 @@ brkn.Main.prototype.enterDocument = function() {
       e.preventDefault(); 
     }
   });
+  
+  this.getHandler().listen(window, goog.events.EventType.CLICK, function(e) {
+    var a = goog.dom.getAncestorByTagNameAndClass(e.target, 'a')
+    var href = a ? a.href : null;
+    if (href) {
+      e.preventDefault();
+      e.stopPropagation();
+      var matches = href.match('#(.*):(.*)');
+      switch(matches[1]) {
+        case 'user':
+          var user = brkn.model.Users.getInstance().get(matches[2]);
+          brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.PROFILE, user);
+          break;
+        case 'channel':
+          var channel = brkn.model.Channels.getInstance().get(matches[2]);
+          brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.CHANGE_CHANNEL,
+              channel);
+          break;
+        case 'info':
+          var media = brkn.model.Medias.getInstance().get(matches[2]);
+          brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.MEDIA_INFO, media);
+          break;
+      }
+    }
+  });
 };
 
 
@@ -272,4 +297,3 @@ String.prototype.toHHMMSS = function () {
 goog.exportSymbol('brkn.Main.staticInit', brkn.Main.staticInit);
 goog.exportSymbol('brkn.Main.auth', brkn.Main.auth);
 
-goog.DEBUG && goog.exportSymbol('brkn.Admin.init', brkn.Admin.init);

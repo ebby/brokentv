@@ -68,9 +68,11 @@ brkn.model.BrowserChannel.prototype.onMessage_ = function(rawMessage) {
 	    break;
 	  case 'new_comment':
 	    var comment = new brkn.model.Comment(message['comment']);
+	    var tweet = message['tweet'] ? new brkn.model.Tweet(message['tweet']) : null;
 	    var media = brkn.model.Medias.getInstance().getOrAdd(message['comment']['media']);
 	    if (media) {
 	      media.publish(brkn.model.Media.Actions.ADD_COMMENT, comment);
+	      tweet && media.publish(brkn.model.Media.Actions.ADD_TWEET, tweet);
 	    }
 	    break;
 	  case 'new_activity':

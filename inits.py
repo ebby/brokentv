@@ -132,7 +132,7 @@ COLLECTIONS = {
   },
   'Fashion': {
     'keywords': ['Entertainment', 'Howto'],
-    'publishers': ['Buzz60', 'The New York Times', 'The New Yorker', 'FashionTV']     
+    'publishers': ['Buzz60', 'The New York Times', 'The New Yorker']     
   },
   'TED': {
     'keywords': ['Education', 'Howto'],

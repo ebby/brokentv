@@ -174,11 +174,17 @@ brkn.sidebar.CommentInput.prototype.getValue = function() {
 
 
 /**
- * 
+ * @return {boolean} true if collapsing, false if already collapsed
  */
 brkn.sidebar.CommentInput.prototype.collapse = function() {
-  goog.style.setPosition(this.commentControls_, 0,
-      brkn.sidebar.CommentInput.COMMENT_CONTROLS_HEIGHT);
+  if (goog.style.getPosition(this.commentControls_).y !=
+      brkn.sidebar.CommentInput.COMMENT_CONTROLS_HEIGHT) {
+    goog.style.setPosition(this.commentControls_, 0,
+        brkn.sidebar.CommentInput.COMMENT_CONTROLS_HEIGHT);
+    return true;
+  } else {
+    return false;
+  }
 }
 
 
@@ -194,6 +200,9 @@ brkn.sidebar.CommentInput.prototype.isFocused = function() {
  * @param {boolean} focus
  */
 brkn.sidebar.CommentInput.prototype.setFocused = function(focus) {
+  if (focus) {
+    this.commentInput_.getElement().focus();
+  }
   return goog.dom.classes.enable(this.getElement(), 'focused', focus);
 };
 

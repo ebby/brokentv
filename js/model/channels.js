@@ -71,7 +71,7 @@ brkn.model.Channels.prototype.findOnline = function() {
   var channel = this.channels[0];
   var index = 0;
   while (!channel.getCurrentProgram() && index < this.channels.length) {
-    channel = this.channels[index];
+    channel = !channel.myChannel ? this.channels[index] : channel;
     index++;
   }
   // If neither have content, stick with current

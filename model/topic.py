@@ -16,27 +16,32 @@ class Topic(db.Model):
     return self.key().name()
   
   @classmethod
+  def fetch_details(cls, id):
+    topic = Topic.get_by_key_name(id)
+    logging.info('FETCHING FREEBASE TOPIC: ' + id)
+    topic_response = get_freebase_topic(id)
+    properties = topic_response.get('property')
+    if properties:
+      description = ''
+      if properties.get('/common/topic/article') and \
+          properties['/common/topic/article']['values'][0]['property'].get('/common/document/text'):
+        description = properties['/common/topic/article']['values'][0]['property'] \
+                        ['/common/document/text']['values'][0]['value']
+      logging.info(properties['/type/object/name']['values'][0]['text'])
+      topic.name=properties['/type/object/name']['values'][0]['text']
+      topic.type=properties['/type/object/type']['values'][0]['text']
+      topic.type_id=properties['/type/object/type']['values'][0]['id']
+      topic.description=description
+      topic.put()
+  
+  @classmethod
   def add(cls, id):
     topic = Topic.get_by_key_name(id)
-    if not topic:
-      topic_response = get_freebase_topic(id)
-      properties = topic_response.get('property')
-      if properties:
-        description = ''
-        if properties.get('/common/topic/article') and \
-            properties['/common/topic/article']['values'][0]['property'].get('/common/document/text'):
-          description = properties['/common/topic/article']['values'][0]['property'] \
-                          ['/common/document/text']['values'][0]['value']
-          
-        topic = Topic(key_name=id,
-                      name=properties['/type/object/name']['values'][0]['text'],
-                      type=properties['/type/object/type']['values'][0]['text'],
-                      type_id=properties['/type/object/type']['values'][0]['id'],
-                      description=description)
-        topic.put()
-      else:
-        topic = Topic(key_name=id)
-        topic.put()
+    if True:
+      topic = Topic(key_name=id)
+      topic.put()
+      deferred.defer(Topic.fetch_details, topic.id,
+                     _name='freebase-' + str(uuid.uuid1()))
     return topic
 
 

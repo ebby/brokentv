@@ -159,13 +159,18 @@ class CommentHandler(BaseHandler):
       tweet = self.request.get('tweet') == 'true'
       if media and text:
         c = Comment.add(media, self.current_user, text, self.request.get('parent_id'))
-        broadcast.broadcastNewComment(c);
+        new_tweet = None
         if tweet:
           client = oauth.TwitterClient(constants.TWITTER_CONSUMER_KEY,
                                        constants.TWITTER_CONSUMER_SECRET,
                                        self.request.host_url + '/_twitter/callback')
           response = client.update_status(text, self.current_user.twitter_token,
                                           self.current_user.twitter_secret)
+          if not response.get('errors'):
+            new_tweet = Tweet.add_from_response(self.current_user, response, media)
+          else:
+            logging.warning('TWITTER ERROR: ' + str(response['errors']))
+        broadcast.broadcastNewComment(c, new_tweet);
       
 class SeenHandler(BaseHandler):
     def get(self, id):

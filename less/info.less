@@ -68,8 +68,12 @@ div#sidebar div.info {
     font-size: 10px;
     color: #181818;
     margin-bottom: 7px;
+    margin-left: 10px;
     text-shadow: 1px 1px 1px white;
     font-family: MuseoSans700;
+    a {
+      cursor: pointer;
+    }
   }
   div.scrollable {
     height: 200px;
@@ -217,129 +221,7 @@ div#sidebar div.info {
       }
     }
   }
-  div.tweet-holder {
-    position: relative;
-    top: 20px;
-    width: 300px;
-    div.label {
-      margin-left: 10px;
-    }
-    div.tweets {
-      white-space: nowrap;
-      overflow: hidden;
-    }
-    div.tweet {
-      position: relative;
-      width: 280px;
-      white-space: normal;
-      display: inline-block;
-      border-radius: 3px;
-      background: rgba(0, 0, 0, 0.65);
-      border: 1px solid #333;
-      margin: 0 9px;
-      padding-bottom: 20px;
-      overflow: hidden;
-      box-shadow: 0 0 2px 0px rgba(0, 0, 0, .8);
-      vertical-align: middle;
-      img {
-        width: 28px;
-        height: 28px;
-        left: 4px;
-        top: 4px;
-        position: absolute;
-        border-radius: 3px;
-      }
-      div.text {
-        a {
-          color: #f5f5f5;
-        }
-        position: relative;
-        left: 37px;
-        top: 3px;
-        font-size: 13px;
-        line-height: 16px;
-        width: 240px;
-      }
-      div.timestamp {
-        position: absolute;
-        bottom: 3px;
-        right: 5px;
-        font-size: 10px;
-      }
-    }
-    div.dot-nav {
-      text-align: center;
-      div.dot {
-        width: 6px;
-        height: 6px;
-        border-radius: 6px;
-        background: rgba(0, 0, 0, .3);
-        display: inline-block;
-        margin: 7px 5px;
-        cursor: pointer;
-        border: 1px solid rgba(0, 0, 0, .4);
-        &.selected {
-          background: rgba(255, 255, 255, .9);
-          border-color: rgba(255, 255, 255, .4);
-        }
-      }
-    }
-  }
   div.comments-holder {
-    position: relative;
     top: 20px;
-    left: 10px;
-    margin-right: 20px;
-    width: 280px;
-    div.comments {
-      overflow-x: scroll;
-      -webkit-transition: height .5s ease;
-         -moz-transition: height .5s ease;
-              transition: height .5s ease;
-    }
-    div.comment {
-      position: relative;
-      width: 99%;
-      background: rgba(0, 0, 0, 0.65);
-      border: 1px solid #333;
-      box-shadow: 0 0 2px 0px rgba(0, 0, 0, .8),  0 3px 1px -1px rgba(255, 255, 255, 0.5);
-      padding-top: 5px;
-      padding-bottom: 20px;
-      overflow: hidden;
-      &:first-child {
-        border-top-left-radius: 3px;
-        border-top-right-radius: 3px;
-      }
-      &:last-child {
-        border-bottom-left-radius: 3px;
-        border-bottom-right-radius: 3px;
-        box-shadow: 0 0 2px 0px rgba(0, 0, 0, .8);
-      }
-      img {
-        width: 28px;
-        height: 28px;
-        left: 4px;
-        top: 7px;
-        position: absolute;
-        border-radius: 3px;
-      }
-      div.text {
-        a {
-          color: #f5f5f5;
-        }
-        position: relative;
-        left: 37px;
-        top: 3px;
-        font-size: 13px;
-        line-height: 16px;
-        width: 240px;
-      }
-      div.timestamp {
-        position: absolute;
-        bottom: 3px;
-        right: 5px;
-        font-size: 10px;
-      }
-    }
   }
 }

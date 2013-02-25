@@ -37,9 +37,12 @@
       <div class="tweets"></div>
       <div class="dot-nav"></div>
     </div>
-    <div class="comments-holder ios-scroll" style="display: none">
-      <div class="label">CONVERSATION</div>
+    <div class="comments-holder ios-scroll">
+      <div class="label"><a class="conv-link">CONVERSATION</a></div>
+      <div class="no-comments" style="display:none">Start the conversation.</div>
       <div class="comments"></div>
+      <div class="top-grad"></div>
+      <div class="bottom-grad"></div>
     </div>
   </div>
 {/template}
@@ -78,9 +81,11 @@
  */
 {template .comment}
   <div class="comment">
-    <img src="{$comment.user.picture}"/>
+    <a href="#user:{$comment.user.id}">
+      <img src="{$comment.user.picture}"/>
+    </a>
     <div class="text">
-      <a href="#">{$comment.user.name}</a>{sp}
+      <a href="#user:{$comment.user.id}">{$comment.user.name}</a>{sp}
       {$comment.text}
     </div>
     <div class="timestamp">{$timestamp}</div>
@@ -95,7 +100,7 @@
     <div class="comment-controls">
       <div class="comment-button tweet-toggle">tweet<div class="check"></div></div>
       <div class="comment-button fb-toggle">post<div class="check"></div></div>
-      <div class="comment-button add-comment">add</div>
+      <div class="comment-button add-comment"><div class="return">&#8618;</div>add</div>
     </div>
     <div class="input-holder">
       <textarea class="comment-textarea" rows="1" placeholder="Add to the conversation..."></textarea>
@@ -363,6 +368,28 @@
       <div class="loading loading-starred"><div class="loading-spinner"></div></div>
     </div>
     <div class="spinner" style="display:none"></div>
+  </div>
+{/template}
+
+
+/**
+ */
+{template .conversation}
+  <div class="tabbed">
+    <ul class="tabs">
+      <li class="tab comments">
+        <div class="label">CONVERSATION</div>
+      </li>
+      <li class="tab tweets">
+        <div class="label">TWEETS</div>
+      </li>
+    </ul>
+    <div class="comments-content content comments-holder">
+      <div class="loading loading-activity"><div class="loading-spinner"></div></div>
+    </div>
+    <div class="tweets-content content tweet-holder">
+      <div class="loading loading-starred"><div class="loading-spinner"></div></div>
+    </div>
   </div>
 {/template}
 

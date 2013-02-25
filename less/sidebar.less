@@ -373,15 +373,24 @@ div#sidebar {
           position: absolute;
           top: 0;
         }
+        div.return {
+          width: 100%;
+          height: 100%;
+          position: absolute;
+          top: 4px;
+          left: 6px;
+          width: 10px;
+          font-size: 16px;
+          color: #bbb;
+        }
       }
     }
     div.input-holder {
       background: #f7f7f7;
       width: 100%;
       height: 100%;
-      border-top: 2px solid #ccc;
-      box-shadow: 0 -2px 2px 0 rgba(0, 0, 0, 0.4), inset 4px -2px 6px -3px rgba(0, 0, 0, 0.3),
-          0 0 0 1px rgba(24, 24, 24, 0.3);
+      border-top: 1px solid #ccc;
+      .box-shadow(e('0 -2px 2px 0 rgba(0, 0, 0, 0.3), inset 4px -2px 6px -3px rgba(0, 0, 0, 0.4)'));
       position: relative;
       textarea {
         resize:none;
@@ -394,12 +403,12 @@ div#sidebar {
         border-color: #CCC;
         resize: none;
         margin-left: 10px;
-        margin-top: 7px;
+        margin-top: 8px;
         margin-bottom: 4px;
       }
     }
   }
-  div.info.current div.comment-input {
+  div.info.current div.comment-input, div.conversation div.comment-input {
     visibility: visible;
     opacity: 1;
   }
@@ -438,6 +447,7 @@ div#sidebar {
     }
     div.content {
       display: none;
+      width: 300px;
     }
     &.activity {
       div.activity {
@@ -452,6 +462,22 @@ div#sidebar {
         display: block;
       }
       ul.tabs li.starred {
+        background: rgba(245, 245, 245, 0.6);
+      }
+    }
+    &.comments {
+      div.comments-holder {
+        display: block;
+      }
+      ul.tabs li.comments {
+        background: rgba(245, 245, 245, 0.6);
+      }
+    }
+    &.tweets {
+      div.tweet-holder {
+        display: block;
+      }
+      ul.tabs li.tweets {
         background: rgba(245, 245, 245, 0.6);
       }
     }
@@ -664,6 +690,165 @@ div#sidebar {
     div.description, div.duration {
       font-size: 11px;
       margin: 5px;
+    }
+  }
+  div.tweet-holder {
+    position: relative;
+    top: 20px;
+    width: 300px;
+    div.label {
+      margin-left: 10px;
+    }
+    div.tweets {
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    div.tweet {
+      position: relative;
+      width: 280px;
+      white-space: normal;
+      display: inline-block;
+      border-radius: 3px;
+      background: rgba(0, 0, 0, 0.65);
+      border: 1px solid #333;
+      margin: 0 9px;
+      padding-bottom: 20px;
+      overflow: hidden;
+      box-shadow: 0 0 2px 0px rgba(0, 0, 0, .8);
+      vertical-align: middle;
+      img {
+        width: 28px;
+        height: 28px;
+        left: 4px;
+        top: 4px;
+        position: absolute;
+        border-radius: 3px;
+      }
+      div.text {
+        a {
+          color: #f5f5f5;
+        }
+        position: relative;
+        left: 37px;
+        top: 3px;
+        font-size: 13px;
+        line-height: 16px;
+        width: 240px;
+      }
+      div.timestamp {
+        position: absolute;
+        bottom: 3px;
+        right: 5px;
+        font-size: 10px;
+      }
+    }
+    div.dot-nav {
+      text-align: center;
+      div.dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 6px;
+        background: rgba(0, 0, 0, .3);
+        display: inline-block;
+        margin: 7px 5px;
+        cursor: pointer;
+        border: 1px solid rgba(0, 0, 0, .4);
+        &.selected {
+          background: rgba(255, 255, 255, .9);
+          border-color: rgba(255, 255, 255, .4);
+        }
+      }
+    }
+  }
+  div.comments-holder {
+    position: relative;
+    div.comments {
+      margin: 10px;
+      overflow-x: scroll;
+      -webkit-transition: height .5s ease;
+         -moz-transition: height .5s ease;
+              transition: height .5s ease;
+    }
+    div.no-comments {
+      background: rgba(255,255,255,.2);
+      border: 1px solid #919191;
+      box-shadow: inset 0 0 2px 0px rgba(0, 0, 0, 0.2);
+      border-radius: 3px;
+      font-size: 12px;
+      text-align: center;
+      color: #181818;
+      text-shadow: 1px 1px 1px white;
+      padding: 10px;
+      margin: 0 10px;
+      font-family: MuseoSans500;
+      cursor: pointer;
+    }
+    &.top-grad div.top-grad, &.bottom-grad div.bottom-grad {
+      display: block;
+    }
+    div.top-grad {
+      display: none;
+      width: 283px;
+      height: 10px;
+      position: absolute;
+      top: 20px;
+      background: url(/static/img/radial-grad.png) no-repeat center;
+      left: 8px;
+      border-top: 2px solid rgba(0, 0, 0, 0.4);
+    }
+    div.bottom-grad {
+      display: none;
+      width: 283px;
+      height: 10px;
+      position: absolute;
+      bottom: -1px;
+      background: url(/static/img/radial-grad-up.png) no-repeat center;
+      left: 8px;
+      border-bottom: 2px solid rgba(0, 0, 0, 0.4);
+    }
+    div.comment {
+      position: relative;
+      width: 99%;
+      background: rgba(0, 0, 0, 0.65);
+      border: 1px solid #333;
+      box-shadow: 0 0 2px 0px rgba(0, 0, 0, .8),  0 3px 1px -1px rgba(255, 255, 255, 0.5);
+      padding-top: 5px;
+      padding-bottom: 20px;
+      overflow: hidden;
+      &:first-child {
+        border-top-left-radius: 3px;
+        border-top-right-radius: 3px;
+      }
+      &:last-child {
+        border-bottom-left-radius: 3px;
+        border-bottom-right-radius: 3px;
+        box-shadow: 0 0 2px 0px rgba(0, 0, 0, .8);
+      }
+      img {
+        width: 28px;
+        height: 28px;
+        left: 4px;
+        top: 7px;
+        position: absolute;
+        border-radius: 3px;
+      }
+      div.text {
+        a {
+          color: #f5f5f5;
+        }
+        position: relative;
+        left: 37px;
+        top: 3px;
+        font-size: 13px;
+        line-height: 16px;
+        width: 240px;
+      }
+      div.timestamp {
+        position: absolute;
+        bottom: 3px;
+        right: 5px;
+        font-size: 10px;
+      }
     }
   }
 }

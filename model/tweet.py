@@ -30,6 +30,20 @@ class Tweet(db.Model):
                                picture_url=result.profile_image_url,
                                picture_url_https=result.profile_image_url_https)
     
+  @classmethod
+  def add_from_response(cls, user, response, media):
+    return Tweet.get_or_insert(str(response['id']),
+                               id=response['id'],
+                               media=media,
+                               user=user,
+                               text=db.Text(response['text']),
+                               time=datetime.datetime.now(),
+                               handle=user.twitter_handle,
+                               name=user.name,
+                               user_id=user.twitter_id,
+                               picture_url=response['user']['profile_image_url'],
+                               picture_url_https=response['user']['profile_image_url_https'])
+    
   def to_json(self):
     json = {}
     json['text'] = self.text

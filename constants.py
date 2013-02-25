@@ -21,7 +21,8 @@ TWITTER_USER_BLACKLIST = [
   'unlimitnews',
   'thevideotweets',
   'irishchronicle',
-  'whonewz'                    
+  'whonewz',
+  'usabusinessnews'                    
 ]
 
 TWITTER_PHRASE_BLACKLIST = [

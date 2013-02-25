@@ -32,5 +32,6 @@ brkn.model.Sidebar.Actions = {
   MEDIA_INFO: 'media-info',
   MEDIA_LIST: 'media-list',
   PROFILE: 'profile',
-  APPROVED: 'approved'
+  APPROVED: 'approved',
+  CONVERSATION: 'conversation'
 };

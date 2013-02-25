@@ -6,6 +6,7 @@ goog.require('brkn.model.Controller');
 goog.require('brkn.model.Sidebar');
 goog.require('brkn.sidebar');
 goog.require('brkn.sidebar.Admin');
+goog.require('brkn.sidebar.Conversation');
 goog.require('brkn.sidebar.Info');
 goog.require('brkn.sidebar.MediaList');
 goog.require('brkn.sidebar.Profile');
@@ -122,6 +123,13 @@ brkn.Sidebar.prototype.mediaListEl_;
 brkn.Sidebar.prototype.profileEl_;
 
 
+/**
+ * @type {Element}
+ * @private
+ */
+brkn.Sidebar.prototype.conversationEl_;
+
+
 /** @inheritDoc */
 brkn.Sidebar.prototype.enterDocument = function() {
   goog.base(this, 'enterDocument');
@@ -129,6 +137,7 @@ brkn.Sidebar.prototype.enterDocument = function() {
   this.contentEl_ = goog.dom.getElement('sidebar-content');
   this.mediaListEl_ = goog.dom.getElement('media-list');
   this.profileEl_ = goog.dom.getElement('profile');
+  this.conversationEl_ = goog.dom.getElement('conversation');
   this.toolbar_ = goog.dom.getElement('toolbar');
   this.tabsEl_ = goog.dom.getElementByClass('tabs', this.getElement());
   var keyHandler = new goog.events.KeyHandler(document);
@@ -215,6 +224,8 @@ brkn.Sidebar.prototype.enterDocument = function() {
   
   brkn.model.Sidebar.getInstance().subscribe(brkn.model.Sidebar.Actions.NAVIGATE,
       this.navigate, this);
+  brkn.model.Sidebar.getInstance().subscribe(brkn.model.Sidebar.Actions.CONVERSATION,
+      this.showConversation, this);
   brkn.model.Sidebar.getInstance().subscribe(brkn.model.Sidebar.Actions.MEDIA_LIST,
       this.showMediaList, this);
   brkn.model.Sidebar.getInstance().subscribe(brkn.model.Sidebar.Actions.MEDIA_INFO,
@@ -369,6 +380,21 @@ brkn.Sidebar.prototype.navigate = function(to, opt_back, opt_title) {
     goog.dom.setTextContent(goog.dom.getElementByClass('back-title', this.toolbar_), opt_title);
   }
   
+};
+
+
+/**
+ * @param {brkn.model.Media} media
+ * @param {?Array.<brkn.model.Comment>=} opt_comments
+ * @param {?Array.<brkn.model.Tweet>=} opt_tweets
+ * @param {?boolean=} opt_twitter
+ */
+brkn.Sidebar.prototype.showConversation = function(media, opt_comments, opt_tweets, opt_twitter) {
+  window.console.log('SHOW CONVO');
+  var conversation = new brkn.sidebar.Conversation(media, opt_comments, opt_tweets, opt_twitter);
+  conversation.decorate(this.conversationEl_);
+  brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NAVIGATE,
+      this.conversationEl_, false, media.name);
 };
 
 

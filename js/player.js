@@ -388,6 +388,7 @@ brkn.Player.prototype.updateStagecover_ = function(opt_message) {
     goog.style.showElement(this.spinner_, false);
     goog.dom.classes.remove(stagecover, 'covered');
   }
+  goog.style.setOpacity(stagecover, this.playerState_ == YT.PlayerState.BUFFERING ? .9 : 1);
   this.resize();
 };
 

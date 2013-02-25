@@ -245,31 +245,6 @@ brkn.sidebar.Stream.prototype.addActivity_ = function(opt_activity, opt_digest, 
     'element': activityEl
   }, insertAt);
 
-  this.getHandler().listen(activityEl, goog.events.EventType.CLICK, function(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    var a = goog.dom.getAncestorByTagNameAndClass(e.target, 'a')
-    var href = a ? a.href : null;
-    if (href) {
-      var matches = href.match('#(.*):(.*)');
-      switch(matches[1]) {
-        case 'user':
-          var user = brkn.model.Users.getInstance().get(matches[2]);
-          brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.PROFILE, user);
-          break;
-        case 'channel':
-          var channel = brkn.model.Channels.getInstance().get(matches[2]);
-          brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.CHANGE_CHANNEL,
-              channel);
-          break;
-        case 'info':
-          var media = brkn.model.Medias.getInstance().get(matches[2]);
-          brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.MEDIA_INFO, media);
-          break;
-      }
-    }
-  });
-
   var mediasEl = goog.dom.getElementByClass('medias', activityEl);
   goog.array.forEach(medias, function(m) {
     var media = new brkn.model.Media(m);

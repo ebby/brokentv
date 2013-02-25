@@ -113,7 +113,8 @@ brkn.model.Media.prototype.getPublishDate = function (opt_time) {
  * @enum {string}
  */
 brkn.model.Media.Actions = {
-  ADD_COMMENT: 'add-comment'
+  ADD_COMMENT: 'add-comment',
+  ADD_TWEET: 'add-tweet'
 };
 
 
