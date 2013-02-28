@@ -6,7 +6,6 @@ goog.provide('brkn.model.Tweet');
  * @constructor
  */
 brkn.model.Tweet = function(tweet) {
-  window.console.log(tweet);
   /**
    * @type {number}
    * @private

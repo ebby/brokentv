@@ -114,20 +114,18 @@ brkn.sidebar.Conversation.prototype.enterDocument = function() {
         this.navigate_(tabEl);
       }, this))
       .listen(this.commentInput_, 'add', goog.bind(this.onAddComment_, this))
-      .listen(this.commentInput_,
-          goog.events.EventType.FOCUS,
-          goog.bind(function(e) {
-            this.commentList_.resize(brkn.sidebar.CommentInput.COMMENT_CONTROLS_HEIGHT, true);
-            this.tweetList_.resize(brkn.sidebar.CommentInput.COMMENT_CONTROLS_HEIGHT, true);
-          }, this))
+//      .listen(this.commentInput_,
+//          goog.events.EventType.FOCUS,
+//          goog.bind(function(e) {
+//            this.commentList_.resize();
+//            this.tweetList_.resize();
+//          }, this))
       .listen(this.commentInput_,
           'resize',
           goog.bind(function(e) {
             goog.dom.classes.has(this.getElement().firstChild, 'comments') ?
-                this.commentList_.resize(brkn.sidebar.CommentInput.COMMENT_CONTROLS_HEIGHT +
-                    (e.target.height_ - brkn.sidebar.CommentInput.INPUT_HEIGHT), true) :
-                this.tweetList_.resize(brkn.sidebar.CommentInput.COMMENT_CONTROLS_HEIGHT +
-                    (e.target.height_ - brkn.sidebar.CommentInput.INPUT_HEIGHT), true)
+                this.commentList_.resize(brkn.sidebar.CommentInput.INPUT_HEIGHT) :
+                this.tweetList_.resize(brkn.sidebar.CommentInput.INPUT_HEIGHT)
           }, this))
       .listen(window,
           goog.events.EventType.CLICK,
@@ -136,34 +134,41 @@ brkn.sidebar.Conversation.prototype.enterDocument = function() {
                 !this.commentInput_.getValue()) {
               this.commentInput_.setFocused(false);
               this.commentInput_.collapse();
-              goog.dom.classes.has(this.getElement().firstChild, 'comments') ?
-                  this.commentList_.resize(brkn.sidebar.CommentInput.INPUT_HEIGHT, true) :
-                  this.tweetList_.resize(brkn.sidebar.CommentInput.INPUT_HEIGHT, true);
+//              goog.dom.classes.has(this.getElement().firstChild, 'comments') ?
+//                  this.commentList_.resize(brkn.sidebar.CommentInput.INPUT_HEIGHT) :
+//                  this.tweetList_.resize(brkn.sidebar.CommentInput.INPUT_HEIGHT);
             }
           }, this))
       .listen(goog.dom.getElementByClass('no-comments', this.getElement()),
           goog.events.EventType.CLICK,
-          goog.bind(function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            this.commentInput_.setFocused(true);
-          }, this))
+          goog.bind(this.onNoComments_, this))
+      .listen(goog.dom.getElementsByClass('no-comments', this.getElement())[1],
+          goog.events.EventType.CLICK,
+          goog.bind(this.onNoComments_, this))
       .listen(window,
           goog.events.EventType.CLICK,
           goog.bind(function(e) {
             if (!goog.dom.getAncestorByClass(e.target, 'comment-input') &&
                 !this.commentInput_.getValue()) {
               this.commentInput_.setFocused(false);
-              if (this.commentInput_.collapse()) {
-                this.commentList_.resize(brkn.sidebar.CommentInput.INPUT_HEIGHT);
-                this.tweetList_.resize(brkn.sidebar.CommentInput.INPUT_HEIGHT);
-              }
+              this.commentInput_.collapse()
             }
           }, this));
+
   this.commentList_.resize(brkn.sidebar.CommentInput.INPUT_HEIGHT);
   this.tweetList_.resize(brkn.sidebar.CommentInput.INPUT_HEIGHT);
 };
 
+
+/**
+ * @param {Object} e
+ * @private
+ */
+brkn.sidebar.Conversation.prototype.onNoComments_ = function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  this.commentInput_.setFocused(true);
+};
 
 /**
  * @param {Object} e

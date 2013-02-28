@@ -16,6 +16,12 @@ goog.require('goog.pubsub.PubSub');
  */
 brkn.model.BrowserChannel = function(token) {
 	goog.base(this);
+	
+	/**
+	 * @type {boolean}
+	 * @private
+	 */
+	this.loggedOff_ = false;
 };
 goog.inherits(brkn.model.BrowserChannel, goog.pubsub.PubSub);
 goog.addSingletonGetter(brkn.model.BrowserChannel);
@@ -39,6 +45,8 @@ brkn.model.BrowserChannel.prototype.init = function(token) {
 	var channel = new appengine.Channel(unescape(token));
 	var socket = channel.open();
 	socket.onmessage = goog.bind(this.onMessage_, this);
+	socket.onclose = goog.bind(this.onClose_, this);
+	window.onbeforeunload = goog.bind(this.onClose_, this);
 	return this;
 };
 
@@ -108,4 +116,18 @@ brkn.model.BrowserChannel.prototype.onMessage_ = function(rawMessage) {
 	        }, this));
       break;
 	}
+};
+
+
+/**
+ * @private
+ */
+brkn.model.BrowserChannel.prototype.onClose_ = function() {
+  if (!this.loggedOff_) {
+    // Update UI prefs
+    goog.net.XhrIo.send('/_settings', goog.functions.NULL(), 'POST',
+        'show_guide=' + brkn.model.Controller.getInstance().guideToggled +
+        '&show_sidebar=' + brkn.model.Controller.getInstance().sidebarToggled);
+    this.loggedOff_ = true;
+  }
 };

@@ -41,16 +41,19 @@ brkn.model.Analytics.prototype.login = function() {
 
 brkn.model.Analytics.prototype.endSession = function(channel, time, mediaCount) {
   _gaq.push(['_trackEvent', 'Users', 'SessionTime',
-             brkn.model.Users.getInstance().currentUser.id, time]);
+             brkn.model.Users.getInstance().currentUser.id, Math.round(time)]);
   _gaq.push(['_trackEvent', 'Users', 'SessionMediaCount',
+             brkn.model.Users.getInstance().currentUser.id, mediaCount]);
+  _gaq.push(['_trackEvent', 'Users', 'Active',
              brkn.model.Users.getInstance().currentUser.id, mediaCount]);
   _gaq.push(['_trackEvent', 'Users', channel.id + '-time',
              brkn.model.Users.getInstance().currentUser.id, time]);
   _gaq.push(['_trackEvent', 'Users', channel.id + '-medias',
              brkn.model.Users.getInstance().currentUser.id, mediaCount]);
-  window.console.log(time);
-  _gaq.push(['_trackEvent', 'Channel', 'SessionTime', channel.id, time]);
-  _gaq.push(['_trackEvent', 'Channel', 'SessionMediaCount', channel.id, mediaCount]);
+  if (!channel.myChannel) {
+    _gaq.push(['_trackEvent', 'Channel', 'SessionTime', channel.id, time]);
+    _gaq.push(['_trackEvent', 'Channel', 'SessionMediaCount', channel.id, mediaCount]);
+  }
 };
 
 
@@ -61,8 +64,10 @@ brkn.model.Analytics.prototype.playAsync = function(media) {
 
 
 brkn.model.Analytics.prototype.changeChannel = function(channel, lastChannel) {
-  _gaq.push(['_trackEvent', 'Channel', 'OptOut', lastChannel.id]);
-  _gaq.push(['_trackEvent', 'Channel', 'OptIn', channel.id]);
+  if (!channel.myChannel) {
+    _gaq.push(['_trackEvent', 'Channel', 'OptOut', lastChannel.id]);
+    _gaq.push(['_trackEvent', 'Channel', 'OptIn', channel.id]);
+  }
 };
 
 brkn.model.Analytics.prototype.comment = function(media, facebook, twitter) {

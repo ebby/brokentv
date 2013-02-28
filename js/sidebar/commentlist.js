@@ -49,6 +49,12 @@ brkn.sidebar.CommentList = function(media, opt_comments, opt_twitter, opt_tweets
    * @private
    */
   this.commentsHeight_ = 0;
+  
+  /**
+   * @type {number}
+   * @private
+   */
+  this.resizeExtra_ = 0;
 };
 goog.inherits(brkn.sidebar.CommentList, goog.ui.Component);
 
@@ -96,6 +102,7 @@ brkn.sidebar.CommentList.prototype.decorateInternal = function(el) {
 
   this.noCommentsEl_ = goog.dom.createDom('div', 'no-comments', 'Start the conversation.');
   goog.dom.appendChild(this.getElement(), this.noCommentsEl_);
+  goog.style.showElement(this.noCommentsEl_, false);
 
   this.commentsEl_ = goog.dom.createDom('div', 'comments tweets');
   goog.dom.appendChild(this.getElement(), this.commentsEl_);
@@ -108,13 +115,11 @@ brkn.sidebar.CommentList.prototype.decorateInternal = function(el) {
       this.addComment_(comment);
     }, this);
     this.mediasHeight_ = goog.style.getSize(this.commentsEl_).height;
-    this.resize();
   } else if (this.twitter_ && this.tweets_.length) {
     goog.array.forEach(this.tweets_, function(tweet) {
       this.addTweet_(tweet);
     }, this);
     this.mediasHeight_ = goog.style.getSize(this.commentsEl_).height;
-    this.resize();
   } else {
     goog.style.showElement(this.spinner_, true);
   }
@@ -129,6 +134,7 @@ brkn.sidebar.CommentList.prototype.decorateInternal = function(el) {
             this.addTweet_(tweet);
             return tweet;
           }, this);
+          goog.style.showElement(this.noCommentsEl_, !tweets.length);
           this.mediasHeight_ = goog.style.getSize(this.commentsEl_).height;
           this.resize();
         }, this)); 
@@ -142,10 +148,12 @@ brkn.sidebar.CommentList.prototype.decorateInternal = function(el) {
             this.addComment_(comment);
             return comment;
           }, this);
+          goog.style.showElement(this.noCommentsEl_, !comments.length);
           this.mediasHeight_ = goog.style.getSize(this.commentsEl_).height;
           this.resize();
         }, this)); 
   }
+  this.resize(brkn.sidebar.CommentInput.INPUT_HEIGHT);
 };
 
 
@@ -191,12 +199,11 @@ brkn.sidebar.CommentList.prototype.addComment_ = function(comment) {
 
 /**
  * @param {?number=} opt_extra Extra space to subtract
- * @param {?boolean=} opt_commentInput
  * @private
  */
-brkn.sidebar.CommentList.prototype.resize = function(opt_extra, opt_commentInput) {
-  var extra = opt_extra || 0;
-  goog.style.setHeight(this.getElement(), goog.dom.getViewportSize().height - 55 - extra -
-      (goog.dom.getAncestorByClass(this.getElement(), 'tabbed') ? 30 : 0));
+brkn.sidebar.CommentList.prototype.resize = function(opt_extra) {
+  this.resizeExtra_ = opt_extra || this.resizeExtra_;
+  goog.style.setHeight(this.getElement(), goog.dom.getViewportSize().height - 42 -
+      this.resizeExtra_ - (goog.dom.getAncestorByClass(this.getElement(), 'tabbed') ? 30 : 0));
 };
 

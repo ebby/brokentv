@@ -141,6 +141,7 @@ def create_handlers_map():
     ('/_seen', rpc.SeenHandler),
     ('/_seen/(.*)', rpc.SeenHandler),
     ('/_session', rpc.SessionHandler),
+    ('/_settings', rpc.SettingsHandler),
     ('/_star', rpc.StarHandler),
     ('/_star/(.*)', rpc.StarHandler),
     ('/_tweet/(.*)', rpc.TweetHandler),

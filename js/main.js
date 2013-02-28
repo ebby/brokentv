@@ -67,12 +67,15 @@ brkn.Main.prototype.popup_;
 /** @inheritDoc */
 brkn.Main.prototype.decorateInternal = function(element) {
   goog.base(this, 'decorateInternal', element);
+  
+  window.console.log(brkn.model.Users.getInstance().currentUser.showGuide)
+  window.console.log(brkn.model.Users.getInstance().currentUser.showSidebar)
 
   var mainEl = soy.renderAsElement(brkn.main.main, {
     user: brkn.model.Users.getInstance().currentUser,
     admin: brkn.model.Users.getInstance().currentUser.isAdmin(),
-    guide: false, //!brkn.model.Channels.getInstance().currentChannel.myChannel
-    sidebar: true
+    guide: brkn.model.Users.getInstance().currentUser.showGuide,
+    sidebar: brkn.model.Users.getInstance().currentUser.showSidebar
   });
   goog.dom.insertChildAt(element, mainEl, 0);
 };

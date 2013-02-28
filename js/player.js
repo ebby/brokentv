@@ -109,7 +109,33 @@ brkn.Player.prototype.enterDocument = function() {
       }, this))
       .listen(this.getElement(), goog.events.EventType.DBLCLICK, goog.bind(this.toggleExpand_, this))
       .listen(expandEl, goog.events.EventType.CLICK, goog.bind(this.toggleExpand_, this))
-      .listen(this.getElement(), goog.events.EventType.CLICK, goog.bind(function() {
+      .listen(this.getElement(), goog.events.EventType.MOUSEDOWN, goog.bind(function(e) {
+        if (e.offsetX > goog.style.getSize(this.getElement()).width/2 &&
+            e.offsetY > goog.style.getSize(this.getElement()).height/2) {
+          // Pass click through to kill possible advertisement
+          window.console.log(e.offsetX);
+          window.console.log(e.offsetY);
+          window.console.log('mousedown')
+          goog.style.showElement(this.stagecover_, false);
+          goog.Timer.callOnce(goog.bind(function() {
+            goog.style.showElement(this.stagecover_, true);
+          }, this));
+        }
+      }, this))
+      .listen(this.getElement(), goog.events.EventType.MOUSEUP, goog.bind(function(e) {
+        if (e.offsetX > goog.style.getSize(this.getElement()).width/2 &&
+            e.offsetY > goog.style.getSize(this.getElement()).height/2) {
+          // Pass click through to kill possible advertisement
+          window.console.log('mouseup')
+          goog.style.showElement(this.stagecover_, true);
+        }
+      }, this))
+      .listen(this.getElement(), goog.events.EventType.CLICK, goog.bind(function(e) {
+        if (e.offsetX > goog.style.getSize(this.getElement()).width/2 &&
+            e.offsetY > goog.style.getSize(this.getElement()).height/2) {
+          
+          return; 
+        }
         if (this.player_ && this.player_.getPlayerState) {
           switch (this.player_.getPlayerState()) {
             case YT.PlayerState.PLAYING:

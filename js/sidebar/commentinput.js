@@ -74,14 +74,14 @@ goog.inherits(brkn.sidebar.CommentInput, goog.ui.Component);
  * @type {number}
  * @constant
  */
-brkn.sidebar.CommentInput.COMMENT_CONTROLS_HEIGHT = 27;
+brkn.sidebar.CommentInput.COMMENT_CONTROLS_HEIGHT = 25;
 
 
 /**
  * @type {number}
  * @constant
  */
-brkn.sidebar.CommentInput.INPUT_HEIGHT = 22;
+brkn.sidebar.CommentInput.INPUT_HEIGHT = 41;
 
 
 /**

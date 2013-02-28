@@ -10,11 +10,7 @@ SUPER_ADMINS = ['1240963']
 SENDGRID = False
 
 # Make prod app
-TWITTER_CONSUMER_KEY = 'hiEtXnWvrHwBscT698zP3w'
-TWITTER_CONSUMER_SECRET = 'bGY381qzadl7rlcYeKWW3pFLTcYAoIgQYT4awjxXOc'
-TWITTER_ACCESS_TOKEN = '423216326-IuRUPJRwLtdPRW9a9etVSVZy5EuWHsjXo3a4BOBT'
-TWITTER_TOKEN_SECRET = 'y02WSt6kTqhaB6kALBBp5B2fqu1KQLUpAYiUl7qs'
-TWITTER_CALLBACK = 'http://local.broken.tv:8011/_twitter/callback'
+
 
 TWITTER_USER_BLACKLIST = [
   'vodionews',
@@ -52,6 +48,12 @@ if DEVELOPMENT:
   CLIENT_SECRETS_FILE = "client_secrets_dev.json"
   STATS_JS_SOURCE = SIMPLE_JS
   ADMIN_JS_SOURCE = '//localhost:9810/compile?id=admin&mode=simple&pretty-print=true'
+  
+  TWITTER_CONSUMER_KEY = 'o2RPbUJUFDtltq7LmKVD1A'
+  TWITTER_CONSUMER_SECRET = 'E88eAbv1Wag6XMCUjuDpBQuQr7KKwVujxsE1z3eoO8'
+  TWITTER_ACCESS_TOKEN = '423216326-eDLmanwsrUcZewQ9IwKlmYJJaRq3MbG6OMNh6cjk'
+  TWITTER_TOKEN_SECRET = 'kP7AKjHN2KYl5F0QLKI19Rh7maNDKCOJd9gXCeUEJg'
+  TWITTER_CALLBACK = 'http://local.broken.tv:8011/_twitter/callback'
 else :
   FACEBOOK_APP_ID = "131936020298013"
   FACEBOOK_APP_SECRET = "d69567a45ca1a5313c06c5b615555227"
@@ -61,6 +63,12 @@ else :
   CLIENT_SECRETS_FILE = "client_secrets_prod.json"
   STATS_JS_SOURCE = '/static/js/stats-min.js'
   ADMIN_JS_SOURCE = '/static/js/admin-min.js'
+  
+  TWITTER_CONSUMER_KEY = 'hiEtXnWvrHwBscT698zP3w'
+  TWITTER_CONSUMER_SECRET = 'bGY381qzadl7rlcYeKWW3pFLTcYAoIgQYT4awjxXOc'
+  TWITTER_ACCESS_TOKEN = '423216326-IuRUPJRwLtdPRW9a9etVSVZy5EuWHsjXo3a4BOBT'
+  TWITTER_TOKEN_SECRET = 'y02WSt6kTqhaB6kALBBp5B2fqu1KQLUpAYiUl7qs'
+  TWITTER_CALLBACK = 'http://www.xylovision.com/_twitter/callback'
 
 class AccessLevel:
   WAITLIST = 0

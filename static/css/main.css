@@ -1618,6 +1618,7 @@ div#sidebar div#toolbar ul.tabs li.tab div.label {
 div#sidebar div#toolbar div.arrow {
   position: absolute;
   top: 40px;
+  left: 50%;
   -webkit-transition: left 0.3s ease;
   -moz-transition: left 0.3s ease;
   -o-transition: left 0.3s ease;
@@ -1856,7 +1857,7 @@ div#sidebar div.comment-input div.input-holder textarea {
   resize: none;
   margin-left: 10px;
   margin-top: 8px;
-  margin-bottom: 4px;
+  margin-bottom: 5px;
 }
 div#sidebar div.info.current div.comment-input,
 div#sidebar div.conversation div.comment-input {
@@ -1934,7 +1935,7 @@ div#sidebar div.loading {
   border-radius: 6px;
 }
 div#sidebar div.loading div.loading-spinner {
-  background: url(/static/img/spinner2.gif) no-repeat center;
+  background: url(/static/img/spinner.gif) no-repeat center;
   background-size: 50px;
   width: 90px;
   height: 90px;
@@ -1990,11 +1991,10 @@ div#sidebar div.list-media:hover div.media div.preview div.play {
   -ms-filter: invert(100%);
 }
 div#sidebar div.list-media:active {
-  margin-bottom: 11px;
-  box-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);
-}
-div#sidebar div.list-media:active div.publisher {
-  margin-bottom: 3px;
+  -webkit-box-shadow: 0 1px 1px 1px rgba(255, 255, 255, 0.5);
+  -moz-box-shadow: 0 1px 1px 1px rgba(255, 255, 255, 0.5);
+  box-shadow: 0 1px 1px 1px rgba(255, 255, 255, 0.5);
+  border-color: #666;
 }
 div#sidebar div.list-media:last-child:active div.publisher {
   margin-bottom: 4px;
@@ -2206,9 +2206,11 @@ div#sidebar div.comments-holder {
 div#sidebar div.comments-holder div.comments {
   margin: 10px;
   overflow-x: scroll;
-  -webkit-transition: height .5s ease;
-  -moz-transition: height .5s ease;
-  transition: height .5s ease;
+  -webkit-transition: max-height 0.5s ease;
+  -moz-transition: max-height 0.5s ease;
+  -o-transition: max-height 0.5s ease;
+  -ms-transition: max-height 0.5s ease;
+  transition: max-height 0.5s ease;
 }
 div#sidebar div.comments-holder.top-grad div.top-grad,
 div#sidebar div.comments-holder.bottom-grad div.bottom-grad {
@@ -2222,7 +2224,7 @@ div#sidebar div.comments-holder div.top-grad {
   top: 20px;
   background: url(/static/img/radial-grad.png) no-repeat center;
   left: 9px;
-  border-top: 2px solid rgba(0, 0, 0, 0.6);
+  border-top: 2px solid rgba(0, 0, 0, 0.5);
   -webkit-box-shadow: 0 -3px 3px -1px rgba(0, 0, 0, 0.2);
   -moz-box-shadow: 0 -3px 3px -1px rgba(0, 0, 0, 0.2);
   box-shadow: 0 -3px 3px -1px rgba(0, 0, 0, 0.2);
@@ -2235,7 +2237,7 @@ div#sidebar div.comments-holder div.bottom-grad {
   bottom: -1px;
   background: url(/static/img/radial-grad-up.png) no-repeat center;
   left: 9px;
-  border-bottom: 2px solid rgba(0, 0, 0, 0.6);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.5);
   -webkit-box-shadow: 0 3px 3px -1px rgba(0, 0, 0, 0.2);
   -moz-box-shadow: 0 3px 3px -1px rgba(0, 0, 0, 0.2);
   box-shadow: 0 3px 3px -1px rgba(0, 0, 0, 0.2);
@@ -2284,14 +2286,16 @@ div#sidebar div.comments-holder div.comment div.timestamp {
   right: 5px;
   font-size: 10px;
 }
-div#sidebar div.no-comments {
+div#sidebar div.no-comments,
+div#sidebar div.no-info {
   background: rgba(255, 255, 255, 0.2);
+  width: 260px;
   border: 1px solid #919191;
   box-shadow: inset 0 0 2px 0px rgba(0, 0, 0, 0.2);
   border-radius: 3px;
   font-size: 12px;
   text-align: center;
-  color: #181818;
+  color: #666;
   text-shadow: 1px 1px 1px white;
   padding: 10px;
   margin: 0 10px;
@@ -2716,6 +2720,10 @@ div#sidebar div.info {
   */
 
 }
+div#sidebar div.info div.no-info {
+  margin-top: 20px;
+  cursor: default;
+}
 div#sidebar div.info div.picture {
   display: inline-block;
   width: 300px;
@@ -2903,6 +2911,9 @@ div#sidebar div.info div.viewers {
   left: 9px;
   padding-right: 9px;
   width: 280px;
+}
+div#sidebar div.info div.viewers div.label {
+  margin-left: 0;
 }
 div#sidebar div.info div.viewers div.viewer {
   background: #ccc;

@@ -187,6 +187,7 @@ div#sidebar {
     div.arrow {
       position: absolute;
       top: 40px;
+      left: 50%;
       .transition(left, .3s, ease);
       &:after, &:before {
         top: 100%;
@@ -404,7 +405,7 @@ div#sidebar {
         resize: none;
         margin-left: 10px;
         margin-top: 8px;
-        margin-bottom: 4px;
+        margin-bottom: 5px;
       }
     }
   }
@@ -494,7 +495,7 @@ div#sidebar {
     background: rgba(0, 0, 0, .6);
     border-radius: 6px;
     div.loading-spinner {
-      background: url(/static/img/spinner2.gif) no-repeat center;
+      background: url(/static/img/spinner.gif) no-repeat center;
       background-size: 50px;
       width: 90px;
       height: 90px;
@@ -542,11 +543,8 @@ div#sidebar {
       }
     }
     &:active {
-      margin-bottom: 11px;
-      box-shadow: 0 1px 1px rgba(255,255,255,.2);
-      div.publisher {
-        margin-bottom: 3px;
-      }
+      .box-shadow(0, 1px, 1px, 1px, rgba(255, 255, 255, 0.5));
+      border-color: #666;
     }
     &:last-child:active {
       div.publisher {
@@ -755,9 +753,7 @@ div#sidebar {
     div.comments {
       margin: 10px;
       overflow-x: scroll;
-      -webkit-transition: height .5s ease;
-         -moz-transition: height .5s ease;
-              transition: height .5s ease;
+      .transition(max-height, .5s, ease);
     }
     &.top-grad div.top-grad, &.bottom-grad div.bottom-grad {
       display: block;
@@ -770,7 +766,7 @@ div#sidebar {
       top: 20px;
       background: url(/static/img/radial-grad.png) no-repeat center;
       left: 9px;
-      border-top: 2px solid rgba(0, 0, 0, 0.6);
+      border-top: 2px solid rgba(0, 0, 0, 0.5);
       .box-shadow(0, -3px, 3px, -1px, rgba(0, 0,0, .2));
     }
     div.bottom-grad {
@@ -781,7 +777,7 @@ div#sidebar {
       bottom: -1px;
       background: url(/static/img/radial-grad-up.png) no-repeat center;
       left: 9px;
-      border-bottom: 2px solid rgba(0, 0, 0, 0.6);
+      border-bottom: 2px solid rgba(0, 0, 0, 0.5);
       .box-shadow(0, 3px, 3px, -1px, rgba(0, 0,0, .2));
     }
     div.comment {
@@ -829,14 +825,15 @@ div#sidebar {
       }
     }
   }
-  div.no-comments {
+  div.no-comments, div.no-info {
     background: rgba(255,255,255,.2);
+    width: 260px;
     border: 1px solid #919191;
     box-shadow: inset 0 0 2px 0px rgba(0, 0, 0, 0.2);
     border-radius: 3px;
     font-size: 12px;
     text-align: center;
-    color: #181818;
+    color: #666;
     text-shadow: 1px 1px 1px white;
     padding: 10px;
     margin: 0 10px;

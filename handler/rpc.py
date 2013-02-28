@@ -1,6 +1,6 @@
 from common import *
 
-def get_session(current_user):
+def get_session(current_user, set_programming=True):
   data = {}
 
   # RETREIVE CHANNELS AND PROGRAMMING
@@ -17,7 +17,7 @@ def get_session(current_user):
   for channel in cached_channels:
     next_time = iso8601.parse_date(channel['next_time']).replace(tzinfo=None) \
         if channel['next_time'] else None
-    if not next_time or next_time < datetime.datetime.now():
+    if set_programming and (not next_time or next_time < datetime.datetime.now()):
       # Kick our programming backend off. It shuts down when users leave.
       #programming.Programming.set_programming(channel['id'], queue='programming', kickoff=True)
       #new_programming = True
@@ -101,7 +101,7 @@ def get_session(current_user):
   data['viewer_sessions'] = viewer_sessions
 
   # ME
-  user_obj = current_user.toJson()
+  user_obj = current_user.toJson(configs=True)
   user_obj['current_channel'] = current_channel.id
   data['current_user'] = user_obj
 
@@ -118,8 +118,19 @@ class SessionHandler(BaseHandler):
       if self.current_user.access_level < AccessLevel.USER:
         self.error(401)
       else:
-        data = get_session(self.current_user)
+        data = get_session(self.current_user, set_programming=(not constants.DEVELOPMENT))
         self.response.out.write(simplejson.dumps(data))
+
+class SettingsHandler(BaseHandler):
+    def post(self):
+      show_guide = self.request.get('show_guide') == 'true'
+      show_sidebar = self.request.get('show_sidebar') == 'true'
+
+      self.current_user.show_guide = show_guide
+      self.current_user.show_sidebar = show_sidebar
+      self.current_user.put()
+      logging.info(self.current_user.toJson(configs=True))
+      self.response.out.write('')
 
 class ProgramHandler(BaseHandler):
     def post(self):
@@ -150,8 +161,9 @@ class InfoHandler(BaseHandler):
 
 class CommentHandler(BaseHandler):
     def get(self, id):
+      offset = self.request.get('offset') or 0
       media = Media.get_by_key_name(id)
-      comments = Comment.get_by_media(media)
+      comments = Comment.get_by_media(media, offset)
       return self.response.out.write(simplejson.dumps([c.toJson() for c in comments]))
     def post(self):
       media = Media.get_by_key_name(self.request.get('media_id'))
@@ -301,9 +313,10 @@ class StarHandler(BaseHandler):
     
 class TweetHandler(BaseHandler):
   def get(self, media_key):
+    offset = self.request.get('offset') or 0
     media = Media.get_by_key_name(media_key)
     if media:
-      tweets = media.get_tweets()
+      tweets = media.get_tweets(offset=offset)
       self.response.out.write(simplejson.dumps([t.to_json() for t in tweets]))
     
 class TwitterHandler(BaseHandler):

@@ -74,7 +74,30 @@ brkn.model.User = function(user) {
   /**
    * @type {number}
    */
-  this.aveSession = user['ave_session'];
+  this.aveSession = user['ave_session'] ? user['ave_session'].toFixed(2) : null;
+  
+  /**
+   * @type {boolean}
+   */
+  this.showGuide = user['show_guide'] || true;
+  
+  /**
+   * @type {boolean}
+   */
+  this.showSidebar = user['show_sidebar'] || true;
+  
+  /**
+   * @type {boolean}
+   */
+  this.postFacebook = user['post_facebook'] || false;
+  
+  /**
+   * @type {boolean}
+   */
+  this.postTwitter = user['post_twitter'] || false;
+  
+  window.console.log(this.showGuide);
+  window.console.log(this.showSidebar);
 };
 goog.inherits(brkn.model.User, goog.pubsub.PubSub);
 

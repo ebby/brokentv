@@ -14,9 +14,9 @@ brkn.model.Controller = function() {
 	
 	this.playing = true;
 	
-	this.sidebarToggled = false;
+	this.sidebarToggled = goog.dom.classes.has(goog.dom.getElement('controller'), 'sidebar-toggled');
 	
-	this.guideToggled = true;
+	this.guideToggled = goog.dom.classes.has(goog.dom.getElement('controller'), 'guide-toggled');
 
 	this.subscribe(brkn.model.Controller.Actions.TOGGLE_SIDEBAR, function(show) {
 	  this.sidebarToggled = show;

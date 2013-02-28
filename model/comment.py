@@ -11,8 +11,8 @@ class Comment(db.Model):
   time = db.DateTimeProperty(auto_now_add=True)
 
   @classmethod
-  def get_by_media(cls, media):
-    return Comment.all().filter('media =', media).order('time').fetch(100)
+  def get_by_media(cls, media, offset=0):
+    return Comment.all().filter('media =', media).order('time').fetch(20, offset)
 
   @classmethod
   def add(cls, media, user, text, parent_id=None):

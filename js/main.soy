@@ -41,7 +41,7 @@
     </div>
   </div>
   <div id="controller" class="controller
-      {if $guide}{sp}guide-toggled{else}{sp}collapsed{sp}window{/if}
+      {if $guide}{sp}guide-toggled{else}{sp}collapsed{/if}
       {if $sidebar}{sp}sidebar-toggled{/if}">
     <div class="background"></div>
     <div class="left">
@@ -90,8 +90,12 @@
       <div class="arrow"></div>
     </div>
     <div id="sidebar-content">
-      <div id="info" class="screen info"></div>
-      <div id="stream" class="screen stream"></div>
+      <div id="info" class="screen info">
+        <div class="no-info">Pick a channel or play a story.</div>
+      </div>
+      <div id="stream" class="screen stream">
+        <div class="loading loading-activity"><div class="loading-spinner"></div></div>
+      </div>
       <div id="my-profile" class="screen profile"></div>
       <div id="admin" class="screen admin"></div>
       <div id="media-list" class="slide media-list"></div>

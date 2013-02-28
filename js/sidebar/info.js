@@ -76,6 +76,12 @@ brkn.sidebar.Info = function(media) {
    * @type {goog.ui.CustomButton}
    */
   this.plusButton_ = new goog.ui.CustomButton('Plus');
+  
+  /**
+   * @type {number}
+   * @private
+   */
+  this.resizeExtra_ = 0;
 };
 goog.inherits(brkn.sidebar.Info, goog.ui.Component);
 
@@ -121,6 +127,13 @@ brkn.sidebar.Info.prototype.commentsEl_;
 brkn.sidebar.Info.prototype.noCommentsEl_;
 
 
+/**
+ * @type {Element}
+ * @private
+ */
+brkn.sidebar.Info.prototype.spinner_;
+
+
 /** @inheritDoc */
 brkn.sidebar.Info.prototype.createDom = function() {
   var el = soy.renderAsElement(brkn.sidebar.info, {
@@ -151,6 +164,7 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
   var scrollable = goog.dom.getElementByClass('scrollable', this.getElement());
   var publisherEl = goog.dom.getElementByClass('publisher', this.getElement());
   var titleEl = goog.dom.getElementByClass('title', this.getElement());
+  this.spinner_ = goog.dom.getElementByClass('loading', this.getElement())
   var img = /** @type {Element} */ picEl.firstChild;
   this.tweetHolderEl_ = goog.dom.getElementByClass('tweet-holder', this.getElement());
   this.tweetsEl_ = goog.dom.getElementByClass('tweets', this.getElement());
@@ -209,13 +223,14 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
     
     // Comments
     var comments = /** @type {Array.<Object>} */ response['comments'];
+    goog.style.showElement(this.commentsEl_.parentElement, true);
     goog.style.showElement(this.noCommentsEl_, !comments.length);
     this.comments_ = goog.array.map(comments, function(comment) {
       var c = new brkn.model.Comment(comment);
       this.addComment_(c);
       return c;
     }, this);
-    
+    goog.style.showElement(this.spinner_, false);
     this.resize();
   }, this));
   
@@ -274,7 +289,7 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
       .listen(this.commentInput_,
           goog.events.EventType.FOCUS,
           goog.bind(function(e) {
-            this.resize(brkn.sidebar.CommentInput.COMMENT_CONTROLS_HEIGHT);
+            this.resize(brkn.sidebar.CommentInput.COMMENT_CONTROLS_HEIGHT, true);
           }, this))
       .listen(this.commentInput_,
           'resize',
@@ -304,7 +319,7 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
                 !this.commentInput_.getValue()) {
               this.commentInput_.setFocused(false);
               if (this.commentInput_.collapse()) {
-                this.resize();
+                this.resize(0);
               }
             }
           }, this))
@@ -339,16 +354,7 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
               }, this))
       .listen(this.commentsEl_,
               goog.events.EventType.SCROLL,
-              goog.bind(function() {
-                goog.dom.classes.enable(this.commentsEl_.parentElement, 'top-grad',
-                    !!this.commentsEl_.scrollTop);
-                var maxHeight = this.commentsEl_.style.maxHeight;
-                maxHeight = maxHeight.substring(0, maxHeight.length-2);
-                var height = goog.style.getSize(this.commentsEl_).height;
-                goog.dom.classes.enable(this.commentsEl_.parentElement, 'bottom-grad',
-                    this.commentsEl_.scrollTop < this.commentsEl_.scrollHeight - maxHeight &&
-                    height >= maxHeight);
-              }, this))
+              goog.bind(this.scrollGrad_, this))
       .listen(goog.dom.getElementByClass('desc-link', this.getElement()),
           goog.events.EventType.CLICK,
           goog.bind(function() {
@@ -457,26 +463,45 @@ brkn.sidebar.Info.prototype.addComment_ = function(comment) {
       goog.dom.getElementByClass('timestamp', commentEl));
   goog.dom.appendChild(this.commentsEl_, commentEl);
   this.resize(this.commentInput_.isFocused()
-      ? brkn.sidebar.CommentInput.COMMENT_CONTROLS_HEIGHT : 0);
+      ? brkn.sidebar.CommentInput.COMMENT_CONTROLS_HEIGHT : 0, true);
+};
 
-  // Give the comment div a second/2 to resize, then scroll to bottom.
-  goog.Timer.callOnce(goog.bind(function() {
-    var scrollAnim = new goog.fx.dom.Scroll(this.commentsEl_,
-        [this.commentsEl_.scrollLeft, this.commentsEl_.scrollTop],
-        [this.commentsEl_.scrollLeft, this.commentsEl_.scrollHeight], 400);
-    scrollAnim.play();
-  }, this), 0);
+
+/**
+ * @private
+ */
+brkn.sidebar.Info.prototype.scrollGrad_ = function() {
+  goog.dom.classes.enable(this.commentsEl_.parentElement, 'top-grad',
+      !!this.commentsEl_.scrollTop);
+  var maxHeight = this.commentsEl_.style.maxHeight;
+  maxHeight = maxHeight.substring(0, maxHeight.length-2);
+  var height = goog.style.getSize(this.commentsEl_).height;
+  goog.dom.classes.enable(this.commentsEl_.parentElement, 'bottom-grad',
+      this.commentsEl_.scrollTop < this.commentsEl_.scrollHeight - maxHeight - 5 &&
+      height >= maxHeight);
 };
 
 
 /**
  * @param {?number=} opt_extra Extra space to subtract
+ * @param {?boolean=} opt_scrollComments
  */
-brkn.sidebar.Info.prototype.resize = function(opt_extra) {
-  var extra = opt_extra + 10 || 10;
+brkn.sidebar.Info.prototype.resize = function(opt_extra, opt_scrollComments) {
+  this.resizeExtra_ = opt_extra != undefined ? opt_extra : this.resizeExtra_;
   if (this.commentsEl_ && this.commentsEl_.parentElement) {
     goog.style.setStyle(this.commentsEl_, 'max-height', goog.dom.getViewportSize().height -
-        goog.style.getPosition(this.commentsEl_.parentElement).y - 100 - extra + 'px');
+        goog.style.getPosition(this.commentsEl_.parentElement).y - 110 - this.resizeExtra_ + 'px');
+  }
+  this.scrollGrad_();
+  
+  if (opt_scrollComments) {
+    // Give the comment div a second/2 to resize, then scroll to bottom.
+    goog.Timer.callOnce(goog.bind(function() {
+      var scrollAnim = new goog.fx.dom.Scroll(this.commentsEl_,
+          [this.commentsEl_.scrollLeft, this.commentsEl_.scrollTop],
+          [this.commentsEl_.scrollLeft, this.commentsEl_.scrollHeight], 400);
+      scrollAnim.play();
+    }, this), 0);
   }
 };
 
