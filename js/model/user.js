@@ -79,25 +79,22 @@ brkn.model.User = function(user) {
   /**
    * @type {boolean}
    */
-  this.showGuide = user['show_guide'] || true;
+  this.showGuide = user['show_guide'] != undefined ? user['show_guide'] : true;
   
   /**
    * @type {boolean}
    */
-  this.showSidebar = user['show_sidebar'] || true;
+  this.showSidebar = user['show_sidebar'] != undefined ? user['show_sidebar'] : true;
   
   /**
    * @type {boolean}
    */
-  this.postFacebook = user['post_facebook'] || false;
-  
+  this.postFacebook = user['post_facebook'] != undefined ? user['post_facebook'] : true;
+
   /**
    * @type {boolean}
    */
-  this.postTwitter = user['post_twitter'] || false;
-  
-  window.console.log(this.showGuide);
-  window.console.log(this.showSidebar);
+  this.postTwitter = user['post_twitter'] != undefined ? user['post_twitter'] : true;
 };
 goog.inherits(brkn.model.User, goog.pubsub.PubSub);
 

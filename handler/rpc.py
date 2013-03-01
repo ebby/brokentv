@@ -118,19 +118,17 @@ class SessionHandler(BaseHandler):
       if self.current_user.access_level < AccessLevel.USER:
         self.error(401)
       else:
-        data = get_session(self.current_user, set_programming=(not constants.DEVELOPMENT))
+        data = get_session(self.current_user)
         self.response.out.write(simplejson.dumps(data))
 
 class SettingsHandler(BaseHandler):
     def post(self):
+      user = self.current_user
       show_guide = self.request.get('show_guide') == 'true'
       show_sidebar = self.request.get('show_sidebar') == 'true'
-
-      self.current_user.show_guide = show_guide
-      self.current_user.show_sidebar = show_sidebar
-      self.current_user.put()
-      logging.info(self.current_user.toJson(configs=True))
-      self.response.out.write('')
+      user.show_guide = show_guide
+      user.show_sidebar = show_sidebar
+      user.put()
 
 class ProgramHandler(BaseHandler):
     def post(self):
@@ -169,6 +167,7 @@ class CommentHandler(BaseHandler):
       media = Media.get_by_key_name(self.request.get('media_id'))
       text = self.request.get('text')
       tweet = self.request.get('tweet') == 'true'
+      facebook = self.request.get('facebook') == 'true'
       if media and text:
         c = Comment.add(media, self.current_user, text, self.request.get('parent_id'))
         new_tweet = None
@@ -182,6 +181,12 @@ class CommentHandler(BaseHandler):
             new_tweet = Tweet.add_from_response(self.current_user, response, media)
           else:
             logging.warning('TWITTER ERROR: ' + str(response['errors']))
+        
+        # Update user prefs
+        self.current_user.post_facebook = facebook
+        self.current_user.post_twitter = tweet
+        self.current_user.put()
+        
         broadcast.broadcastNewComment(c, new_tweet);
       
 class SeenHandler(BaseHandler):

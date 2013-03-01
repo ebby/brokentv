@@ -647,7 +647,7 @@ brkn.Channel.prototype.update = function() {
   }
  
   // Potentially move title for current program
-  if (this.currentProgram_ && this.changeTime_ > 2) {
+  if (this.currentProgram_) {
     var currentProgram = this.programs_[this.currentProgram_];
     var delta = goog.style.getPosition(currentProgram).x +
         goog.style.getPosition(goog.dom.getElement('guide')).x;

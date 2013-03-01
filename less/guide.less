@@ -8,11 +8,16 @@ div#guide {
   width: 100%;
   color: #ccc;
   .transition(e('height .5s ease, opacity .5s ease'));
-  &.toggled {
-    .transition(e('height .5s ease, opacity .5s ease, left 1s ease-in-out'));
-  }
-  &.collapsed {
-    .transition(e('height .5s ease, opacity .5s ease, left 1s ease-in-out'));
+  &.animate {
+  .transition(e('height .5s ease, opacity .5s ease, left 1s ease-in-out'));
+    div.channels div.channel {
+      div.name {
+        .transition(left, 1s, ease-in-out);
+      }
+      div.programs div.program div.channel div.title {
+        .transition(left, .1s, linear);
+      }
+    }
   }
   
   &.drag, &.drag div.channel div.name, &.aligning div.channel div.name {
@@ -323,7 +328,6 @@ div#guide {
         box-shadow: 1px 0 3px rgba(0, 0, 0, .8);
         cursor: pointer;
         z-index: 1;
-        .transition(left, 1s, ease-in-out);
         div.text {
           position: relative;
           top: 50%;
@@ -446,7 +450,6 @@ div#guide {
 						white-space: nowrap;
 						overflow: hidden;
 						padding-right: 25px;
-						.transition(left, .1s, linear);
 						&.marquee {
 						  .transition(e('margin-left 10s linear, left 1s linear'));
 						}

@@ -31,28 +31,28 @@ brkn.sidebar.CommentInput = function() {
    * @private
    */
   this.tweetToggle_ = new goog.ui.CustomButton('tweet');
-  this.tweetToggle_.setSupportedState(goog.ui.Component.State.CHECKED,
-      true);
+  this.tweetToggle_.setSupportedState(goog.ui.Component.State.CHECKED, true);
   
   /**
    * @type {goog.ui.CustomButton}
    * @private
    */
   this.fbToggle_ = new goog.ui.CustomButton('post');
-  this.fbToggle_.setSupportedState(goog.ui.Component.State.CHECKED,
-      true);
+  this.fbToggle_.setSupportedState(goog.ui.Component.State.CHECKED, true);
+
+  var currentUser = brkn.model.Users.getInstance().currentUser;
   
   /**
    * @type {boolean}
    * @private
    */
-  this.fbPublish_;
+  this.fbPublish_ = currentUser.postFacebook;
   
   /**
    * @type {boolean}
    * @private
    */
-  this.twitterPublish_;
+  this.twitterPublish_ = currentUser.postTwitter;
   
   /**
    * @type {boolean}
@@ -112,7 +112,7 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
   this.tweetToggle_.decorate(goog.dom.getElementByClass('tweet-toggle', this.getElement()));
   goog.net.XhrIo.send('/_twitter', goog.bind(function(e) {
     var response = e.target.getResponseJson()
-    this.twitterPublish_ = response['auth'];
+    this.twitterPublish_ = this.twitterPublish_ && response['auth'];
     this.twitterAuthUrl_ = response['auth_url'];
     this.tweetToggle_.setChecked(this.twitterPublish_);
   }, this));
@@ -120,7 +120,7 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
   this.addChild(this.fbToggle_);
   this.fbToggle_.decorate(goog.dom.getElementByClass('fb-toggle', this.getElement()));
   FB.api('/me/permissions', goog.bind(function(response) {
-    this.fbPublish_ = !!response.data[0]['publish_stream'];
+    this.fbPublish_ = this.fbPublish_ && !!response.data[0]['publish_stream'];
     this.fbToggle_.setChecked(this.fbPublish_);
   }, this));
   

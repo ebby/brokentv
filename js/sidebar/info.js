@@ -402,7 +402,8 @@ brkn.sidebar.Info.prototype.onAddComment_ = function(e) {
       '/_comment',
       e.callback,
       'POST',
-      'media_id=' + this.media_.id + '&text=' + e.text + '&tweet=' + e.twitter);
+      'media_id=' + this.media_.id + '&text=' + e.text +
+      '&tweet=' + e.twitter + '&facebook=' + e.facebook);
   
   if (e.facebook) {
     FB.api('/me/feed', 'POST', {

@@ -303,9 +303,8 @@ brkn.Controller.prototype.toggleGuide_ = function(show) {
 
 /**
  * Resize
- * @param {?boolean=} opt_window
  */
-brkn.Controller.prototype.resize = function(opt_window) {
+brkn.Controller.prototype.resize = function() {
   goog.style.setWidth(this.getElement(), goog.dom.getViewportSize().width -
       (this.sidebarToggle_.isChecked() ? 300 : 0));
   if (!brkn.model.Channels.getInstance().currentChannel.myChannel) {
@@ -326,7 +325,7 @@ brkn.Controller.prototype.resize = function(opt_window) {
       goog.style.setWidth(this.rightEl_, rightWidth);
     }
     goog.Timer.callOnce(goog.bind(function() {
-      goog.dom.classes.enable(this.getElement(), 'window', opt_window || 
+      goog.dom.classes.enable(this.getElement(), 'window',
           (goog.dom.classes.has(this.getElement(), 'collapsed') && !!lastProgram &&
           width < goog.dom.getViewportSize().width - 203));
     }, this), 400);

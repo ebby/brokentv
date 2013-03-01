@@ -310,10 +310,6 @@ brkn.Guide.prototype.enterDocument = function() {
                 myCurrentProgress - this.minTime_.getTime())/1000 *
                 this.pixelsPerSecond_) : elapsed;
             this.updateNowButtons_();
-            while (elapsed + goog.dom.getViewportSize().width > this.width_ -
-                (brkn.model.Controller.getInstance().sidebarToggled ? 300 : 0)) {
-              this.expand_();
-            }
             
             goog.style.setPosition(this.tickerEl_, elapsed);
             goog.style.setPosition(this.myTickerEl_, myElapsed);
@@ -388,7 +384,7 @@ brkn.Guide.prototype.enterDocument = function() {
       this.playAsync_, this);
 
   this.resize_();
-  this.align_(true);
+  this.align_(true, undefined, false);
   
   if (this.isAdmin_) {
     // Don't drag when shift key is pressed...we're rescheduling a show.
@@ -424,7 +420,9 @@ brkn.Guide.prototype.forceScroll_ = function(el, scrollTo) {
  */
 brkn.Guide.prototype.toggleGuide_ = function(show) {
   // Align before we see guide
+  goog.dom.classes.remove(this.getElement(), 'animate');
   this.align_(true, undefined, false);
+  goog.dom.classes.add(this.getElement(), 'animate');
 
   var height = Math.min(this.channelsEl_.scrollHeight, 210);
   goog.dom.classes.enable(this.getElement(), 'toggled', show);
@@ -609,6 +607,7 @@ brkn.Guide.prototype.align_ = function(opt_setAligned, opt_offset, opt_setScroll
           brkn.model.Player.getInstance().getCurrentProgram() :
           this.cursor_[0].getCurrentProgram(this.guideOffset_);
   this.cursor_[1] = program;
+  
   if ((this.aligned_ || opt_offset) && program) {
     var myCurrentProgram = brkn.model.Player.getInstance().getCurrentProgram();
     var myCurrentProgress = brkn.model.Player.getInstance().getProgress()*1000;
@@ -617,11 +616,17 @@ brkn.Guide.prototype.align_ = function(opt_setAligned, opt_offset, opt_setScroll
         Math.round((myCurrentProgram.time.getTime() +
         myCurrentProgress - this.minTime_.getTime())/1000 *
         this.pixelsPerSecond_) : elapsed;
+        
+    // Expand timeline if need be
+    while (elapsed + goog.dom.getViewportSize().width > this.width_ -
+        (brkn.model.Controller.getInstance().sidebarToggled ? 300 : 0)) {
+      this.expand_();
+    }
 
     var offset = -(program.time.getTime() - this.minTime_.getTime())/1000 * this.pixelsPerSecond_ + 5;
     var viewWidth = goog.dom.getViewportSize().width - 
         (brkn.model.Controller.getInstance().sidebarToggled ? 300 : 0);
-    if (!opt_offset && !brkn.model.Controller.getInstance().guideToggled &&
+    if (!opt_offset && brkn.model.Controller.getInstance().guideToggled &&
         elapsed > -offset + viewWidth - 300) {
       // If program is off-screen, keep up.
       offset = (opt_live ? -elapsed : -myElapsed) + viewWidth - 350;

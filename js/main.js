@@ -67,9 +67,6 @@ brkn.Main.prototype.popup_;
 /** @inheritDoc */
 brkn.Main.prototype.decorateInternal = function(element) {
   goog.base(this, 'decorateInternal', element);
-  
-  window.console.log(brkn.model.Users.getInstance().currentUser.showGuide)
-  window.console.log(brkn.model.Users.getInstance().currentUser.showSidebar)
 
   var mainEl = soy.renderAsElement(brkn.main.main, {
     user: brkn.model.Users.getInstance().currentUser,
