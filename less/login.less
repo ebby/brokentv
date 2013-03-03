@@ -16,7 +16,9 @@ div#login {
     overflow: hidden;
     top: -100%;
   }
-  
+  .bold {
+    font-family: MuseoSans700;
+  }
   div#static-scrollable {
     width: 100%;
     height: 100%;
@@ -58,7 +60,7 @@ div#login {
       border-right: 1px solid rgba(0, 0, 0, .4);
       box-shadow: 2px 0px 0 -1px rgba(255, 255, 255, 0.5);
       font-family: MuseoSans700;
-      color: #4d4d4d;
+      color: #3d3d3d;
       text-shadow: 1px 1px 1px rgba(255, 255, 255, .9);
     }
     div.subtitle {
@@ -67,7 +69,7 @@ div#login {
       top: 70px;
       padding: 30px 0;
       font-family: MuseoSans300;
-      color: #4d4d4d;
+      color: #3d3d3d;
       text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.9);
     }
     div.fb-login {
@@ -166,13 +168,15 @@ div#login {
         pointer-events: none;
       }
     }
-    &.about div#pages div.about, &.tos div#pages div.tos, &.privacy div#pages div.privacy {
+    &.about div#pages div.about, &.jobs div#pages div.jobs, &.tos div#pages div.tos,
+        &.privacy div#pages div.privacy {
       visibility: visible;
       opacity: 1;
       height: auto;
       padding: 10px;
     }
-    &.about div#footer a#about, &.tos div#footer a#tos, &.privacy div#footer a#privacy {
+    &.about div#footer a#about, &.jobs div#footer a#jobs, &.tos div#footer a#tos,
+        &.privacy div#footer a#privacy {
       text-decoration: underline;
     }
     div#pages {
@@ -180,8 +184,11 @@ div#login {
       margin: auto;
       margin-top: 170px;
       position: relative;
-      color: #4d4d4d;
+      color: #3d3d3d;
       text-shadow: 1px 1px 1px white;
+      a {
+        color: #3d3d3d;
+      }
       div.page {
         visibility: hidden;
         opacity: 0;
@@ -199,13 +206,16 @@ div#login {
         margin-bottom: 20px;
       }
       div.page-content {
-        font-size: 16px;
+        width: 740px;
+        font-size: 14px;
         font-family: MuseoSans300;
+        .select-text();
+        line-height: 20px;
       }
       
     }
     div.footer {
-      position: fixed;
+      position: absolute;
       bottom: 0;
       width: 900px;
       font-size: 10px;

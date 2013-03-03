@@ -139,6 +139,7 @@ brkn.Main.init = function(response, channelToken, channels, programs,
 	if (!goog.object.isEmpty(currentUser)) {
 	  brkn.model.Users.getInstance().setCurrentUser(currentUser);
 	}
+
 	brkn.model.Channels.getInstance().loadFromJson(channels, currentUser['current_channel']);
 	brkn.model.Programs.getInstance().loadFromJson(programs);
 	brkn.model.Channels.getInstance().loadViewersFromJson(viewerSessions);
@@ -167,7 +168,7 @@ brkn.Main.staticInit = function() {
   var resize = function(expand) {
     if (expand) {
       content.style.top = Math.max(10,
-          goog.dom.getViewportSize().height - 190) + 'px';
+          goog.dom.getViewportSize().height - 280) + 'px';
       var scrollAnim = new goog.fx.dom.Scroll(login,
           [login.scrollLeft, login.scrollTop],
           [login.scrollLeft, Math.min(goog.dom.getViewportSize().height - 435, content.scrollHeight + 190)],
@@ -190,7 +191,7 @@ brkn.Main.staticInit = function() {
     }
   });
   goog.events.listen(login, goog.events.EventType.SCROLL, function(e) {
-    if (login.scrollTop < 10) {
+    if (login.scrollTop < 1) {
       expand = false;
       resize(expand);
     }

@@ -14,6 +14,8 @@ class Channel(db.Model):
   suggested = db.ReferenceProperty(Collection)
   user = db.ReferenceProperty(User, collection_name='channel')
   online = db.BooleanProperty(default=False)
+  current_media = db.ReferenceProperty(Media)
+  current_seek = db.IntegerProperty(default=0)
 
   @property
   def id(self):
@@ -38,6 +40,8 @@ class Channel(db.Model):
   def get_current_program(self):
     # MEMCACHE THIS!!
     current_program = Program.get_by_id(self.current_program) if self.current_program else None
+    if self.privacy == Privacy.PRIVATE:
+      return current_program
     if current_program and current_program.time <= datetime.datetime.now() <= \
           current_program.time + datetime.timedelta(seconds=current_program.media.duration):
       return current_program
@@ -75,6 +79,8 @@ class Channel(db.Model):
     return col
 
   def toJson(self, get_programming=False):
+    current_program = self.get_current_program() if self.privacy == Privacy.PRIVATE else None
+    
     json = {}
     json['id'] = self.key().name()
     json['name'] = self.name
@@ -83,6 +89,9 @@ class Channel(db.Model):
     json['online'] = self.online
     json['my_channel'] = self.privacy == Privacy.PRIVATE
     json['next_time'] = self.next_time.isoformat() if self.next_time else datetime.datetime.now().isoformat()
+    json['current_program'] = current_program.toJson(fetch_channel=False, media_desc=False) if current_program else None
+    json['current_media'] = self.current_media.toJson() if self.current_media else None
+    json['current_seek'] = self.current_seek
     return json
 
 from program import *

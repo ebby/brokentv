@@ -39,6 +39,19 @@ brkn.sidebar.Info = function(media) {
   this.comments_ = [];
 
   /**
+   * @type {Object.<number, brkn.model.Comment>}
+   * @private
+   */
+  this.commentsMap_ = {};
+
+  /**
+   * The last comment/reply element for a comment thread
+   * @type {Object.<number, Element>}
+   * @private
+   */
+  this.lastCommentEl_ = {};
+
+  /**
    * @type {Array.<brkn.model.Tweet>}
    * @private
    */
@@ -71,12 +84,14 @@ brkn.sidebar.Info = function(media) {
    * @type {goog.ui.CustomButton}
    */
   this.playButton_ = new goog.ui.CustomButton('Play');
-  
+
   /**
    * @type {goog.ui.CustomButton}
    */
   this.plusButton_ = new goog.ui.CustomButton('Plus');
-  
+  this.plusButton_.setSupportedState(goog.ui.Component.State.CHECKED,
+      true);
+
   /**
    * @type {number}
    * @private
@@ -225,7 +240,7 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
     var comments = /** @type {Array.<Object>} */ response['comments'];
     goog.style.showElement(this.commentsEl_.parentElement, true);
     goog.style.showElement(this.noCommentsEl_, !comments.length);
-    this.comments_ = goog.array.map(comments, function(comment) {
+    comments = goog.array.map(comments, function(comment) {
       var c = new brkn.model.Comment(comment);
       this.addComment_(c);
       return c;
@@ -260,6 +275,10 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
           goog.bind(this.onTwitterButton_, this))
       .listen(this.playButton_, goog.ui.Component.EventType.ACTION,
           goog.bind(this.onPlayButton_, this))
+      .listen(this.plusButton_, goog.ui.Component.EventType.ACTION,
+          goog.bind(this.onPlusButton_, this))
+      .listen(this.plusButton_.getElement(), goog.events.EventType.MOUSEDOWN,
+          goog.bind(this.onPlusMouseDown_, this))
       .listen(this.commentInput_,
           'add',
           goog.bind(this.onAddComment_, this))
@@ -271,13 +290,13 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
             this.commentInput_.setFocused(true);
           }, this))
       .listen(goog.dom.getElementByClass('conv-link', this.getElement()),
-        goog.events.EventType.CLICK,
-        goog.bind(function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.CONVERSATION,
-              this.media_, this.comments_, this.tweets_);
-        }, this))
+          goog.events.EventType.CLICK,
+          goog.bind(function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.CONVERSATION,
+                this.media_, this.comments_, this.tweets_);
+          }, this))
       .listen(goog.dom.getElementByClass('tweets-link', this.getElement()),
         goog.events.EventType.CLICK,
         goog.bind(function(e) {
@@ -355,6 +374,9 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
       .listen(this.commentsEl_,
               goog.events.EventType.SCROLL,
               goog.bind(this.scrollGrad_, this))
+      .listen(this.commentsEl_,
+              goog.events.EventType.CLICK,
+              goog.bind(this.commentClick_, this))
       .listen(goog.dom.getElementByClass('desc-link', this.getElement()),
           goog.events.EventType.CLICK,
           goog.bind(function() {
@@ -403,7 +425,8 @@ brkn.sidebar.Info.prototype.onAddComment_ = function(e) {
       e.callback,
       'POST',
       'media_id=' + this.media_.id + '&text=' + e.text +
-      '&tweet=' + e.twitter + '&facebook=' + e.facebook);
+      '&tweet=' + e.twitter + '&facebook=' + e.facebook +
+      (e.parentId ? '&parent_id=' + e.parentId : ''));
   
   if (e.facebook) {
     FB.api('/me/feed', 'POST', {
@@ -455,16 +478,51 @@ brkn.sidebar.Info.prototype.addTweet_ = function(tweet, opt_first) {
  * @private
  */
 brkn.sidebar.Info.prototype.addComment_ = function(comment) {
+  this.comments_.push(comment);
+  this.commentsMap_[comment.id] = comment;
+
   goog.style.showElement(this.noCommentsEl_, false);
   var commentEl = soy.renderAsElement(brkn.sidebar.comment, {
     comment: comment,
-    timestamp: goog.date.relative.format(comment.time.getTime())
+    timestamp: goog.date.relative.format(comment.time.getTime()),
+    owner: (comment.user.id == brkn.model.Users.getInstance().currentUser.id)
   });
   brkn.model.Clock.getInstance().addTimestamp(comment.time,
       goog.dom.getElementByClass('timestamp', commentEl));
-  goog.dom.appendChild(this.commentsEl_, commentEl);
+  if (comment.parentId) {
+    window.console.log('appending comment');
+    window.console.log(this.lastCommentEl_[comment.parentId]);
+    goog.dom.insertSiblingAfter(commentEl, this.lastCommentEl_[comment.parentId]);
+  } else {
+    goog.dom.appendChild(this.commentsEl_, commentEl);
+  }
+  this.lastCommentEl_[(comment.parentId || comment.id)] = commentEl;
   this.resize(this.commentInput_.isFocused()
       ? brkn.sidebar.CommentInput.COMMENT_CONTROLS_HEIGHT : 0, true);
+  goog.array.forEach(comment.replies, function(reply) {
+    this.addComment_(reply);
+  }, this);
+};
+
+
+/**
+ * @param {Event} e
+ * @private
+ */
+brkn.sidebar.Info.prototype.commentClick_ = function(e) {
+  var targetEl = /** @type {Element} */ e.target;
+  var commentEl = goog.dom.getAncestorByClass(targetEl, 'comment');
+  if (commentEl) {
+    var commentId = parseInt(commentEl.id.split('-')[1], 10);
+    var comment = this.commentsMap_[commentId];
+    if (goog.dom.classes.has(targetEl, 'reply')) {
+      brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.REPLY_COMMENT,
+          comment.parentId ? this.commentsMap_[comment.parentId] : comment);
+    } else if (goog.dom.classes.has(targetEl, 'remove')) {
+      goog.style.showElement(commentEl, false);
+      goog.net.XhrIo.send('/_comment', goog.functions.NULL(), 'POST', 'delete=true&id=' + commentId);
+    }
+  }
 };
 
 
@@ -516,7 +574,7 @@ brkn.sidebar.Info.prototype.onFacebookButton_ = function() {
       {
         method: 'feed',
         name: this.media_.name,
-        link: 'http://www.xylovision.com',
+        link: 'http://www.xylocast.com',
         picture: this.media_.thumbnail,
         caption: 'on XYLO',
         description: this.media_.description
@@ -534,7 +592,7 @@ brkn.sidebar.Info.prototype.onFacebookButton_ = function() {
  * @private
  */
 brkn.sidebar.Info.prototype.onTwitterButton_ = function() {
-  var url = 'https://twitter.com/share?url=www.xylovision.com&text=I\'m watching ' + this.media_.name;
+  var url = 'https://twitter.com/share?url=www.xylocast.com&text=I\'m watching ' + this.media_.name;
   var newWindow = window.open(url,'Tweet','height=320,width=550');
   newWindow.moveTo(screen.width/2-225,
       screen.height/2-150)
@@ -548,6 +606,38 @@ brkn.sidebar.Info.prototype.onTwitterButton_ = function() {
  * @private
  */
 brkn.sidebar.Info.prototype.onPlayButton_ = function() {
-  brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.PLAY_ASYNC,
-      this.getModel());
+  var program = brkn.model.Program.async((/** @type {brkn.model.Media} */ this.getModel()));
+  brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.PLAY_ASYNC, program);
+};
+
+
+/**
+ * @private
+ */
+brkn.sidebar.Info.prototype.onPlusMouseDown_ = function() {
+  if (!(brkn.model.Player.getInstance().getCurrentProgram() &&
+      brkn.model.Player.getInstance().getCurrentProgram().async)) {
+    this.playButton_.setActive(true); 
+    goog.Timer.callOnce(goog.bind(function() {
+      // Just in case we don't complete click.
+      this.playButton_.setActive(false); 
+    }, this), 2000)
+  }
+};
+
+
+/**
+ * @private
+ */
+brkn.sidebar.Info.prototype.onPlusButton_ = function() {
+  if (!(brkn.model.Player.getInstance().getCurrentProgram() &&
+      brkn.model.Player.getInstance().getCurrentProgram().async)) {
+    var program = brkn.model.Program.async((/** @type {brkn.model.Media} */ this.getModel()));
+    brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.PLAY_ASYNC, program);
+    this.playButton_.setActive(false);
+    this.plusButton_.setChecked(false);
+  } else {
+    brkn.model.Channels.getInstance().getMyChannel().publish(brkn.model.Channel.Action.ADD_QUEUE,
+        (/** @type {brkn.model.Media} */ this.getModel()), this.plusButton_.isChecked()); 
+  }
 };

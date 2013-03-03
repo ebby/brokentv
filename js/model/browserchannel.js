@@ -125,9 +125,13 @@ brkn.model.BrowserChannel.prototype.onMessage_ = function(rawMessage) {
 brkn.model.BrowserChannel.prototype.onClose_ = function() {
   if (!this.loggedOff_) {
     // Update UI prefs
+    var myChannel = brkn.model.Channels.getInstance().currentChannel.myChannel;
+    var currentMedia = myChannel && brkn.model.Channels.getInstance().currentChannel.currentMedia;
+    var seek = currentMedia && Math.floor(brkn.model.Player.getInstance().getCurrentTime())
     goog.net.XhrIo.send('/_settings', goog.functions.NULL(), 'POST',
         'show_guide=' + brkn.model.Controller.getInstance().guideToggled +
-        '&show_sidebar=' + brkn.model.Controller.getInstance().sidebarToggled);
+        '&show_sidebar=' + brkn.model.Controller.getInstance().sidebarToggled +
+        (seek ? '&current_seek=' + seek : ''));
     this.loggedOff_ = true;
   }
 };

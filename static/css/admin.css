@@ -1,2 +1,222 @@
-.button{display:inline-block;border-radius:3px;border:1px solid #2d3446;width:70px;height:15px;font-size:13px;text-align:center;padding:3px 0;box-shadow:inset 0 0 1px rgba(255,255,255,.1),0 0 1px rgba(255,255,255,.5);color:#FEFEFE;text-shadow:1px 1px black;cursor:pointer;outline:0;background:rgba(218,218,218,.9)}.button.goog-custom-button-active,.button.goog-custom-button-checked,.button:active{background:rgba(180,180,180,.9);box-shadow:inset 0 0 1px 1px rgba(0,0,0,.3),0 0 1px #dedede;color:#ddd}.button.dark{background:0}.button.dark.goog-custom-button-active,.button.dark.goog-custom-button-checked,.button.dark:active{background-color:#111;box-shadow:inset 0 0 1px 1px #000;color:#ddd}.button.dark.goog-custom-button-disabled{background-color:#111;box-shadow:inset 0 0 1px 1px #000;color:#ddd;cursor:default}@font-face{font-family:'MuseoSans100';src:url('/static/webfonts/museosans/100.woff') format('woff')}@font-face{font-family:'MuseoSans300';src:url('/static/webfonts/museosans/300.woff') format('woff')}@font-face{font-family:'MuseoSans500';src:url('/static/webfonts/museosans/500.woff') format('woff')}@font-face{font-family:'MuseoSans700';src:url('/static/webfonts/museosans/700.woff') format('woff')}html,body{background:#f5f5f5 url(/static/img/content-texture.png);margin:0;font-family:MuseoSans300;font-size:12px}body{overflow:hidden}a{text-decoration:none;font-family:MuseoSans300;font-size:12px;color:#fff;text-shadow:1px 1px 1px #181818}a:hover{text-decoration:underline}div#header{position:fixed;top:0;left:0;width:100%;height:40px;background:#5c5c5c url(/static/img/grad.png);-webkit-box-shadow:inset 0 -3px 7px -3px rgba(0,0,0,.2),0 0 5px 0 rgba(0,0,0,.5);-moz-box-shadow:inset 0 -3px 7px -3px rgba(0,0,0,.2),0 0 5px 0 rgba(0,0,0,.5);box-shadow:inset 0 -3px 7px -3px rgba(0,0,0,.2),0 0 5px 0 rgba(0,0,0,.5)}div#header div.logo{font-family:MuseoSans700;font-size:16px;color:#f5f5f5;margin:10px;text-shadow:1px 1px 1px #181818}div#header div.logo span{font-family:MuseoSans100}div#content{position:absolute;left:0;top:0;width:100%;height:100%;overflow-y:scroll}div.users{margin:10px auto;margin-top:50px;width:900px}div.users div.header{font-size:11px;position:relative;height:45px;margin-left:10px}div.users div.header .pic,div.users div.header .access{top:18px}div.users div.user-list{box-shadow:inset 0 0 2px 1px rgba(0,0,0,.3);margin:0 10px;border-radius:3px}div.users div.user{background:rgba(0,0,0,.5);border-bottom:1px solid rgba(0,0,0,.3);height:50px;position:relative;color:#fff;text-shadow:1px 1px 1px #181818}div.users div.user:last-child{border-bottom-right-radius:3px;border-bottom-left-radius:3px;-webkit-border-bottom-right-radius:3px;-webkit-border-bottom-left-radius:3px;border-bottom:0}div.users div.user:first-child{border-top-left-radius:3px;border-top-right-radius:3px;-webkit-border-top-left-radius:3px;-webkit-border-top-right-radius:3px}div.users .pic{position:absolute;top:5px;left:5px}div.users .pic img{width:40px;height:40px;border-radius:3px;box-shadow:0 0 1px 1px rgba(0,0,0,.4)}div.users .name{position:absolute;top:18px;left:55px;width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}div.users .access{position:absolute;left:210px;top:11px}div.users .location{position:absolute;left:390px;top:18px}div.users .last-login{position:absolute;left:550px;top:18px}div.users .session-count{position:absolute;left:700px;top:18px}div.users .ave-session{position:absolute;left:800px;top:18px}div.controls{display:inline-block}div.controls div.button{border-radius:0;margin-left:-1px;width:50px;height:20px;font-size:11px;line-height:20px;border-color:#181818;background:rgba(0,0,0,.4)}div.controls div.button.selected{pointer-events:none;background-color:#111;box-shadow:inset 0 0 1px 1px #000;color:#ddd;cursor:default}div.controls>div:last-child{border-top-right-radius:3px;border-bottom-right-radius:3px;-webkit-border-top-right-radius:3px;-webkit-border-bottom-right-radius:3px}div.controls>div:first-child{border-top-left-radius:3px;border-bottom-left-radius:3px;-webkit-border-top-left-radius:3px;-webkit-border-bottom-left-radius:3px}
-/* This beautiful CSS-File has been crafted with LESS (lesscss.org) and compiled by simpLESS (wearekiss.com/simpless) */
+.button {
+  display: inline-block;
+  border-radius: 3px;
+  border: 1px solid #2d3446;
+  width: 70px;
+  height: 15px;
+  font-size: 13px;
+  text-align: center;
+  padding: 3px 0;
+  box-shadow: inset 0 0 1px rgba(255, 255, 255, 0.1), 0 0 1px rgba(255, 255, 255, 0.5);
+  color: #FEFEFE;
+  text-shadow: 1px 1px black;
+  cursor: pointer;
+  outline: none;
+  background: rgba(218, 218, 218, 0.9);
+}
+.button.goog-custom-button-active,
+.button.goog-custom-button-checked,
+.button:active {
+  background: rgba(180, 180, 180, 0.9);
+  box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.3), 0 0 1px #dedede;
+  color: #ddd;
+}
+.button.dark {
+  background: none;
+}
+.button.dark.goog-custom-button-active,
+.button.dark.goog-custom-button-checked,
+.button.dark:active {
+  background-color: #111;
+  box-shadow: inset 0 0 1px 1px #000;
+  color: #ddd;
+}
+.button.dark.goog-custom-button-disabled {
+  background-color: #111;
+  box-shadow: inset 0 0 1px 1px #000;
+  color: #ddd;
+  cursor: default;
+}
+@font-face {
+  font-family: 'MuseoSans100';
+  src: url('/static/webfonts/museosans/100.woff') format('woff');
+}
+@font-face {
+  font-family: 'MuseoSans300';
+  src: url('/static/webfonts/museosans/300.woff') format('woff');
+}
+@font-face {
+  font-family: 'MuseoSans500';
+  src: url('/static/webfonts/museosans/500.woff') format('woff');
+}
+@font-face {
+  font-family: 'MuseoSans700';
+  src: url('/static/webfonts/museosans/700.woff') format('woff');
+}
+html,
+body {
+  background: #f5f5f5 url(/static/img/content-texture.png);
+  margin: 0;
+  font-family: MuseoSans300;
+  font-size: 12px;
+}
+body {
+  overflow: hidden;
+}
+a {
+  text-decoration: none;
+  font-family: MuseoSans300;
+  font-size: 12px;
+  color: white;
+  text-shadow: 1px 1px 1px #181818;
+}
+a:hover {
+  text-decoration: underline;
+}
+div#header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 40px;
+  background: #5c5c5c url(/static/img/grad.png);
+  -webkit-box-shadow: inset 0 -3px 7px -3px rgba(0,0,0,0.2), 0 0 5px 0 rgba(0, 0, 0, .5);
+  -moz-box-shadow: inset 0 -3px 7px -3px rgba(0,0,0,0.2), 0 0 5px 0 rgba(0, 0, 0, .5);
+  box-shadow: inset 0 -3px 7px -3px rgba(0,0,0,0.2), 0 0 5px 0 rgba(0, 0, 0, .5);
+}
+div#header div.logo {
+  font-family: MuseoSans700;
+  font-size: 16px;
+  color: #f5f5f5;
+  margin: 10px;
+  text-shadow: 1px 1px 1px #181818;
+}
+div#header div.logo span {
+  font-family: MuseoSans100;
+}
+div#content {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow-y: scroll;
+}
+div.users {
+  margin: 10px auto;
+  margin-top: 50px;
+  width: 900px;
+}
+div.users div.header {
+  font-size: 11px;
+  position: relative;
+  height: 45px;
+  margin-left: 10px;
+}
+div.users div.header .pic,
+div.users div.header .access {
+  top: 18px;
+}
+div.users div.user-list {
+  box-shadow: inset 0 0 2px 1px rgba(0, 0, 0, 0.3);
+  margin: 0 10px;
+  border-radius: 3px;
+}
+div.users div.user {
+  background: rgba(0, 0, 0, 0.5);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+  height: 50px;
+  position: relative;
+  color: white;
+  text-shadow: 1px 1px 1px #181818;
+}
+div.users div.user:last-child {
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+  -webkit-border-bottom-right-radius: 3px;
+  -webkit-border-bottom-left-radius: 3px;
+  border-bottom: none;
+}
+div.users div.user:first-child {
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  -webkit-border-top-left-radius: 3px;
+  -webkit-border-top-right-radius: 3px;
+}
+div.users .pic {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+}
+div.users .pic img {
+  width: 40px;
+  height: 40px;
+  border-radius: 3px;
+  box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.4);
+}
+div.users .name {
+  position: absolute;
+  top: 18px;
+  left: 55px;
+  width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+div.users .access {
+  position: absolute;
+  left: 210px;
+  top: 11px;
+}
+div.users .location {
+  position: absolute;
+  left: 390px;
+  top: 18px;
+}
+div.users .last-login {
+  position: absolute;
+  left: 550px;
+  top: 18px;
+}
+div.users .session-count {
+  position: absolute;
+  left: 700px;
+  top: 18px;
+}
+div.users .ave-session {
+  position: absolute;
+  left: 800px;
+  top: 18px;
+}
+div.controls {
+  display: inline-block;
+}
+div.controls div.button {
+  border-radius: 0;
+  margin-left: -1px;
+  width: 50px;
+  height: 20px;
+  font-size: 11px;
+  line-height: 20px;
+  border-color: #181818;
+  background: rgba(0, 0, 0, 0.4);
+}
+div.controls div.button.selected {
+  pointer-events: none;
+  background-color: #111;
+  box-shadow: inset 0 0 1px 1px #000;
+  color: #ddd;
+  cursor: default;
+}
+div.controls > div:last-child {
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
+  -webkit-border-top-right-radius: 3px;
+  -webkit-border-bottom-right-radius: 3px;
+}
+div.controls > div:first-child {
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
+  -webkit-border-top-left-radius: 3px;
+  -webkit-border-bottom-left-radius: 3px;
+}

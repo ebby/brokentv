@@ -40,6 +40,18 @@ brkn.model.Program = function(opt_program, opt_media) {
 	 */
 	this.time = program ? goog.date.fromIsoString(program['time'] + 'Z') :
 	    new goog.date.DateTime();
+	
+	/**
+	 * @type {boolean}
+	 * @private
+	 */
+	this.async = program ? program['async'] : true;
+
+	/**
+   * @type {?number}
+   * @private
+   */
+  this.seek = program ? program['seek'] : null;
 };
 goog.inherits(brkn.model.Program, goog.pubsub.PubSub);
 

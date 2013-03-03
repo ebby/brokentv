@@ -391,6 +391,19 @@ div#sidebar {
         margin-top: 8px;
         margin-bottom: 5px;
       }
+      div.token {
+        position: absolute;
+        top: 10px;
+        left: 12px;
+        background: #dedede;
+        color: #333;
+        font-size: 13px;
+        text-shadow: 1px 1px 1px white;
+        border-radius: 3px;
+        border: 1px solid #666;
+        padding: 1px;
+        display: inline;
+      }
     }
   }
   div.info.current div.comment-input, div.conversation div.comment-input {
@@ -766,7 +779,7 @@ div#sidebar {
     }
     div.comment {
       position: relative;
-      width: 99%;
+      width: 278px;
       background: rgba(0, 0, 0, 0.65);
       border: 1px solid #333;
       box-shadow: 0 0 2px 0px rgba(0, 0, 0, .8),  0 3px 1px -1px rgba(255, 255, 255, 0.5);
@@ -781,6 +794,11 @@ div#sidebar {
         border-bottom-left-radius: 3px;
         border-bottom-right-radius: 3px;
         box-shadow: 0 0 2px 0px rgba(0, 0, 0, .8);
+      }
+      &.reply {
+        background: rgba(0, 0, 0, .4);
+        border-left: 5px solid #181818;
+        width: 274px;
       }
       img {
         width: 28px;
@@ -806,6 +824,36 @@ div#sidebar {
         bottom: 3px;
         right: 5px;
         font-size: 10px;
+      }
+      div.comment-options {
+        position: absolute;
+        width: 35px;
+        height: 15px;
+        top: 3px;
+        right: 5px;
+        visibility: hidden;
+        opacity: 0;
+        .transition(opacity, .2s, ease);
+        div.remove {
+          width: 13px;
+          height: 13px;
+          background: url(/static/img/close-light.png) center no-repeat;
+          cursor: pointer;
+          margin-left: 2px;
+          float: right;
+        }
+        div.reply {
+          width: 13px;
+          height: 13px;
+          background: url(/static/img/reply.png) center no-repeat;
+          background-size: 100%;
+          cursor: pointer;
+          float: right;
+        }
+      }
+      &:hover div.comment-options {
+        visibility: visible;
+        opacity: 1;
       }
     }
   }

@@ -363,7 +363,7 @@ brkn.Guide.prototype.enterDocument = function() {
           var x = goog.style.getPosition(this.getElement()).x + delta;
           if (x < 0 && x > (-1 * this.width_ + goog.dom.getViewportSize().width)) {
             goog.style.setPosition(this.getElement(), x);
-            this.currentChannel_.update();
+            this.currentChannel_ && this.currentChannel_.update();
             this.channelNameStyle_.innerHTML = 'div#guide div.channels div.channel div.name' + '{left:'
                 + -x + 'px !important}';
           }
@@ -385,7 +385,7 @@ brkn.Guide.prototype.enterDocument = function() {
 
   this.resize_();
   this.align_(true, undefined, false);
-  
+
   if (this.isAdmin_) {
     // Don't drag when shift key is pressed...we're rescheduling a show.
     this.getHandler().listen(this.dragger_, goog.fx.Dragger.EventType.BEFOREDRAG,
@@ -482,19 +482,11 @@ brkn.Guide.prototype.changeChannel = function(channel) {
 
 
 /**
- * @param {brkn.model.Media} media
+ * @param {brkn.model.Program} program
  * @private
  */
-brkn.Guide.prototype.playAsync_ = function(media) {
-  if (!this.myChannel_) {
-    // Create a private channel
-    var user = brkn.model.Users.getInstance().currentUser;
-    this.myChannel_ = new brkn.model.Channel({
-      id: user.id,
-      name: user.name.split(' ')[0] + '\'s Channel'
-    });
-    brkn.model.Channels.getInstance().myChannel = this.myChannel_;
-  }
+brkn.Guide.prototype.playAsync_ = function(program) {
+  this.myChannel_ = this.myChannel_ || brkn.model.Channels.getInstance().getMyChannel();
   if (brkn.Exp.MY_CHANNEL && !this.channelMap_[this.myChannel_.id]) {
     var channel = new brkn.Channel(this.myChannel_, this.timeline, this.startTime_, 0,
         this.minTime_);
@@ -502,12 +494,9 @@ brkn.Guide.prototype.playAsync_ = function(media) {
     this.channels_.push(channel);
     this.channelMap_[this.myChannel_.id] = channel;
   }
-  var program = brkn.model.Program.async(media);
-  this.myChannel_.publish(brkn.model.Channel.Action.ADD_PROGRAM, program);
+  
   brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.CHANGE_CHANNEL,
       this.myChannel_);
-  goog.net.XhrIo.send('/_addprogram', goog.functions.NULL(), 'POST',
-      'channel_id=' + brkn.model.Channels.getInstance().myChannel.id + '&media_id=' + media.id);
   brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.TOGGLE_GUIDE, false);
 };
 

@@ -373,6 +373,6 @@ brkn.sidebar.AdminList.prototype.approval_ = function(media, approve, mediaEl) {
  * @private
  */
 brkn.sidebar.AdminList.prototype.play_ = function(media) {
-  brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.PLAY_ASYNC,
-      media);
+  var program = brkn.model.Program.async(media);
+  brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.PLAY_ASYNC, program);
 };

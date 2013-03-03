@@ -13,8 +13,8 @@ brkn.model.Comment = function(comment) {
    * @type {number}
    * @private
    */
-  this.id = comment.id;
-  
+  this.id = comment['id'];
+
   /**
    * @type {brkn.model.User}
    * @private
@@ -36,4 +36,21 @@ brkn.model.Comment = function(comment) {
    * @type {string}
    */
   this.relativeTime = goog.date.relative.format(this.time.getTime());
+
+  /**
+   * @type {number}
+   */
+  this.parentId = comment['parent_id'];
+
+  /**
+   * @type {Array.<brkn.model.Comment>}
+   * @private
+   */
+  this.replies = [];
+
+  goog.array.forEach(comment['replies'], function(reply) {
+    var r = new brkn.model.Comment(reply);
+    this.replies.push(r);
+  }, this);
+  window.console.log(this.replies);
 };

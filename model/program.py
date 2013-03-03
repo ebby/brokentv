@@ -9,6 +9,8 @@ class Program(db.Model):
   media = db.ReferenceProperty(Media)
   channel = db.ReferenceProperty(Channel)
   time = db.DateTimeProperty()
+  async = db.BooleanProperty(default=False)
+  seek = db.IntegerProperty(default=0)
 
   @classmethod
   def get_current_programs(cls, channels):    
@@ -23,27 +25,32 @@ class Program(db.Model):
 
     memcache.set('programming', simplejson.dumps(programming))
     return programming
-  
+
   @classmethod
   @db.transactional
-  def atomic_add(cls, media, channel):
+  def atomic_add(cls, media, channel, time=None, async=False):
     program = Program(media=media, channel=channel,
-                      time=channel.get_next_time().replace(microsecond=0))
+                      time=(time or channel.get_next_time().replace(microsecond=0)),
+                      async=async)
     program.put()
     return program
-      
+
   @classmethod
-  def add_program(cls, channel, media):
+  def add_program(cls, channel, media, time=None, async=False):
     if media:
       # Microseconds break equalities when passing datetimes between front/backend
-      program = Program.atomic_add(media=media, channel=channel)
+      program = Program.atomic_add(media=media, channel=channel, time=time, async=async)
 
       channelProgram = ChannelProgram(channel=channel, program=program, time=program.time)
       channelProgram.put()
       
       channel.next_time = program.time + datetime.timedelta(seconds=program.media.duration)
+      if async:
+        channel.current_program = program.key().id()
+        channel.current_media = media
+        channel.seek = 0
       channel.put()
-      
+
       media.last_programmed = datetime.datetime.now()
       media.programmed_count += 1
       media.put()
@@ -83,6 +90,8 @@ class Program(db.Model):
     json['media'] = self.media.toJson(media_desc) if fetch_media else self.media.key().name()
     json['time'] = self.time.isoformat() if self.time else None
     json['channel'] = self.channel.toJson() if fetch_channel else {'id': self.channel.id}
+    json['async'] = self.async or False
+    json['seek'] = self.seek
     return json
 
 class ChannelProgram(db.Model):

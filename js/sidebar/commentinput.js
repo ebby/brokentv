@@ -65,7 +65,17 @@ brkn.sidebar.CommentInput = function() {
    * @private
    */
   this.addCommentButton_ = new goog.ui.CustomButton('add');
-  
+
+  /**
+   * @type {?Element}
+   * @private
+   */
+  this.token_ = null;
+
+  /**
+   * @type {?string}
+   */
+  this.parentComment = null;
 };
 goog.inherits(brkn.sidebar.CommentInput, goog.ui.Component);
 
@@ -91,6 +101,13 @@ brkn.sidebar.CommentInput.INPUT_HEIGHT = 41;
 brkn.sidebar.CommentInput.prototype.commentControls_;
 
 
+/**
+ * @type {Element}
+ * @private
+ */
+brkn.sidebar.CommentInput.prototype.inputHolder_;
+
+
 /** @inheritDoc */
 brkn.sidebar.CommentInput.prototype.createDom = function() {
   var el = soy.renderAsElement(brkn.sidebar.commentInput);
@@ -107,6 +124,7 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
   var keyHandler = new goog.events.KeyHandler(this.commentInput_.getKeyEventTarget());
    
   this.commentControls_ = goog.dom.getElementByClass('comment-controls', this.getElement());
+  this.inputHolder_ = goog.dom.getElementByClass('input-holder', this.getElement());
   
   this.addChild(this.tweetToggle_);
   this.tweetToggle_.decorate(goog.dom.getElementByClass('tweet-toggle', this.getElement()));
@@ -145,6 +163,8 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
               e.stopPropagation();
               this.addCommentButton_.setActive(this.commentInput_.getValue());
               this.onAddComment_(e);
+            } else if (e.keyCode == '8' && !this.getValue() && this.token_) {
+              this.removeReply_();
             }
           }, this))
        .listen(this.commentInput_,
@@ -161,6 +181,33 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
       .listen(this.addCommentButton_,
           goog.ui.Component.EventType.ACTION,
           goog.bind(this.onAddComment_, this));
+  
+  brkn.model.Sidebar.getInstance().subscribe(brkn.model.Sidebar.Actions.REPLY_COMMENT,
+      this.reply_, this);
+};
+
+
+/**
+ * @param {brkn.model.Comment} comment
+ * @private
+ */
+brkn.sidebar.CommentInput.prototype.reply_ = function(comment) {
+  this.parentComment = comment.id.toString();
+  this.token_ = goog.dom.createDom('div', 'token', '@' + comment.user.firstName());
+  goog.dom.appendChild(this.inputHolder_, this.token_);
+  this.setFocused(true);
+  this.commentInput_.getElement().style.paddingLeft = goog.style.getSize(this.token_).width + 5 + 'px';
+}
+
+
+/**
+ * @private
+ */
+brkn.sidebar.CommentInput.prototype.removeReply_ = function() {
+  this.parentComment = null;
+  goog.dom.removeNode(this.token_);
+  this.token_ = null;
+  this.commentInput_.getElement().style.paddingLeft = '';
 };
 
 
@@ -202,6 +249,7 @@ brkn.sidebar.CommentInput.prototype.isFocused = function() {
 brkn.sidebar.CommentInput.prototype.setFocused = function(focus) {
   if (focus) {
     this.commentInput_.getElement().focus();
+    goog.style.setPosition(this.commentControls_, 0, 0);
   }
   return goog.dom.classes.enable(this.getElement(), 'focused', focus);
 };
@@ -221,10 +269,12 @@ brkn.sidebar.CommentInput.prototype.onAddComment_ = function(e) {
           this.commentInput_.setValue('');
           this.commentInput_.setEnabled(true);
           this.commentInput_.setFocused(true);
+          this.removeReply_();
         }, this),
       facebook: this.fbToggle_.isChecked(),
       twitter: this.tweetToggle_.isChecked(),
-      text: this.commentInput_.getValue()
+      text: this.commentInput_.getValue(),
+      parentId: this.parentComment
     });
   }
 };

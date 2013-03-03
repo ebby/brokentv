@@ -69,13 +69,15 @@ brkn.model.Channels.prototype.findOnline = function() {
     return this.lastChannel;
   }
   var channel = this.channels[0];
+  var currentProgram = channel.getCurrentProgram()
   var index = 0;
-  while (!channel.getCurrentProgram() && index < this.channels.length) {
+  while (!currentProgram && index < this.channels.length) {
     channel = !channel.myChannel ? this.channels[index] : channel;
+    currentProgram = channel.getCurrentProgram();
     index++;
   }
   // If neither have content, stick with current
-  return !channel.getCurrentProgram() ? this.currentChannel : channel;
+  return !currentProgram ? this.currentChannel : channel;
 };
 
 
@@ -125,13 +127,30 @@ brkn.model.Channels.prototype.loadViewersFromJson = function(viewerSessions) {
  * @param {?boolean=} opt_forced Forced channel change, not by user
  */
 brkn.model.Channels.prototype.changeChannel = function(channel, opt_forced) {
-  if (channel) {
+  if ((channel && !this.currentChannel) ||
+      (channel && this.currentChannel && this.currentChannel.id != channel.id)) {
     this.lastChannel = this.currentChannel;
     this.currentChannel = channel;
     goog.net.XhrIo.send('/_changechannel', goog.functions.NULL(), 'POST',
         'channel=' + channel.id + (opt_forced ? '&forced=1' : ''));
     brkn.model.Analytics.getInstance().changeChannel(channel, this.lastChannel);
   }
+};
+
+
+/**
+ * Make or return my channel
+ */
+brkn.model.Channels.prototype.getMyChannel = function() {
+  if (!this.myChannel) {
+    // Create a private channel
+    var user = brkn.model.Users.getInstance().currentUser;
+    this.myChannel = new brkn.model.Channel({
+      id: user.id,
+      name: user.name.split(' ')[0] + '\'s Channel'
+    });
+  }
+  return this.myChannel;
 };
 
 

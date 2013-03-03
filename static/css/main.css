@@ -122,8 +122,8 @@ div.controller div.right div.border {
 }
 div.controller div.progress {
   width: 100%;
-  height: 2px;
-  border-bottom: 2px solid #f5f5f5;
+  height: 4px;
+  background: #f5f5f5;
   box-shadow: inset 0 -1px 1px 0 #cccccc, 0 0 2px 1px rgba(88, 88, 88, 0.3);
   position: absolute;
   top: 27px;
@@ -132,15 +132,24 @@ div.controller div.progress {
   cursor: pointer;
   border-radius: 300px;
 }
+div.controller div.progress.drag div.elapsed,
+div.controller div.progress.drag div.seek {
+  -webkit-transition: none !important;
+  -moz-transition: none !important;
+  -o-transition: none !important;
+  -ms-transition: none !important;
+  transition: none !important;
+}
 div.controller div.progress div.elapsed {
   position: absolute;
   left: 0;
-  bottom: -2px;
   width: 0;
-  height: 3px;
+  height: 4px;
   background: #B7432E;
   box-shadow: inset 0 -1px 1px 0 rgba(255, 255, 255, 0.2);
   border-radius: 300px;
+}
+div.controller div.progress div.elapsed.animate {
   -webkit-transition: width 1s linear;
   -moz-transition: width 1s linear;
   -o-transition: width 1s linear;
@@ -151,7 +160,7 @@ div.controller div.progress div.seek {
   position: absolute;
   bottom: 0px;
   width: 1px;
-  height: 3px;
+  height: 4px;
   background: #B7432E;
   opacity: 0.9;
   right: 0;
@@ -309,19 +318,26 @@ div#guide {
   -ms-transition: height .5s ease, opacity .5s ease;
   transition: height .5s ease, opacity .5s ease;
 }
-div#guide.toggled {
+div#guide.animate {
   -webkit-transition: height .5s ease, opacity .5s ease, left 1s ease-in-out;
   -moz-transition: height .5s ease, opacity .5s ease, left 1s ease-in-out;
   -o-transition: height .5s ease, opacity .5s ease, left 1s ease-in-out;
   -ms-transition: height .5s ease, opacity .5s ease, left 1s ease-in-out;
   transition: height .5s ease, opacity .5s ease, left 1s ease-in-out;
 }
-div#guide.collapsed {
-  -webkit-transition: height .5s ease, opacity .5s ease, left 1s ease-in-out;
-  -moz-transition: height .5s ease, opacity .5s ease, left 1s ease-in-out;
-  -o-transition: height .5s ease, opacity .5s ease, left 1s ease-in-out;
-  -ms-transition: height .5s ease, opacity .5s ease, left 1s ease-in-out;
-  transition: height .5s ease, opacity .5s ease, left 1s ease-in-out;
+div#guide.animate div.channels div.channel div.name {
+  -webkit-transition: left 1s ease-in-out;
+  -moz-transition: left 1s ease-in-out;
+  -o-transition: left 1s ease-in-out;
+  -ms-transition: left 1s ease-in-out;
+  transition: left 1s ease-in-out;
+}
+div#guide.animate div.channels div.channel div.programs div.program div.channel div.title {
+  -webkit-transition: left 0.1s linear;
+  -moz-transition: left 0.1s linear;
+  -o-transition: left 0.1s linear;
+  -ms-transition: left 0.1s linear;
+  transition: left 0.1s linear;
 }
 div#guide.drag,
 div#guide.drag div.channel div.name,
@@ -680,11 +696,6 @@ div.channels div.channel div.name {
   box-shadow: 1px 0 3px rgba(0, 0, 0, 0.8);
   cursor: pointer;
   z-index: 1;
-  -webkit-transition: left 1s ease-in-out;
-  -moz-transition: left 1s ease-in-out;
-  -o-transition: left 1s ease-in-out;
-  -ms-transition: left 1s ease-in-out;
-  transition: left 1s ease-in-out;
 }
 div.channels div.channel div.name div.text {
   position: relative;
@@ -819,11 +830,6 @@ div.channels div.channel div.programs div.program div.title {
   white-space: nowrap;
   overflow: hidden;
   padding-right: 25px;
-  -webkit-transition: left 0.1s linear;
-  -moz-transition: left 0.1s linear;
-  -o-transition: left 0.1s linear;
-  -ms-transition: left 0.1s linear;
-  transition: left 0.1s linear;
 }
 div.channels div.channel div.programs div.program div.title.marquee {
   -webkit-transition: margin-left 10s linear, left 1s linear;
@@ -1539,42 +1545,25 @@ div#sidebar div#toolbar div.back div.back-title {
 div#sidebar div#toolbar div.back div.back-button {
   width: 0;
   opacity: 0;
-  height: 25px;
+  height: 30px;
   position: absolute;
-  left: 20px;
-  top: 6px;
-  border: 1px solid #ccc;
-  border-radius: 3px;
+  left: 7px;
+  top: 5px;
   cursor: pointer;
   -webkit-transition: opacity .3s ease, width, .3s, ease;
   -moz-transition: opacity .3s ease, width, .3s, ease;
   -o-transition: opacity .3s ease, width, .3s, ease;
   -ms-transition: opacity .3s ease, width, .3s, ease;
   transition: opacity .3s ease, width, .3s, ease;
+  background: url(/static/img/backbutton.png) no-repeat;
+  padding-left: 14px;
+  padding-top: 3px;
 }
-div#sidebar div#toolbar div.back div.back-button:after,
-div#sidebar div#toolbar div.back div.back-button:before {
-  right: 100%;
-  border: solid transparent;
-  content: " ";
-  height: 0;
-  width: 0;
-  position: absolute;
-  pointer-events: none;
+div#sidebar div#toolbar div.back div.back-button:active {
+  background-image: url(/static/img/backbutton-active.png);
 }
-div#sidebar div#toolbar div.back div.back-button:after {
-  border-color: rgba(245, 245, 245, 0);
-  border-right-color: #f5f5f5;
-  border-width: 12px;
-  top: 50%;
-  margin-top: -12px;
-}
-div#sidebar div#toolbar div.back div.back-button:before {
-  border-color: rgba(204, 204, 204, 0);
-  border-right-color: #ccc;
-  border-width: 14px;
-  top: 50%;
-  margin-top: -14px;
+div#sidebar div#toolbar div.back div.back-button:active div {
+  color: #8d8d8d;
 }
 div#sidebar div#toolbar div.back div.back-button div {
   font-size: 11px;
@@ -1858,6 +1847,19 @@ div#sidebar div.comment-input div.input-holder textarea {
   margin-left: 10px;
   margin-top: 8px;
   margin-bottom: 5px;
+}
+div#sidebar div.comment-input div.input-holder div.token {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  background: #dedede;
+  color: #333;
+  font-size: 13px;
+  text-shadow: 1px 1px 1px white;
+  border-radius: 3px;
+  border: 1px solid #666;
+  padding: 1px;
+  display: inline;
 }
 div#sidebar div.info.current div.comment-input,
 div#sidebar div.conversation div.comment-input {
@@ -2244,7 +2246,7 @@ div#sidebar div.comments-holder div.bottom-grad {
 }
 div#sidebar div.comments-holder div.comment {
   position: relative;
-  width: 99%;
+  width: 278px;
   background: rgba(0, 0, 0, 0.65);
   border: 1px solid #333;
   box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.8), 0 3px 1px -1px rgba(255, 255, 255, 0.5);
@@ -2260,6 +2262,11 @@ div#sidebar div.comments-holder div.comment:last-child {
   border-bottom-left-radius: 3px;
   border-bottom-right-radius: 3px;
   box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.8);
+}
+div#sidebar div.comments-holder div.comment.reply {
+  background: rgba(0, 0, 0, 0.4);
+  border-left: 5px solid #181818;
+  width: 274px;
 }
 div#sidebar div.comments-holder div.comment img {
   width: 28px;
@@ -2285,6 +2292,40 @@ div#sidebar div.comments-holder div.comment div.timestamp {
   bottom: 3px;
   right: 5px;
   font-size: 10px;
+}
+div#sidebar div.comments-holder div.comment div.comment-options {
+  position: absolute;
+  width: 35px;
+  height: 15px;
+  top: 3px;
+  right: 5px;
+  visibility: hidden;
+  opacity: 0;
+  -webkit-transition: opacity 0.2s ease;
+  -moz-transition: opacity 0.2s ease;
+  -o-transition: opacity 0.2s ease;
+  -ms-transition: opacity 0.2s ease;
+  transition: opacity 0.2s ease;
+}
+div#sidebar div.comments-holder div.comment div.comment-options div.remove {
+  width: 13px;
+  height: 13px;
+  background: url(/static/img/close-light.png) center no-repeat;
+  cursor: pointer;
+  margin-left: 2px;
+  float: right;
+}
+div#sidebar div.comments-holder div.comment div.comment-options div.reply {
+  width: 13px;
+  height: 13px;
+  background: url(/static/img/reply.png) center no-repeat;
+  background-size: 100%;
+  cursor: pointer;
+  float: right;
+}
+div#sidebar div.comments-holder div.comment:hover div.comment-options {
+  visibility: visible;
+  opacity: 1;
 }
 div#sidebar div.no-comments,
 div#sidebar div.no-info {
@@ -2324,6 +2365,9 @@ div#login.hide {
   overflow: hidden;
   top: -100%;
 }
+div#login .bold {
+  font-family: MuseoSans700;
+}
 div#login div#static-scrollable {
   width: 100%;
   height: 100%;
@@ -2355,21 +2399,21 @@ div#login div#static-content.hide div#footer {
   display: none;
 }
 div#login div#static-content div.header {
-  width: 900px;
+  width: 760px;
   margin: auto;
   position: relative;
 }
 div#login div#static-content div.title {
   font-size: 40px;
   position: absolute;
-  width: 595px;
+  width: 455px;
   left: -1px;
   top: 20px;
   padding: 30px 0;
   border-right: 1px solid rgba(0, 0, 0, 0.4);
   box-shadow: 2px 0px 0 -1px rgba(255, 255, 255, 0.5);
   font-family: MuseoSans700;
-  color: #4d4d4d;
+  color: #3d3d3d;
   text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.9);
 }
 div#login div#static-content div.subtitle {
@@ -2378,7 +2422,7 @@ div#login div#static-content div.subtitle {
   top: 70px;
   padding: 30px 0;
   font-family: MuseoSans300;
-  color: #4d4d4d;
+  color: #3d3d3d;
   text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.9);
 }
 div#login div#static-content div.fb-login {
@@ -2494,6 +2538,7 @@ div#login div#static-content div.fb-login.disabled {
   pointer-events: none;
 }
 div#login div#static-content.about div#pages div.about,
+div#login div#static-content.jobs div#pages div.jobs,
 div#login div#static-content.tos div#pages div.tos,
 div#login div#static-content.privacy div#pages div.privacy {
   visibility: visible;
@@ -2502,17 +2547,21 @@ div#login div#static-content.privacy div#pages div.privacy {
   padding: 10px;
 }
 div#login div#static-content.about div#footer a#about,
+div#login div#static-content.jobs div#footer a#jobs,
 div#login div#static-content.tos div#footer a#tos,
 div#login div#static-content.privacy div#footer a#privacy {
   text-decoration: underline;
 }
 div#login div#static-content div#pages {
-  width: 900px;
+  width: 760px;
   margin: auto;
   margin-top: 170px;
   position: relative;
-  color: #4d4d4d;
+  color: #3d3d3d;
   text-shadow: 1px 1px 1px white;
+}
+div#login div#static-content div#pages a {
+  color: #3d3d3d;
 }
 div#login div#static-content div#pages div.page {
   visibility: hidden;
@@ -2535,11 +2584,19 @@ div#login div#static-content div#pages div.page-title {
   margin-bottom: 20px;
 }
 div#login div#static-content div#pages div.page-content {
-  font-size: 16px;
+  width: 740px;
+  font-size: 14px;
   font-family: MuseoSans300;
+  -webkit-touch-callout: text;
+  -webkit-user-select: text;
+  -khtml-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+  line-height: 20px;
 }
 div#login div#static-content div.footer {
-  position: fixed;
+  position: absolute;
   bottom: 0;
   width: 900px;
   font-size: 10px;

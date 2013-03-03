@@ -106,6 +106,16 @@ brkn.model.User.prototype.isAdmin = function() {
   return this.accessLevel == brkn.model.User.AccessLevel.ADMIN;
 };
 
+
+/**
+ * @return {string}
+ */
+brkn.model.User.prototype.firstName = function() {
+  var split = this.name.split(' ');
+  return split && split.length ? split[0] : this.name;
+};
+
+
 /**
  * @return {Array.<Object>}
  */

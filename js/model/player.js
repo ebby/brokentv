@@ -25,8 +25,20 @@ brkn.model.Player = function() {
    */
   this.currentProgram_;
 
-  this.subscribe(brkn.model.Player.Actions.PLAY_ASYNC, function(media) {
-    brkn.model.Analytics.getInstance().playAsync(media);
+  this.subscribe(brkn.model.Player.Actions.PLAY_ASYNC, function(program) {
+    brkn.model.Channels.getInstance().getMyChannel().publish(
+        brkn.model.Channel.Action.ADD_PROGRAM, program);
+
+    goog.net.XhrIo.send('/_addprogram', goog.functions.NULL(), 'POST',
+        'channel_id=' + brkn.model.Channels.getInstance().myChannel.id +
+        '&media_id=' + program.media.id +
+        '&async=' + true);
+    brkn.model.Analytics.getInstance().playAsync(program.media);
+  }, this);
+
+  this.subscribe(brkn.model.Player.Actions.PLAYING, function(media) {
+    goog.net.XhrIo.send('/_started', goog.functions.NULL(), 'POST',
+        'media_id=' + media.id);
   }, this);
 };
 goog.inherits(brkn.model.Player, goog.pubsub.PubSub);
@@ -77,7 +89,8 @@ brkn.model.Player.prototype.getProgress = function() {
  * @enum {string}
  */
 brkn.model.Player.Actions = {
+  NO_MEDIA: 'no-media',
   PLAY_ASYNC: 'play-async',
   PLAYING: 'playing',
-  NO_MEDIA: 'no-media'
+  SEEK: 'seek'
 };

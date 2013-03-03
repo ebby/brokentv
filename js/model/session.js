@@ -49,13 +49,19 @@ brkn.model.Session = function(id, user, channel, tuneIn, opt_tuneOut) {
  * @param {brkn.model.Media} media
  */
 brkn.model.Session.prototype.seen = function(media) {
+  this.medias.push(media);
+  if (this.channel.myChannel && this.channel.currentProgram) {
+    this.channel.currentProgram.seek = null;
+    this.channel.currentProgram = null;
+  }
+  
   goog.net.XhrIo.send(
       '/_seen',
       goog.functions.NULL(),
       'POST',
       'media_id=' + media.id +
-      '&session_id=' + this.id);
-  this.medias.push(media);
+      '&session_id=' + this.id +
+      '&async=' + this.channel.myChannel);
 };
 
 

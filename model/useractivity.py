@@ -50,9 +50,16 @@ class UserActivity(db.Model):
     json = {}
     json['type'] = self.type
     json['user'] = self.user.toJson()
-    json['comment'] = self.comment.toJson() if self.comment else None
-    json['session'] = self.session.toJson(get_media=True) if self.session else None
     json['media'] = self.media.toJson() if self.media else None
     json['time'] = self.time.isoformat()
+    try:
+      json['comment'] = self.comment.toJson() if self.comment else None
+      json['session'] = self.session.toJson(get_media=True) if self.session else None
+    except:
+      json['comment'] = None
+      json['session'] = None
+      json['type'] = None
+      # If there's a reference error, kill this entry
+      self.delete()
     return json
   

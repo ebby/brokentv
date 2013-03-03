@@ -336,7 +336,8 @@ class StartHandler(webapp2.RequestHandler):
       Programming(no_media) # Do fetch if no media
       channels = Channel.get_public()
     for c in channels:
-      Programming.set_programming(c.key().name(), queue='programming')
+      Programming.set_programming(c.key().name(), queue='programming',
+                                  fetch_twitter=(not constants.DEVELOPMENT))
     
   
 app = webapp.WSGIApplication([('/_ah/start', StartHandler)], debug=True)

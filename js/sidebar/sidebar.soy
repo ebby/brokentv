@@ -83,9 +83,10 @@
 /**
  * @param comment
  * @param timestamp
+ * @param owner
  */
 {template .comment}
-  <div class="comment">
+  <div class="comment{if $comment.parentId}{sp}reply{/if}" id="comment-{$comment.id}">
     <a href="#user:{$comment.user.id}">
       <img src="{$comment.user.picture}"/>
     </a>
@@ -94,6 +95,10 @@
       {$comment.text}
     </div>
     <div class="timestamp">{$timestamp}</div>
+    <div class="comment-options">
+      {if $owner}<div class="remove"></div> {/if}
+      <div class="reply"></div>
+    </div>
   </div>
 {/template}
 

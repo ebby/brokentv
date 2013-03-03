@@ -18,8 +18,8 @@ class Tweet(db.Model):
   @classmethod
   def add_from_result(cls, result, media):
     user = User.get_by_twitter_id(result.from_user_id)
-    return Tweet.get_or_insert(str(result.id),
-                               id=result.id,
+    return Tweet.get_or_insert(result.id_str,
+                               id=int(result.id_str),
                                media=media,
                                user=user,
                                text=db.Text(result.text),
@@ -32,8 +32,8 @@ class Tweet(db.Model):
     
   @classmethod
   def add_from_response(cls, user, response, media):
-    return Tweet.get_or_insert(str(response['id']),
-                               id=response['id'],
+    return Tweet.get_or_insert(response['id_str'],
+                               id=int(response['id_str']),
                                media=media,
                                user=user,
                                text=db.Text(response['text']),

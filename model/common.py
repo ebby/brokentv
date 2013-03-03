@@ -7,6 +7,7 @@ import gdata.youtube.service
 import gdata.alt.appengine
 import iso8601
 import logging
+import math
 import simplejson
 import urllib
 import urlparse

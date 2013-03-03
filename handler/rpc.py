@@ -23,7 +23,7 @@ def get_session(current_user, set_programming=True):
       #new_programming = True
       deferred.defer(programming.Programming.set_programming, channel['id'],
                      _name=channel['name'].replace(' ', '') + '-' + str(uuid.uuid1()),
-                     _queue='programming')
+                     _queue='programming', fetch_twitter=(not constants.DEVELOPMENT))
   if not len(cached_programming) or new_programming:
     # No cached programming, attempt to fetch
     channels = channels or Channel.get_public()
@@ -130,11 +130,19 @@ class SettingsHandler(BaseHandler):
       user.show_sidebar = show_sidebar
       user.put()
 
+      if self.request.get('current_seek'):
+        channel = Channel.get_by_key_name(self.current_user.id)
+        program = channel.get_current_program()
+        if program:
+          program.seek = int(self.request.get('current_seek'))
+          program.put()
+
 class ProgramHandler(BaseHandler):
     def post(self):
       channel = Channel.get_by_key_name(self.request.get('channel_id'))
       url = self.request.get('url')
       media_id = self.request.get('media_id')
+      now = self.request.get('now') == 'true'
       if channel and url:
         # Add to pending media for user suggestion collection
         media = Media.add_from_url(url)
@@ -143,7 +151,9 @@ class ProgramHandler(BaseHandler):
       if channel and media_id and channel.id == self.current_user.id:
         # Add to my personal channel
         media = Media.get_by_key_name(media_id)
-        program = Program.add_program(channel, media)
+        program = Program.add_program(channel, media,
+                                      time=(datetime.datetime.now() if now else None), 
+                                      async=True)
         self.response.out.write(simplejson.dumps(program.toJson(False)))
       
 class InfoHandler(BaseHandler):
@@ -161,15 +171,25 @@ class CommentHandler(BaseHandler):
     def get(self, id):
       offset = self.request.get('offset') or 0
       media = Media.get_by_key_name(id)
-      comments = Comment.get_by_media(media, offset)
+      comments = Comment.get_by_media(media, uid=self.current_user.id, offset=offset)
       return self.response.out.write(simplejson.dumps([c.toJson() for c in comments]))
     def post(self):
       media = Media.get_by_key_name(self.request.get('media_id'))
       text = self.request.get('text')
       tweet = self.request.get('tweet') == 'true'
       facebook = self.request.get('facebook') == 'true'
+      parent_id = self.request.get('parent_id')
+      delete = self.request.get('delete') == 'true'
+      id = self.request.get('id')
+
+      if delete and id:
+        c = Comment.get_by_id(int(id))
+        c.delete()
+
       if media and text:
-        c = Comment.add(media, self.current_user, text, self.request.get('parent_id'))
+        acl = self.current_user.friends + [self.current_user.id]
+        c = Comment.add(media, self.current_user, text,
+                        acl=acl, parent_id=parent_id)
         new_tweet = None
         if tweet:
           client = oauth.TwitterClient(constants.TWITTER_CONSUMER_KEY,
@@ -188,7 +208,7 @@ class CommentHandler(BaseHandler):
         self.current_user.put()
         
         broadcast.broadcastNewComment(c, new_tweet);
-      
+
 class SeenHandler(BaseHandler):
     def get(self, id):
       media = Media.get_by_key_name(id)
@@ -196,11 +216,20 @@ class SeenHandler(BaseHandler):
     def post(self):
       media = Media.get_by_key_name(self.request.get('media_id'))
       session = UserSession.get_by_id(int(self.request.get('session_id')))
+      async = self.request.get('async') == 'true'
       if session and media:
         session.add_media(media)
       if media:
-       media.seen_by(self.current_user)
-       
+        media.seen_by(self.current_user)
+      if async:
+        channel = Channel.get_by_key_name(self.current_user.id)
+        channel.current_media = None
+        channel.current_seek = None
+        channel.put()
+        program = channel.get_current_program()
+        program.seek = None
+        program.put()
+
 class ActivityHandler(BaseHandler):
     def get(self, uid=None):
       offset = self.request.get('offset') or 0
@@ -231,9 +260,6 @@ class ChangeChannelHandler(BaseHandler):
         remove_user = True
         
         if (datetime.datetime.now() - user_sessions[0].tune_in).seconds < 30:
-          logging.info(channel.id)
-          logging.info(user_sessions[0].channel.id)
-          logging.info(user_sessions[1].channel.id)
           if len(user_sessions) > 1 and user_sessions[1].channel.id == channel.id:
             # If they switched to another channel, then switched back.
             session = user_sessions[1]

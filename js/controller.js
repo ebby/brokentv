@@ -6,6 +6,7 @@ goog.require('brkn.Exp');
 goog.require('brkn.model.Channels');
 goog.require('brkn.model.Controller');
 
+goog.require('goog.fx.Dragger');
 goog.require('goog.ui.Component');
 goog.require('goog.ui.Component.EventType');
 goog.require('goog.ui.CustomButton');
@@ -104,6 +105,13 @@ brkn.Controller.prototype.elapsedEl_;
 
 
 /**
+ * @type {goog.fx.Dragger}
+ * @private
+ */
+brkn.Controller.prototype.dragger_;
+
+
+/**
  * @type {Element}
  * @private
  */
@@ -159,6 +167,23 @@ brkn.Controller.prototype.enterDocument = function() {
       brkn.model.Users.getInstance().currentUser.accessLevel == brkn.model.User.AccessLevel.ADMIN);
 
   var guideThrottle = new goog.Throttle(this.throttledGuide_, 1000, this);
+
+  this.resize();
+  this.dragger_ = new goog.fx.Dragger(this.seekEl_);
+  this.dragger_.setEnabled(false);
+  var progressEl = this.progressEl_;
+  var elapsedEl = this.elapsedEl_;
+  var durationEl = this.durationEl_;
+  this.dragger_.defaultAction = function(x, y) {
+    if (x > 0 && x < goog.style.getSize(progressEl).width) {
+      this.target.style.left = x + 'px';
+      elapsedEl.style.width = x + 'px'; 
+      var percent = x/goog.style.getSize(progressEl).width;
+      var duration = brkn.model.Player.getInstance().getCurrentProgram().media.duration;
+      goog.dom.setTextContent(durationEl, (Math.round(percent * duration)).toString().toHHMMSS() +
+          ' / ' + duration.toString().toHHMMSS());
+    }
+  };
   
   this.getHandler()
       .listen(window, 'resize', goog.bind(this.resize, this))
@@ -180,8 +205,10 @@ brkn.Controller.prototype.enterDocument = function() {
           goog.bind(function(e) {
             e.stopPropagation();
             if (brkn.model.Player.getInstance().getCurrentProgram()) {
-              brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.PLAY_ASYNC,
+              var program = brkn.model.Program.async(
                   brkn.model.Player.getInstance().getCurrentProgram().media);
+              brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.PLAY_ASYNC,
+                  program);
               this.resize();
             }
           }, this))
@@ -212,7 +239,8 @@ brkn.Controller.prototype.enterDocument = function() {
           goog.Timer.TICK,
           goog.bind(function() {
             if (brkn.model.Channels.getInstance().currentChannel.myChannel &&
-                brkn.model.Player.getInstance().getCurrentProgram()) {
+                brkn.model.Player.getInstance().getCurrentProgram() &&
+                !goog.dom.classes.has(this.elapsedEl_, 'drag')) {
               var elapsed = brkn.model.Player.getInstance().getCurrentTime() /
                   brkn.model.Player.getInstance().getCurrentProgram().media.duration;
               goog.dom.setTextContent(this.durationEl_,
@@ -221,12 +249,46 @@ brkn.Controller.prototype.enterDocument = function() {
                   brkn.model.Player.getInstance().getCurrentProgram().media.duration.toString().toHHMMSS());
               goog.style.setWidth(this.elapsedEl_, this.progressWidth_ ? elapsed * this.progressWidth_ : 0);
             }
-          }, this));
+          }, this))
+    .listen(this.progressEl_, goog.events.EventType.CLICK,
+        goog.bind(function(e) {
+          if (!goog.dom.classes.has(this.progressEl_, 'drag') &&
+              brkn.model.Player.getInstance().getCurrentProgram()) {
+            var seek = e.offsetX / goog.style.getSize(this.progressEl_).width *
+                brkn.model.Player.getInstance().getCurrentProgram().media.duration;
+            goog.dom.classes.remove(this.elapsedEl_, 'animate');
+            brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.SEEK, seek);
+            goog.Timer.callOnce(goog.bind(function() {
+              goog.dom.classes.add(this.elapsedEl_, 'animate');
+            }, this), 1000);
+          }
+        }, this))
+    .listen(this.dragger_,
+        goog.fx.Dragger.EventType.BEFOREDRAG,
+        goog.bind(function() {
+          goog.dom.classes.add(this.progressEl_, 'drag');
+        }, this))
+    .listen(this.dragger_,
+        goog.fx.Dragger.EventType.END,
+        goog.bind(function(e) {
+          this.seekEl_.style.left = '';
+          var seek = e.left / goog.style.getSize(this.progressEl_).width *
+              brkn.model.Player.getInstance().getCurrentProgram().media.duration;
+          goog.dom.classes.remove(this.elapsedEl_, 'animate');
+          brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.SEEK, seek);
+          goog.Timer.callOnce(goog.bind(function() {
+            goog.dom.classes.remove(this.progressEl_, 'drag');
+            goog.dom.classes.add(this.elapsedEl_, 'animate');
+          }, this), 1000);
+        }, this))
 
-  brkn.model.Player.getInstance().subscribe(brkn.model.Player.Actions.PLAY_ASYNC,
-      this.setAsync_, this);
-  brkn.model.Player.getInstance().subscribe(brkn.model.Player.Actions.PLAYING,
-      this.resize, this);
+  brkn.model.Player.getInstance().subscribe(brkn.model.Player.Actions.PLAY_ASYNC, function(program) {
+    this.setAsync_(program, true);
+  }, this);
+  brkn.model.Player.getInstance().subscribe(brkn.model.Player.Actions.PLAYING, function() {
+    this.dragger_.setEnabled(true);
+    this.resize();
+  }, this);
   brkn.model.Channels.getInstance().subscribe(brkn.model.Channels.Actions.CHANGE_CHANNEL,
       function() {
         goog.dom.classes.remove(this.getElement(), 'window');
@@ -253,18 +315,23 @@ brkn.Controller.prototype.enterDocument = function() {
       this.resize();
     }
   }, this);
-
-  this.resize();
 };
 
 
 /**
- * @param {brkn.model.Media} media
+ * @param {brkn.model.Program} program
+ * @param {?boolean=} opt_restart
  * @private 
  */
-brkn.Controller.prototype.setAsync_ = function(media) {
-  goog.dom.setTextContent(this.titleEl_, media.name.toUpperCase());
-  goog.dom.setTextContent(this.durationEl_, media.duration.toString().toHHMMSS());
+brkn.Controller.prototype.setAsync_ = function(program, opt_restart) {
+  goog.dom.setTextContent(this.titleEl_, program.media.name.toUpperCase());
+  if (opt_restart) {
+    goog.dom.classes.remove(this.elapsedEl_, 'animate');
+    goog.style.setWidth(this.elapsedEl_, 0); 
+    goog.Timer.callOnce(goog.bind(function() {
+      goog.dom.classes.add(this.elapsedEl_, 'animate');
+    }, this), 1000);
+  }
 };
 
 
@@ -320,6 +387,7 @@ brkn.Controller.prototype.resize = function() {
     var width = Math.min(goog.dom.getViewportSize().width - 200,
         Math.max(100, goog.dom.getViewportSize().width - viewportLeft));
     var rightWidth = this.sidebarToggle_.isChecked() && width > 300 ? width - 295 : width + 5;
+    rightWidth = brkn.model.Users.getInstance().currentUser.isAdmin() ? rightWidth : rightWidth - 50;
     if (this.rightWidth_ != rightWidth) {
       this.rightWidth_ = rightWidth;
       goog.style.setWidth(this.rightEl_, rightWidth);
@@ -331,7 +399,7 @@ brkn.Controller.prototype.resize = function() {
     }, this), 400);
   } else if (brkn.model.Player.getInstance().getCurrentProgram()) {
     goog.style.showElement(this.progressEl_, true);
-    this.setAsync_(brkn.model.Player.getInstance().getCurrentProgram().media);
+    this.setAsync_(brkn.model.Player.getInstance().getCurrentProgram());
     this.progressWidth_ = goog.dom.getViewportSize().width -
         (this.sidebarToggle_.isChecked() ? 560 : 260) -
         (brkn.model.Users.getInstance().currentUser.isAdmin() ? 50 : 0);

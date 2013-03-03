@@ -62,11 +62,26 @@ brkn.Player.prototype.stagecover_;
  */
 brkn.Player.prototype.message_;
 
+
 /**
  * @type {Element}
  * @private
  */
 brkn.Player.prototype.spinner_;
+
+
+/**
+ * @type {number}
+ * @private
+ */
+brkn.Player.prototype.width_;
+
+
+/**
+ * @type {number}
+ * @private
+ */
+brkn.Player.prototype.height_;
 
 
 /** @inheritDoc */
@@ -109,25 +124,16 @@ brkn.Player.prototype.enterDocument = function() {
       }, this))
       .listen(this.getElement(), goog.events.EventType.DBLCLICK, goog.bind(this.toggleExpand_, this))
       .listen(expandEl, goog.events.EventType.CLICK, goog.bind(this.toggleExpand_, this))
-      .listen(this.getElement(), goog.events.EventType.MOUSEDOWN, goog.bind(function(e) {
-        if (e.offsetX > goog.style.getSize(this.getElement()).width/2 &&
-            e.offsetY > goog.style.getSize(this.getElement()).height/2) {
-          // Pass click through to kill possible advertisement
-          window.console.log(e.offsetX);
-          window.console.log(e.offsetY);
-          window.console.log('mousedown')
+      .listen(this.getElement(), goog.events.EventType.MOUSEMOVE, goog.bind(function(e) {
+        var xPer = e.offsetX/this.height_;
+        var yPer = e.offsetY/this.width_;
+        if (xPer > .7 && xPer < .9 && yPer > .7 && yPer < .9) {
+          // Pass click through to flash to kill possible advertisement
           goog.style.showElement(this.stagecover_, false);
           goog.Timer.callOnce(goog.bind(function() {
+            // Re-enable after period, can't detect mousemove or clicks on flash
             goog.style.showElement(this.stagecover_, true);
-          }, this));
-        }
-      }, this))
-      .listen(this.getElement(), goog.events.EventType.MOUSEUP, goog.bind(function(e) {
-        if (e.offsetX > goog.style.getSize(this.getElement()).width/2 &&
-            e.offsetY > goog.style.getSize(this.getElement()).height/2) {
-          // Pass click through to kill possible advertisement
-          window.console.log('mouseup')
-          goog.style.showElement(this.stagecover_, true);
+          }, this), 500);
         }
       }, this))
       .listen(this.getElement(), goog.events.EventType.CLICK, goog.bind(function(e) {
@@ -158,6 +164,8 @@ brkn.Player.prototype.enterDocument = function() {
       }, this);
   brkn.model.Player.getInstance().subscribe(brkn.model.Player.Actions.PLAY_ASYNC,
       this.playAsync_, this);
+  brkn.model.Player.getInstance().subscribe(brkn.model.Player.Actions.SEEK,
+      this.seek_, this);
   brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_SIDEBAR,
       function(show) {
         this.resize(show);
@@ -232,6 +240,7 @@ brkn.Player.prototype.toggleExpand_ = function(e) {
  */
 brkn.Player.prototype.playProgram = function(program) {
   brkn.model.Player.getInstance().setCurrentProgram(program);
+  window.console.log(program);
   this.play(program.media);
 };
 
@@ -285,6 +294,8 @@ brkn.Player.prototype.resize = function() {
   var guideHeight = goog.dom.getElement('guide').style.height;
   guideHeight = guideHeight.substring(0, guideHeight.length - 2);
   var sidebarWidth = goog.dom.classes.has(goog.dom.getElement('sidebar'), 'toggled')  ? 300 : 0;
+  this.width_ = goog.dom.getViewportSize().height - guideHeight;
+  this.height_ = goog.dom.getViewportSize().width - sidebarWidth;
   goog.style.setHeight(playerEl, goog.dom.getViewportSize().height - guideHeight);
   goog.style.setWidth(playerEl, goog.dom.getViewportSize().width - sidebarWidth); 
   goog.style.setHeight(stagecover, goog.dom.getViewportSize().height - guideHeight);
@@ -312,15 +323,27 @@ brkn.Player.prototype.changeChannel = function(channel) {
 
 
 /**
- * @param {brkn.model.Media} media
+ * @param {brkn.model.Program} program
  * @private
  */
-brkn.Player.prototype.playAsync_ = function(media) {
-  this.asyncMedia_ = media;
-  this.play(media, 0);
-  
+brkn.Player.prototype.playAsync_ = function(program) {
+  window.console.log('PLAY ASYNC')
+  window.console.log(program)
+  this.currentProgram_ = program;
+  this.playProgram(program);
+  this.updateStagecover_();
+
   goog.net.XhrIo.send('/_optin', goog.functions.NULL(), 'POST',
       'media_id=' + this.currentProgram_.media.id);
+};
+
+
+/**
+ * @param {number} seek
+ * @private
+ */
+brkn.Player.prototype.seek_ = function(seek) {
+  this.player_.seekTo && this.player_.seekTo(seek, true);
 };
 
 
@@ -332,13 +355,16 @@ brkn.Player.prototype.playerStateChange_ = function(event) {
   this.updateStagecover_();
   switch (event.data) {
     case YT.PlayerState.CUED:
-      var seek = (goog.now() - this.currentProgram_.time.getTime())/1000;
+      window.console.log()
+      var seek = this.currentProgram_.async ? this.currentProgram_.seek :
+          (goog.now() - this.currentProgram_.time.getTime())/1000;
       this.player_.seekTo(seek);
       this.player_.playVideo();
       brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.PLAY, true);
       break;
     case YT.PlayerState.PLAYING:
-      brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.PLAYING);
+      brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.PLAYING,
+          this.currentProgram_.media);
       break;
     case YT.PlayerState.ENDED:
   	  brkn.model.Users.getInstance().currentUser.currentSession.seen(this.currentProgram_.media);
@@ -349,14 +375,9 @@ brkn.Player.prototype.playerStateChange_ = function(event) {
             nextProgram);
       } else {
         brkn.model.Player.getInstance().setCurrentProgram(null);
+        window.console.log(brkn.model.Channels.getInstance().findOnline());
         brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.CHANGE_CHANNEL,
             brkn.model.Channels.getInstance().findOnline(), true);
-        if (this.asyncMedia_) {
-          this.asyncMedia_ = null;
-        } else {
-          goog.net.XhrIo.send('/_started', goog.functions.NULL(), 'POST',
-              'media_id=' + this.currentProgram_.media.id);
-        }
       }
   	  break;
 	}
@@ -374,7 +395,8 @@ brkn.Player.prototype.onPlayerReady_ = function(event) {
       this.playProgram(this.currentProgram_);
     } else if (this.player_.getPlayerState()) {
       // If we did and cued the video
-      var seek = (goog.now() - this.currentProgram_.time.getTime())/1000;
+      var seek = this.currentProgram_.async ? this.currentProgram_.seek :
+          (goog.now() - this.currentProgram_.time.getTime())/1000;
       this.player_.seekTo(seek);
       this.player_.playVideo();
     }
@@ -397,7 +419,8 @@ brkn.Player.prototype.onPlayerError_ = function(event) {
  */
 brkn.Player.prototype.updateStagecover_ = function(opt_message) {
   var stagecover = goog.dom.getElement('stagecover');
-  var seek = this.currentProgram_ ? (goog.now() - this.currentProgram_.time.getTime())/1000 : 0;
+//  var seek = this.currentProgram_ ? (goog.now() - this.currentProgram_.time.getTime())/1000 : 0;
+  var seek = this.currentProgram_ ? brkn.model.Player.getInstance().getCurrentTime() : 0;
   if (!this.currentProgram_ || (this.currentProgram_ && seek > this.currentProgram_.media.duration)) {
     brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.NO_MEDIA);
     goog.dom.setTextContent((/** @type {Element} */ this.message_.firstChild),
