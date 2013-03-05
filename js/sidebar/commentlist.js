@@ -138,6 +138,9 @@ brkn.sidebar.CommentList.prototype.decorateInternal = function(el) {
           this.mediasHeight_ = goog.style.getSize(this.commentsEl_).height;
           this.resize();
         }, this)); 
+    this.media_.subscribe(brkn.model.Media.Actions.ADD_TWEET, function(tweet) {
+      this.addTweet_(tweet, true);
+    }, this);
   } else {
     goog.net.XhrIo.send('/_comment/' + this.media_.id + '?offset=' + this.comments_.length,
         goog.bind(function(e) {
@@ -151,7 +154,8 @@ brkn.sidebar.CommentList.prototype.decorateInternal = function(el) {
           goog.style.showElement(this.noCommentsEl_, !comments.length);
           this.mediasHeight_ = goog.style.getSize(this.commentsEl_).height;
           this.resize();
-        }, this)); 
+        }, this));
+    this.media_.subscribe(brkn.model.Media.Actions.ADD_COMMENT, this.addComment_, this);
   }
   this.resize(brkn.sidebar.CommentInput.INPUT_HEIGHT);
 };

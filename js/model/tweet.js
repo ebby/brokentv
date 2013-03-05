@@ -7,7 +7,7 @@ goog.provide('brkn.model.Tweet');
  */
 brkn.model.Tweet = function(tweet) {
   /**
-   * @type {number}
+   * @type {string}
    * @private
    */
   this.id = tweet['id'];

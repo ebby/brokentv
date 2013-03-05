@@ -188,12 +188,13 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
 
 
 /**
- * @param {brkn.model.Comment} comment
+ * @param {brkn.model.Comment} comment Parent comment
+ * @param {brkn.model.User} user But in reply to this user
  * @private
  */
-brkn.sidebar.CommentInput.prototype.reply_ = function(comment) {
+brkn.sidebar.CommentInput.prototype.reply_ = function(comment, user) {
   this.parentComment = comment.id.toString();
-  this.token_ = goog.dom.createDom('div', 'token', '@' + comment.user.firstName());
+  this.token_ = goog.dom.createDom('div', 'token', '@' + user.firstName());
   goog.dom.appendChild(this.inputHolder_, this.token_);
   this.setFocused(true);
   this.commentInput_.getElement().style.paddingLeft = goog.style.getSize(this.token_).width + 5 + 'px';
@@ -249,7 +250,9 @@ brkn.sidebar.CommentInput.prototype.isFocused = function() {
 brkn.sidebar.CommentInput.prototype.setFocused = function(focus) {
   if (focus) {
     this.commentInput_.getElement().focus();
-    goog.style.setPosition(this.commentControls_, 0, 0);
+    goog.Timer.callOnce(goog.bind(function() {
+      goog.style.setPosition(this.commentControls_, 0, 0);
+    }, this));
   }
   return goog.dom.classes.enable(this.getElement(), 'focused', focus);
 };

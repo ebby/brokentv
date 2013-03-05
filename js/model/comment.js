@@ -52,5 +52,4 @@ brkn.model.Comment = function(comment) {
     var r = new brkn.model.Comment(reply);
     this.replies.push(r);
   }, this);
-  window.console.log(this.replies);
 };

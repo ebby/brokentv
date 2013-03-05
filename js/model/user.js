@@ -15,7 +15,7 @@ brkn.model.User = function(user) {
 	goog.base(this);
 
 	/**
-	 * @type {number}
+	 * @type {string}
 	 */
 	this.id = user['id'];
 	
@@ -49,7 +49,10 @@ brkn.model.User = function(user) {
 	 * @type {string}
 	 */
 	this.color = Raphael.getColor();
-	
+//	while (this.color == '#00bf85' || this.color == '#00bf2f') {
+//	  this.color = Raphael.getColor(); // Don't allow green, we use for presence.
+//	}
+
 	/**
    * @type {number}
    */

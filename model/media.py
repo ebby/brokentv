@@ -27,6 +27,7 @@ class Media(db.Model):
   opt_out = db.StringListProperty(default=[]) # Users who change channels or log out
   host_views = db.IntegerProperty(default=0)
   comment_count = db.IntegerProperty(default=0)
+  star_count = db.IntegerProperty(default=0)
   programmed_count = db.IntegerProperty(default=0)
 
   @property
@@ -189,4 +190,5 @@ class Media(db.Model):
     json['published'] = self.published.isoformat()
     json['description'] = self.description if get_desc else ''
     json['thumb_pos'] = self.thumb_pos
+    json['star_count'] = self.star_count
     return json

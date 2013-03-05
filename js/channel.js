@@ -72,7 +72,7 @@ brkn.Channel = function(model, timeline, startTime, startTimeOffset, minTime) {
 	this.startTimeOffset_ = startTimeOffset;
 	
 	/**
-	 * @type {Object.<number, Element>}
+	 * @type {Object.<string, Element>}
 	 * @private
 	 */
 	this.viewers_ = {};

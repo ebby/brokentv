@@ -174,18 +174,18 @@ class CommentHandler(BaseHandler):
       comments = Comment.get_by_media(media, uid=self.current_user.id, offset=offset)
       return self.response.out.write(simplejson.dumps([c.toJson() for c in comments]))
     def post(self):
+      delete = self.request.get('delete') == 'true'
+      id = self.request.get('id')
+      if delete and id:
+        c = Comment.get_by_id(int(id))
+        c.delete()
+        return
+
       media = Media.get_by_key_name(self.request.get('media_id'))
       text = self.request.get('text')
       tweet = self.request.get('tweet') == 'true'
       facebook = self.request.get('facebook') == 'true'
       parent_id = self.request.get('parent_id')
-      delete = self.request.get('delete') == 'true'
-      id = self.request.get('id')
-
-      if delete and id:
-        c = Comment.get_by_id(int(id))
-        c.delete()
-
       if media and text:
         acl = self.current_user.friends + [self.current_user.id]
         c = Comment.add(media, self.current_user, text,
@@ -339,6 +339,8 @@ class StarHandler(BaseHandler):
     if self.request.get('delete'):
       collection.remove_media(media)
     else:
+      media.star_count += 1
+      media.put()
       collection.add_media(media, True)
       broadcast.broadcastNewActivity(UserActivity.add_starred(self.current_user, media))
     
@@ -347,7 +349,7 @@ class TweetHandler(BaseHandler):
     offset = self.request.get('offset') or 0
     media = Media.get_by_key_name(media_key)
     if media:
-      tweets = media.get_tweets(offset=offset)
+      tweets = media.get_tweets(offset=int(offset))
       self.response.out.write(simplejson.dumps([t.to_json() for t in tweets]))
     
 class TwitterHandler(BaseHandler):

@@ -27,7 +27,8 @@ def broadcastNewComment(comment, tweet):
   response['tweet'] = tweet.to_json() if tweet else ''
   channels = memcache.get('web_channels') or {}
   for client in channels.iterkeys():
-    webchannel.send_message(client, simplejson.dumps(response))
+    if client in comment.acl:
+      webchannel.send_message(client, simplejson.dumps(response))
     
 def broadcastNewActivity(activity):
   response = {}

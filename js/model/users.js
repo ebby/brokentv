@@ -14,7 +14,7 @@ brkn.model.Users = function() {
 	goog.base(this);
 	
 	/**
-	 * @type {Object.<number, brkn.model.User>}
+	 * @type {Object.<string, brkn.model.User>}
 	 */
 	this.userMap = {};
 };

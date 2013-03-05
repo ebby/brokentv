@@ -191,7 +191,7 @@ class ProgramHandler(BaseHandler):
       if self.request.get('channel_id'):
         channel = Channel.get_by_key_name(self.request.get('channel_id'))
         if self.current_user.id in constants.SUPER_ADMINS or self.current_user in channel.admins.fetch(None):
-          Programming.set_programming(channel.id, queue='programming')
+          Programming.set_programming(channel.id, queue='programming', fetch_twitter=(not constants.DEVELOPMENT))
         
 class InitProgrammingHandler(BaseHandler):
     def get(self):
@@ -214,7 +214,7 @@ class SetProgrammingHandler(BaseHandler):
         channels = Channel.get_public()
       for channel in channels:
         Programming.set_programming(channel.id, duration=int(duration), schedule_next=False,
-                                    fetch_twitter=twitter)
+                                    fetch_twitter=(not constants.DEVELOPMENT and twitter))
       self.response.out.write('done')
 
 class ChannelsHandler(BaseHandler):
@@ -238,7 +238,8 @@ class ChannelsHandler(BaseHandler):
         if name:
           channel = Channel.get_or_insert(key_name=Channel.make_key(name), name=name)
           if channel.online:
-            Programming.set_programming(channel.id, queue='programming')
+            Programming.set_programming(channel.id, queue='programming',
+                                        fetch_twitter=(not constants.DEVELOPMENT))
           self.response.out.write(simplejson.dumps(channel.toJson()))
           
     def delete(self, id):
@@ -260,7 +261,8 @@ class ChannelOnlineHandler(BaseHandler):
         channel.online = (self.request.get('online') == '1' or self.request.get('online') == 'true')
         channel.put()
         if channel.online:
-            Programming.set_programming(channel.id, queue='programming')
+            Programming.set_programming(channel.id, queue='programming',
+                                        fetch_twitter=(not constants.DEVELOPMENT))
         self.response.out.write(simplejson.dumps(channel.toJson()))
         
 class RemovePublisher(BaseHandler):

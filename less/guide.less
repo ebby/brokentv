@@ -8,6 +8,7 @@ div#guide {
   width: 100%;
   color: #ccc;
   .transition(e('height .5s ease, opacity .5s ease'));
+
   &.animate {
   .transition(e('height .5s ease, opacity .5s ease, left 1s ease-in-out'));
     div.channels div.channel {
@@ -21,9 +22,8 @@ div#guide {
   }
   
   &.drag, &.drag div.channel div.name, &.aligning div.channel div.name {
-    -webkit-transition: none !important;
-       -moz-transition: none !important;
-            transition: none !important;
+    .transition(e('none !important'));
+    .grab();
   }
   &.drag div.channels div.channel div.programs div.program.playing div.title {
     .transition(none);

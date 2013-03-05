@@ -3,6 +3,7 @@
 
 /**
  * @param media
+ * @param description
  * @param published
  */
 {template .info}
@@ -19,7 +20,7 @@
           <a href="#">DESCRIPTION</a>
           <div class="published">{$published}</div>
         </div>
-        <div class="description">{$media.description}</div>
+        <div class="description">{$description|noAutoescape}</div>
       </div>
       <div class="options">
         <div class="button star"></div>
@@ -30,7 +31,7 @@
       </div>
     </div>
     <div class="viewers" style="display: none">
-      <div class="label">SEEN BY</div>
+      <div class="label">SEEN</div>
     </div>
     <div class="tweet-holder" style="display:none">
       <div class="label"><a class="tweets-link">LATEST TWEETS</a></div>
@@ -53,7 +54,7 @@
  * @param user
  */
 {template .viewer}
-  <div class="viewer" style="background-color:{$user.color}">
+  <div class="viewer">
     <img src="{$user.picture}">
   </div>
 {/template}
@@ -368,7 +369,7 @@
         <div class="label">ACTIVITY</div>
       </li>
       <li class="tab starred">
-        <div class="label">STARRED</div>
+        <div class="label"><div class="heart"></div>'d</div>
       </li>
     </ul>
     <div class="activity-content content activity">
@@ -419,6 +420,10 @@
     <div class="publisher">
       <img src="{$media.publisher.picture}">
       <div class="name">{$media.publisher.name}</div>
+    </div>
+    <div class="stats">
+      <div class="comment-count">{$media.commentCount}</div>
+      <div class="star-count">{$media.starCount}</div>
     </div>
   </div>
 {/template}

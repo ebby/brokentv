@@ -71,8 +71,14 @@ brkn.model.BrowserChannel.prototype.onMessage_ = function(rawMessage) {
 	    if (message['last_channel_id']) {
   	    var lastChannel = brkn.model.Channels.getInstance().get(message['last_channel_id']);
   	    lastChannel.publish(brkn.model.Channel.Action.REMOVE_VIEWER, user);
+  	    var lastProgram = lastChannel.getCurrentProgram();
+  	    lastProgram && lastProgram.media.publish(brkn.model.Media.Actions.WATCHING, user,
+  	        lastChannel, true);
 	    }
 	    channel.publish(brkn.model.Channel.Action.ADD_VIEWER, session);
+
+	    var program = channel.getCurrentProgram();
+	    program && program.media.publish(brkn.model.Media.Actions.WATCHING, user, channel);
 	    break;
 	  case 'new_comment':
 	    var comment = new brkn.model.Comment(message['comment']);

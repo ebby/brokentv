@@ -1,6 +1,7 @@
 goog.provide('brkn.Player');
 
 goog.require('brkn.model.Channels');
+goog.require('brkn.model.Notify');
 goog.require('brkn.model.Player');
 
 goog.require('goog.fx.AnimationSerialQueue');
@@ -240,7 +241,9 @@ brkn.Player.prototype.toggleExpand_ = function(e) {
  */
 brkn.Player.prototype.playProgram = function(program) {
   brkn.model.Player.getInstance().setCurrentProgram(program);
-  window.console.log(program);
+  brkn.model.Notify.getInstance().publish(brkn.model.Notify.Actions.FLASH,
+      'Now Playing', program.media.name, undefined, program.media.thumbnail1,
+      '#info:' + program.media.id);
   this.play(program.media);
 };
 
@@ -327,8 +330,6 @@ brkn.Player.prototype.changeChannel = function(channel) {
  * @private
  */
 brkn.Player.prototype.playAsync_ = function(program) {
-  window.console.log('PLAY ASYNC')
-  window.console.log(program)
   this.currentProgram_ = program;
   this.playProgram(program);
   this.updateStagecover_();

@@ -344,7 +344,13 @@ div#guide.drag div.channel div.name,
 div#guide.aligning div.channel div.name {
   -webkit-transition: none !important;
   -moz-transition: none !important;
+  -o-transition: none !important;
+  -ms-transition: none !important;
   transition: none !important;
+  cursor: grabbing !important;
+  cursor: -moz-grabbing !important;
+  cursor: -webkit-grabbing !important;
+  cursor: url(/static/img/closedhand.cur) !important;
 }
 div#guide.drag div.channels div.channel div.programs div.program.playing div.title {
   -webkit-transition: none;
@@ -2110,14 +2116,10 @@ div#sidebar div.list-media div.media:hover div.title {
   text-shadow: 0px 0px 4px black;
 }
 div#sidebar div.list-media div.publisher {
-  left: 10px;
-  top: 10px;
   position: relative;
   top: 3px;
   left: 0px;
   margin-bottom: 4px;
-  /* border-bottom: 1px solid rgba(204, 204, 204, 0.32); */
-
   width: 272px;
   padding: 3px;
   font-family: MuseoSans500;
@@ -2139,6 +2141,29 @@ div#sidebar div.list-media div.publisher div.duration {
   position: absolute;
   right: 3px;
   top: 3px;
+}
+div#sidebar div.list-media div.stats {
+  position: absolute;
+  right: 3px;
+  bottom: 7px;
+}
+div#sidebar div.list-media div.stats div.comment-count {
+  background: url(/static/img/comment-count.png) no-repeat;
+  min-width: 15px;
+  height: 15px;
+  padding-left: 17px;
+  background-size: 13px;
+  font-size: 10px;
+  float: right;
+}
+div#sidebar div.list-media div.stats div.star-count {
+  background: url(/static/img/star-count.png) no-repeat;
+  min-width: 15px;
+  height: 15px;
+  padding-left: 17px;
+  background-size: 13px;
+  font-size: 10px;
+  float: right;
 }
 div#sidebar div.list-media div.description,
 div#sidebar div.list-media div.duration {
@@ -2297,7 +2322,7 @@ div#sidebar div.comments-holder div.comment div.comment-options {
   position: absolute;
   width: 35px;
   height: 15px;
-  top: 3px;
+  top: 5px;
   right: 5px;
   visibility: hidden;
   opacity: 0;
@@ -2755,27 +2780,6 @@ div.program.drag div.border {
 }
 div#sidebar div.info {
   margin-top: -2px;
-  /*
-  div.description {
-    margin-top: 1px;
-    width: 280px;
-    max-height: 60px;
-    overflow: hidden;
-    overflow-y: scroll;
-    position: relative;
-    margin-right: 5px;
-    padding: 8px 10px;
-    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
-    background: rgba(0, 0, 0, 0.75);
-    border-bottom: 1px solid rgba(24, 24, 24, 0.6);
-    box-shadow: inset 0 -1px 0px 0px rgb(85, 85, 85), inset -1px -2px 0px -1px #5e5e5e,
-        0px 1px 0px 1px rgba(200, 200, 200, 0.7);
-    line-height: 18px;
-    font-family: MuseoSans100;
-    font-size: 12px;
-  }
-  */
-
 }
 div#sidebar div.info div.no-info {
   margin-top: 20px;
@@ -2861,6 +2865,7 @@ div#sidebar div.info div.label a {
 div#sidebar div.info div.scrollable {
   height: 200px;
   overflow-y: scroll;
+  overflow-x: hidden;
 }
 div#sidebar div.info div.title {
   position: absolute;
@@ -2905,6 +2910,11 @@ div#sidebar div.info div.description {
   font-family: MuseoSans300;
   font-size: 12px;
 }
+div#sidebar div.info div.description a {
+  color: #181818;
+  font-family: MuseoSans300;
+  text-decoration: underline;
+}
 div#sidebar div.info div.published {
   position: absolute;
   right: 0;
@@ -2948,11 +2958,11 @@ div#sidebar div.info div.options div.plus {
   background-size: auto 30%;
 }
 div#sidebar div.info div.options div.star {
-  background-image: url(/static/img/28-star-2x.png);
+  background-image: url(/static/img/heart-light.png);
   background-size: auto 30%;
 }
 div#sidebar div.info div.options div.star.goog-custom-button-checked {
-  background-image: url(/static/img/28-star-yellow-2x.png);
+  background-image: url(/static/img/heart-red.png);
 }
 div#sidebar div.info div.options div.facebook {
   background-image: url(/static/img/facebook.png);
@@ -2973,21 +2983,28 @@ div#sidebar div.info div.viewers div.label {
   margin-left: 0;
 }
 div#sidebar div.info div.viewers div.viewer {
-  background: #ccc;
-  width: 25px;
-  height: 25px;
-  border-radius: 10px;
-  box-shadow: 0px 1px 1px 0px rgba(255, 255, 255, 0.6);
+  background: rgba(0, 0, 0, 0.2);
+  width: 28px;
+  height: 28px;
+  border-radius: 14px;
+  box-shadow: inset 0px 0px 2px 1px rgba(0, 0, 0, 0.6);
   display: inline-block;
   margin-left: 9px;
   cursor: pointer;
 }
 div#sidebar div.info div.viewers div.viewer img {
-  width: 21px;
+  width: 20px;
   height: 20px;
-  margin-left: 2px;
-  margin-top: 2px;
+  margin-left: 4px;
+  margin-top: 4px;
   border-radius: 10px;
+  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.4);
+}
+div#sidebar div.info div.viewers div.viewer:active img {
+  box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+div#sidebar div.info div.viewers div.viewer.online {
+  background-color: #00bf2f !important;
 }
 div#sidebar div.info div.comments-holder,
 div#sidebar div.info div.tweet-holder {
@@ -3004,6 +3021,123 @@ div#sidebar div.info div.tweet-holder div.tweet {
   vertical-align: middle;
   margin: 0 9px;
   white-space: normal;
+}
+div#notify {
+  position: absolute;
+  z-index: 200;
+  left: 0;
+  top: 0;
+}
+div#notify a {
+  text-decoration: none;
+}
+div#notify div.note {
+  width: 200px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid #dedede;
+  border-radius: 3px;
+  font-size: 13px;
+  margin: 5px;
+  padding: 5px;
+  position: relative;
+  color: #181818;
+  text-shadow: 1px 1px 1px white;
+  opacity: 0;
+  height: 55px;
+  overflow: hidden;
+  visibility: hidden;
+}
+div#notify div.note.show {
+  opacity: 1;
+  visibility: visible;
+  -webkit-transition: opacity 0.5s ease-in;
+  -moz-transition: opacity 0.5s ease-in;
+  -o-transition: opacity 0.5s ease-in;
+  -ms-transition: opacity 0.5s ease-in;
+  transition: opacity 0.5s ease-in;
+}
+div#notify div.note.collapse {
+  height: 0;
+  -webkit-transition: height 0.2s ease;
+  -moz-transition: height 0.2s ease;
+  -o-transition: height 0.2s ease;
+  -ms-transition: height 0.2s ease;
+  transition: height 0.2s ease;
+}
+div#notify div.note.dim {
+  opacity: .5;
+  visibility: visible;
+  -webkit-transition: opacity 3s ease-out;
+  -moz-transition: opacity 3s ease-out;
+  -o-transition: opacity 3s ease-out;
+  -ms-transition: opacity 3s ease-out;
+  transition: opacity 3s ease-out;
+}
+div#notify div.note.fade-out {
+  opacity: 0;
+  visibility: visible;
+  -webkit-transition: opacity 5s ease-out;
+  -moz-transition: opacity 5s ease-out;
+  -o-transition: opacity 5s ease-out;
+  -ms-transition: opacity 5s ease-out;
+  transition: opacity 5s ease-out;
+}
+div#notify div.note.show:hover {
+  opacity: 1;
+  -webkit-transition: none;
+  -moz-transition: none;
+  -o-transition: none;
+  -ms-transition: none;
+  transition: none;
+}
+div#notify div.note.pic {
+  padding-left: 55px;
+}
+div#notify div.note a {
+  color: #181818;
+}
+div#notify div.note div.action {
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 185px;
+  max-height: 22px;
+  line-height: 11px;
+}
+div#notify div.note div.picture {
+  width: 45px;
+  height: 45px;
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  overflow: hidden;
+  border-radius: 3px;
+}
+div#notify div.note div.picture img {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  height: auto;
+  width: 150%;
+}
+div#notify div.note div.content {
+  font-family: MuseoSans500;
+  width: 200px;
+  height: 30px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+div#notify div.note div.close {
+  position: absolute;
+  top: 3px;
+  right: 5px;
+  width: 13px;
+  height: 13px;
+  background: url(/static/img/close-dark.png) center no-repeat;
+  cursor: pointer;
+  margin-left: 2px;
+  float: right;
 }
 div#sidebar div.stream {
   overflow-x: hidden;
@@ -3082,19 +3216,23 @@ div#sidebar div.stream div.activity.digest div.medias {
 div#sidebar div.stream div.activity div.picture {
   position: absolute;
   background: #ccc;
-  width: 35px;
+  width: 34px;
   height: 34px;
   border-radius: 18px;
-  box-shadow: 0px 1px 1px 0px rgba(255, 255, 255, 0.6);
+  box-shadow: inset 0px 0px 2px 1px rgba(0, 0, 0, 0.6);
   display: inline-block;
   margin-left: 9px;
 }
 div#sidebar div.stream div.activity div.picture img {
-  width: 31px;
-  height: 30px;
-  margin-left: 2px;
-  margin-top: 2px;
+  width: 26px;
+  height: 26px;
+  margin-left: 4px;
+  margin-top: 4px;
   border-radius: 15px;
+  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.4);
+}
+div#sidebar div.stream div.activity div.picture:active img {
+  box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.1);
 }
 div#sidebar div.stream div.activity div.text {
   position: relative;
@@ -3371,6 +3509,21 @@ div#sidebar div#admin-list div.list-media div.media div.preview div.title {
   margin-right: 60px;
   height: 30px;
   line-height: 14px;
+}
+div#sidebar div#sidebar-content div.screen.profile div.tabbed ul.tabs li.tab.starred div.label,
+div#sidebar div#sidebar-content div.slide.profile div.tabbed ul.tabs li.tab.starred div.label {
+  padding-left: 17px;
+  position: relative;
+}
+div#sidebar div#sidebar-content div.screen.profile div.heart,
+div#sidebar div#sidebar-content div.slide.profile div.heart {
+  background: url(/static/img/heart-dark.png) no-repeat;
+  width: 13px;
+  height: 13px;
+  position: absolute;
+  top: 0px;
+  left: 63px;
+  background-size: 13px;
 }
 div#sidebar div#sidebar-content div.screen.profile div.no-comments,
 div#sidebar div#sidebar-content div.slide.profile div.no-comments {

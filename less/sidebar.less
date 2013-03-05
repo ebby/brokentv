@@ -653,13 +653,10 @@ div#sidebar {
       }
     }
     div.publisher {
-      left: 10px;
-      top: 10px;
       position: relative;
       top: 3px;
       left: 0px;
       margin-bottom: 4px;
-      /* border-bottom: 1px solid rgba(204, 204, 204, 0.32); */
       width: 272px;
       padding: 3px;
       font-family: MuseoSans500;
@@ -680,6 +677,29 @@ div#sidebar {
         position: absolute;
         right: 3px;
         top: 3px;
+      }
+    }
+    div.stats {
+      position: absolute;
+      right: 3px;
+      bottom: 7px;
+      div.comment-count {
+        background: url(/static/img/comment-count.png) no-repeat;
+        min-width: 15px;
+        height: 15px;
+        padding-left: 17px;
+        background-size: 13px;
+        font-size: 10px;
+        float: right;
+      }
+      div.star-count {
+        background: url(/static/img/star-count.png) no-repeat;
+        min-width: 15px;
+        height: 15px;
+        padding-left: 17px;
+        background-size: 13px;
+        font-size: 10px;
+        float: right;
       }
     }
     div.description, div.duration {
@@ -829,7 +849,7 @@ div#sidebar {
         position: absolute;
         width: 35px;
         height: 15px;
-        top: 3px;
+        top: 5px;
         right: 5px;
         visibility: hidden;
         opacity: 0;

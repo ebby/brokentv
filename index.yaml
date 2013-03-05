@@ -28,6 +28,12 @@ indexes:
   properties:
   - name: media
   - name: time
+
+- kind: Comment
+  properties:
+  - name: is_parent
+  - name: media
+  - name: time
   
 - kind: Tweet
   properties:

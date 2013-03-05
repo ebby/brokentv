@@ -47,7 +47,7 @@ class Tweet(db.Model):
   def to_json(self):
     json = {}
     json['text'] = self.text
-    json['id'] = self.id
+    json['id'] = str(self.id)
     json['handle'] = self.handle
     json['picture'] = self.picture_url
     json['time'] = self.time.isoformat()

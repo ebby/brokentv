@@ -1,0 +1,27 @@
+{namespace brkn.notify}
+
+
+/** 
+ * @param action
+ * @param content
+ * @param? user
+ * @param? img
+ * @param? link
+ */
+{template .note}
+  {if $link}<a href="{$link}">{/if}
+    <div class="note{if $img}{sp}pic{/if}">
+      {if $img}
+        <div class="picture"><img class="image" src={$img} style="display: none"/></div>
+      {/if}
+      <div class="action">
+        {if $user}
+          {$user.name}{sp}
+        {/if}
+        {$action}
+      </div>
+      <div class="content">{$content}</div>
+      <div class="close"></div>
+    </div>
+  {if $link}</a>{/if}
+{/template}

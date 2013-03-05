@@ -163,7 +163,7 @@ class Programming():
                      reduce(lambda x, y: x + y, [p.media.duration for p in programs], 0))
       next_gen = min(next_gen, duration - 120)
       logging.info('COUNTDOWN FOR ' + channel.name + ': ' + str(next_gen))
-      deferred.defer(Programming.set_programming, channel.key().name(),
+      deferred.defer(Programming.set_programming, channel.key().name(), fetch_twitter=fetch_twitter,
                      _name=channel.name.replace(' ', '') + '-' + str(uuid.uuid1()),
                      _countdown=next_gen,
                      _queue=queue)

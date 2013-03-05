@@ -1,0 +1,98 @@
+div#notify {
+  position: absolute;
+  z-index: 200;
+  left: 0;
+  top: 0;
+  a {
+    text-decoration: none;
+  }
+  div.note {
+    width: 200px;
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid #dedede;
+    border-radius: 3px;
+    font-size: 13px;
+    margin: 5px;
+    padding: 5px;
+    position: relative;
+    color: #181818;
+    text-shadow: 1px 1px 1px white;
+    opacity: 0;
+    height: 55px;
+    overflow: hidden;
+    visibility: hidden;
+    &.show {
+      opacity: 1;
+      visibility: visible;
+      .transition(opacity, .5s, ease-in);
+    }
+    &.collapse {
+      height: 0;
+      .transition(height, .2s, ease);
+    }
+    &.dim {
+      opacity: .5;
+      visibility: visible;
+      .transition(opacity, 3s, ease-out);
+    }
+    &.fade-out {
+      opacity: 0;
+      visibility: visible;
+      .transition(opacity, 5s, ease-out);
+    }
+    &.show:hover {
+      opacity: 1;
+      .transition(none);
+    }
+    &.pic {
+      padding-left: 55px;
+    }
+    a {
+      color: #181818;
+    }
+    div.action {
+      font-size: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 185px;
+      max-height: 22px;
+      line-height: 11px;
+    }
+    div.picture {
+      width: 45px;
+      height: 45px;
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      overflow: hidden;
+      border-radius: 3px;
+      img {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        height: auto;
+        width: 150%;
+      }
+    }
+    div.content {
+      font-family: MuseoSans500;
+      width: 200px;
+      height: 30px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    div.close {
+      position: absolute;
+      top: 3px;
+      right: 5px;
+      width: 13px;
+      height: 13px;
+      background: url(/static/img/close-dark.png) center no-repeat;
+      cursor: pointer;
+      margin-left: 2px;
+      float: right;
+    }
+    
+  }
+}

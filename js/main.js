@@ -2,6 +2,7 @@ goog.provide('brkn.Main');
 
 goog.require('brkn.Guide');
 goog.require('brkn.Controller');
+goog.require('brkn.Notify');
 goog.require('brkn.Player');
 goog.require('brkn.Popup');
 goog.require('brkn.Sidebar');
@@ -53,6 +54,11 @@ brkn.Main = function(channelToken) {
 	 * @type {brkn.Player}
 	 */
 	this.player_ = new brkn.Player();
+
+	/**
+   * @type {brkn.Notify}
+   */
+  this.notify_ = new brkn.Notify();
 };
 goog.inherits(brkn.Main, goog.ui.Component);
 
@@ -86,6 +92,7 @@ brkn.Main.prototype.enterDocument = function() {
   this.guide_.decorate(goog.dom.getElement('guide'));
   this.sidebar_.decorate(goog.dom.getElement('sidebar'));
   this.player_.decorate(goog.dom.getElement('stage'));
+  this.notify_.decorate(goog.dom.getElement('notify'));
 
   
   // iPad
@@ -205,7 +212,7 @@ brkn.Main.staticInit = function() {
       resize(expand);
     }
   });
-  goog.events.listen(window, goog.events.EventType.RESIZE, goog.partial(resize, true));
+  goog.events.listen(window, goog.events.EventType.RESIZE, goog.partial(resize, expand));
   
   brkn.model.Analytics.getInstance().init();
 };
