@@ -8,21 +8,21 @@ div#notify {
   }
   div.note {
     width: 200px;
-    background: rgba(255, 255, 255, 0.8);
-    border: 1px solid #dedede;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.4);
     border-radius: 3px;
     font-size: 13px;
     margin: 5px;
     padding: 5px;
     position: relative;
-    color: #181818;
-    text-shadow: 1px 1px 1px white;
+    color: #ccc;
+    text-shadow: 1px 1px 1px #181818;
     opacity: 0;
     height: 55px;
     overflow: hidden;
     visibility: hidden;
     &.show {
-      opacity: 1;
+      opacity: .95;
       visibility: visible;
       .transition(opacity, .5s, ease-in);
     }
@@ -86,13 +86,10 @@ div#notify {
       position: absolute;
       top: 3px;
       right: 5px;
-      width: 13px;
-      height: 13px;
-      background: url(/static/img/close-dark.png) center no-repeat;
+      .sprite-close-light();
       cursor: pointer;
       margin-left: 2px;
       float: right;
     }
-    
   }
 }

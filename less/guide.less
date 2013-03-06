@@ -49,12 +49,12 @@ div#guide {
     display: none;
     position: absolute;
     top: 0;
-    background: url(/static/img/ticker.png) no-repeat;
+    .sprite-ticker();
     margin-left: @name-width - 20;
+    margin-top: -7px;
     width: 30px;
     height: 45px;
-    background-position: 0 -4px;
-    cursor: pointer;
+    pointer-events: none;
     z-index: 110;
     .transition(left, 1s, linear);
     &.go-live div.go-live, &.can-go-live:hover div.go-live {
@@ -73,7 +73,7 @@ div#guide {
       margin-left: -14px;
       border-radius: 3px;
       background: #dedede;
-      box-shadow: 0 0 4px 1px rgba(0, 0, 0, .4), 0px 1px 0 0px rgba(0, 0, 0,.4);
+      .box-shadow(e('0 0 4px 1px rgba(0, 0, 0, .4), 0px 1px 0 0px rgba(0, 0, 0,.4)'));
       font-size: 11px;
       font-family: MuseoSans700;
       color: #181818;
@@ -114,7 +114,7 @@ div#guide {
       width: 25px;
       height: 24px;
       border-radius: 10px;
-      box-shadow: 0 2px 0px 0px rgba(0, 0, 0, 0.5);
+      .box-shadow(0, 2px, 0px, 0px, rgba(0, 0, 0, 0.5));
       img {
         width: 21px;
         height: 20px;
@@ -144,7 +144,7 @@ div#guide {
     opacity: 0;
     visibility: hidden;
     .transition(opacity, .3s, ease);
-    background-image: url(/static/img/my-ticker.png);
+    .sprite-my-ticker();
     &.show, &.show-me div.me {
       opacity: 1;
       visibility: visible;
@@ -171,6 +171,8 @@ div#guide {
     z-index: 100;
     width: 100%;
     font-size: 10px;
+    color: #f5f5f5;
+    text-shadow: 1px 1px 1px #333;
     div.name {
       width: 10%;
       min-width: 60px;
@@ -185,11 +187,9 @@ div#guide {
       position: relative;
       white-space: nowrap;
       padding-left: @name-width - 10;
-      background: #7E7E7E url(/static/img/grad-flat.png);
+      background: #7E7E7E @grad-flat;
       border-top: 1px solid #ccc;
-      -webkit-box-shadow: inset 0 -3px 7px -3px rgba(0,0,0,0.2), 0 0 5px 1px rgba(0, 0, 0, .6);
-         -moz-box-shadow: inset 0 -3px 7px -3px rgba(0,0,0,0.2), 0 0 5px 1px rgba(0, 0, 0, .6);
-              box-shadow: inset 0 -3px 7px -3px rgba(0,0,0,0.2), 0 0 5px 1px rgba(0, 0, 0, .6);
+      .box-shadow(e('inset 0 -3px 7px -3px rgba(0,0,0,0.2), 0 0 5px 1px rgba(0, 0, 0, .6)'));
       div.time {
         display: inline-block;
         padding: 5px 0;
@@ -199,7 +199,7 @@ div#guide {
       width: 30px;
       height: 20px;
       margin-top: -1px;
-      background: #7E7E7E url(/static/img/grad-flat.png);
+      background: #7E7E7E @grad-flat;
       border-top: 1px solid #ccc;
       font-size: 11px;
       font-family: MuseoSans700;
@@ -209,18 +209,18 @@ div#guide {
       cursor: pointer;
       &.left {
         border-right: 1px solid #2d3446;
-        box-shadow: inset -5px 0px 2px -5px #dedede;
+        .box-shadow(inset, -5px, 0px, 2px, -5px, #dedede);
         left: 0;
       }
       &.right {
         border-left: 1px solid #2d3446;
-        box-shadow: inset 1px 0px 2px -1px #dedede;
+        .box-shadow(inset, 1px, 0px, 2px, -1px, #dedede);
         right: 0;
       }
       &:active {
         border-top: 1px solid transparent;
         background: #111;
-        box-shadow: inset 0 0 1px 1px #000;
+        .box-shadow(inset, 0, 0, 1px, 1px, #000);
         color: #ddd;
       }
       span {
@@ -259,18 +259,17 @@ div#guide {
         display: none;
       }
       div.programs {
-        background: #3d3d3d url(/static/img/grad.png);
+        background: #3d3d3d @grad;
         margin-top: 5px;
         div.program {
-          box-shadow: none;
           border-radius: 0;
           border: none;
           border-left: 1px solid #2d3446;
           padding-right: 10px;
           margin-top: -1px;
-          box-shadow: inset -1px 0 1px -1px #F1F1F1, 0 0 1px #DEDEDE;
+          .box-shadow(e('inset -1px 0 1px -1px #F1F1F1, 0 0 1px #DEDEDE'));
           &:last-child {
-            box-shadow: none;
+            .box-shadow(none);
           }
           div.info div.title {
             position: relative;
@@ -287,7 +286,7 @@ div#guide {
           }
           &:active {
             background: #111;
-            box-shadow: inset -1px 0 1px #000;
+            .box-shadow(inset, -1px, 0, 1px, #000);
             color: #ddd;
           }
         }
@@ -325,7 +324,7 @@ div#guide {
         background: black;
         opacity: .8;
         margin-right: 1px solid #888;
-        box-shadow: 1px 0 3px rgba(0, 0, 0, .8);
+        .box-shadow(1px, 0, 3px, rgba(0, 0, 0, .8));
         cursor: pointer;
         z-index: 1;
         div.text {
@@ -382,7 +381,7 @@ div#guide {
 					text-shadow: 1px 1px 1px white;
 					z-index: 0;
 					border-radius: 5px;
-					box-shadow: inset 0px 0px 1px 1px rgba(0, 0, 0, .4);
+					.box-shadow(inset, 0px, 0px, 1px, 1px, rgba(0, 0, 0, .4));
           border: 1px solid whiteSmoke;
           padding: 1px;
           cursor: pointer;
@@ -402,7 +401,6 @@ div#guide {
 					  display: inline-block;
 					  width: 100%;
 					  height: 100%;
-					  /*box-shadow: inset 0px 15px 30px -1px rgba(0, 0, 0, .9);*/
 					}
 					&:hover div.thumb, &.playing div.thumb {
            -webkit-transition: opacity .6s ease, background-position 3s ease-out;
@@ -464,10 +462,9 @@ div#guide {
             top: 3px;
             width: 20px;
             height: 20px;
-            background-image: url(/static/img/31-circle-x.png);
+            background-image: url(/static/img/circle-x.png);
             background-repeat: no-repeat;
             background-position: center;
-            background-size: 80%;
             filter: invert(100%);
           }
           div.repos {
@@ -477,10 +474,9 @@ div#guide {
             top: 23px;
             width: 20px;
             height: 20px;
-            background-image: url(/static/img/repos.png);
+            background-image: url(/static/img/circle-repos.png);
             background-repeat: no-repeat;
             background-position: center;
-            background-size: 80%;
           }
           &:hover div.remove, &:hover div.repos {
             filter: invert(100%);
@@ -537,7 +533,7 @@ div#guide {
 	        	background: #ccc;
 	        	top: 11px;
 	        	width: 100%;
-	        	box-shadow: 0px 1px 1px 0px rgba(255, 255, 255, .6);
+	        	.box-shadow(0px, 1px, 1px, 0px, rgba(255, 255, 255, .6));
 	        	pointer-events: all;
 	        	cursor: pointer;
 	        	display: none;
@@ -554,7 +550,7 @@ div#guide {
 		          height: 13px;
 		          border-radius: 10px;
 		          background: inherit;
-		          box-shadow: 0px 1px 1px 0px rgba(255, 255, 255, .6);
+		          .box-shadow(0px, 1px, 1px, 0px, rgba(255, 255, 255, .6));
 		        }
 		        &::after {
 		          content: '';
@@ -573,7 +569,7 @@ div#guide {
 							border-radius: 10px;
 							right: -5px;
 							top: -10px;
-							box-shadow: 0px 1px 1px 0px rgba(255, 255, 255, .6);
+							.box-shadow(0px, 1px, 1px, 0px, rgba(255, 255, 255, .6));
 							position: absolute;
 							img {
 			          width: 21px;
@@ -627,7 +623,7 @@ div#guide {
       color: #f5f5f5;
       border-color: #f5f5f5;
       border-radius: 4px;
-      box-shadow: inset 0px 0px 1px 1px rgba(0, 0, 0, .4);
+      .box-shadow(inset, 0px, 0px, 1px, 1px, rgba(0, 0, 0, .4));
       .transition(opacity, 3s, ease-out);
       display: none;
       border-radius: 6px 6px 4px 4px;
@@ -638,7 +634,7 @@ div#guide {
         width: 162px;
         height: 20px;
         text-align: center;
-        background: url(/static/img/grad-flat.png);
+        background: @grad-flat;
         border-top: 1px solid #ccc;
         color: #fefefe;
         text-shadow: 1px 1px black;
@@ -647,9 +643,7 @@ div#guide {
         line-height: 20px;
         border-radius: 4px 4px 0 0;
         div.close {
-          width: 10px;
-          height: 10px;
-          background: url(/static/img/close-light.png) center no-repeat;
+          .sprite-close-light();
           cursor: pointer;
           position: absolute;
           right: 5px;
@@ -671,7 +665,7 @@ div#guide {
           margin-top: 30px;
           margin-left: 4px;
           border: 1px solid #ccc;
-          box-shadow: none;
+          .box-shadow(none);
           border-radius: 5px;
           font-size: 12px;
           font-weight: normal;
@@ -740,8 +734,7 @@ div#guide {
     }
 	  .current div.name {
       background: #181818 !important;
-      box-shadow: 1px 0 3px rgba(0, 0, 0, 0.8), -3px 0px 3px 3px rgba(105, 105, 105, 0.8),
-          10px 0 55px -8px rgba(255,255,255,.7) !important;
+      .box-shadow(e('1px 0 3px rgba(0, 0, 0, 0.8), -3px 0px 3px 3px rgba(105, 105, 105, 0.8), 0px 0 55px -8px rgba(255,255,255,.7) !important'));
       z-index: 2 !important;
       cursor: default !important;
       &:after {

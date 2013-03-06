@@ -11,9 +11,8 @@ div#sidebar div.info {
     position: relative;
     overflow: hidden;
     background: #f5f5f5;
-    /*box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 0.8); */
     border-bottom: 1px solid #181818;
-    box-shadow: 0 0 2px 2px rgba(77, 77, 77, 0.7), 0 0 1px #5e5e5e;
+    .box-shadow(e('0 0 2px 2px rgba(77, 77, 77, 0.7), 0 0 1px #5e5e5e'));
     img.thumb {
       width: 100%;
       height: auto;
@@ -63,7 +62,7 @@ div#sidebar div.info {
     height: 70px;
     border-radius: 6px;
     position: absolute;
-    box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.5), 0 0 1px 1px rgba(255, 255, 255, .9);
+    .box-shadow(e('0 0 3px 0 rgba(0, 0, 0, 0.5), 0 0 1px 1px rgba(255, 255, 255, .9)'));
     border: 0px solid whiteSmoke;
     left: 10px;
     top: 30px;
@@ -92,7 +91,7 @@ div#sidebar div.info {
     color: whiteSmoke;
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
     font-size: 18px;
-    font-family: MuseoSans100;
+    font-family: MuseoSans300;
     width: 230px;
     overflow: hidden;
     background: rgba(0, 0, 0, .6);
@@ -146,45 +145,56 @@ div#sidebar div.info {
     position: absolute;
     top: 0;
     right: -2px;
-    box-shadow: -1px 0 1px 0px rgba(200, 200, 200, 0.6);
+    .box-shadow(-1px, 0, 1px, 0px, rgba(200, 200, 200, 0.6));
     div.button {
       display: block;
       background: rgba(0, 0, 0, 0.6);
       border: 1px solid rgba(45, 52, 70, 0.4);
       border-radius: 0;
-      box-shadow: inset 0 0 1px 1px rgba(140, 140, 140, 0.70), 0 0 1px #5e5e5e;
+      .box-shadow(e('inset 0 0 1px 1px rgba(140, 140, 140, 0.70), 0 0 1px #5e5e5e'));
       margin-top: -1px;
       width: 40px;
       height: 33px;
-      background-repeat: no-repeat;
-      background-position: center;
+      position: relative;
       &:active, &.goog-custom-button-active, &.goog-custom-button-disabled,
       &.goog-custom-button-checked {
         background-color: rgba(80, 80, 80, 0.6);
       }
     }
-    div.play {
-      background-image: url(/static/img/16-play-2x.png);
-      background-size: auto 30%;
+    div.icon {
+      position: absolute;
+      top: 50%;
+      left: 50%
     }
-    div.plus {
-      background-image: url(/static/img/13-plus-2x.png);
-      background-size: auto 30%;
+    div.play .icon {
+      .sprite-info-play();
+      margin-top: -6px;
+      margin-left: -3px;
     }
-    div.star {
-      background-image: url(/static/img/heart-light.png);
-      background-size: auto 30%;
-      &.goog-custom-button-checked {
-        background-image: url(/static/img/heart-red.png);
-      }
+    div.plus .icon {
+      .sprite-info-plus();
+      margin-top: -6px;
+      margin-left: -6px;
     }
-    div.facebook {
-      background-image: url(/static/img/facebook.png);
-      background-size: auto 40%;
+    div.star .icon {
+      .sprite-heart-light();
+      margin-top: -6px;
+      margin-left: -6px;
     }
-    div.twitter {
-      background-image: url(/static/img/twitter.png);
-      background-size: auto 30%; 
+    div.star.goog-custom-button-checked .icon {
+      .sprite-heart-red();
+      margin-top: -6px;
+      margin-left: -6px;
+    }
+    div.facebook .icon {
+      .sprite-facebook();
+      margin-top: -8px;
+      margin-left: -4px;
+    }
+    div.twitter .icon {
+      .sprite-twitter();
+      margin-top: -8px;
+      margin-left: -8px;
     }
   }
   div.viewers {
@@ -201,7 +211,7 @@ div#sidebar div.info {
       width: 28px;
       height: 28px;
       border-radius: 14px;
-      box-shadow: inset 0px 0px 2px 1px rgba(0, 0, 0, 0.6);
+      .box-shadow(inset, 0px, 0px, 2px, 1px, rgba(0, 0, 0, 0.6));
       display: inline-block;
       margin-left: 9px;
       cursor: pointer;
@@ -211,11 +221,11 @@ div#sidebar div.info {
         margin-left: 4px;
         margin-top: 4px;
         border-radius: 10px;
-        box-shadow: 0 0 2px 1px rgba(0, 0, 0, .4);
+        .box-shadow(0, 0, 2px, 1px, rgba(0, 0, 0, .4));
       }
       &:active {
         img {
-          box-shadow: 0 0 1px 1px rgba(0, 0, 0, .1);
+          .box-shadow(0, 0, 1px, 1px, rgba(0, 0, 0, .1));
         }
       }
       &.online {

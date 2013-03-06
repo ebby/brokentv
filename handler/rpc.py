@@ -171,7 +171,7 @@ class CommentHandler(BaseHandler):
     def get(self, id):
       offset = self.request.get('offset') or 0
       media = Media.get_by_key_name(id)
-      comments = Comment.get_by_media(media, uid=self.current_user.id, offset=offset)
+      comments = Comment.get_by_media(media, uid=self.current_user.id, offset=int(offset))
       return self.response.out.write(simplejson.dumps([c.toJson() for c in comments]))
     def post(self):
       delete = self.request.get('delete') == 'true'
@@ -374,4 +374,5 @@ class TwitterCallbackHandler(BaseHandler):
                                  constants.TWITTER_CALLBACK)
     user_info = client.get_user_info(auth_token, auth_verifier=auth_verifier)
     self.current_user.set_twitter_info(user_info)
+    broadcast.broadcastTwitterAuth(self.current_user)
     self.response.out.write('<script>window.close()</script>')

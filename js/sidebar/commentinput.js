@@ -184,6 +184,9 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
   
   brkn.model.Sidebar.getInstance().subscribe(brkn.model.Sidebar.Actions.REPLY_COMMENT,
       this.reply_, this);
+  brkn.model.Users.getInstance().subscribe(brkn.model.User.Actions.TWITTER_AUTH, function() {
+    this.tweetToggle_.setChecked(true);
+  }, this);
 };
 
 
@@ -303,6 +306,7 @@ brkn.sidebar.CommentInput.prototype.onFacebookToggle_ = function(e) {
  */
 brkn.sidebar.CommentInput.prototype.onTwitterToggle_ = function(e) {
   if (!this.twitterPublish_ && this.tweetToggle_.isChecked()) {
+      this.tweetToggle_.setChecked(false);
       var newWindow = window.open(this.twitterAuthUrl_,'Twitter Login','height=300,width=550');
       newWindow.moveTo(screen.width/2-225, screen.height/2-150);
       newWindow.focus();

@@ -23,11 +23,11 @@
         <div class="description">{$description|noAutoescape}</div>
       </div>
       <div class="options">
-        <div class="button star"></div>
-        <div class="button facebook"></div>
-        <div class="button twitter"></div>
-        <div class="button play"></div>
-        <div class="button plus"></div>
+        <div class="button star"><div class="icon"></div></div>
+        <div class="button facebook"><div class="icon"></div></div>
+        <div class="button twitter"><div class="icon"></div></div>
+        <div class="button play"><div class="icon"></div></div>
+        <div class="button plus"><div class="icon"></div></div>
       </div>
     </div>
     <div class="viewers" style="display: none">
@@ -62,6 +62,7 @@
 
 /**
  * @param tweet
+ * @param text
  * @param timestamp
  */
 {template .tweet}
@@ -72,10 +73,10 @@
       <img src="{$tweet.picture}"/>
     {/if}
     <div class="text">
-      <a target="_blank" href="http://www.twitter.com/{$tweet.handle}/status/{$tweet.id}">
+      <a class="handle" target="_blank" href="http://www.twitter.com/{$tweet.handle}/status/{$tweet.id}">
         {$tweet.handle}
       </a>{sp}
-      {$tweet.text}
+      {$text|noAutoescape}
     </div>
     <div class="timestamp">{$timestamp}</div>
   </div>
@@ -83,6 +84,7 @@
 
 /**
  * @param comment
+ * @param text
  * @param timestamp
  * @param owner
  */
@@ -93,7 +95,7 @@
     </a>
     <div class="text">
       <a href="#user:{$comment.user.id}">{$comment.user.name}</a>{sp}
-      {$comment.text}
+      {$text|noAutoescape}
     </div>
     <div class="timestamp">{$timestamp}</div>
     <div class="comment-options">
@@ -109,8 +111,8 @@
 {template .commentInput}
   <div class="comment-input">
     <div class="comment-controls">
-      <div class="comment-button tweet-toggle">tweet<div class="check"></div></div>
-      <div class="comment-button fb-toggle">post<div class="check"></div></div>
+      <div class="comment-button tweet-toggle"><div class="icon"></div>tweet<div class="check"></div></div>
+      <div class="comment-button fb-toggle"><div class="icon"></div>post<div class="check"></div></div>
       <div class="comment-button add-comment"><div class="return">&#8618;</div>add</div>
     </div>
     <div class="input-holder">
@@ -422,8 +424,8 @@
       <div class="name">{$media.publisher.name}</div>
     </div>
     <div class="stats">
-      <div class="comment-count">{$media.commentCount}</div>
-      <div class="star-count">{$media.starCount}</div>
+      <div class="comment-count"><div class="icon"></div>{$media.commentCount}</div>
+      <div class="star-count"><div class="icon"></div>{$media.starCount}</div>
     </div>
   </div>
 {/template}

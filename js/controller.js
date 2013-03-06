@@ -238,11 +238,14 @@ brkn.Controller.prototype.enterDocument = function() {
       .listen(brkn.model.Clock.getInstance().clock,
           goog.Timer.TICK,
           goog.bind(function() {
+            var elapsed = brkn.model.Player.getInstance().getCurrentTime() /
+              brkn.model.Player.getInstance().getCurrentProgram().media.duration;
+            if (elapsed > .98) {
+              brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.BEFORE_END);
+            }
             if (brkn.model.Channels.getInstance().currentChannel.myChannel &&
                 brkn.model.Player.getInstance().getCurrentProgram() &&
                 !goog.dom.classes.has(this.elapsedEl_, 'drag')) {
-              var elapsed = brkn.model.Player.getInstance().getCurrentTime() /
-                  brkn.model.Player.getInstance().getCurrentProgram().media.duration;
               goog.dom.setTextContent(this.durationEl_,
                   (brkn.model.Player.getInstance().getCurrentTime() ?
                   brkn.model.Player.getInstance().getCurrentTime().toString().toHHMMSS() + ' / ' : '') +
@@ -386,7 +389,8 @@ brkn.Controller.prototype.resize = function() {
 
     var width = Math.min(goog.dom.getViewportSize().width - 200,
         Math.max(100, goog.dom.getViewportSize().width - viewportLeft));
-    var rightWidth = this.sidebarToggle_.isChecked() && width > 300 ? width - 295 : width + 5;
+    var rightWidth = Math.max(100,
+        (this.sidebarToggle_.isChecked() && width > 250 ? width - 247 : width + 5));
     rightWidth = brkn.model.Users.getInstance().currentUser.isAdmin() ? rightWidth : rightWidth - 50;
     if (this.rightWidth_ != rightWidth) {
       this.rightWidth_ = rightWidth;

@@ -5,6 +5,7 @@ goog.require('brkn.model.Comment');
 goog.require('brkn.model.Tweet');
 goog.require('brkn.sidebar');
 
+goog.require('goog.string.linkify');
 goog.require('goog.ui.Component');
 
 
@@ -168,8 +169,16 @@ brkn.sidebar.CommentList.prototype.decorateInternal = function(el) {
  */
 brkn.sidebar.CommentList.prototype.addTweet_ = function(tweet, opt_first) {
   goog.style.showElement(this.noCommentsEl_, false);
+  var linkedText = goog.string.linkify.linkifyPlainText(tweet.text);
+  linkedText = linkedText.replace(/#(\S+)/g, function(hashtag, query) {
+    return '<a target="_blank" href="http://twitter.com/search?q=%23' + query + '">' + hashtag + '</a>';
+  });
+  linkedText = linkedText.replace(/@(\S+)/g, function(handle, name) {
+    return '<a target="_blank" href="http://twitter.com/' + name + '">' + handle + '</a>';
+  });
   var tweetEl = soy.renderAsElement(brkn.sidebar.tweet, {
     tweet: tweet,
+    text: linkedText,
     timestamp: goog.date.relative.format(tweet.time.getTime())
   });
   brkn.model.Clock.getInstance().addTimestamp(tweet.time,
@@ -192,6 +201,7 @@ brkn.sidebar.CommentList.prototype.addComment_ = function(comment) {
   goog.style.showElement(this.noCommentsEl_, false);
   var commentEl = soy.renderAsElement(brkn.sidebar.comment, {
     comment: comment,
+    text: goog.string.linkify.linkifyPlainText(comment.text),
     timestamp: goog.date.relative.format(comment.time.getTime())
   });
   brkn.model.Clock.getInstance().addTimestamp(comment.time,

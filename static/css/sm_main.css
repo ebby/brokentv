@@ -1,0 +1,3594 @@
+.button {
+  display: inline-block;
+  border-radius: 3px;
+  border: 1px solid #2d3446;
+  width: 70px;
+  height: 15px;
+  font-size: 13px;
+  text-align: center;
+  padding: 3px 0;
+  box-shadow: inset 0 0 1px rgba(255, 255, 255, 0.1), 0 0 1px rgba(255, 255, 255, 0.5);
+  color: #FEFEFE;
+  text-shadow: 1px 1px black;
+  cursor: pointer;
+  outline: none;
+  background: rgba(218, 218, 218, 0.9);
+}
+.button.goog-custom-button-active,
+.button.goog-custom-button-checked,
+.button:active {
+  background: rgba(180, 180, 180, 0.9);
+  box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.3), 0 0 1px #dedede;
+  color: #ddd;
+}
+.button.dark {
+  background: none;
+}
+.button.dark.goog-custom-button-active,
+.button.dark.goog-custom-button-checked,
+.button.dark:active {
+  background-color: #111;
+  box-shadow: inset 0 0 1px 1px #000;
+  color: #ddd;
+}
+.button.dark.goog-custom-button-disabled {
+  background-color: #111;
+  box-shadow: inset 0 0 1px 1px #000;
+  color: #ddd;
+  cursor: default;
+}
+div.controller {
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  height: 40px;
+  z-index: 100;
+  background: transparent url(../img/grad-window.png);
+  border-top: 1px solid #ccc;
+  pointer-events: none;
+  -webkit-box-shadow: inset 0 -3px 7px -3px rgba(0, 0, 0, 0.2), 0 0 5px 0 rgba(0, 0, 0, 0.5);
+  -moz-box-shadow: inset 0 -3px 7px -3px rgba(0, 0, 0, 0.2), 0 0 5px 0 rgba(0, 0, 0, 0.5);
+  box-shadow: inset 0 -3px 7px -3px rgba(0, 0, 0, 0.2), 0 0 5px 0 rgba(0, 0, 0, 0.5);
+  -webkit-transition: width 0.5s ease;
+  -moz-transition: width 0.5s ease;
+  -o-transition: width 0.5s ease;
+  -ms-transition: width 0.5s ease;
+  transition: width 0.5s ease;
+}
+div.controller.window div.background {
+  opacity: 0;
+  -webkit-transition: opacity 0.3s ease;
+  -moz-transition: opacity 0.3s ease;
+  -o-transition: opacity 0.3s ease;
+  -ms-transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+div.controller.window div.left div.border,
+div.controller.window div.right div.border {
+  display: block;
+}
+div.controller div.background {
+  opacity: 1;
+  background: #5c5c5c url(../img/grad.png);
+  pointer-events: all;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+div.controller div.left {
+  background: #5c5c5c url(../img/grad.png);
+  display: inline-block;
+  position: relative;
+  width: 203px;
+  height: 100%;
+  pointer-events: all;
+}
+div.controller div.left div.border {
+  display: none;
+  width: 6px;
+  height: 100%;
+  background: url('../img.png') no-repeat 0 -701px;
+  position: absolute;
+  right: -6px;
+  top: 0;
+}
+div.controller div.right {
+  background: #5c5c5c url(../img/grad.png);
+  display: inline-block;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 100px;
+  height: 100%;
+  pointer-events: all;
+  -webkit-transition: width 0.5s ease;
+  -moz-transition: width 0.5s ease;
+  -o-transition: width 0.5s ease;
+  -ms-transition: width 0.5s ease;
+  transition: width 0.5s ease;
+}
+div.controller div.right div.border {
+  display: none;
+  width: 6px;
+  height: 100%;
+  background: url('../img.png') no-repeat -62px -88px;
+  position: absolute;
+  left: -6px;
+  top: 0;
+}
+div.controller div.progress {
+  width: 100%;
+  height: 4px;
+  background: #f5f5f5;
+  box-shadow: inset 0 -1px 1px 0 #cccccc, 0 0 2px 1px rgba(88, 88, 88, 0.3);
+  position: absolute;
+  top: 27px;
+  pointer-events: all;
+  left: 205px;
+  cursor: pointer;
+  border-radius: 300px;
+}
+div.controller div.progress.drag div.elapsed,
+div.controller div.progress.drag div.seek {
+  -webkit-transition: none !important;
+  -moz-transition: none !important;
+  -o-transition: none !important;
+  -ms-transition: none !important;
+  transition: none !important;
+}
+div.controller div.progress div.elapsed {
+  position: absolute;
+  left: 0;
+  width: 0;
+  height: 4px;
+  background: #B7432E;
+  box-shadow: inset 0 -1px 1px 0 rgba(255, 255, 255, 0.2);
+  border-radius: 300px;
+}
+div.controller div.progress div.elapsed.animate {
+  -webkit-transition: width 1s linear;
+  -moz-transition: width 1s linear;
+  -o-transition: width 1s linear;
+  -ms-transition: width 1s linear;
+  transition: width 1s linear;
+}
+div.controller div.progress div.seek {
+  position: absolute;
+  bottom: 0px;
+  width: 1px;
+  height: 4px;
+  background: #B7432E;
+  opacity: 0.9;
+  right: 0;
+  cursor: pointer;
+  box-shadow: 0px 0 6px 2px rgba(255, 255, 255, 0.2);
+}
+div.controller div.progress div.title {
+  position: absolute;
+  left: 0;
+  top: -18px;
+  font-size: 11px;
+  font-family: MuseoSans100;
+  color: #f5f5f5;
+  text-shadow: 1px 1px 1px #181818;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80%;
+}
+div.controller div.progress div.current-time {
+  position: absolute;
+  right: 40px;
+  top: -18px;
+  font-size: 11px;
+  font-family: MuseoSans100;
+  color: #f5f5f5;
+  text-shadow: 1px 1px 1px #181818;
+}
+div.controller div.progress div.duration {
+  position: absolute;
+  right: 0;
+  top: -18px;
+  font-size: 11px;
+  font-family: MuseoSans100;
+  color: #f5f5f5;
+  text-shadow: 1px 1px 1px #181818;
+}
+div.controller:hover div.progress div.seek {
+  -webkit-transition: all 0.3s ease;
+  -moz-transition: all 0.3s ease;
+  -o-transition: all 0.3s ease;
+  -ms-transition: all 0.3s ease;
+  transition: all 0.3s ease;
+  opacity: 1;
+  width: 10px;
+  height: 10px;
+  border-radius: 10px;
+  bottom: -3px;
+  right: -3px;
+  margin-left: -4px;
+  box-shadow: 0px 0px 1px 1px rgba(255, 255, 255, 0.9);
+  z-index: 2;
+}
+div.controller div.button.guide-toggle {
+  position: absolute;
+  top: 4px;
+  width: 55px;
+  height: 25px;
+  left: 5px;
+  line-height: 29px;
+  font-size: 11px;
+  font-family: MuseoSans700;
+}
+div.controller div.button.sidebar-toggle {
+  position: absolute;
+  right: 5px;
+  top: 4px;
+  width: 35px;
+  height: 25px;
+  background-image: url(../img/comment.png);
+  background-repeat: no-repeat;
+  background-position: center;
+}
+div.controller div.button.admin-toggle {
+  position: absolute;
+  right: 50px;
+  top: 4px;
+  width: 35px;
+  height: 25px;
+  background-image: url(../img/gear.png);
+  background-repeat: no-repeat;
+  background-position: center;
+}
+div.controller div.button.admin-toggle div.pending {
+  height: 13px;
+  background: red;
+  color: white;
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  border-radius: 3px;
+  font-size: 10px;
+  text-align: center;
+  line-height: 14px;
+  border: 1px solid #460000;
+  padding: 0 3px;
+}
+div.controller div.controls {
+  position: absolute;
+  left: 80px;
+  top: 4px;
+}
+div.controller div.controls div.button {
+  border-radius: 0;
+  margin-left: -1px;
+  width: 35px;
+  height: 25px;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+div.controller div.controls div.button:last-child {
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
+  -webkit-border-top-right-radius: 3px;
+  -webkit-border-bottom-right-radius: 3px;
+}
+div.controller div.controls div.button:first-child {
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
+  -webkit-border-top-left-radius: 3px;
+  -webkit-border-bottom-left-radius: 3px;
+}
+div.controller div.controls div.restart {
+  background-image: url(../img/restart.png);
+  background-size: 50%;
+}
+div.controller div.controls div.play {
+  background-image: url(../img/pause.png);
+}
+div.controller div.controls div.play.goog-custom-button-checked {
+  background-color: transparent;
+  background-image: url(../img/play.png);
+  box-shadow: inset 0 0 1px rgba(255, 255, 255, 0.1), 0 0 1px rgba(255, 255, 255, 0.5);
+}
+div.controller div.controls div.volume {
+  background-image: url(../img/volume-up.png);
+  background-size: 50%;
+}
+div.controller div.controls div.volume.mute,
+div.controller div.controls div.volume.goog-custom-button-checked {
+  background-image: url(../img/volume-down.png);
+  background-position: 9px;
+}
+div#guide {
+  position: absolute;
+  bottom: 0px;
+  height: 40px;
+  overflow: hidden;
+  background: #f7f7f7;
+  width: 100%;
+  color: #ccc;
+  -webkit-transition: height .5s ease, opacity .5s ease;
+  -moz-transition: height .5s ease, opacity .5s ease;
+  -o-transition: height .5s ease, opacity .5s ease;
+  -ms-transition: height .5s ease, opacity .5s ease;
+  transition: height .5s ease, opacity .5s ease;
+}
+div#guide.animate {
+  -webkit-transition: height .5s ease, opacity .5s ease, left 1s ease-in-out;
+  -moz-transition: height .5s ease, opacity .5s ease, left 1s ease-in-out;
+  -o-transition: height .5s ease, opacity .5s ease, left 1s ease-in-out;
+  -ms-transition: height .5s ease, opacity .5s ease, left 1s ease-in-out;
+  transition: height .5s ease, opacity .5s ease, left 1s ease-in-out;
+}
+div#guide.animate div.channels div.channel div.name {
+  -webkit-transition: left 1s ease-in-out;
+  -moz-transition: left 1s ease-in-out;
+  -o-transition: left 1s ease-in-out;
+  -ms-transition: left 1s ease-in-out;
+  transition: left 1s ease-in-out;
+}
+div#guide.animate div.channels div.channel div.programs div.program div.channel div.title {
+  -webkit-transition: left 0.1s linear;
+  -moz-transition: left 0.1s linear;
+  -o-transition: left 0.1s linear;
+  -ms-transition: left 0.1s linear;
+  transition: left 0.1s linear;
+}
+div#guide.drag,
+div#guide.drag div.channel div.name,
+div#guide.aligning div.channel div.name {
+  -webkit-transition: none !important;
+  -moz-transition: none !important;
+  -o-transition: none !important;
+  -ms-transition: none !important;
+  transition: none !important;
+  cursor: grabbing !important;
+  cursor: -moz-grabbing !important;
+  cursor: -webkit-grabbing !important;
+  cursor: url(../img/closedhand.cur) !important;
+}
+div#guide.drag div.channels div.channel div.programs div.program.playing div.title {
+  -webkit-transition: none;
+  -moz-transition: none;
+  -o-transition: none;
+  -ms-transition: none;
+  transition: none;
+}
+div#guide.admin.toggled div.channels div.channel div.programs div.program div.remove,
+div#guide.admin.toggled div.channels div.channel div.programs div.program div.repos {
+  display: block;
+}
+div#guide.admin.toggled div.channels div.channel div.programs div.program:hover div.thumb,
+div#guide.admin.toggled div.channels div.channel div.programs div.program.playing div.thumb {
+  -webkit-transition: opacity 0.6s ease;
+  -moz-transition: opacity 0.6s ease;
+  -o-transition: opacity 0.6s ease;
+  -ms-transition: opacity 0.6s ease;
+  transition: opacity 0.6s ease;
+  -webkit-filter: none !important;
+  opacity: 1;
+  background-position-y: inherit !important;
+}
+div#guide.faded {
+  opacity: .5;
+}
+div#guide.faded:hover {
+  opacity: 1;
+}
+div#guide div.ticker,
+div#guide div.my-ticker {
+  display: none;
+  position: absolute;
+  top: 0;
+  background: url('../img.png') no-repeat 0 -88px;
+  margin-left: 180px;
+  width: 30px;
+  height: 45px;
+  background-position: 0 -4px;
+  cursor: pointer;
+  z-index: 110;
+  -webkit-transition: left 1s linear;
+  -moz-transition: left 1s linear;
+  -o-transition: left 1s linear;
+  -ms-transition: left 1s linear;
+  transition: left 1s linear;
+}
+div#guide div.ticker.go-live div.go-live,
+div#guide div.my-ticker.go-live div.go-live,
+div#guide div.ticker.can-go-live:hover div.go-live,
+div#guide div.my-ticker.can-go-live:hover div.go-live {
+  opacity: 1;
+  visibility: visible;
+}
+div#guide div.ticker div.go-live,
+div#guide div.my-ticker div.go-live {
+  display: none;
+  opacity: 0;
+  visibility: hidden;
+  -webkit-transition: opacity 0.3s ease;
+  -moz-transition: opacity 0.3s ease;
+  -o-transition: opacity 0.3s ease;
+  -ms-transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease;
+  position: absolute;
+  top: 37px;
+  width: 45px;
+  padding: 5px;
+  margin-left: -14px;
+  border-radius: 3px;
+  background: #dedede;
+  box-shadow: 0 0 4px 1px rgba(0, 0, 0, 0.4), 0px 1px 0 0px rgba(0, 0, 0, 0.4);
+  font-size: 11px;
+  font-family: MuseoSans700;
+  color: #181818;
+  text-shadow: 1px 1px 1px white;
+  border: 1px solid rgba(0, 0, 0, 0.6);
+}
+div#guide div.ticker div.go-live:after,
+div#guide div.my-ticker div.go-live:after,
+div#guide div.ticker div.go-live:before,
+div#guide div.my-ticker div.go-live:before {
+  bottom: 100%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+div#guide div.ticker div.go-live:after,
+div#guide div.my-ticker div.go-live:after {
+  border-color: rgba(222, 222, 222, 0);
+  border-bottom-color: #dedede;
+  border-width: 5px;
+  left: 50%;
+  margin-left: -5px;
+}
+div#guide div.ticker div.go-live:before,
+div#guide div.my-ticker div.go-live:before {
+  border-color: rgba(204, 204, 204, 0);
+  border-bottom-color: rgba(0, 0, 0, 0.6);
+  border-width: 6px;
+  left: 50%;
+  margin-left: -6px;
+}
+div#guide div.ticker div.me,
+div#guide div.my-ticker div.me {
+  display: none;
+  opacity: 0;
+  visibility: hidden;
+  -webkit-transition: opacity 0.3s ease;
+  -moz-transition: opacity 0.3s ease;
+  -o-transition: opacity 0.3s ease;
+  -ms-transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease;
+  position: absolute;
+  top: 37px;
+  left: 3px;
+  width: 25px;
+  height: 24px;
+  border-radius: 10px;
+  box-shadow: 0 2px 0px 0px rgba(0, 0, 0, 0.5);
+}
+div#guide div.ticker div.me img,
+div#guide div.my-ticker div.me img {
+  width: 21px;
+  height: 20px;
+  margin-left: 2px;
+  margin-top: 2px;
+  border-radius: 10px;
+}
+div#guide div.ticker div.me:after,
+div#guide div.my-ticker div.me:after,
+div#guide div.ticker div.me:before,
+div#guide div.my-ticker div.me:before {
+  bottom: 96%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+div#guide div.ticker div.me:after,
+div#guide div.my-ticker div.me:after {
+  border-color: rgba(222, 222, 222, 0);
+  border-bottom-color: inherit;
+  border-width: 6px;
+  left: 50%;
+  margin-left: -7px;
+}
+div#guide div.my-ticker {
+  opacity: 0;
+  visibility: hidden;
+  -webkit-transition: opacity 0.3s ease;
+  -moz-transition: opacity 0.3s ease;
+  -o-transition: opacity 0.3s ease;
+  -ms-transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease;
+  background-image: url(../img/my-ticker.png);
+}
+div#guide div.my-ticker.show,
+div#guide div.my-ticker.show-me div.me {
+  opacity: 1;
+  visibility: visible;
+}
+div#guide.toggled div.ticker div.go-live {
+  display: block;
+}
+div#guide.toggled div.my-ticker div.me {
+  display: block;
+}
+div#guide.toggled div.ticker,
+div#guide.toggled div.my-ticker {
+  display: block;
+}
+div#guide.collapsed div.header div.times {
+  display: none;
+}
+div.header {
+  position: absolute;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+  font-size: 10px;
+}
+div.header div.name {
+  width: 10%;
+  min-width: 60px;
+  border-right: 1px solid #ccc;
+  text-align: center;
+  padding: 5px 0;
+  display: inline-block;
+  border-top: 1px solid #181818;
+}
+div.header div.times {
+  width: 100%;
+  position: relative;
+  white-space: nowrap;
+  padding-left: 190px;
+  background: #7e7e7e url(../img/grad-flat.png);
+  border-top: 1px solid #ccc;
+  -webkit-box-shadow: inset 0 -3px 7px -3px rgba(0, 0, 0, 0.2), 0 0 5px 1px rgba(0, 0, 0, 0.6);
+  -moz-box-shadow: inset 0 -3px 7px -3px rgba(0, 0, 0, 0.2), 0 0 5px 1px rgba(0, 0, 0, 0.6);
+  box-shadow: inset 0 -3px 7px -3px rgba(0, 0, 0, 0.2), 0 0 5px 1px rgba(0, 0, 0, 0.6);
+}
+div.header div.times div.time {
+  display: inline-block;
+  padding: 5px 0;
+}
+div.header div.browse {
+  width: 30px;
+  height: 20px;
+  margin-top: -1px;
+  background: #7e7e7e url(../img/grad-flat.png);
+  border-top: 1px solid #ccc;
+  font-size: 11px;
+  font-family: MuseoSans700;
+  line-height: 21px;
+  position: fixed;
+  text-align: center;
+  cursor: pointer;
+}
+div.header div.browse.left {
+  border-right: 1px solid #2d3446;
+  box-shadow: inset -5px 0px 2px -5px #dedede;
+  left: 0;
+}
+div.header div.browse.right {
+  border-left: 1px solid #2d3446;
+  box-shadow: inset 1px 0px 2px -1px #dedede;
+  right: 0;
+}
+div.header div.browse:active {
+  border-top: 1px solid transparent;
+  background: #111;
+  box-shadow: inset 0 0 1px 1px #000;
+  color: #ddd;
+}
+div.header div.browse span {
+  display: none;
+  margin: 0 4px;
+}
+div.header div.browse.now {
+  width: 60px;
+}
+div.header div.browse.now span {
+  display: inline-block;
+}
+.toggled div.channels div.channel div.programs div.program.playing div.title {
+  color: #f5f5f5;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.6), -1px -1px 1px rgba(0, 0, 0, 0.6), -1px 1px 1px rgba(0, 0, 0, 0.6), 1px -1px 1px rgba(0, 0, 0, 0.6);
+}
+.toggled div.channels div.channel div.programs div.program.clipped:hover {
+  z-index: 1;
+  width: 200px !important;
+}
+.collapsed div.channels {
+  height: 40px;
+  overflow: hidden;
+  margin-top: 2px;
+}
+.collapsed div.channels div.channel {
+  background: #5c5c5c;
+}
+.collapsed div.channels div.channel div.viewers {
+  display: none;
+}
+.collapsed div.channels div.channel div.name {
+  display: none;
+}
+.collapsed div.channels div.channel div.programs {
+  background: #3d3d3d url(../img/grad.png);
+  margin-top: 5px;
+}
+.collapsed div.channels div.channel div.programs div.program {
+  box-shadow: none;
+  border-radius: 0;
+  border: none;
+  border-left: 1px solid #2d3446;
+  padding-right: 10px;
+  margin-top: -1px;
+  box-shadow: inset -1px 0 1px -1px #f1f1f1, 0 0 1px #dedede;
+}
+.collapsed div.channels div.channel div.programs div.program:last-child {
+  box-shadow: none;
+}
+.collapsed div.channels div.channel div.programs div.program div.info div.title {
+  position: relative;
+  top: 8px;
+  color: #f7f7f7;
+  font-family: MuseoSans700;
+  font-size: 11px;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.7);
+  padding-right: 0;
+  text-overflow: ellipsis;
+}
+.collapsed div.channels div.channel div.programs div.program div.remove,
+.collapsed div.channels div.channel div.programs div.program div.repos {
+  display: none;
+}
+.collapsed div.channels div.channel div.programs div.program:active {
+  background: #111;
+  box-shadow: inset -1px 0 1px #000000;
+  color: #ddd;
+}
+.collapsed div.channels div.suggest {
+  display: none;
+}
+.collapsed div.channels div.channel div.programs div.program div.thumb {
+  display: none;
+}
+div.channels {
+  position: absolute;
+  margin-top: 22px;
+  -webkit-transition: padding-top 0.5s ease;
+  -moz-transition: padding-top 0.5s ease;
+  -o-transition: padding-top 0.5s ease;
+  -ms-transition: padding-top 0.5s ease;
+  transition: padding-top 0.5s ease;
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  font-size: 12px;
+}
+div.channels div.channel {
+  border-bottom: 1px solid #ccc;
+  position: relative;
+  background: #f7f7f7 url(../img/content-texture.png);
+  overflow: hidden;
+  -webkit-transition: height 0.3s ease;
+  -moz-transition: height 0.3s ease;
+  -o-transition: height 0.3s ease;
+  -ms-transition: height 0.3s ease;
+  transition: height 0.3s ease;
+}
+div.channels div.channel div.name {
+  width: 200px;
+  text-align: center;
+  display: inline-block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  vertical-align: top;
+  background: black;
+  opacity: .8;
+  margin-right: 1px solid #888;
+  box-shadow: 1px 0 3px rgba(0, 0, 0, 0.8);
+  cursor: pointer;
+  z-index: 1;
+}
+div.channels div.channel div.name div.text {
+  position: relative;
+  top: 50%;
+  line-height: 0;
+  color: whiteSmoke;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
+  font-size: 15px;
+}
+div.channels div.channel div.name div.suggest-program {
+  padding: 5px 0;
+  display: inline-block;
+  position: absolute;
+  left: 5px;
+  top: 10px;
+}
+div.channels div.channel div.add-program {
+  display: inline-block;
+  width: 25px;
+  font-size: 16px;
+  display: none;
+}
+div.channels div.channel div.programming {
+  display: inline-block;
+  position: relative;
+  vertical-align: top;
+  width: 100%;
+}
+div.channels div.channel div.programs-container {
+  height: 80px;
+}
+div.channels div.channel div.programs {
+  display: inline-block;
+  white-space: nowrap;
+  width: 100%;
+  height: 80px;
+  min-width: 540px;
+  position: relative;
+  vertical-align: top;
+  margin-bottom: 4px;
+  margin-left: 200px;
+  margin-top: 6px;
+}
+div.channels div.channel div.programs div.program {
+  display: inline-block;
+  position: absolute;
+  white-space: normal;
+  overflow: hidden;
+  border-left: 1px solid #CCC;
+  vertical-align: middle;
+  height: 100%;
+  color: #999;
+  text-shadow: 1px 1px 1px white;
+  z-index: 0;
+  border-radius: 5px;
+  box-shadow: inset 0px 0px 1px 1px rgba(0, 0, 0, 0.4);
+  border: 1px solid whiteSmoke;
+  padding: 1px;
+  cursor: pointer;
+  -webkit-transition: width 0.3s ease;
+  -moz-transition: width 0.3s ease;
+  -o-transition: width 0.3s ease;
+  -ms-transition: width 0.3s ease;
+  transition: width 0.3s ease;
+}
+div.channels div.channel div.programs div.program.selected {
+  border: 1px solid rgba(0, 0, 255, 0.5);
+}
+div.channels div.channel div.programs div.program:hover div.title {
+  display: block !important;
+}
+div.channels div.channel div.programs div.program:hover div.title {
+  color: #f5f5f5;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.6), -1px -1px 1px rgba(0, 0, 0, 0.6), -1px 1px 1px rgba(0, 0, 0, 0.6), 1px -1px 1px rgba(0, 0, 0, 0.6);
+}
+div.channels div.channel div.programs div.program div.info {
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  /*box-shadow: inset 0px 15px 30px -1px rgba(0, 0, 0, .9);*/
+
+}
+div.channels div.channel div.programs div.program:hover div.thumb,
+div.channels div.channel div.programs div.program.playing div.thumb {
+  -webkit-transition: opacity 0.6s ease, background-position 3s ease-out;
+  -moz-transition: opacity 0.6s ease, background-position 3s ease-out;
+  -o-transition: opacity 0.6s ease, background-position 3s ease-out;
+  -ms-transition: opacity 0.6s ease, background-position 3s ease-out;
+  transition: opacity 0.6s ease, background-position 3s ease-out;
+  -webkit-filter: none !important;
+  opacity: .9;
+}
+div.channels div.channel div.programs div.program.clipped:hover div.thumb,
+div.channels div.channel div.programs div.program.playing div.thumb {
+  -webkit-transition: background-position 4s ease-out;
+  -moz-transition: background-position 4s ease-out;
+  -o-transition: background-position 4s ease-out;
+  -ms-transition: background-position 4s ease-out;
+  transition: background-position 4s ease-out;
+}
+div.channels div.channel div.programs div.program div.thumb {
+  width: 100%;
+  height: 100%;
+  opacity: .2;
+  background-size: 110% auto;
+  background-position: 50% 37%;
+  border-radius: 3px;
+}
+div.channels div.channel div.programs div.program div.thumb.fix-height {
+  background-size: auto 100%;
+}
+div.channels div.channel div.programs div.program div.thumb.repeat {
+  background-size: 480px auto;
+}
+div.channels div.channel div.programs div.program div.progress {
+  display: none;
+  width: 0;
+  height: 100%;
+  background: rgba(218, 218, 218, 0.8);
+  position: absolute;
+  margin-top: -10px;
+  border-right: 2px solid #5d5d5d;
+}
+div.channels div.channel div.programs div.program div.title {
+  left: 5px;
+  top: 5px;
+  color: #2d2d2d;
+  text-shadow: 1px 1px 1px white;
+  height: 40px;
+  font-size: 14px;
+  position: absolute;
+  white-space: nowrap;
+  overflow: hidden;
+  padding-right: 25px;
+}
+div.channels div.channel div.programs div.program div.title.marquee {
+  -webkit-transition: margin-left 10s linear, left 1s linear;
+  -moz-transition: margin-left 10s linear, left 1s linear;
+  -o-transition: margin-left 10s linear, left 1s linear;
+  -ms-transition: margin-left 10s linear, left 1s linear;
+  transition: margin-left 10s linear, left 1s linear;
+}
+div.channels div.channel div.programs div.program.current {
+  background: rgba(255, 255, 255, 0.3);
+}
+div.channels div.channel div.programs div.program div.remove {
+  display: none;
+  position: absolute;
+  right: 5px;
+  top: 3px;
+  width: 20px;
+  height: 20px;
+  background-image: url(../img/circle-x.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 80%;
+  filter: invert(100%);
+}
+div.channels div.channel div.programs div.program div.repos {
+  display: none;
+  position: absolute;
+  right: 5px;
+  top: 23px;
+  width: 20px;
+  height: 20px;
+  background-image: url(../img/repos.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 80%;
+}
+div.channels div.channel div.programs div.program:hover div.remove,
+div.channels div.channel div.programs div.program:hover div.repos {
+  filter: invert(100%);
+  -webkit-filter: invert(100%);
+  -moz-filter: invert(100%);
+  -o-filter: invert(100%);
+  -ms-filter: invert(100%);
+}
+div.channels div.channel div.programs div.program div.border {
+  position: absolute;
+  width: 98%;
+  height: 98%;
+  left: -1%;
+  top: -1%;
+  border-radius: 16px;
+  border: 8px solid #f5f5f5;
+}
+div.channels div.channel div.graph {
+  display: inline-block;
+  width: 100%;
+  position: relative;
+  pointer-events: none;
+  z-index: 1;
+  margin-bottom: 1px;
+  opacity: 0;
+  visibility: hidden;
+  -webkit-transition: opacity 0.3s ease;
+  -moz-transition: opacity 0.3s ease;
+  -o-transition: opacity 0.3s ease;
+  -ms-transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease;
+}
+div.channels div.channel div.graph svg {
+  top: 5px;
+}
+div.channels div.channel:hover div.graph {
+  opacity: 1;
+  visibility: visible;
+}
+div.channels div.channel div.viewers {
+  width: 100%;
+  position: absolute;
+  bottom: 10px;
+  z-index: 1;
+  pointer-events: none;
+  -webkit-transition: height .3s;
+  -moz-transition: height .3s;
+  transition: height .3s;
+}
+div.channels div.channel div.viewers div.viewer {
+  position: relative;
+  margin-left: 6px;
+  height: 25px;
+}
+div.channels div.channel div.viewers div.viewer div.line {
+  position: absolute;
+  height: 4px;
+  background: #ccc;
+  top: 11px;
+  width: 100%;
+  box-shadow: 0px 1px 1px 0px rgba(255, 255, 255, 0.6);
+  pointer-events: all;
+  cursor: pointer;
+  display: none;
+  -webkit-transition: width 1s linear;
+  -moz-transition: width 1s linear;
+  -o-transition: width 1s linear;
+  -ms-transition: width 1s linear;
+  transition: width 1s linear;
+}
+div.channels div.channel div.viewers div.viewer div.line:last-child {
+  display: inline-block;
+}
+div.channels div.channel div.viewers div.viewer div.line::before {
+  content: '';
+  position: absolute;
+  left: -7px;
+  top: -5px;
+  width: 13px;
+  height: 13px;
+  border-radius: 10px;
+  background: inherit;
+  box-shadow: 0px 1px 1px 0px rgba(255, 255, 255, 0.6);
+}
+div.channels div.channel div.viewers div.viewer div.line::after {
+  content: '';
+  position: absolute;
+  left: -3px;
+  top: -1px;
+  width: 5px;
+  height: 5px;
+  border-radius: 10px;
+  background: white;
+}
+div.channels div.channel div.viewers div.viewer div.line div.pic {
+  background: inherit;
+  width: 25px;
+  height: 25px;
+  border-radius: 10px;
+  right: -5px;
+  top: -10px;
+  box-shadow: 0px 1px 1px 0px rgba(255, 255, 255, 0.6);
+  position: absolute;
+}
+div.channels div.channel div.viewers div.viewer div.line div.pic img {
+  width: 21px;
+  height: 20px;
+  margin-left: 2px;
+  margin-top: 2px;
+  border-radius: 10px;
+}
+div.channels div.channel div.viewers div.viewer div.username {
+  position: absolute;
+  left: 10px;
+  top: 3px;
+}
+div.channels div.suggest {
+  position: absolute;
+  top: 5px;
+  margin-left: 200px;
+  vertical-align: middle;
+  height: 100%;
+  border-radius: 5px;
+  border: 1px solid transparent;
+  padding: 1px;
+  cursor: pointer;
+  outline: none;
+}
+div.channels div.suggest div.spinner {
+  margin: 0 10px;
+  font-size: 80px;
+  line-height: 37px;
+  position: absolute;
+  -webkit-transition: margin 0.3s ease;
+  -moz-transition: margin 0.3s ease;
+  -o-transition: margin 0.3s ease;
+  -ms-transition: margin 0.3s ease;
+  transition: margin 0.3s ease;
+}
+div.channels div.suggest.show div.spinner {
+  margin: 0 50px;
+}
+div.channels div.suggest.show div.select-program {
+  display: block;
+}
+div.channels div.suggest:hover,
+div.channels div.suggest.show {
+  color: #2d2d2d;
+}
+div.channels div.select-program {
+  padding-top: 22px;
+  height: 60px;
+  background-color: #dfdfdf;
+  color: #f5f5f5;
+  border-color: #f5f5f5;
+  border-radius: 4px;
+  box-shadow: inset 0px 0px 1px 1px rgba(0, 0, 0, 0.4);
+  -webkit-transition: opacity 3s ease-out;
+  -moz-transition: opacity 3s ease-out;
+  -o-transition: opacity 3s ease-out;
+  -ms-transition: opacity 3s ease-out;
+  transition: opacity 3s ease-out;
+  display: none;
+  border-radius: 6px 6px 4px 4px;
+}
+div.channels div.select-program div.select-header {
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 162px;
+  height: 20px;
+  text-align: center;
+  background: url('../img.png') no-repeat -69px -88px;
+  border-top: 1px solid #ccc;
+  color: #fefefe;
+  text-shadow: 1px 1px black;
+  font-size: 10px;
+  font-family: MuseoSans700;
+  line-height: 20px;
+  border-radius: 4px 4px 0 0;
+}
+div.channels div.select-program div.select-header div.close {
+  width: 10px;
+  height: 10px;
+  background: url(../img/close-light.png) center no-repeat;
+  cursor: pointer;
+  position: absolute;
+  right: 5px;
+  top: 5px;
+}
+div.channels div.select-program div.select-content {
+  width: 160px;
+  height: 100%;
+  margin: 1px;
+  overflow: hidden;
+}
+div.channels div.select-program div.select-content div.page {
+  width: 320px;
+  height: 58px;
+  position: relative;
+}
+div.channels div.select-program div.select-content input[type=text] {
+  width: 144px;
+  margin-top: 30px;
+  margin-left: 4px;
+  border: 1px solid #ccc;
+  box-shadow: none;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: normal;
+  line-height: 15px;
+  color: #555;
+  margin-bottom: 6px;
+  resize: none;
+  padding: 3px;
+  height: 16px;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+  outline: none;
+}
+div.channels div.select-program div.select-content div.page2 {
+  position: absolute;
+  left: 160px;
+  width: 160px;
+  height: 100%;
+  top: 0;
+  background: #f5f5f5;
+  border-radius: 6px;
+}
+div.channels div.select-program div.confirm-media {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+div.channels div.select-program div.confirm-media div.thumb {
+  background-position: center;
+  background-size: auto 110px;
+  opacity: .5;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+div.channels div.select-program div.confirm-media div.title {
+  font-size: 14px;
+  width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  color: #2d2d2d;
+  text-shadow: 1px 1px 1px white;
+  text-overflow: ellipsis;
+  margin: 3px 5px;
+  position: absolute;
+}
+div.channels div.select-program div.confirm-media div.button,
+div.channels div.select-program div.confirm-media div.added {
+  position: absolute;
+  right: 3px;
+  bottom: 4px;
+  line-height: 18px;
+  font-family: MuseoSans700;
+  font-size: 10px;
+  width: 40px;
+  color: #2d2d2d;
+  text-shadow: none;
+  -webkit-transition: opacity 0.5s ease;
+  -moz-transition: opacity 0.5s ease;
+  -o-transition: opacity 0.5s ease;
+  -ms-transition: opacity 0.5s ease;
+  transition: opacity 0.5s ease;
+}
+div.channels div.select-program div.confirm-media div.button {
+  background: #f5f5f5;
+}
+div.channels .current div.name {
+  background: #181818 !important;
+  box-shadow: 1px 0 3px rgba(0, 0, 0, 0.8), -3px 0px 3px 3px rgba(105, 105, 105, 0.8), 10px 0 55px -8px rgba(255, 255, 255, 0.7) !important;
+  z-index: 2 !important;
+  cursor: default !important;
+}
+div.channels .current div.name:after {
+  left: 100%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+div.channels .current div.name:after {
+  border-left-color: #181818;
+  border-width: 15px;
+  top: 50%;
+  margin-top: -15px;
+}
+div.channels div.offline div.channel {
+  height: 0;
+  border: none;
+}
+.current div.program,
+div.program:hover {
+  opacity: 1 !important;
+}
+.current div.program img {
+  -webkit-filter: blur(1px) !important;
+}
+#ytplayer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  -webkit-transition: width .5s ease, height .5s ease, top .5s ease;
+  -moz-transition: width .5s ease, height .5s ease, top .5s ease;
+  transition: width .5s ease, height .5s ease, top .5s ease;
+}
+#stagecover {
+  width: 100%;
+  height: 100%;
+  -webkit-transition: width 0.5s ease;
+  -moz-transition: width 0.5s ease;
+  -o-transition: width 0.5s ease;
+  -ms-transition: width 0.5s ease;
+  transition: width 0.5s ease;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: transparent;
+}
+#stagecover.covered {
+  background: #181818;
+  -webkit-transition: width .5s ease, height .5s ease;
+  -moz-transition: width .5s ease, height .5s ease;
+  -o-transition: width .5s ease, height .5s ease;
+  -ms-transition: width .5s ease, height .5s ease;
+  transition: width .5s ease, height .5s ease;
+}
+#stagecover.covered div.message {
+  display: block;
+}
+#stagecover div.message {
+  display: none;
+  font-size: 24px;
+  font-family: MuseoSans100;
+  color: #f7f7f7;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+}
+#stagecover div.message div.spinner {
+  position: absolute;
+  left: 50%;
+  margin-left: -100px;
+  bottom: -150px;
+  background: url(../img/spinner.gif) no-repeat center;
+  background-size: 80px;
+  width: 200px;
+  height: 220px;
+}
+#stagecover div.fullscreen,
+#stagecover div.expand {
+  width: 25px;
+  height: 25px;
+  border-radius: 4px;
+  position: absolute;
+  cursor: pointer;
+  opacity: 0;
+  -webkit-transition: opacity 0.1s ease;
+  -moz-transition: opacity 0.1s ease;
+  -o-transition: opacity 0.1s ease;
+  -ms-transition: opacity 0.1s ease;
+  transition: opacity 0.1s ease;
+}
+#stagecover div.fullscreen {
+  background: rgba(150, 150, 150, 0.8) url(../img/fullscreen.png) center no-repeat;
+  background-size: 70%;
+  right: 40px;
+  top: 10px;
+}
+#stagecover div.fullscreen.full {
+  background-image: url(../img/closescreen.png);
+}
+#stagecover div.expand {
+  background: rgba(150, 150, 150, 0.8) url(../img/expand.png) center no-repeat;
+  background-size: 70%;
+  right: 10px;
+  top: 10px;
+}
+#stagecover:hover div.fullscreen,
+#stagecover:hover div.expand {
+  opacity: .6;
+}
+#stagecover:hover div.fullscreen:hover,
+#stagecover:hover div.expand:hover {
+  opacity: .9;
+}
+#stagecover div.play,
+#stagecover div.pause {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 100px;
+  height: 100px;
+  margin-left: -50px;
+  margin-top: -50px;
+  background: rgba(0, 0, 0, 0.5) no-repeat center;
+  border-radius: 6px;
+  opacity: .6;
+}
+#stagecover div.play {
+  background-image: url(../img/player-play.png);
+  background-size: 10%;
+}
+#stagecover div.pause {
+  background-image: url(../img/player-pause.png);
+  background-size: 15%;
+}
+div#popup {
+  width: 260px;
+  min-height: 55px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.3);
+  z-index: 999;
+  position: absolute;
+}
+div#popup.left::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -10px;
+  border-width: 7px 10px 7px 0;
+  border-style: solid;
+  border-color: transparent rgba(255, 255, 255, 0.9);
+  display: block;
+  width: 0;
+  margin-top: -7px;
+}
+div#popup div.select-program {
+  margin-top: 20px;
+}
+div#popup div.select-program div.select-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 20px;
+  text-align: center;
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(45, 52, 70, 0.55)), to(rgba(45, 52, 70, 0.8)));
+  border-top: 1px solid #ccc;
+  color: #FEFEFE;
+  text-shadow: 1px 1px black;
+  font-size: 12px;
+  line-height: 20px;
+  margin-top: -2px;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+}
+div#popup div.select-program div.select-content {
+  width: 260px;
+  overflow: hidden;
+}
+div#popup div.select-program div.select-content div.page {
+  width: 520px;
+  position: relative;
+}
+div#popup div.select-program div.select-content input[type=text] {
+  width: 244px;
+  margin-top: 4px;
+  margin-left: 4px;
+  border: 1px solid #ccc;
+  box-shadow: none;
+  font-size: 12px;
+  font-weight: normal;
+  line-height: 15px;
+  color: #555;
+  margin-bottom: 6px;
+  resize: none;
+  padding: 3px;
+  height: 16px;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+  outline: none;
+}
+div#popup div.select-program div.select-content div.page2 {
+  position: absolute;
+  left: 260px;
+  width: 260px;
+  top: 0;
+}
+div#popup div.select-program div.confirm-media {
+  position: relative;
+}
+div#popup div.select-program div.confirm-media img {
+  height: 25px;
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  border-radius: 3px;
+}
+div#popup div.select-program div.confirm-media div.title {
+  position: absolute;
+  left: 41px;
+  top: 10px;
+  font-size: 12px;
+  width: 180px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+div#popup div.select-program div.confirm-media div.button {
+  position: absolute;
+  right: 3px;
+  top: 4px;
+  width: 30px;
+  color: #181818;
+  text-shadow: none;
+}
+div#popup div.share-record {
+  position: relative;
+}
+div#popup div.share-record div.mosaic {
+  position: absolute;
+  left: 5px;
+  top: 5px;
+}
+div#popup div.share-record div.mosaic img {
+  width: 70px;
+  height: 70px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}
+div#popup div.share-record div.buttons {
+  position: absolute;
+  left: 82px;
+  top: 5px;
+}
+div#popup div.share-record div.buttons > iframe {
+  margin-top: 2px;
+}
+div#popup div.share-record div.buttons .fb_edge_widget_with_comment {
+  position: absolute;
+  overflow: hidden;
+}
+div#popup div.share-record div.buttons span {
+  width: 115px !important;
+}
+div#popup div.share-record div.url {
+  position: absolute;
+  left: 82px;
+  top: 35px;
+  font-size: 12px;
+  color: #2d3446;
+}
+div#popup div.share-record div.url input {
+  font-size: 11px;
+  border: 1px solid #ccc;
+  width: 164px;
+  height: 16px;
+  margin: 2px 0 0 0;
+}
+div#popup div.share-record div.url input:focus {
+  outline: none;
+}
+.btn {
+  height: 25px !important;
+}
+div#sidebar {
+  position: absolute;
+  right: -300px;
+  top: 0;
+  width: 300px;
+  height: 100%;
+  background: #aaaaaa url(../img/linen-75.png);
+  z-index: 100;
+  border-left: 1px solid rgba(0, 0, 0, 0.7);
+  overflow: hidden;
+  font-family: MuseoSans300;
+  color: #f5f5f5;
+  text-shadow: 1px 1px 1px #181818;
+  -webkit-transition: right .5s ease;
+  -moz-transition: right .5s ease;
+  transition: right .5s ease;
+  z-index: 110;
+}
+div#sidebar div.scrollable {
+  width: 300px;
+}
+div#sidebar.dark {
+  background: #aaaaaa url(../img/linen-black-70.png);
+}
+div#sidebar.dark div.stream div.activity div.text,
+div#sidebar.dark div.stream div.activity div.text,
+div#sidebar.dark div.stream div.activity div.text a,
+div#sidebar.dark div.info div.label {
+  color: #f5f5f5;
+  text-shadow: 1px 1px 1px #181818;
+}
+div#sidebar.dark div.tabbed.activity ul.tabs li.activity {
+  background: rgba(245, 245, 245, 0.8);
+}
+div#sidebar.dark div.list-media {
+  background: rgba(240, 240, 240, 0.2);
+  box-shadow: 0 0 2px 0px rgba(255, 255, 255, 0.8);
+}
+div#sidebar.dark div.list-media:active {
+  box-shadow: 0 1px 1px rgba(255, 255, 255, 0.4);
+}
+div#sidebar.dark div.info div.comments-holder div.comment,
+div#sidebar.dark div.info div.tweet-holder div.tweet {
+  background: rgba(255, 255, 255, 0.15);
+  border: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.8);
+}
+div#sidebar.toggled {
+  right: 0px;
+  box-shadow: inset 4px 0 6px -4px rgba(0, 0, 0, 0.7), 0 0 2px 1px rgba(146, 146, 146, 0.6);
+}
+div#sidebar.admin div.admin {
+  display: block !important;
+}
+div#sidebar.admin li.tab.admin {
+  display: table-cell !important;
+}
+div#sidebar div#toolbar {
+  width: 100%;
+  height: 40px;
+  background: #f7f7f7;
+  position: relative;
+  border-bottom: 2px solid #AAA;
+  box-shadow: 0 2px 3px 1px rgba(0, 0, 0, 0.2), inset 4px 2px 6px -3px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(24, 24, 24, 0.2);
+  z-index: 20;
+}
+div#sidebar div#toolbar.back ul.tabs {
+  display: none;
+}
+div#sidebar div#toolbar.back div.arrow {
+  opacity: 0;
+}
+div#sidebar div#toolbar.back div.back {
+  display: block;
+}
+div#sidebar div#toolbar.back div.back div.back-title {
+  width: 140px;
+  opacity: 1;
+}
+div#sidebar div#toolbar.back div.back div.back-button {
+  width: 50px;
+  opacity: 1;
+}
+div#sidebar div#toolbar div.back {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+div#sidebar div#toolbar div.back div.back-title {
+  text-align: center;
+  margin: auto;
+  padding-top: 13px;
+  width: 0;
+  opacity: 0;
+  font-size: 15px;
+  color: #7d7d7d;
+  text-shadow: 1px 1px 1px white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-transition: opacity .3s ease, width, .3s, ease;
+  -moz-transition: opacity .3s ease, width, .3s, ease;
+  -o-transition: opacity .3s ease, width, .3s, ease;
+  -ms-transition: opacity .3s ease, width, .3s, ease;
+  transition: opacity .3s ease, width, .3s, ease;
+}
+div#sidebar div#toolbar div.back div.back-button {
+  width: 0;
+  opacity: 0;
+  height: 30px;
+  position: absolute;
+  left: 7px;
+  top: 5px;
+  cursor: pointer;
+  -webkit-transition: opacity .3s ease, width, .3s, ease;
+  -moz-transition: opacity .3s ease, width, .3s, ease;
+  -o-transition: opacity .3s ease, width, .3s, ease;
+  -ms-transition: opacity .3s ease, width, .3s, ease;
+  transition: opacity .3s ease, width, .3s, ease;
+  background: url('../img.png') no-repeat 0 -134px;
+  background-position: -67px 0;
+  padding-left: 14px;
+  padding-top: 3px;
+}
+div#sidebar div#toolbar div.back div.back-button:active {
+  background: url('../img.png') no-repeat 0 -134px;
+  background-position: 0 0;
+}
+div#sidebar div#toolbar div.back div.back-button:active div {
+  color: #8d8d8d;
+}
+div#sidebar div#toolbar div.back div.back-button div {
+  font-size: 11px;
+  font-family: MuseoSans700;
+  margin-top: 6px;
+  margin-left: 6px;
+  color: #7d7d7d;
+  text-shadow: 1px 1px 1px white;
+}
+div#sidebar div#toolbar ul.tabs {
+  height: 100%;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  display: table;
+  table-layout: fixed;
+  border-collapse: collapse;
+  margin: 0;
+}
+div#sidebar div#toolbar ul.tabs li.tab {
+  height: 100%;
+  border-right: 1px solid #ccc;
+  margin-left: -2px;
+  display: table-cell;
+  vertical-align: middle;
+  cursor: pointer;
+}
+div#sidebar div#toolbar ul.tabs li.tab.admin {
+  display: none;
+}
+div#sidebar div#toolbar ul.tabs li.tab:last-child {
+  border-right: none;
+}
+div#sidebar div#toolbar ul.tabs li.tab div.label {
+  text-align: center;
+  font-family: MuseoSans700;
+  font-size: 11px;
+  color: #7d7d7d;
+  text-shadow: 1px 1px 1px white;
+}
+div#sidebar div#toolbar div.arrow {
+  position: absolute;
+  top: 40px;
+  left: 50%;
+  -webkit-transition: left 0.3s ease;
+  -moz-transition: left 0.3s ease;
+  -o-transition: left 0.3s ease;
+  -ms-transition: left 0.3s ease;
+  transition: left 0.3s ease;
+}
+div#sidebar div#toolbar div.arrow:after,
+div#sidebar div#toolbar div.arrow:before {
+  top: 100%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+div#sidebar div#toolbar div.arrow:after {
+  border-color: rgba(245, 245, 245, 0);
+  border-top-color: #f5f5f5;
+  border-width: 10px;
+  left: 50%;
+  margin-left: -10px;
+}
+div#sidebar div#toolbar div.arrow:before {
+  border-color: rgba(204, 204, 204, 0);
+  border-top-color: #AAA;
+  border-width: 13px;
+  left: 50%;
+  margin-left: -13px;
+}
+div#sidebar div#toolbar div.radial-grad {
+  position: absolute;
+  width: 100%;
+  height: 20px;
+  background: url('../img.png') no-repeat -222px 0;
+  top: 43px;
+  pointer-events: none;
+}
+div#sidebar div#sidebar-content {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+div#sidebar div#sidebar-content div.screen {
+  opacity: 0;
+  visibility: hidden;
+  -webkit-transition: opacity 0.5s ease-in-out;
+  -moz-transition: opacity 0.5s ease-in-out;
+  -o-transition: opacity 0.5s ease-in-out;
+  -ms-transition: opacity 0.5s ease-in-out;
+  transition: opacity 0.5s ease-in-out;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 43px;
+  right: -300px;
+  overflow: hidden;
+  -webkit-transition: opacity .3s ease, width .3s ease, right .3s ease, left .3s ease;
+  -moz-transition: opacity .3s ease, width .3s ease, right .3s ease, left .3s ease;
+  -o-transition: opacity .3s ease, width .3s ease, right .3s ease, left .3s ease;
+  -ms-transition: opacity .3s ease, width .3s ease, right .3s ease, left .3s ease;
+  transition: opacity .3s ease, width .3s ease, right .3s ease, left .3s ease;
+  -webkit-overflow-scroll: touch;
+}
+div#sidebar div#sidebar-content div.slide {
+  position: absolute;
+  width: 0;
+  height: 100%;
+  top: 43px;
+  overflow: hidden;
+  -webkit-transition: opacity .3s ease, width .3s ease, right .3s ease;
+  -moz-transition: opacity .3s ease, width .3s ease, right .3s ease;
+  -o-transition: opacity .3s ease, width .3s ease, right .3s ease;
+  -ms-transition: opacity .3s ease, width .3s ease, right .3s ease;
+  transition: opacity .3s ease, width .3s ease, right .3s ease;
+  -webkit-overflow-scroll: touch;
+}
+div#sidebar div#sidebar-content div.screen.current,
+div#sidebar div#sidebar-content div.slide.current {
+  opacity: 1;
+  visibility: visible;
+  width: 100%;
+  right: 0;
+}
+div#sidebar div#sidebar-content div.media-list {
+  overflow-y: scroll;
+}
+div#sidebar div#sidebar-content div.media-list div.list-info {
+  margin: 10px;
+  display: table;
+  table-layout: fixed;
+  border-collapse: collapse;
+  width: 280px;
+}
+div#sidebar div#sidebar-content div.media-list div.list-info > div {
+  display: none;
+  vertical-align: top;
+}
+div#sidebar div#sidebar-content div.media-list div.list-info div.picture-cell {
+  width: 60px;
+}
+div#sidebar div#sidebar-content div.media-list div.list-info div.picture {
+  width: 60px;
+  box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.65);
+  border-radius: 3px;
+}
+div#sidebar div#sidebar-content div.media-list div.list-info div.picture:active {
+  box-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);
+}
+div#sidebar div#sidebar-content div.media-list div.list-info div.picture img {
+  width: 60px;
+  height: 60px;
+  border-bottom: 1px solid rgba(204, 204, 204, 0.32);
+}
+div#sidebar div#sidebar-content div.media-list div.list-info div.description {
+  font-size: 12px;
+  padding-left: 10px;
+  color: #181818;
+  text-shadow: 1px 1px 1px white;
+  font-family: MuseoSans500;
+  font-size: 13px;
+}
+div#sidebar div#sidebar-content div.media-list div.medias {
+  margin: 10px;
+  padding-bottom: 5px;
+}
+div#sidebar div.comment-input {
+  visibility: hidden;
+  opacity: 0;
+  width: 100%;
+  min-height: 31px;
+  position: absolute;
+  bottom: 42px;
+}
+div#sidebar div.comment-input div.comment-controls {
+  width: 100%;
+  height: 24px;
+  border-top: 1px solid #CCC;
+  background: rgba(255, 255, 255, 0.7);
+  color: #7D7D7D;
+  text-shadow: 1px 1px 1px white;
+  top: 27px;
+  position: relative;
+  -webkit-transition: top .5s ease;
+  -moz-transition: top .5s ease;
+  transition: top .5s ease;
+}
+div#sidebar div.comment-input div.comment-controls div.comment-button {
+  width: 100px;
+  height: 100%;
+  display: inline-block;
+  border-right: 1px solid #ccc;
+  font-size: 12px;
+  outline: none;
+  cursor: pointer;
+  position: relative;
+}
+div#sidebar div.comment-input div.comment-controls div.comment-button:first-child {
+  margin-left: -2px;
+}
+div#sidebar div.comment-input div.comment-controls div.comment-button:last-child {
+  border-right: none;
+}
+div#sidebar div.comment-input div.comment-controls div.comment-button.tweet-toggle {
+  background-image: url(../img/twitter.png);
+  background-repeat: no-repeat;
+  background-size: 13px;
+  background-position: 10px 5px;
+}
+div#sidebar div.comment-input div.comment-controls div.comment-button.fb-toggle {
+  background-image: url(../img/facebook.png);
+  background-repeat: no-repeat;
+  background-size: 7px;
+  background-position: 10px 3px;
+}
+div#sidebar div.comment-input div.comment-controls div.comment-button .goog-custom-button-inner-box {
+  margin-top: 5px;
+  text-align: center;
+}
+div#sidebar div.comment-input div.comment-controls div.comment-button.goog-custom-button-checked,
+div#sidebar div.comment-input div.comment-controls div.comment-button.add-comment {
+  background-color: rgba(255, 255, 255, 0.8);
+}
+div#sidebar div.comment-input div.comment-controls div.comment-button.goog-custom-button-checked div.check {
+  background-image: url(../img/check.png);
+  background-repeat: no-repeat;
+  background-size: 10px;
+  background-position: 75px 5px;
+}
+div#sidebar div.comment-input div.comment-controls div.comment-button.goog-custom-button-disabled {
+  background: none !important;
+  cursor: normal;
+}
+div#sidebar div.comment-input div.comment-controls div.comment-button.add-comment.goog-custom-button-active {
+  background: rgba(0, 0, 0, 0.1);
+  color: #6D6D6D;
+}
+div#sidebar div.comment-input div.comment-controls div.comment-button div.check {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+}
+div#sidebar div.comment-input div.comment-controls div.comment-button div.return {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 4px;
+  left: 6px;
+  width: 10px;
+  font-size: 16px;
+  color: #bbb;
+}
+div#sidebar div.comment-input div.input-holder {
+  background: #f7f7f7;
+  width: 100%;
+  height: 100%;
+  border-top: 1px solid #ccc;
+  -webkit-box-shadow: 0 -2px 2px 0 rgba(0, 0, 0, 0.3), inset 4px -2px 6px -3px rgba(0, 0, 0, 0.4);
+  -moz-box-shadow: 0 -2px 2px 0 rgba(0, 0, 0, 0.3), inset 4px -2px 6px -3px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 -2px 2px 0 rgba(0, 0, 0, 0.3), inset 4px -2px 6px -3px rgba(0, 0, 0, 0.4);
+  position: relative;
+}
+div#sidebar div.comment-input div.input-holder textarea {
+  resize: none;
+  height: auto;
+  border-radius: 3px;
+  width: 280px;
+  font-size: 13px;
+  min-height: 16px;
+  outline: none;
+  border-color: #CCC;
+  resize: none;
+  margin-left: 10px;
+  margin-top: 8px;
+  margin-bottom: 5px;
+}
+div#sidebar div.comment-input div.input-holder div.token {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  background: #dedede;
+  color: #333;
+  font-size: 13px;
+  text-shadow: 1px 1px 1px white;
+  border-radius: 3px;
+  border: 1px solid #666;
+  padding: 1px;
+  display: inline;
+}
+div#sidebar div.info.current div.comment-input,
+div#sidebar div.conversation div.comment-input {
+  visibility: visible;
+  opacity: 1;
+}
+div#sidebar div.tabbed ul.tabs {
+  height: 30px;
+  width: 100%;
+  display: table;
+  table-layout: fixed;
+  border-collapse: collapse;
+  margin: 0;
+  border-bottom: 1px solid rgba(112, 108, 108, 0.7);
+}
+div#sidebar div.tabbed ul.tabs li.tab {
+  height: 100%;
+  border-right: 1px solid #ccc;
+  margin-left: -2px;
+  display: table-cell;
+  vertical-align: middle;
+  background: rgba(245, 245, 245, 0.9);
+  cursor: pointer;
+}
+div#sidebar div.tabbed ul.tabs li.tab.admin {
+  display: none;
+}
+div#sidebar div.tabbed ul.tabs li.tab:last-child {
+  border-right: none;
+}
+div#sidebar div.tabbed ul.tabs li.tab div.label {
+  text-align: center;
+  font-family: MuseoSans700;
+  font-size: 11px;
+  color: #7d7d7d;
+  text-shadow: 1px 1px 1px white;
+}
+div#sidebar div.tabbed div.content {
+  display: none;
+  width: 300px;
+}
+div#sidebar div.tabbed.activity div.activity {
+  display: block;
+}
+div#sidebar div.tabbed.activity ul.tabs li.activity {
+  background: rgba(245, 245, 245, 0.6);
+}
+div#sidebar div.tabbed.starred div.starred {
+  display: block;
+}
+div#sidebar div.tabbed.starred ul.tabs li.starred {
+  background: rgba(245, 245, 245, 0.6);
+}
+div#sidebar div.tabbed.comments div.comments-holder {
+  display: block;
+}
+div#sidebar div.tabbed.comments ul.tabs li.comments {
+  background: rgba(245, 245, 245, 0.6);
+}
+div#sidebar div.tabbed.tweets div.tweet-holder {
+  display: block;
+}
+div#sidebar div.tabbed.tweets ul.tabs li.tweets {
+  background: rgba(245, 245, 245, 0.6);
+}
+div#sidebar div.loading {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 90px;
+  height: 90px;
+  margin-left: -45px;
+  margin-top: -45px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 6px;
+}
+div#sidebar div.loading div.loading-spinner {
+  background: url(../img/spinner.gif) no-repeat center;
+  background-size: 50px;
+  width: 90px;
+  height: 90px;
+}
+div#sidebar div.list-media {
+  margin-bottom: 4px;
+  border-radius: 3px;
+  position: relative;
+  background: rgba(50, 50, 50, 0.85);
+  border: 1px solid #333;
+  box-shadow: 0 0 1px 0px rgba(0, 0, 0, 0.8);
+  cursor: pointer;
+  color: #f5f5f5;
+  text-shadow: 1px 1px 1px #181818;
+  opacity: 0;
+  -webkit-transition: opacity 0.3s ease-in;
+  -moz-transition: opacity 0.3s ease-in;
+  -o-transition: opacity 0.3s ease-in;
+  -ms-transition: opacity 0.3s ease-in;
+  transition: opacity 0.3s ease-in;
+}
+div#sidebar div.list-media.show {
+  opacity: 1;
+}
+div#sidebar div.list-media.remove {
+  opacity: 0;
+}
+div#sidebar div.list-media:hover div.media div.preview {
+  background: -webkit-linear-gradient(top, #000000, #aaaaaa);
+  background-size: auto 100%;
+}
+div#sidebar div.list-media:hover div.media div.preview div.thumb {
+  -webkit-transition: opacity .3s ease, background-position .3s ease;
+  -moz-transition: opacity .3s ease, background-position .3s ease;
+  -o-transition: opacity .3s ease, background-position .3s ease;
+  -ms-transition: opacity .3s ease, background-position .3s ease;
+  transition: opacity .3s ease, background-position .3s ease;
+  opacity: .7;
+  background-position-y: 40% !important;
+}
+div#sidebar div.list-media:hover div.media div.preview div.title,
+div#sidebar div.list-media:hover div.media div.preview div.published {
+  color: #f7f7f7;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5), -1px -1px rgba(0, 0, 0, 0.5), 1px -1px 1px rgba(0, 0, 0, 0.5), -1px 1px rgba(0, 0, 0, 0.5);
+}
+div#sidebar div.list-media:hover div.media div.preview div.approve,
+div#sidebar div.list-media:hover div.media div.preview div.remove,
+div#sidebar div.list-media:hover div.media div.preview div.repos,
+div#sidebar div.list-media:hover div.media div.preview div.play {
+  filter: invert(100%);
+  -webkit-filter: invert(100%);
+  -moz-filter: invert(100%);
+  -o-filter: invert(100%);
+  -ms-filter: invert(100%);
+}
+div#sidebar div.list-media:active {
+  -webkit-box-shadow: 0 1px 1px 1px rgba(255, 255, 255, 0.5);
+  -moz-box-shadow: 0 1px 1px 1px rgba(255, 255, 255, 0.5);
+  box-shadow: 0 1px 1px 1px rgba(255, 255, 255, 0.5);
+  border-color: #666;
+}
+div#sidebar div.list-media:last-child:active div.publisher {
+  margin-bottom: 4px;
+}
+div#sidebar div.list-media div.media {
+  white-space: normal;
+  overflow: hidden;
+  vertical-align: middle;
+  height: 48px;
+  color: #999;
+  text-shadow: 1px 1px 1px white;
+  margin-top: -1px;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+div#sidebar div.list-media div.media div.preview {
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  background: #f5f5f5;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  margin-top: 1px;
+}
+div#sidebar div.list-media div.media div.preview div.thumb {
+  width: 100%;
+  height: 100%;
+  opacity: .2;
+  background-size: 150% auto;
+  background-position: center;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+div#sidebar div.list-media div.media div.preview div.title {
+  left: 5px;
+  top: 5px;
+  color: #181818;
+  text-shadow: 1px 1px 1px white;
+  height: 100%;
+  font-size: 14px;
+  line-height: 20px;
+  position: absolute;
+  overflow: hidden;
+  margin-right: 10px;
+  font-family: MuseoSans300;
+}
+div#sidebar div.list-media div.media div.preview div.title.marquee {
+  -webkit-transition: margin-left 10s linear;
+  -moz-transition: margin-left 10s linear;
+  -o-transition: margin-left 10s linear;
+  -ms-transition: margin-left 10s linear;
+  transition: margin-left 10s linear;
+}
+div#sidebar div.list-media div.media div.preview div.published {
+  position: absolute;
+  bottom: 3px;
+  font-size: 10px;
+  color: #181818;
+  left: 5px;
+}
+div#sidebar div.list-media div.media div.preview div.approve {
+  position: absolute;
+  right: 25px;
+  top: 3px;
+  width: 20px;
+  height: 20px;
+  background-image: url(../img/circle-check.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 80%;
+}
+div#sidebar div.list-media div.media div.preview div.remove {
+  position: absolute;
+  right: 5px;
+  top: 3px;
+  width: 20px;
+  height: 20px;
+  background-image: url(../img/circle-x.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 80%;
+  filter: invert(100%);
+}
+div#sidebar div.list-media div.media div.preview div.repos {
+  position: absolute;
+  right: 5px;
+  bottom: 3px;
+  width: 20px;
+  height: 20px;
+  background-image: url(../img/repos.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 80%;
+}
+div#sidebar div.list-media div.media div.preview div.play {
+  position: absolute;
+  right: 45px;
+  top: 3px;
+  width: 20px;
+  height: 20px;
+  background-image: url(../img/circle-play.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 80%;
+}
+div#sidebar div.list-media div.media:hover div.title {
+  color: #f5f5f5;
+  text-shadow: 0px 0px 4px black;
+}
+div#sidebar div.list-media div.publisher {
+  position: relative;
+  top: 3px;
+  left: 0px;
+  margin-bottom: 4px;
+  width: 272px;
+  padding: 3px;
+  font-family: MuseoSans500;
+}
+div#sidebar div.list-media div.publisher img {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  vertical-align: top;
+  border: 1px solid transparent;
+}
+div#sidebar div.list-media div.publisher div.name {
+  font-size: 11px;
+  line-height: 3px;
+  margin: 0 5px;
+  display: inline-block;
+}
+div#sidebar div.list-media div.publisher div.duration {
+  position: absolute;
+  right: 3px;
+  top: 3px;
+}
+div#sidebar div.list-media div.stats {
+  position: absolute;
+  right: 3px;
+  bottom: 7px;
+}
+div#sidebar div.list-media div.stats div.comment-count {
+  background: url('../img.png') no-repeat -197px -29px;
+  min-width: 15px;
+  height: 15px;
+  padding-left: 17px;
+  background-size: 13px;
+  font-size: 10px;
+  float: right;
+}
+div#sidebar div.list-media div.stats div.star-count {
+  background: url('../img.png') no-repeat -179px -29px;
+  min-width: 15px;
+  height: 15px;
+  padding-left: 17px;
+  background-size: 13px;
+  font-size: 10px;
+  float: right;
+}
+div#sidebar div.list-media div.description,
+div#sidebar div.list-media div.duration {
+  font-size: 11px;
+  margin: 5px;
+}
+div#sidebar div.tweet-holder {
+  position: relative;
+  width: 300px;
+}
+div#sidebar div.tweet-holder div.label {
+  margin-left: 10px;
+}
+div#sidebar div.tweet-holder div.tweet {
+  position: relative;
+  background: rgba(0, 0, 0, 0.65);
+  border: 1px solid #333;
+  padding-bottom: 20px;
+  overflow: hidden;
+  box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.8);
+}
+div#sidebar div.tweet-holder div.tweet img {
+  width: 28px;
+  height: 28px;
+  left: 4px;
+  top: 4px;
+  position: absolute;
+  border-radius: 3px;
+}
+div#sidebar div.tweet-holder div.tweet div.text {
+  position: relative;
+  left: 37px;
+  top: 3px;
+  font-size: 13px;
+  line-height: 16px;
+  width: 230px;
+}
+div#sidebar div.tweet-holder div.tweet div.text a {
+  color: #f5f5f5;
+}
+div#sidebar div.tweet-holder div.tweet div.timestamp {
+  position: absolute;
+  bottom: 3px;
+  right: 5px;
+  font-size: 10px;
+}
+div#sidebar div.tweet-holder div.dot-nav {
+  text-align: center;
+}
+div#sidebar div.tweet-holder div.dot-nav div.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.3);
+  display: inline-block;
+  margin: 7px 5px;
+  cursor: pointer;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+}
+div#sidebar div.tweet-holder div.dot-nav div.dot.selected {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+div#sidebar div.comments-holder {
+  position: relative;
+}
+div#sidebar div.comments-holder div.comments {
+  margin: 10px;
+  overflow-x: scroll;
+  -webkit-transition: max-height 0.5s ease;
+  -moz-transition: max-height 0.5s ease;
+  -o-transition: max-height 0.5s ease;
+  -ms-transition: max-height 0.5s ease;
+  transition: max-height 0.5s ease;
+}
+div#sidebar div.comments-holder.top-grad div.top-grad,
+div#sidebar div.comments-holder.bottom-grad div.bottom-grad {
+  display: block;
+}
+div#sidebar div.comments-holder div.top-grad {
+  display: none;
+  width: 282px;
+  height: 10px;
+  position: absolute;
+  top: 20px;
+  background: url(../img/radial-grad.png) no-repeat center;
+  left: 9px;
+  border-top: 2px solid rgba(0, 0, 0, 0.5);
+  -webkit-box-shadow: 0 -3px 3px -1px rgba(0, 0, 0, 0.2);
+  -moz-box-shadow: 0 -3px 3px -1px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 -3px 3px -1px rgba(0, 0, 0, 0.2);
+}
+div#sidebar div.comments-holder div.bottom-grad {
+  display: none;
+  width: 282px;
+  height: 10px;
+  position: absolute;
+  bottom: -1px;
+  background: url(../img/radial-grad-up.png) no-repeat center;
+  left: 9px;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.5);
+  -webkit-box-shadow: 0 3px 3px -1px rgba(0, 0, 0, 0.2);
+  -moz-box-shadow: 0 3px 3px -1px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 3px 3px -1px rgba(0, 0, 0, 0.2);
+}
+div#sidebar div.comments-holder div.comment {
+  position: relative;
+  width: 278px;
+  background: rgba(0, 0, 0, 0.65);
+  border: 1px solid #333;
+  box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.8), 0 3px 1px -1px rgba(255, 255, 255, 0.5);
+  padding-top: 5px;
+  padding-bottom: 20px;
+  overflow: hidden;
+}
+div#sidebar div.comments-holder div.comment:first-child {
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+div#sidebar div.comments-holder div.comment:last-child {
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+  box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.8);
+}
+div#sidebar div.comments-holder div.comment.reply {
+  background: rgba(0, 0, 0, 0.4);
+  border-left: 5px solid #181818;
+  width: 274px;
+}
+div#sidebar div.comments-holder div.comment img {
+  width: 28px;
+  height: 28px;
+  left: 4px;
+  top: 7px;
+  position: absolute;
+  border-radius: 3px;
+}
+div#sidebar div.comments-holder div.comment div.text {
+  position: relative;
+  left: 37px;
+  top: 3px;
+  font-size: 13px;
+  line-height: 16px;
+  width: 240px;
+}
+div#sidebar div.comments-holder div.comment div.text a {
+  color: #f5f5f5;
+}
+div#sidebar div.comments-holder div.comment div.timestamp {
+  position: absolute;
+  bottom: 3px;
+  right: 5px;
+  font-size: 10px;
+}
+div#sidebar div.comments-holder div.comment div.comment-options {
+  position: absolute;
+  width: 35px;
+  height: 15px;
+  top: 5px;
+  right: 5px;
+  visibility: hidden;
+  opacity: 0;
+  -webkit-transition: opacity 0.2s ease;
+  -moz-transition: opacity 0.2s ease;
+  -o-transition: opacity 0.2s ease;
+  -ms-transition: opacity 0.2s ease;
+  transition: opacity 0.2s ease;
+}
+div#sidebar div.comments-holder div.comment div.comment-options div.remove {
+  width: 13px;
+  height: 13px;
+  background: url(../img/close-light.png) center no-repeat;
+  cursor: pointer;
+  margin-left: 2px;
+  float: right;
+}
+div#sidebar div.comments-holder div.comment div.comment-options div.reply {
+  width: 13px;
+  height: 13px;
+  background: url(../img/reply.png) center no-repeat;
+  background-size: 100%;
+  cursor: pointer;
+  float: right;
+}
+div#sidebar div.comments-holder div.comment:hover div.comment-options {
+  visibility: visible;
+  opacity: 1;
+}
+div#sidebar div.no-comments,
+div#sidebar div.no-info {
+  background: rgba(255, 255, 255, 0.2);
+  width: 260px;
+  border: 1px solid #919191;
+  box-shadow: inset 0 0 2px 0px rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+  font-size: 12px;
+  text-align: center;
+  color: #666;
+  text-shadow: 1px 1px 1px white;
+  padding: 10px;
+  margin: 0 10px;
+  font-family: MuseoSans500;
+  cursor: pointer;
+}
+div#login {
+  width: 100%;
+  height: 100%;
+  background: #181818 url(../img/homepage.jpg);
+  background-position: center -50px;
+  background-size: cover;
+  position: absolute;
+  z-index: 10000;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.8);
+  box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.59), inset 0 -3px 1px 0px rgba(255, 255, 255, 0.5), 0 0 2px 1px rgba(0, 0, 0, 0.5);
+}
+div#login.hide {
+  -webkit-transition: top 0.6s ease-in;
+  -moz-transition: top 0.6s ease-in;
+  -o-transition: top 0.6s ease-in;
+  -ms-transition: top 0.6s ease-in;
+  transition: top 0.6s ease-in;
+  overflow: hidden;
+  top: -100%;
+}
+div#login .bold {
+  font-family: MuseoSans700;
+}
+div#login div#static-scrollable {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+div#login div#static-content {
+  width: 100%;
+  height: 190px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  background: #dedede url(../img/content-texture.png);
+  border-top: 1px solid rgba(0, 0, 0, 0.8);
+  box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.59), inset 0 3px 1px 0px rgba(255, 255, 255, 0.5), 0 0 2px 1px rgba(0, 0, 0, 0.5);
+}
+div#login div#static-content.hide {
+  -webkit-transition: height 1s ease-in;
+  -moz-transition: height 1s ease-in;
+  -o-transition: height 1s ease-in;
+  -ms-transition: height 1s ease-in;
+  transition: height 1s ease-in;
+  height: 0;
+  overflow: hidden;
+  position: fixed;
+}
+div#login div#static-content.hide div#footer {
+  display: none;
+}
+div#login div#static-content div.header {
+  width: 760px;
+  margin: auto;
+  position: relative;
+}
+div#login div#static-content div.title {
+  font-size: 40px;
+  position: absolute;
+  width: 455px;
+  left: -1px;
+  top: 20px;
+  padding: 30px 0;
+  border-right: 1px solid rgba(0, 0, 0, 0.4);
+  box-shadow: 2px 0px 0 -1px rgba(255, 255, 255, 0.5);
+  font-family: MuseoSans700;
+  color: #3d3d3d;
+  text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.9);
+}
+div#login div#static-content div.subtitle {
+  font-size: 19px;
+  position: absolute;
+  top: 70px;
+  padding: 30px 0;
+  font-family: MuseoSans300;
+  color: #3d3d3d;
+  text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.9);
+}
+div#login div#static-content div.fb-login {
+  background: #f5f5f5;
+  width: 230px;
+  height: 70px;
+  border-radius: 3px;
+  box-shadow: 0 0 5px 2px rgba(9, 9, 9, 0.5), 0 0 0 3px #e6e6e6, 0 0 0 4px rgba(121, 121, 121, 0.5);
+  position: absolute;
+  right: 3px;
+  top: 40px;
+  color: #4d4d4d;
+  text-shadow: 1px 1px 1px white;
+  cursor: pointer;
+  visibility: hidden;
+  opacity: 0;
+}
+div#login div#static-content div.fb-login div.power {
+  width: 70px;
+  height: 70px;
+  display: inline-block;
+  border-right: 1px solid #aaa;
+}
+div#login div#static-content div.fb-login div.power div.bg {
+  width: 100%;
+  height: 100%;
+  background: url('../img.png') no-repeat 0 -29px;
+  background-size: 30px;
+  background-position: 20px 19px;
+}
+div#login div#static-content div.fb-login.spin div.power div.bg {
+  animation: spin 3s infinite linear;
+  -moz-animation: spin 3s infinite linear;
+  /* Firefox */
+
+  -webkit-animation: spin 3s infinite linear;
+  /* Safari and Chrome */
+
+  -o-animation: spin 3s infinite linear;
+  /* Opera */
+
+}
+div#login div#static-content div.fb-login div.label,
+div#login div#static-content div.fb-login div.loading {
+  font-family: MuseoSans500;
+  display: inline-block;
+  vertical-align: top;
+  text-align: center;
+  position: relative;
+  left: 37px;
+  top: 15px;
+  font-size: 24px;
+}
+div#login div#static-content div.fb-login div.loading {
+  display: none;
+  top: 24px;
+  left: 25px;
+  font-size: 22px;
+}
+div#login div#static-content div.fb-login div.with-fb {
+  font-family: MuseoSans300;
+  position: absolute;
+  width: 80px;
+  font-size: 11px;
+  top: 40px;
+  margin: auto;
+  vertical-align: top;
+  left: 113px;
+  display: inline-block;
+}
+div#login div#static-content div.fb-login.spin div.loading {
+  display: inline-block;
+}
+div#login div#static-content div.fb-login.spin div.label,
+div#login div#static-content div.fb-login.spin div.with-fb {
+  display: none;
+}
+div#login div#static-content div.fb-login div.waitlist {
+  display: none;
+  font-family: MuseoSans300;
+  vertical-align: top;
+  text-align: center;
+  position: relative;
+  left: 3px;
+  top: 28px;
+  font-size: 14px;
+}
+div#login div#static-content div.fb-login.waitlist div.waitlist {
+  display: inline-block;
+}
+div#login div#static-content div.fb-login.waitlist div.label,
+div#login div#static-content div.fb-login.waitlist div.with-fb {
+  display: none;
+}
+div#login div#static-content div.fb-login.show {
+  visibility: visible;
+  opacity: 1;
+  -webkit-transition: opacity 0.3s ease-in-out;
+  -moz-transition: opacity 0.3s ease-in-out;
+  -o-transition: opacity 0.3s ease-in-out;
+  -ms-transition: opacity 0.3s ease-in-out;
+  transition: opacity 0.3s ease-in-out;
+}
+div#login div#static-content div.fb-login:active,
+div#login div#static-content div.fb-login:disabled,
+div#login div#static-content div.fb-login.disabled {
+  background-color: #dedede;
+  box-shadow: 0 0 5px 2px rgba(0, 0, 0, 0.7), 0 0 0 3px whiteSmoke, 0 0 0 4px rgba(121, 121, 121, 0.5);
+  color: #2D2D2D;
+}
+div#login div#static-content div.fb-login.disabled {
+  cursor: default;
+  pointer-events: none;
+}
+div#login div#static-content.about div#pages div.about,
+div#login div#static-content.jobs div#pages div.jobs,
+div#login div#static-content.tos div#pages div.tos,
+div#login div#static-content.privacy div#pages div.privacy {
+  visibility: visible;
+  opacity: 1;
+  height: auto;
+  padding: 10px;
+}
+div#login div#static-content.about div#footer a#about,
+div#login div#static-content.jobs div#footer a#jobs,
+div#login div#static-content.tos div#footer a#tos,
+div#login div#static-content.privacy div#footer a#privacy {
+  text-decoration: underline;
+}
+div#login div#static-content div#pages {
+  width: 760px;
+  margin: auto;
+  margin-top: 170px;
+  position: relative;
+  color: #3d3d3d;
+  text-shadow: 1px 1px 1px white;
+}
+div#login div#static-content div#pages a {
+  color: #3d3d3d;
+}
+div#login div#static-content div#pages div.page {
+  visibility: hidden;
+  opacity: 0;
+  overflow: hidden;
+  -webkit-transition: opacity 0.3s ease;
+  -moz-transition: opacity 0.3s ease;
+  -o-transition: opacity 0.3s ease;
+  -ms-transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease;
+  height: 0;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+  border: 1px solid #a9a9a9;
+  box-shadow: inset 0 0 1px 0 rgba(0, 0, 0, 0.2);
+}
+div#login div#static-content div#pages div.page-title {
+  font-size: 26px;
+  font-family: MuseoSans500;
+  margin-bottom: 20px;
+}
+div#login div#static-content div#pages div.page-content {
+  width: 740px;
+  font-size: 14px;
+  font-family: MuseoSans300;
+  -webkit-touch-callout: text;
+  -webkit-user-select: text;
+  -khtml-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+  line-height: 20px;
+}
+div#login div#static-content div.footer {
+  position: absolute;
+  bottom: 0;
+  width: 900px;
+  font-size: 10px;
+  text-align: center;
+  height: 25px;
+  left: 50%;
+  margin-left: -450px;
+  color: #4d4d4d;
+  font-family: MuseoSans500;
+}
+div#login div#static-content div.footer a {
+  color: #4d4d4d;
+}
+div.program.drag {
+  display: inline-block;
+  position: absolute;
+  white-space: normal;
+  overflow: hidden;
+  border-left: 1px solid #CCC;
+  vertical-align: middle;
+  height: 100px;
+  color: #999;
+  text-shadow: 1px 1px 1px white;
+  z-index: 0;
+  border-radius: 3px;
+  box-shadow: inset 0px 0px 1px 1px rgba(0, 0, 0, 0.3);
+  border: 1px solid whiteSmoke;
+  background: white;
+  cursor: move;
+}
+div.program.drag.playing div.progress {
+  display: block;
+}
+div.program.drag:last-child {
+  border-right: 1px solid #CCC;
+}
+div.program.drag div.info {
+  display: inline-block;
+  width: 100%;
+  /*box-shadow: inset 0px 15px 30px -1px rgba(0, 0, 0, .9);*/
+
+}
+div.program.drag img {
+  width: 100%;
+  height: auto;
+  position: absolute;
+  opacity: .2;
+  top: 50%;
+  left: 50%;
+  margin-top: -20px;
+  z-index: -10;
+  -webkit-filter: blur(1px) grayscale();
+}
+div.program.drag img.fix-height {
+  height: 150%;
+  width: auto;
+}
+div.program.drag div.progress {
+  display: none;
+  width: 0;
+  height: 100%;
+  background: rgba(218, 218, 218, 0.8);
+  position: absolute;
+  margin-top: -10px;
+  border-right: 2px solid #5d5d5d;
+}
+div.program.drag div.title {
+  left: 5px;
+  top: 5px;
+  color: #5d5d5d;
+  text-shadow: 1px 1px 1px white;
+  height: 40px;
+  font-size: 14px;
+  position: absolute;
+  white-space: nowrap;
+  overflow: hidden;
+  margin-right: 25px;
+}
+div.program.drag div.title.marquee {
+  -webkit-transition: margin-left 10s linear;
+  -moz-transition: margin-left 10s linear;
+  -o-transition: margin-left 10s linear;
+  -ms-transition: margin-left 10s linear;
+  transition: margin-left 10s linear;
+}
+div.program.drag.current {
+  background: rgba(255, 255, 255, 0.3);
+}
+div.program.drag div.remove {
+  display: none;
+  position: absolute;
+  background: url('../img.png') no-repeat -542px 0;
+  background-size: 100%;
+  top: 5px;
+  right: 5px;
+  width: 10px;
+  height: 10px;
+  font-size: 12px;
+}
+div.program.drag div.border {
+  position: absolute;
+  width: 98%;
+  height: 98%;
+  left: -1%;
+  top: -1%;
+  border-radius: 16px;
+  border: 8px solid #f5f5f5;
+}
+div#sidebar div.info {
+  margin-top: -2px;
+}
+div#sidebar div.info div.no-info {
+  margin-top: 20px;
+  cursor: default;
+}
+div#sidebar div.info div.picture {
+  display: inline-block;
+  width: 300px;
+  height: 200px;
+  position: relative;
+  overflow: hidden;
+  background: #f5f5f5;
+  /*box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 0.8); */
+
+  border-bottom: 1px solid #181818;
+  box-shadow: 0 0 2px 2px rgba(77, 77, 77, 0.7), 0 0 1px #5e5e5e;
+}
+div#sidebar div.info div.picture img.thumb {
+  width: 100%;
+  height: auto;
+  position: absolute;
+  opacity: .5;
+  top: 50%;
+  left: 50%;
+  margin-top: -20px;
+  pointer-events: none;
+  /* -webkit-filter: grayscale() brightness(40%); */
+
+}
+div#sidebar div.info div.picture img.thumb.fix-height {
+  height: 150%;
+  width: auto;
+}
+div#sidebar div.info div.picture div.publisher {
+  left: 9px;
+  top: 10px;
+  background: rgba(0, 0, 0, 0.6);
+  display: inline-block;
+  border-radius: 3px;
+  position: absolute;
+  cursor: pointer;
+}
+div#sidebar div.info div.picture div.publisher img {
+  width: 22px;
+  height: 22px;
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
+  vertical-align: top;
+  border: 1px solid transparent;
+}
+div#sidebar div.info div.picture div.publisher div.name {
+  color: #f5f5f5;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
+  font-size: 11px;
+  font-family: MuseoSans500;
+  line-height: 3px;
+  margin: 0 5px 0 2px;
+  display: inline-block;
+}
+div#sidebar div.info div.picture.scrolled div.publisher {
+  pointer-events: none;
+}
+div#sidebar div.info img.thumb {
+  height: 70px;
+  border-radius: 6px;
+  position: absolute;
+  box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.5), 0 0 1px 1px rgba(255, 255, 255, 0.9);
+  border: 0px solid whiteSmoke;
+  left: 10px;
+  top: 30px;
+}
+div#sidebar div.info div.label {
+  font-size: 10px;
+  color: #181818;
+  margin-bottom: 7px;
+  margin-left: 10px;
+  text-shadow: 1px 1px 1px white;
+  font-family: MuseoSans700;
+}
+div#sidebar div.info div.label a {
+  cursor: pointer;
+}
+div#sidebar div.info div.scrollable {
+  height: 200px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+div#sidebar div.info div.title {
+  position: absolute;
+  left: 9px;
+  top: 40px;
+  padding-right: 10px;
+  color: whiteSmoke;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
+  font-size: 18px;
+  font-family: MuseoSans100;
+  width: 230px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 3px;
+  padding: 5px;
+  pointer-events: none;
+}
+div#sidebar div.info div.desc-link {
+  position: relative;
+  width: 240px;
+  margin-top: 181px;
+  font-size: 12px;
+  margin-left: 9px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #181818;
+}
+div#sidebar div.info div.desc-link a {
+  font-size: 10px;
+  color: #181818;
+  text-shadow: 1px 1px 1px white;
+  font-family: MuseoSans700;
+}
+div#sidebar div.info div.description {
+  width: 240px;
+  min-height: 150px;
+  position: relative;
+  margin-right: 5px;
+  padding: 8px 10px;
+  color: #181818;
+  text-shadow: none;
+  line-height: 18px;
+  font-family: MuseoSans300;
+  font-size: 12px;
+}
+div#sidebar div.info div.description a {
+  color: #181818;
+  font-family: MuseoSans300;
+  text-decoration: underline;
+}
+div#sidebar div.info div.published {
+  position: absolute;
+  right: 0;
+  top: 0;
+  color: black;
+  text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.7);
+  line-height: 18px;
+  font-family: MuseoSans500;
+  font-size: 10px;
+}
+div#sidebar div.info div.options {
+  position: absolute;
+  top: 0;
+  right: -2px;
+  box-shadow: -1px 0 1px 0px rgba(200, 200, 200, 0.6);
+}
+div#sidebar div.info div.options div.button {
+  display: block;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(45, 52, 70, 0.4);
+  border-radius: 0;
+  box-shadow: inset 0 0 1px 1px rgba(140, 140, 140, 0.7), 0 0 1px #5e5e5e;
+  margin-top: -1px;
+  width: 40px;
+  height: 33px;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+div#sidebar div.info div.options div.button:active,
+div#sidebar div.info div.options div.button.goog-custom-button-active,
+div#sidebar div.info div.options div.button.goog-custom-button-disabled,
+div#sidebar div.info div.options div.button.goog-custom-button-checked {
+  background-color: rgba(80, 80, 80, 0.6);
+}
+div#sidebar div.info div.options div.play {
+  background-image: url(../img/info-play.png);
+  background-size: auto 30%;
+}
+div#sidebar div.info div.options div.plus {
+  background-image: url(../img/info-plus.png);
+  background-size: auto 30%;
+}
+div#sidebar div.info div.options div.star {
+  background-image: url(../img/heart-light.png);
+  background-size: auto 30%;
+}
+div#sidebar div.info div.options div.star.goog-custom-button-checked {
+  background-image: url(../img/heart-red.png);
+}
+div#sidebar div.info div.options div.facebook {
+  background-image: url(../img/facebook.png);
+  background-size: auto 40%;
+}
+div#sidebar div.info div.options div.twitter {
+  background-image: url(../img/twitter.png);
+  background-size: auto 30%;
+}
+div#sidebar div.info div.viewers {
+  position: relative;
+  top: 10px;
+  left: 9px;
+  padding-right: 9px;
+  width: 280px;
+}
+div#sidebar div.info div.viewers div.label {
+  margin-left: 0;
+}
+div#sidebar div.info div.viewers div.viewer {
+  background: rgba(0, 0, 0, 0.2);
+  width: 28px;
+  height: 28px;
+  border-radius: 14px;
+  box-shadow: inset 0px 0px 2px 1px rgba(0, 0, 0, 0.6);
+  display: inline-block;
+  margin-left: 9px;
+  cursor: pointer;
+}
+div#sidebar div.info div.viewers div.viewer img {
+  width: 20px;
+  height: 20px;
+  margin-left: 4px;
+  margin-top: 4px;
+  border-radius: 10px;
+  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.4);
+}
+div#sidebar div.info div.viewers div.viewer:active img {
+  box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+div#sidebar div.info div.viewers div.viewer.online {
+  background-color: #00bf2f !important;
+}
+div#sidebar div.info div.comments-holder,
+div#sidebar div.info div.tweet-holder {
+  top: 20px;
+}
+div#sidebar div.info div.tweet-holder div.tweets {
+  white-space: nowrap;
+  overflow: hidden;
+}
+div#sidebar div.info div.tweet-holder div.tweet {
+  width: 280px;
+  display: inline-block;
+  border-radius: 3px;
+  vertical-align: middle;
+  margin: 0 9px;
+  white-space: normal;
+}
+div#notify {
+  position: absolute;
+  z-index: 200;
+  left: 0;
+  top: 0;
+}
+div#notify a {
+  text-decoration: none;
+}
+div#notify div.note {
+  width: 200px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid #dedede;
+  border-radius: 3px;
+  font-size: 13px;
+  margin: 5px;
+  padding: 5px;
+  position: relative;
+  color: #181818;
+  text-shadow: 1px 1px 1px white;
+  opacity: 0;
+  height: 55px;
+  overflow: hidden;
+  visibility: hidden;
+}
+div#notify div.note.show {
+  opacity: 1;
+  visibility: visible;
+  -webkit-transition: opacity 0.5s ease-in;
+  -moz-transition: opacity 0.5s ease-in;
+  -o-transition: opacity 0.5s ease-in;
+  -ms-transition: opacity 0.5s ease-in;
+  transition: opacity 0.5s ease-in;
+}
+div#notify div.note.collapse {
+  height: 0;
+  -webkit-transition: height 0.2s ease;
+  -moz-transition: height 0.2s ease;
+  -o-transition: height 0.2s ease;
+  -ms-transition: height 0.2s ease;
+  transition: height 0.2s ease;
+}
+div#notify div.note.dim {
+  opacity: .5;
+  visibility: visible;
+  -webkit-transition: opacity 3s ease-out;
+  -moz-transition: opacity 3s ease-out;
+  -o-transition: opacity 3s ease-out;
+  -ms-transition: opacity 3s ease-out;
+  transition: opacity 3s ease-out;
+}
+div#notify div.note.fade-out {
+  opacity: 0;
+  visibility: visible;
+  -webkit-transition: opacity 5s ease-out;
+  -moz-transition: opacity 5s ease-out;
+  -o-transition: opacity 5s ease-out;
+  -ms-transition: opacity 5s ease-out;
+  transition: opacity 5s ease-out;
+}
+div#notify div.note.show:hover {
+  opacity: 1;
+  -webkit-transition: none;
+  -moz-transition: none;
+  -o-transition: none;
+  -ms-transition: none;
+  transition: none;
+}
+div#notify div.note.pic {
+  padding-left: 55px;
+}
+div#notify div.note a {
+  color: #181818;
+}
+div#notify div.note div.action {
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 185px;
+  max-height: 22px;
+  line-height: 11px;
+}
+div#notify div.note div.picture {
+  width: 45px;
+  height: 45px;
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  overflow: hidden;
+  border-radius: 3px;
+}
+div#notify div.note div.picture img {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  height: auto;
+  width: 150%;
+}
+div#notify div.note div.content {
+  font-family: MuseoSans500;
+  width: 200px;
+  height: 30px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+div#notify div.note div.close {
+  position: absolute;
+  top: 3px;
+  right: 5px;
+  width: 13px;
+  height: 13px;
+  background: url(../img/close-dark.png) center no-repeat;
+  cursor: pointer;
+  margin-left: 2px;
+  float: right;
+}
+div#sidebar div.stream {
+  overflow-x: hidden;
+  overflow-y: scroll !important;
+  padding-top: 10px;
+  width: 100%;
+  color: #181818;
+  text-shadow: 1px 1px 1px #f5f5f5;
+}
+div#sidebar div.stream div.spinner {
+  width: 100%;
+  height: 35px;
+  text-align: center;
+  background: url(../img/spinner2.gif) no-repeat center 5px;
+  background-size: 50px;
+  line-height: 40px;
+  -webkit-transition: height 0.3s linear;
+  -moz-transition: height 0.3s linear;
+  -o-transition: height 0.3s linear;
+  -ms-transition: height 0.3s linear;
+  transition: height 0.3s linear;
+}
+div#sidebar div.stream div.spinner.finished {
+  height: 1px;
+  opacity: 0;
+  visibility: hidden;
+}
+div#sidebar div.stream div.activity {
+  position: relative;
+  font-size: 13px;
+  margin-bottom: 15px;
+  width: 300px;
+  opacity: 0;
+  -webkit-transition: opacity 0.3s ease-in;
+  -moz-transition: opacity 0.3s ease-in;
+  -o-transition: opacity 0.3s ease-in;
+  -ms-transition: opacity 0.3s ease-in;
+  transition: opacity 0.3s ease-in;
+}
+div#sidebar div.stream div.activity.show {
+  opacity: 1;
+}
+div#sidebar div.stream div.activity.digest.comment div.text {
+  margin-bottom: 8px;
+  padding-bottom: 0px;
+}
+div#sidebar div.stream div.activity.digest div.text {
+  left: 10px;
+  margin-bottom: 5px;
+  padding-bottom: 8px;
+}
+div#sidebar div.stream div.activity.digest div.text span {
+  font-family: MuseoSans700;
+}
+div#sidebar div.stream div.activity.digest div.users {
+  margin-left: 10px;
+}
+div#sidebar div.stream div.activity.digest div.users div.picture {
+  position: relative;
+  display: inline-block;
+  margin-left: 4px;
+  margin-bottom: 4px;
+}
+div#sidebar div.stream div.activity.digest div.comment {
+  margin-bottom: 3px;
+}
+div#sidebar div.stream div.activity.digest div.comment div.text {
+  left: 50px;
+  margin-bottom: 10px;
+  padding-bottom: 15px;
+  width: 240px;
+}
+div#sidebar div.stream div.activity.digest div.medias {
+  margin-top: 13px;
+}
+div#sidebar div.stream div.activity div.picture {
+  position: absolute;
+  background: #ccc;
+  width: 34px;
+  height: 34px;
+  border-radius: 18px;
+  box-shadow: inset 0px 0px 2px 1px rgba(0, 0, 0, 0.6);
+  display: inline-block;
+  margin-left: 9px;
+}
+div#sidebar div.stream div.activity div.picture img {
+  width: 26px;
+  height: 26px;
+  margin-left: 4px;
+  margin-top: 4px;
+  border-radius: 15px;
+  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.4);
+}
+div#sidebar div.stream div.activity div.picture:active img {
+  box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+div#sidebar div.stream div.activity div.text {
+  position: relative;
+  left: 50px;
+  top: 0px;
+  min-height: 20px;
+  width: 280px;
+  padding-bottom: 13px;
+  font-family: MuseoSans500;
+}
+div#sidebar div.stream div.activity div.text a {
+  color: #181818;
+}
+div#sidebar div.stream div.activity div.text div.timestamp {
+  font-size: 11px;
+  font-family: MuseoSans300;
+  position: absolute;
+  bottom: 0;
+}
+div#sidebar div.stream div.medias {
+  margin: 10px;
+}
+div#sidebar div#sidebar-content div.admin {
+  margin-top: -2px;
+  display: none;
+  overflow-y: scroll;
+}
+div#sidebar div#sidebar-content div.admin div.search {
+  background: rgba(245, 245, 245, 0.6);
+  width: 100%;
+  height: 35px;
+  border-bottom: 1px solid rgba(112, 108, 108, 0.7);
+}
+div#sidebar div#sidebar-content div.admin div.search input[type=text] {
+  height: auto;
+  border-radius: 3px;
+  width: 280px;
+  font-size: 13px;
+  min-height: 16px;
+  outline: none;
+  border: 1px solid #CCC;
+  resize: none;
+  margin-left: 8px;
+  margin-top: 7px;
+  margin-bottom: 5px;
+}
+div#sidebar div#sidebar-content div.admin div.section {
+  position: relative;
+  margin: 10px;
+}
+div#sidebar div#sidebar-content div.admin div.section div.label {
+  font-size: 10px;
+  color: #181818;
+  margin-bottom: 7px;
+  text-shadow: 1px 1px 1px white;
+  font-family: MuseoSans700;
+}
+div#sidebar div#sidebar-content div.admin div.playlists div.playlist {
+  position: relative;
+  width: 99%;
+  background: rgba(0, 0, 0, 0.65);
+  border: 1px solid #333;
+  overflow: hidden;
+  box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.8), 0 3px 1px -1px rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  font-family: MuseoSans500;
+}
+div#sidebar div#sidebar-content div.admin div.playlists div.playlist:first-child {
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+div#sidebar div#sidebar-content div.admin div.playlists div.playlist:last-child {
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+  box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.8);
+}
+div#sidebar div#sidebar-content div.admin div.playlists div.playlist div.title {
+  position: relative;
+  left: 5px;
+  top: 5px;
+  font-size: 13px;
+  width: 240px;
+  color: white;
+  line-height: 27px;
+  height: 36px;
+}
+div#sidebar div#sidebar-content div.admin div.controls {
+  position: absolute;
+  right: 4px;
+  top: 4px;
+}
+div#sidebar div#sidebar-content div.admin div.controls div.button {
+  border-radius: 0;
+  margin-left: -1px;
+  width: 30px;
+  height: 20px;
+  font-size: 11px;
+  line-height: 20px;
+  border-color: #181818;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+div#sidebar div#sidebar-content div.admin div.controls > div:last-child {
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
+  -webkit-border-top-right-radius: 3px;
+  -webkit-border-bottom-right-radius: 3px;
+}
+div#sidebar div#sidebar-content div.admin div.controls > div:first-child {
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
+  -webkit-border-top-left-radius: 3px;
+  -webkit-border-bottom-left-radius: 3px;
+}
+div#sidebar div#sidebar-content div.admin div.controls div.pending {
+  width: 25px;
+  height: 20px;
+  background: red;
+  color: white;
+  font-size: 11px;
+  text-align: center;
+  line-height: 20px;
+  border: 1px solid #460000;
+  display: inline-block;
+  padding: 3px 0;
+}
+div#sidebar div#sidebar-content div.admin div.controls div.fetch,
+div#sidebar div#sidebar-content div.admin div.controls div.program {
+  display: none;
+  width: 45px;
+}
+div#sidebar div#sidebar-content div.admin div.channel div.controls div.remove {
+  display: none;
+}
+div#sidebar div#sidebar-content div.admin div.channel:hover div.controls div.fetch,
+div#sidebar div#sidebar-content div.admin div.channel:hover div.controls div.program,
+div#sidebar div#sidebar-content div.admin div.channel:hover div.controls div.remove {
+  display: inline-block;
+}
+div#sidebar div#sidebar-content div.admin div.channel.on div.on,
+div#sidebar div#sidebar-content div.admin div.channel.off div.off {
+  pointer-events: none;
+  background-color: #111;
+  box-shadow: inset 0 0 1px 1px #000;
+  color: #ddd;
+  cursor: default;
+}
+div#sidebar div#sidebar-content div.admin div.collections div.collection,
+div#sidebar div#sidebar-content div.admin div.admin-channels div.collection,
+div#sidebar div#sidebar-content div.admin div.topics div.collection,
+div#sidebar div#sidebar-content div.admin div.collections div.channel,
+div#sidebar div#sidebar-content div.admin div.admin-channels div.channel,
+div#sidebar div#sidebar-content div.admin div.topics div.channel,
+div#sidebar div#sidebar-content div.admin div.collections div.topic,
+div#sidebar div#sidebar-content div.admin div.admin-channels div.topic,
+div#sidebar div#sidebar-content div.admin div.topics div.topic {
+  position: relative;
+  width: 99%;
+  background: rgba(0, 0, 0, 0.65);
+  border: 1px solid #333;
+  overflow: hidden;
+  box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.8), 0 3px 1px -1px rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  font-family: MuseoSans500;
+}
+div#sidebar div#sidebar-content div.admin div.collections div.collection:first-child,
+div#sidebar div#sidebar-content div.admin div.admin-channels div.collection:first-child,
+div#sidebar div#sidebar-content div.admin div.topics div.collection:first-child,
+div#sidebar div#sidebar-content div.admin div.collections div.channel:first-child,
+div#sidebar div#sidebar-content div.admin div.admin-channels div.channel:first-child,
+div#sidebar div#sidebar-content div.admin div.topics div.channel:first-child,
+div#sidebar div#sidebar-content div.admin div.collections div.topic:first-child,
+div#sidebar div#sidebar-content div.admin div.admin-channels div.topic:first-child,
+div#sidebar div#sidebar-content div.admin div.topics div.topic:first-child {
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+div#sidebar div#sidebar-content div.admin div.collections div.collection:last-child,
+div#sidebar div#sidebar-content div.admin div.admin-channels div.collection:last-child,
+div#sidebar div#sidebar-content div.admin div.topics div.collection:last-child,
+div#sidebar div#sidebar-content div.admin div.collections div.channel:last-child,
+div#sidebar div#sidebar-content div.admin div.admin-channels div.channel:last-child,
+div#sidebar div#sidebar-content div.admin div.topics div.channel:last-child,
+div#sidebar div#sidebar-content div.admin div.collections div.topic:last-child,
+div#sidebar div#sidebar-content div.admin div.admin-channels div.topic:last-child,
+div#sidebar div#sidebar-content div.admin div.topics div.topic:last-child {
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+  box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.8);
+}
+div#sidebar div#sidebar-content div.admin div.collections div.collection div.title,
+div#sidebar div#sidebar-content div.admin div.admin-channels div.collection div.title,
+div#sidebar div#sidebar-content div.admin div.topics div.collection div.title,
+div#sidebar div#sidebar-content div.admin div.collections div.channel div.title,
+div#sidebar div#sidebar-content div.admin div.admin-channels div.channel div.title,
+div#sidebar div#sidebar-content div.admin div.topics div.channel div.title,
+div#sidebar div#sidebar-content div.admin div.collections div.topic div.title,
+div#sidebar div#sidebar-content div.admin div.admin-channels div.topic div.title,
+div#sidebar div#sidebar-content div.admin div.topics div.topic div.title {
+  position: relative;
+  left: 5px;
+  top: 5px;
+  font-size: 13px;
+  width: 240px;
+  color: white;
+  line-height: 27px;
+  height: 36px;
+}
+div#sidebar div#admin-list {
+  overflow-y: scroll !important;
+}
+div#sidebar div#admin-list div.tabbed div.content {
+  margin: 10px;
+}
+div#sidebar div#admin-list div.tabbed.pending div.pending {
+  display: block;
+}
+div#sidebar div#admin-list div.tabbed.pending ul.tabs li.pending {
+  background: rgba(245, 245, 245, 0.6);
+}
+div#sidebar div#admin-list div.tabbed.all div.all {
+  display: block;
+}
+div#sidebar div#admin-list div.tabbed.all ul.tabs li.all {
+  background: rgba(245, 245, 245, 0.6);
+}
+div#sidebar div#admin-list div.tabbed.playlists div.playlists {
+  display: block;
+}
+div#sidebar div#admin-list div.tabbed.playlists ul.tabs li.playlists {
+  background: rgba(245, 245, 245, 0.6);
+}
+div#sidebar div#admin-list div.spinner {
+  width: 100%;
+  height: 43px;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.6);
+  line-height: 40px;
+  overflow: hidden;
+  -webkit-transition: height 0.3s linear;
+  -moz-transition: height 0.3s linear;
+  -o-transition: height 0.3s linear;
+  -ms-transition: height 0.3s linear;
+  transition: height 0.3s linear;
+}
+div#sidebar div#admin-list div.spinner.finished {
+  height: 0;
+}
+div#sidebar div#admin-list div.list-info {
+  margin: 10px;
+  display: table;
+  table-layout: fixed;
+  border-collapse: collapse;
+  width: 280px;
+}
+div#sidebar div#admin-list div.list-info > div {
+  display: none;
+  vertical-align: top;
+}
+div#sidebar div#admin-list div.list-info div.picture {
+  width: 60px;
+}
+div#sidebar div#admin-list div.list-info div.picture img {
+  width: 60px;
+  height: 60px;
+  box-shadow: 0 0 2px 1px rgba(255, 255, 255, 0.3), 0 0 1px 2px rgba(0, 0, 0, 0.7);
+  border-radius: 3px;
+}
+div#sidebar div#admin-list div.list-info div.description {
+  font-size: 12px;
+  padding-left: 10px;
+}
+div#sidebar div#admin-list div.list-media div.media div.preview div.title {
+  margin-right: 60px;
+  height: 30px;
+  line-height: 14px;
+}
+div#sidebar div#sidebar-content div.screen.profile div.tabbed ul.tabs li.tab.starred div.label,
+div#sidebar div#sidebar-content div.slide.profile div.tabbed ul.tabs li.tab.starred div.label {
+  padding-left: 17px;
+  position: relative;
+}
+div#sidebar div#sidebar-content div.screen.profile div.heart,
+div#sidebar div#sidebar-content div.slide.profile div.heart {
+  background: url('../img.png') no-repeat 0 -658px;
+  width: 13px;
+  height: 13px;
+  position: absolute;
+  top: 0px;
+  left: 63px;
+  background-size: 13px;
+}
+div#sidebar div#sidebar-content div.screen.profile div.no-comments,
+div#sidebar div#sidebar-content div.slide.profile div.no-comments {
+  margin-top: 10px;
+  cursor: default;
+}
+div#sidebar div#sidebar-content div.screen.profile div.content.starred,
+div#sidebar div#sidebar-content div.slide.profile div.content.starred {
+  overflow-y: scroll;
+}
+div#sidebar div#sidebar-content div.screen.profile div.content.starred div.medias,
+div#sidebar div#sidebar-content div.slide.profile div.content.starred div.medias {
+  margin: 10px;
+  padding-bottom: 10px;
+}
+div#sidebar div#conversation div.no-comments {
+  margin-top: 10px;
+}
+div#sidebar div#conversation div.comments-holder {
+  height: 100%;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+div#sidebar div#conversation div.comments-holder div.comments {
+  overflow: hidden;
+}
+div#sidebar div#conversation div.tweet-holder {
+  height: 100%;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+div#sidebar div#conversation div.tweet-holder div.tweets {
+  margin: 10px;
+  overflow-x: scroll;
+  -webkit-transition: height 0.5s ease;
+  -moz-transition: height 0.5s ease;
+  -o-transition: height 0.5s ease;
+  -ms-transition: height 0.5s ease;
+  transition: height 0.5s ease;
+}
+div#sidebar div#conversation div.tweet-holder div.tweet {
+  border-radius: 0;
+}
+div#sidebar div#conversation div.tweet-holder div.tweet:first-child {
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+div#sidebar div#conversation div.tweet-holder div.tweet:last-child {
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+  box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.8);
+}
+@font-face {
+  font-family: 'MuseoSans100';
+  src: url('/static/webfonts/museosans/100.woff') format('woff');
+}
+@font-face {
+  font-family: 'MuseoSans300';
+  src: url('/static/webfonts/museosans/300.woff') format('woff');
+}
+@font-face {
+  font-family: 'MuseoSans500';
+  src: url('/static/webfonts/museosans/500.woff') format('woff');
+}
+@font-face {
+  font-family: 'MuseoSans700';
+  src: url('/static/webfonts/museosans/700.woff') format('woff');
+}
+html,
+body {
+  background: #181818;
+  margin: 0;
+  font-family: MuseoSans300;
+  overflow: hidden;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+body {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  /* for iphone only
+  -webkit-user-select: none; */
+
+}
+div#overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 100;
+}
+a {
+  text-decoration: none;
+  font-family: MuseoSans700;
+}
+a:hover {
+  text-decoration: underline;
+}
+div,
+li,
+a {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-touch-callout: none;
+}
+.ios-scroll {
+  -webkit-overflow-scrolling: touch;
+}

@@ -9,7 +9,7 @@ div#sidebar div.stream {
     width: 100%;
     height: 35px;
     text-align: center;
-    background: url(/static/img/spinner2.gif) no-repeat center 5px;
+    background: @spinner no-repeat center 5px;
     background-size: 50px;
     line-height: 40px;
     .transition(height, .3s, linear);
@@ -70,7 +70,7 @@ div#sidebar div.stream {
       width: 34px;
       height: 34px;
       border-radius: 18px;
-      box-shadow: inset 0px 0px 2px 1px rgba(0, 0, 0, 0.6);
+      .box-shadow(inset, 0px, 0px, 2px, 1px, rgba(0, 0, 0, 0.6));
       display: inline-block;
       margin-left: 9px;
       img {
@@ -79,11 +79,11 @@ div#sidebar div.stream {
         margin-left: 4px;
         margin-top: 4px;
         border-radius: 15px;
-        box-shadow: 0 0 2px 1px rgba(0, 0, 0, .4);
+        .box-shadow(0, 0, 2px, 1px, rgba(0, 0, 0, .4));
       }
       &:active {
         img {
-          box-shadow: 0 0 1px 1px rgba(0, 0, 0, .1);
+          .box-shadow(0, 0, 1px, 1px, rgba(0, 0, 0, .1));
         }
       }
     }

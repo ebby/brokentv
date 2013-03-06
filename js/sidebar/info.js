@@ -35,6 +35,12 @@ brkn.sidebar.Info = function(media) {
   this.media_ = media;
   
   /**
+   * @type {boolean}
+   * @private
+   */
+  this.hasSeen_ = false;
+  
+  /**
    * @type {Object.<string, Element>}
    * @private
    */
@@ -231,6 +237,7 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
       var user = brkn.model.Users.getInstance().get_or_add(viewer);
       if (user.id != brkn.model.Users.getInstance().currentUser.id) {
         goog.style.showElement(this.viewersEl_, true);
+        this.hasSeen_ = true;
         var viewerEl = soy.renderAsElement(brkn.sidebar.viewer, {
           user: user
         });
@@ -469,8 +476,16 @@ brkn.sidebar.Info.prototype.onAddComment_ = function(e) {
  * @private
  */
 brkn.sidebar.Info.prototype.addTweet_ = function(tweet, opt_first) {
+  var linkedText = goog.string.linkify.linkifyPlainText(tweet.text);
+  linkedText = linkedText.replace(/#(\S+)/g, function(hashtag, query) {
+    return '<a target="_blank" href="http://twitter.com/search?q=%23' + query + '">' + hashtag + '</a>';
+  });
+  linkedText = linkedText.replace(/@(\S+)/g, function(handle, name) {
+    return '<a target="_blank" href="http://twitter.com/' + name + '">' + handle + '</a>';
+  });
   var tweetEl = soy.renderAsElement(brkn.sidebar.tweet, {
     tweet: tweet,
+    text: linkedText,
     timestamp: goog.date.relative.format(tweet.time.getTime())
   });
   var dotEl = goog.dom.createDom('div', 'dot');
@@ -504,6 +519,7 @@ brkn.sidebar.Info.prototype.addComment_ = function(comment) {
   goog.style.showElement(this.noCommentsEl_, false);
   var commentEl = soy.renderAsElement(brkn.sidebar.comment, {
     comment: comment,
+    text: goog.string.linkify.linkifyPlainText(comment.text),
     timestamp: goog.date.relative.format(comment.time.getTime()),
     owner: (comment.user.id == brkn.model.Users.getInstance().currentUser.id)
   });
@@ -544,7 +560,8 @@ brkn.sidebar.Info.prototype.addViewer_ = function(user, opt_offline) {
       });
     }
     goog.style.showElement(this.viewersEl_, true);
-    goog.dom.setTextContent((/** @type {Element} */ this.viewersEl_.firstChild), 'WATCHING');
+    goog.dom.setTextContent((/** @type {Element} */ this.viewersEl_.firstChild),
+        'WATCHING' + (this.hasSeen_ ? ' + SEEN' : ''));
     goog.dom.classes.add(this.viewerEls_[user.id], 'online');
   }
 };

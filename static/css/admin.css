@@ -7,7 +7,9 @@
   font-size: 13px;
   text-align: center;
   padding: 3px 0;
-  box-shadow: inset 0 0 1px rgba(255, 255, 255, 0.1), 0 0 1px rgba(255, 255, 255, 0.5);
+  -webkit-box-shadow: inset 0 0 1px rgba(255,255,255,.1), 0 0 1px rgba(255,255,255,.5);
+  -moz-box-shadow: inset 0 0 1px rgba(255,255,255,.1), 0 0 1px rgba(255,255,255,.5);
+  box-shadow: inset 0 0 1px rgba(255,255,255,.1), 0 0 1px rgba(255,255,255,.5);
   color: #FEFEFE;
   text-shadow: 1px 1px black;
   cursor: pointer;
@@ -18,7 +20,9 @@
 .button.goog-custom-button-checked,
 .button:active {
   background: rgba(180, 180, 180, 0.9);
-  box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.3), 0 0 1px #dedede;
+  -webkit-box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, .3),  0 0 1px #DEDEDE;
+  -moz-box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, .3),  0 0 1px #DEDEDE;
+  box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, .3),  0 0 1px #DEDEDE;
   color: #ddd;
 }
 .button.dark {
@@ -28,12 +32,16 @@
 .button.dark.goog-custom-button-checked,
 .button.dark:active {
   background-color: #111;
-  box-shadow: inset 0 0 1px 1px #000;
+  -webkit-box-shadow: inset 0 0 1px 1px #000000;
+  -moz-box-shadow: inset 0 0 1px 1px #000000;
+  box-shadow: inset 0 0 1px 1px #000000;
   color: #ddd;
 }
 .button.dark.goog-custom-button-disabled {
   background-color: #111;
-  box-shadow: inset 0 0 1px 1px #000;
+  -webkit-box-shadow: inset 0 0 1px 1px #000000;
+  -moz-box-shadow: inset 0 0 1px 1px #000000;
+  box-shadow: inset 0 0 1px 1px #000000;
   color: #ddd;
   cursor: default;
 }
@@ -118,7 +126,9 @@ div.users div.header .access {
   top: 18px;
 }
 div.users div.user-list {
-  box-shadow: inset 0 0 2px 1px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: inset 0 0 2px 1px rgba(0, 0, 0, .3);
+  -moz-box-shadow: inset 0 0 2px 1px rgba(0, 0, 0, .3);
+  box-shadow: inset 0 0 2px 1px rgba(0, 0, 0, .3);
   margin: 0 10px;
   border-radius: 3px;
 }
@@ -152,6 +162,8 @@ div.users .pic img {
   width: 40px;
   height: 40px;
   border-radius: 3px;
+  -webkit-box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.4);
+  -moz-box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.4);
   box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.4);
 }
 div.users .name {
@@ -204,7 +216,9 @@ div.controls div.button {
 div.controls div.button.selected {
   pointer-events: none;
   background-color: #111;
-  box-shadow: inset 0 0 1px 1px #000;
+  -webkit-box-shadow: inset 0 0 1px 1px #000000;
+  -moz-box-shadow: inset 0 0 1px 1px #000000;
+  box-shadow: inset 0 0 1px 1px #000000;
   color: #ddd;
   cursor: default;
 }

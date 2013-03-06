@@ -121,6 +121,9 @@ brkn.model.BrowserChannel.prototype.onMessage_ = function(rawMessage) {
 	          }
 	        }, this));
       break;
+	  case 'twitter_auth':
+	    brkn.model.Users.getInstance().currentUser.publish(brkn.model.User.Actions.TWITTER_AUTH);
+	    break;
 	}
 };
 

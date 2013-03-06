@@ -316,9 +316,9 @@ brkn.Guide.prototype.enterDocument = function() {
             goog.style.showElement(this.tickerEl_, !!currentProgram);
             goog.style.showElement(this.myTickerEl_, !!myCurrentProgram);
             goog.dom.classes.enable(this.tickerEl_, 'go-live', !isMyChannel &&
-                Math.abs(myElapsed - elapsed) > 40);
-            goog.dom.classes.enable(this.tickerEl_, 'can-go-live', !isMyChannel &&
-                Math.abs(myElapsed - elapsed) > 15);
+                currentProgram.id != myCurrentProgram.id && Math.abs(myElapsed - elapsed) > 30);
+//            goog.dom.classes.enable(this.tickerEl_, 'can-go-live', !isMyChannel &&
+//                Math.abs(myElapsed - elapsed) > 15);
             goog.dom.classes.enable(this.myTickerEl_, 'show', !Math.abs(myElapsed - elapsed) > 15);
             goog.dom.classes.enable(this.myTickerEl_, 'show-me', !isMyChannel &&
                 Math.abs(myElapsed - elapsed) > 15);
@@ -375,7 +375,7 @@ brkn.Guide.prototype.enterDocument = function() {
   brkn.model.Channels.getInstance().subscribe(brkn.model.Channels.Actions.CHANGE_CHANNEL,
       this.changeChannel, this);
   brkn.model.Channels.getInstance().subscribe(brkn.model.Channels.Actions.NEXT_PROGRAM,
-      goog.bind(this.align_, this, true, undefined, false));
+      goog.bind(this.align_, this));
   brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_ADMIN,
       function(show) {
         goog.dom.classes.enable(this.getElement(), 'admin', show);
@@ -555,7 +555,7 @@ brkn.Guide.prototype.onRight_ = function() {
       brkn.model.Player.getInstance().getCurrentProgram()) {
       this.align_(true, undefined, undefined, true); 
     } else {
-      this.align_(false, undefined, undefined, true); 
+      this.align_(false, undefined, undefined, false); 
     }
   } else {
     this.align_(false, 1);
@@ -595,9 +595,14 @@ brkn.Guide.prototype.align_ = function(opt_setAligned, opt_offset, opt_setScroll
   var program = opt_live ? liveProgram : this.aligned_ ?
           brkn.model.Player.getInstance().getCurrentProgram() :
           this.cursor_[0].getCurrentProgram(this.guideOffset_);
+  if (!program) {
+    // Find the first online to align to
+     var channel = brkn.model.Channels.getInstance().findOnline()
+     program = channel && channel.getCurrentProgram();
+  }
   this.cursor_[1] = program;
   
-  if ((this.aligned_ || opt_offset) && program) {
+  if ((this.aligned_ || opt_offset) && program && this.minTime_) {
     var myCurrentProgram = brkn.model.Player.getInstance().getCurrentProgram();
     var myCurrentProgress = brkn.model.Player.getInstance().getProgress()*1000;
     var elapsed = (goog.now() - this.minTime_.getTime())/1000 * this.pixelsPerSecond_;

@@ -18,8 +18,8 @@
       </div>
       <div class="fullscreen"></div>
       <div class="expand"></div>
-      <div class="play" style="display: none"></div>
-      <div class="pause" style="display: none"></div>
+      <div class="play" style="display: none"><div></div></div>
+      <div class="pause" style="display: none"><div></div></div>
     </div>
   </div>
   <div id="guide" class="guide animate{if $guide}{sp}toggled{else}{sp}collapsed{/if}">
@@ -47,17 +47,18 @@
     <div class="left">
       <div id="guide-toggle" class="guide-toggle dark button">GUIDE</div>
       <div class="controls">
-        <div class="restart dark button"></div>
-        <div class="play dark button"></div>
-        <div class="volume dark button"></div>
+        <div class="restart dark button"><div class="icon"></div></div>
+        <div class="play dark button"><div class="icon"></div></div>
+        <div class="volume dark button"><div class="icon"></div></div>
       </div>
       <div class="border"></div>
     </div>
     <div class="right">
       <div id="admin-toggle" class="admin-toggle dark button" style="display: none">
+        <div class="icon"></div>
         <div id="toggle-pending" class="pending" style="display:none"></div>
       </div>
-      <div id="sidebar-toggle" class="sidebar-toggle dark button"></div>
+      <div id="sidebar-toggle" class="sidebar-toggle dark button"><div class="icon"></div></div>
       <div class="border"></div>
     </div>
     <div class="progress" style="display: none">

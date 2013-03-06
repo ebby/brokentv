@@ -58,3 +58,11 @@ def broadcastNewPrograms(channel, programs):
   channels = memcache.get('web_channels') or {}
   for client in channels.iterkeys():
     webchannel.send_message(client, simplejson.dumps(response))
+    
+def broadcastTwitterAuth(user):
+  response = {}
+  response['type'] = 'twitter_auth'
+  response['success'] = True
+  channels = memcache.get('web_channels') or {}
+  if user.id in channels.iterkeys():
+    webchannel.send_message(user.id, simplejson.dumps(response))

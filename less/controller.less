@@ -5,12 +5,10 @@ div.controller {
   left: 0;
   height: 40px;
   z-index: 100;
-  background: transparent url(/static/img/grad-window.png);
+  background: transparent @grad-window;
 	border-top: 1px solid #ccc;
 	pointer-events: none;
-	-webkit-box-shadow: inset 0 -3px 7px -3px rgba(0,0,0,0.2), 0 0 5px 0 rgba(0, 0, 0, .5);
-	   -moz-box-shadow: inset 0 -3px 7px -3px rgba(0,0,0,0.2), 0 0 5px 0 rgba(0, 0, 0, .5);
-		  		box-shadow: inset 0 -3px 7px -3px rgba(0,0,0,0.2), 0 0 5px 0 rgba(0, 0, 0, .5);
+	.box-shadow(e('inset 0 -3px 7px -3px rgba(0,0,0,0.2), 0 0 5px 0 rgba(0, 0, 0, .5)'));
 	.transition(width, .5s, ease);
   &.window {
     div.background {
@@ -25,7 +23,7 @@ div.controller {
   
   div.background {
     opacity: 1;
-    background: #5c5c5c url(/static/img/grad.png);
+    background: #5c5c5c @grad;
     pointer-events: all;
     width: 100%;
     height: 100%;
@@ -35,7 +33,7 @@ div.controller {
   }
     
   div.left {
-    background: #5c5c5c url(/static/img/grad.png);
+    background: #5c5c5c @grad;
     display: inline-block;
     position: relative;
     width: 203px;
@@ -45,7 +43,7 @@ div.controller {
       display: none;
       width: 6px;
       height: 100%;
-      background: url(/static/img/grad-window-left.png);
+      background: @grad-window-left;
       position: absolute;
       right: -6px;
       top: 0;
@@ -53,7 +51,7 @@ div.controller {
   }
   
   div.right {
-    background: #5c5c5c url(/static/img/grad.png);
+    background: #5c5c5c @grad;
     display: inline-block;
     position: absolute;
     right: 0;
@@ -66,7 +64,7 @@ div.controller {
       display: none;
       width: 6px;
       height: 100%;
-      background: url(/static/img/grad-window-right.png);
+      background: @grad-window-right;
       position: absolute;
       left: -6px;
       top: 0;
@@ -77,7 +75,7 @@ div.controller {
 	  width: 100%;
     height: 4px;
     background: #f5f5f5;
-    box-shadow: inset 0 -1px 1px 0 #ccc, 0 0 2px 1px rgba(88, 88, 88, 0.3);
+    .box-shadow(e('inset 0 -1px 1px 0 #ccc, 0 0 2px 1px rgba(88, 88, 88, 0.3)'));
     position: absolute;
     top: 27px;
     pointer-events: all;
@@ -96,8 +94,8 @@ div.controller {
       left: 0;
       width: 0;
       height: 4px;
-      background: #B7432E;
-      box-shadow: inset 0 -1px 1px 0 rgba(255,255,255,.2);
+      background: #497882;
+      .box-shadow(e('inset 0 -1px 1px 0 rgba(255,255,255,.2)'));
       border-radius: 300px;
       &.animate {
         .transition(width, 1s, linear);
@@ -108,20 +106,20 @@ div.controller {
       bottom: 0px;
       width: 1px;
       height: 4px;
-      background: #B7432E;
+      background: #497882;
       opacity: 0.9;
       right: 0;
       cursor: pointer;
-      box-shadow: 0px 0 6px 2px rgba(255,255,255,0.2);
+      .box-shadow(e('0px 0 6px 2px rgba(255,255,255,0.2)'));
   	}
   	div.title {
   	  position: absolute;
       left: 0;
       top: -18px;
       font-size: 11px;
-      font-family: MuseoSans100;
+      font-family: MuseoSans300;
       color: #f5f5f5;
-      text-shadow: 1px 1px 1px #181818;
+      text-shadow: 1px 1px 1px #666;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -132,18 +130,18 @@ div.controller {
       right: 40px;
       top: -18px;
       font-size: 11px;
-      font-family: MuseoSans100;
+      font-family: MuseoSans300;
       color: #f5f5f5;
-      text-shadow: 1px 1px 1px #181818;
+      text-shadow: 1px 1px 1px #666;
     }
   	div.duration {
   	  position: absolute;
   	  right: 0;
   	  top: -18px;
   	  font-size: 11px;
-  	  font-family: MuseoSans100;
+  	  font-family: MuseoSans300;
   	  color: #f5f5f5;
-  	  text-shadow: 1px 1px 1px #181818;
+  	  text-shadow: 1px 1px 1px #666;
   	}
 	}
 	&:hover div.progress div.seek {
@@ -155,7 +153,7 @@ div.controller {
     bottom: -3px;
     right: -3px;
     margin-left: -4px;
-    box-shadow: 0px 0px 1px 1px rgba(255,255,255,.9);
+    .box-shadow(e('0px 0px 1px 1px rgba(255,255,255,.9)'));
     z-index: 2;
   }
 	
@@ -175,9 +173,10 @@ div.controller {
     top: 4px;
     width: 35px;
 		height: 25px;
-    background-image: url(/static/img/comment.png);
-    background-repeat: no-repeat;
-		background-position: center;
+    .icon {
+      .sprite-comment();
+      margin: 2px 0 0 5px;
+    }
   }
   div.button.admin-toggle {
     position: absolute;
@@ -185,9 +184,10 @@ div.controller {
     top: 4px;
     width: 35px;
     height: 25px;
-    background-image: url(/static/img/19-gear.png);
-    background-repeat: no-repeat;
-    background-position: center;
+    .icon {
+      .sprite-gear();
+      margin: 0 0 0 5px;
+    }
     div.pending {
       height: 13px;
       background: red;
@@ -227,24 +227,31 @@ div.controller {
 	    -webkit-border-top-left-radius: 3px;
       -webkit-border-bottom-left-radius: 3px;
 	  }
-	  div.restart {
-	    background-image: url(/static/img/restart.png);
-	    background-size: 50%;
+	  div.restart .icon {
+	    .sprite-restart();
+	    margin: 5px 0 0 7px;
 	  }
 	  div.play {
-	    background-image: url(/static/img/17-pause.png);
+	    .icon {
+	      .sprite-pause();
+	      margin: 6px 0 0 13px;
+	    }
 	    &.goog-custom-button-checked {
 	      background-color: transparent;
-	      background-image: url(/static/img/16-play.png);
-        box-shadow: inset 0 0 1px rgba(255,255,255,.1), 0 0 1px rgba(255,255,255,.5);
+	      .box-shadow(e('inset 0 0 1px rgba(255,255,255,.1), 0 0 1px rgba(255,255,255,.5)'));
+	      .icon {
+	        .sprite-play();
+	        margin: 6px 0 0 15px;
+	      }
 	    }
 	  }
 	  div.volume {
-	    background-image: url(/static/img/volume-up.png);
-	    background-size: 50%;
-	    &.mute, &.goog-custom-button-checked {
-	      background-image: url(/static/img/volume-down.png);
-	      background-position: 9px;
+	    .icon {
+	      .sprite-volume-up();
+	      margin: 6px 0 0 8px;
+	    }
+	    &.mute .icon, &.goog-custom-button-checked .icon {
+	      .sprite-volume-down();
 	    }
 	  }
 	}

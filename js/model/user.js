@@ -1,4 +1,5 @@
 goog.provide('brkn.model.User');
+goog.provide('brkn.model.User.Actions');
 
 goog.require('goog.date');
 goog.require('goog.pubsub.PubSub');
@@ -143,6 +144,14 @@ brkn.model.User.prototype.getLastLogin = function (opt_time) {
   var date = (this.lastLogin.getMonth() + 1) + '/' + this.lastLogin.getDate() + '/' +
       this.lastLogin.getYear();
   return opt_time ? date + ' ' + this.lastLogin.toUsTimeString() : date
+};
+
+
+/**
+ * @enum {string}
+ */
+brkn.model.User.Actions = {
+  TWITTER_AUTH: 'twitter-auth'
 };
 
 

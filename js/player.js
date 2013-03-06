@@ -128,7 +128,9 @@ brkn.Player.prototype.enterDocument = function() {
       .listen(this.getElement(), goog.events.EventType.MOUSEMOVE, goog.bind(function(e) {
         var xPer = e.offsetX/this.height_;
         var yPer = e.offsetY/this.width_;
-        if (xPer > .7 && xPer < .9 && yPer > .7 && yPer < .9) {
+        if (xPer > .7 && xPer < .9 && yPer > .7 && yPer < .9 &&
+            (this.playerState_ == YT.PlayerState.PLAYING ||
+             this.playerState_ == YT.PlayerState.PAUSED)) {
           // Pass click through to flash to kill possible advertisement
           goog.style.showElement(this.stagecover_, false);
           goog.Timer.callOnce(goog.bind(function() {
@@ -167,6 +169,10 @@ brkn.Player.prototype.enterDocument = function() {
       this.playAsync_, this);
   brkn.model.Player.getInstance().subscribe(brkn.model.Player.Actions.SEEK,
       this.seek_, this);
+  brkn.model.Player.getInstance().subscribe(brkn.model.Player.Actions.BEFORE_END,
+      function() {
+        this.updateStagecover_(undefined, true);
+      }, this);
   brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_SIDEBAR,
       function(show) {
         this.resize(show);
@@ -416,9 +422,10 @@ brkn.Player.prototype.onPlayerError_ = function(event) {
 
 /**
  * @param {?string=} opt_message
+ * @param {?boolean=} opt_beforeEnd
  * @private
  */
-brkn.Player.prototype.updateStagecover_ = function(opt_message) {
+brkn.Player.prototype.updateStagecover_ = function(opt_message, opt_beforeEnd) {
   var stagecover = goog.dom.getElement('stagecover');
 //  var seek = this.currentProgram_ ? (goog.now() - this.currentProgram_.time.getTime())/1000 : 0;
   var seek = this.currentProgram_ ? brkn.model.Player.getInstance().getCurrentTime() : 0;
@@ -428,8 +435,8 @@ brkn.Player.prototype.updateStagecover_ = function(opt_message) {
         brkn.Player.Messages.OFFLINE);
     goog.style.showElement(this.spinner_, false);
     goog.dom.classes.add(stagecover, 'covered');
-  } else if (this.playerState_ != YT.PlayerState.PLAYING &&
-      this.playerState_ != YT.PlayerState.PAUSED) {
+  } else if ((this.playerState_ != YT.PlayerState.PLAYING &&
+      this.playerState_ != YT.PlayerState.PAUSED) || opt_beforeEnd) {
     goog.dom.setTextContent((/** @type {Element} */ this.message_.firstChild),
         brkn.Player.Messages.LOADING);
     goog.style.showElement(this.spinner_, true);

@@ -26,7 +26,7 @@
   div.message {
     display: none;
     font-size: 24px;
-    font-family: MuseoSans100;
+    font-family: MuseoSans300;
     color: #f7f7f7;
     position: absolute;
     left: 50%;
@@ -36,7 +36,7 @@
       left: 50%;
       margin-left: -100px;
       bottom: -150px;
-      background: url(/static/img/spinner.gif) no-repeat center;
+      background: @spinner no-repeat center;
       background-size: 80px;
       width: 200px;
       height: 220px;
@@ -52,17 +52,19 @@
     .transition(opacity, .1s, ease);
   }
   div.fullscreen {
-    background: rgba(150, 150, 150, .8) url(/static/img/fullscreen.png) center no-repeat;
-    background-size: 70%;
+    .sprite-fullscreen();
+    width: 20px;
+    height: 20px;
     right: 40px;
     top: 10px;
     &.full {
-      background-image: url(/static/img/closescreen.png);
+      .sprite-closescreen();
     }
   }
   div.expand {
-    background: rgba(150, 150, 150, .8) url(/static/img/expand.png) center no-repeat;
-    background-size: 70%;
+    .sprite-expand();
+    width: 20px;
+    height: 20px;
     right: 10px;
     top: 10px;
   }
@@ -80,16 +82,28 @@
     height: 100px;
     margin-left: -50px;
     margin-top: -50px;
-    background: rgba(0, 0, 0, .5) no-repeat center;
+    background-color: rgba(0, 0, 0, .5);
     border-radius: 6px;
     opacity: .6;
   }
   div.play {
-    background-image: url(/static/img/16-play-dark.png);
-    background-size: 10%;
+    div {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      margin-top: -5px;
+      margin-left: -7px;
+      .sprite-player-play();
+    }
   }
   div.pause {
-    background-image: url(/static/img/17-pause-dark.png);
-    background-size: 15%;
+    div {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      margin-top: -10px;
+      margin-left: -7px;
+      .sprite-player-pause();
+    }
   }
 }

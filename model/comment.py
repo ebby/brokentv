@@ -14,17 +14,20 @@ class Comment(db.Model):
 
   @classmethod
   def get_by_media(cls, media, uid=None, limit=20, offset=0):
-    query = Comment.all().filter('media =', media).filter('is_parent =', True)
+    query = Comment.all().filter('media =', media)
     if uid:
       query = query.filter('acl =', uid)
     return query.order('time').fetch(limit, offset)
 
   @classmethod
   def add(cls, media, user, text, acl, parent_id=None):
-    c = Comment(media=media, user=user, text=text, acl=acl)
+    c = Comment(media=media, user=user, text=text)
     if parent_id:
       c.parent_comment = Comment.get_by_id(int(parent_id))
       c.is_parent = False
+    else:
+      # ACL only needed on parent. Replies don't need ACLs.
+      c.acl = acl
     c.put()
 
     media.comment_count += 1
