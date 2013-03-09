@@ -8,6 +8,7 @@ div#guide {
   width: 100%;
   color: #ccc;
   .transition(e('height .5s ease, opacity .5s ease'));
+  .grab();
 
   &.animate {
   .transition(e('height .5s ease, opacity .5s ease, left 1s ease-in-out'));
@@ -23,7 +24,7 @@ div#guide {
   
   &.drag, &.drag div.channel div.name, &.aligning div.channel div.name {
     .transition(e('none !important'));
-    .grab();
+    .grabbing();
   }
   &.drag div.channels div.channel div.programs div.program.playing div.title {
     .transition(none);
@@ -384,7 +385,6 @@ div#guide {
 					.box-shadow(inset, 0px, 0px, 1px, 1px, rgba(0, 0, 0, .4));
           border: 1px solid whiteSmoke;
           padding: 1px;
-          cursor: pointer;
 					.transition(width, .3s, ease);
 					&.selected {
 					  border: 1px solid rgba(0, 0, 255, 0.5);
@@ -564,20 +564,26 @@ div#guide {
 		        }
 		        div.pic {
 		          background: inherit;
-							width: 25px;
-							height: 25px;
-							border-radius: 10px;
+							width: 28px;
+							height: 28px;
+							border-radius: 14px;
 							right: -5px;
-							top: -10px;
+							top: -12px;
 							.box-shadow(0px, 1px, 1px, 0px, rgba(255, 255, 255, .6));
 							position: absolute;
 							img {
-			          width: 21px;
+			          width: 20px;
 			          height: 20px;
-			          margin-left: 2px;
-			          margin-top: 2px;
+			          margin-left: 4px;
+			          margin-top: 4px;
 			          border-radius: 10px;
+			          .box-shadow(0, 0, 2px, 1px, rgba(0, 0, 0, .4));
 			        }
+			        &:active {
+                img {
+                  .box-shadow(0, 0, 1px, 1px, rgba(0, 0, 0, .1));
+                }
+              }
 		        }
 	        }
 	        div.username {

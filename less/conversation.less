@@ -4,23 +4,22 @@ div#sidebar div#conversation {
   }
   div.comments-holder {
     height: 100%;
-    overflow-y: scroll;
-    overflow-x: hidden;
-    div.comments {
-      overflow: hidden;
-    }
+    .scroll-y();
+    padding-right: 14px;
+    margin-right: -14px;
   }
   div.tweet-holder {
     height: 100%;
-    overflow-y: scroll;
-    overflow-x: hidden;
+    .scroll-y();
+    padding-right: 14px;
+    margin-right: -14px;
     div.tweets {
       margin: 10px;
-      overflow-x: scroll;
       .transition(height, .5s, ease);
     }
     div.tweet {
       border-radius: 0;
+      width: 278px;
       &:first-child {
         border-top-left-radius: 3px;
         border-top-right-radius: 3px;

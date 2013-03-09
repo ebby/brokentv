@@ -33,7 +33,13 @@ class Publisher(db.Model):
     json['picture'] = '/images/publisher/' + str(self.key().name())
     json['link'] = self.link
     return json
-  
+
+  @classmethod
+  def add_from_url(cls, url):
+    user_id = urlparse.urlsplit(url).path.split('/')[-1].lower()
+    publisher = Publisher.add(constants.MediaHost.YOUTUBE, user_id)
+    return publisher
+
   @classmethod
   def add(self, host, host_id, name=None, channel_id=None):
     publisher = Publisher.get_or_insert(key_name=host+host_id,
@@ -41,7 +47,7 @@ class Publisher(db.Model):
                                         name=name,
                                         channel_id=channel_id)
     return publisher
-  
+
   def fetch(self, collection=None, approve_all=False):
     medias = []
 

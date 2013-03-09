@@ -220,6 +220,9 @@ brkn.Sidebar.prototype.enterDocument = function() {
   brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_SIDEBAR,
       function(show) {
         goog.dom.classes.enable(this.getElement(), 'toggled', show);
+        goog.Timer.callOnce(goog.bind(function() {
+          goog.dom.classes.enable(this.getElement(), 'collapsed', !show);
+        }, this), !show ? 500 : 0);
       }, this);
   
   brkn.model.Sidebar.getInstance().subscribe(brkn.model.Sidebar.Actions.NAVIGATE,

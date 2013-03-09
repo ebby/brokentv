@@ -42,6 +42,11 @@ brkn.model.Media = function(media) {
    * @type {string}
    */
   this.description = media['description'];
+
+  /**
+   * @type {string}
+   */
+  this.link = media['link'] || 'xylocast.com/?m=' + this.id;
   
   /**
    * @type {Object}

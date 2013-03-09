@@ -17,10 +17,22 @@
 }
 
 .grab () {
+  cursor:grab;
+  cursor:-moz-grab;
+  cursor:-webkit-grab;
+  cursor: url(/static/img/openhand.cur);
+}
+
+.grabbing () {
   cursor:grabbing !important;
   cursor:-moz-grabbing !important;
   cursor:-webkit-grabbing !important;
   cursor: url(/static/img/closedhand.cur) !important;
+}
+
+.scroll-y () {
+  overflow-x: hidden;
+  overflow-y: scroll !important;
 }
 
 .box-shadow (...) {

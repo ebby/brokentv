@@ -3,20 +3,23 @@ from common import *
 from user import User
 from channel import Channel
 from media import Media
+from stat import Stat
 
 class UserSession(db.Model):
   user = db.ReferenceProperty(User)
   tune_in = db.DateTimeProperty()
   tune_out = db.DateTimeProperty()
   channel = db.ReferenceProperty(Channel)
+  with_friends = db.BooleanProperty(default=False)
   
   @property
   def id(self):
     return str(self.key().id())
 
   @classmethod
-  def new(cls, user, channel):
-    session = UserSession(user=user, channel=channel, tune_in=datetime.datetime.now())
+  def new(cls, user, channel, with_friends=False):
+    session = UserSession(user=user, channel=channel, tune_in=datetime.datetime.now(),
+                          with_friends=with_friends)
     session.put()
     return session
 
@@ -33,11 +36,7 @@ class UserSession(db.Model):
     self.tune_out = datetime.datetime.now()
     self.put()
     
-    # Update some user stats
-    tally = self.user.ave_session * self.user.session_count
-    self.user.session_count += 1
-    self.user.ave_session = float((tally + (self.tune_out - self.tune_in).seconds) / self.user.session_count)
-    self.user.put()
+    Stat.add_session(self)
     
     # Track user activity
     if self.sessionMedias.get() and self.channel.privacy != Privacy.PRIVATE:

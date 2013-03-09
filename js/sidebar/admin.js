@@ -138,7 +138,7 @@ brkn.sidebar.Admin.prototype.enterDocument = function() {
                 medias = goog.array.map(medias, function(m) {
                   return new brkn.model.Media(m);
                 });
-                var adminList = new brkn.sidebar.AdminList('', medias, []);
+                var adminList = new brkn.sidebar.AdminList('', medias, [], []);
                 adminList.decorate(this.adminListEl_);
                 brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NAVIGATE,
                     this.adminListEl_, false, topic);
@@ -194,8 +194,9 @@ brkn.sidebar.Admin.prototype.enterDocument = function() {
  * @private
  */
 brkn.sidebar.Admin.prototype.addChannel_ = function(channel) {
+  var c = new brkn.model.Channel(channel);
   var channelEl = soy.renderAsElement(brkn.sidebar.channel, {
-    channel: channel
+    channel: c
   });
   goog.dom.appendChild(this.channelsEl_, channelEl);
   goog.events.listen(channelEl, goog.events.EventType.CLICK, goog.bind(function(e) {
@@ -203,7 +204,7 @@ brkn.sidebar.Admin.prototype.addChannel_ = function(channel) {
       goog.dom.classes.enable(channelEl, 'on', goog.dom.classes.has(e.target, 'on'));
       goog.dom.classes.enable(channelEl, 'off', !goog.dom.classes.has(e.target, 'on'));
       goog.net.XhrIo.send(
-          '/admin/_channel/online/' + channel['id'],
+          '/admin/_channel/online/' + c.id,
           goog.bind(function(e) {
             e.target.disabled = '';
             var channel = e.target.getResponseJson();
@@ -214,15 +215,15 @@ brkn.sidebar.Admin.prototype.addChannel_ = function(channel) {
           'online=' + goog.dom.classes.has(e.target, 'on'));
     } else if (goog.dom.classes.has(e.target, 'program')) {
       goog.net.XhrIo.send('/admin/_program', goog.functions.NULL(), 'POST',
-          'channel_id=' + channel['id']);
+          'channel_id=' + c.id);
     } else if (goog.dom.classes.has(e.target, 'fetch')) {
       goog.net.XhrIo.send('/admin/_fetch', function() {
         alert('Fetch began, but give it some time.');  
-      }, 'POST', 'channel_id=' + channel['id']);
+      }, 'POST', 'channel_id=' + c.id);
     } else if (goog.dom.classes.has(e.target, 'remove') &&
-        confirm('Remove ' + channel['name'] + '?')) {
+        confirm('Remove ' + c.name + '?')) {
       goog.style.showElement(channelEl, false);
-      goog.net.XhrIo.send('/admin/_channels/' + channel['id'], function(e) {
+      goog.net.XhrIo.send('/admin/_channels/' + c.id, function(e) {
         var response = e.target.getResponseJson();
         if (response['deleted']) {
           goog.dom.removeNode(channelEl);
@@ -231,10 +232,10 @@ brkn.sidebar.Admin.prototype.addChannel_ = function(channel) {
         }
       }, 'DELETE');
     } else {
-      var colList = new brkn.sidebar.Admin(channel['id']);
+      var colList = new brkn.sidebar.Admin(c.id);
       colList.decorate(this.colListEl_);
       brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NAVIGATE,
-            this.colListEl_, false, channel['name']); 
+            this.colListEl_, false, c.name); 
     }
   }, this));
 };
@@ -276,7 +277,8 @@ brkn.sidebar.Admin.prototype.addCollection_ = function(col) {
               return new brkn.model.Media(m);
             });
             var playlists = /** @type {Array.<Object>} */ res['playlists'];
-            var adminList = new brkn.sidebar.AdminList(col.id, medias, playlists);
+            var publishers = /** @type {Array.<Object>} */ res['publishers'];
+            var adminList = new brkn.sidebar.AdminList(col.id, medias, playlists, publishers);
             adminList.decorate(this.adminListEl_);
             brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NAVIGATE,
                 this.adminListEl_, false, col.name);

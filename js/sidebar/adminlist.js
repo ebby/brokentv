@@ -22,12 +22,13 @@ goog.require('goog.ui.Textarea.EventType');
  * @param {string} collectionId
  * @param {Array.<brkn.model.Media>} pending
  * @param {Array.<Object>} playlists
+ * @param {Array.<Object>} publishers
  * @param {?string=} opt_thumb
  * @param {?string=} opt_desc
  * @constructor
  * @extends {goog.ui.Component}
  */
-brkn.sidebar.AdminList = function(collectionId, pending, playlists,
+brkn.sidebar.AdminList = function(collectionId, pending, playlists, publishers,
     opt_thumb, opt_desc) {
   goog.base(this);
 
@@ -62,6 +63,12 @@ brkn.sidebar.AdminList = function(collectionId, pending, playlists,
   this.playlists_ = playlists;
   
   /**
+   * @type {Array.<Object>}
+   * @private
+   */
+  this.publishers_ = publishers;
+  
+  /**
    * @type {?string}
    * @private
    */
@@ -92,7 +99,7 @@ brkn.sidebar.AdminList = function(collectionId, pending, playlists,
    * @type {Array.<string>}
    * @private
    */
-  this.tabs_ = ['pending', 'all', 'playlists'];
+  this.tabs_ = ['pending', 'all', 'playlists', 'publishers'];
 };
 goog.inherits(brkn.sidebar.AdminList, goog.ui.Component);
 
@@ -127,6 +134,9 @@ brkn.sidebar.AdminList.prototype.decorateInternal = function(el) {
   
   this.playlistsEl_ = goog.dom.getElementByClass('playlists-content', el);
   goog.array.forEach(this.playlists_, this.addPlaylist_, this);
+  
+  this.publishersEl_ = goog.dom.getElementByClass('publishers-content', el);
+  goog.array.forEach(this.publishers_, this.addPublisher_, this);
 
   this.resize();
 };
@@ -225,8 +235,16 @@ brkn.sidebar.AdminList.prototype.fetchLink_ = function(input) {
           } else if (response['type'] == 'playlist') {
             var playlist = response['data'];
             if (!goog.array.find(this.playlists_, function(p) {return p.id == playlist.id})) {
+              this.playlists_.push(playlist);
               this.addPlaylist_(playlist);
               this.navigate_(goog.dom.getElementsByTagNameAndClass('li', 'playlists')[0]);
+            }
+          } else if (response['type'] == 'publisher') {
+            var publisher = response['data'];
+            if (!goog.array.find(this.publishers_, function(p) {return p.id == publisher.id})) {
+              this.publishers_.push(publisher);
+              this.addPublisher_(publisher);
+              this.navigate_(goog.dom.getElementsByTagNameAndClass('li', 'publishers')[0]);
             }
           }
         }, this),
@@ -269,9 +287,22 @@ brkn.sidebar.AdminList.prototype.navigate_ = function(tabEl) {
  */
 brkn.sidebar.AdminList.prototype.addPlaylist_ = function(playlist) {
   var playlistEl = soy.renderAsElement(brkn.sidebar.playlist, {
-    playlist: playlist
+    name: playlist['name']
   });
   goog.dom.appendChild(this.playlistsEl_, playlistEl);
+};
+
+
+/**
+ * @param {Object} publisher 
+ * @private
+ */
+brkn.sidebar.AdminList.prototype.addPublisher_ = function(publisher) {
+  var publisherEl = soy.renderAsElement(brkn.sidebar.publisher, {
+    name: publisher['name'],
+    picture: publisher['picture']
+  });
+  goog.dom.appendChild(this.publishersEl_, publisherEl);
 };
 
 
@@ -300,6 +331,7 @@ brkn.sidebar.AdminList.prototype.addMedia_ = function(parent, media, opt_top) {
   var approve = goog.dom.getElementByClass('approve', mediaEl);
   var remove = goog.dom.getElementByClass('remove', mediaEl);
   dragger.defaultAction = function(x, y) {
+    window.console.log('here');
     var delta = y - 24
     if (delta >= -50 && delta <= 50) {
       goog.style.setStyle(thumb, 'background-position-y', 50 - delta + '%');

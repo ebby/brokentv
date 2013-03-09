@@ -87,12 +87,15 @@ div#header {
   left: 0;
   width: 100%;
   height: 40px;
-  background: #5c5c5c url(/static/img/grad.png);
+  background: #5c5c5c url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAoCAIAAACw1AcgAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyRpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoTWFjaW50b3NoKSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDpCN0QxODVCQTUzREUxMUUyQUU0NkZEMEE1QkIwMzk4RCIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDpCN0QxODVCQjUzREUxMUUyQUU0NkZEMEE1QkIwMzk4RCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkI3RDE4NUI4NTNERTExRTJBRTQ2RkQwQTVCQjAzOThEIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOkI3RDE4NUI5NTNERTExRTJBRTQ2RkQwQTVCQjAzOThEIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+2i3rwAAAADRJREFUeNpi6OvrY/r//z8K/vfvHxMDAwMYg9ggDBOHycHYyPLIagiJIYuj2w8yH8oGCDAAI7RqXUjJdmoAAAAASUVORK5CYII=);
   -webkit-box-shadow: inset 0 -3px 7px -3px rgba(0,0,0,0.2), 0 0 5px 0 rgba(0, 0, 0, .5);
   -moz-box-shadow: inset 0 -3px 7px -3px rgba(0,0,0,0.2), 0 0 5px 0 rgba(0, 0, 0, .5);
   box-shadow: inset 0 -3px 7px -3px rgba(0,0,0,0.2), 0 0 5px 0 rgba(0, 0, 0, .5);
+  z-index: 9999;
 }
 div#header div.logo {
+  position: absolute;
+  left: 0;
   font-family: MuseoSans700;
   font-size: 16px;
   color: #f5f5f5;
@@ -102,37 +105,73 @@ div#header div.logo {
 div#header div.logo span {
   font-family: MuseoSans100;
 }
+div#header div.sections {
+  margin: auto;
+  width: 880px;
+}
+div#header div.sections div.section {
+  text-align: center;
+  color: #dedede;
+  display: inline-block;
+  width: 90px;
+  height: 100%;
+  line-height: 40px;
+  font-family: MuseoSans500;
+  font-size: 11px;
+  margin-right: -3px;
+  border-left: 1px solid #bbb;
+  cursor: pointer;
+}
+div#header div.sections div.section:last-child {
+  border-right: 1px solid #bbb;
+}
+div#header div.sections div.section.selected {
+  background: #5c5c5c;
+  cursor: default;
+}
 div#content {
   position: absolute;
   left: 0;
   top: 0;
   width: 100%;
   height: 100%;
-  overflow-y: scroll;
 }
-div.users {
+div#content > div {
+  display: none;
+}
+div#content.users div.users,
+div#content.stats div.stats,
+div#content.channels div.channels {
+  display: block;
+}
+div#content div#stats {
+  margin: auto;
+  width: 1200px;
+  margin-top: 80px;
+}
+div#content div#users {
   margin: 10px auto;
   margin-top: 50px;
   width: 900px;
 }
-div.users div.header {
+div#content div#users div.header {
   font-size: 11px;
   position: relative;
   height: 45px;
   margin-left: 10px;
 }
-div.users div.header .pic,
-div.users div.header .access {
+div#content div#users div.header .pic,
+div#content div#users div.header .access {
   top: 18px;
 }
-div.users div.user-list {
+div#content div#users div.user-list {
   -webkit-box-shadow: inset 0 0 2px 1px rgba(0, 0, 0, .3);
   -moz-box-shadow: inset 0 0 2px 1px rgba(0, 0, 0, .3);
   box-shadow: inset 0 0 2px 1px rgba(0, 0, 0, .3);
   margin: 0 10px;
   border-radius: 3px;
 }
-div.users div.user {
+div#content div#users div.user {
   background: rgba(0, 0, 0, 0.5);
   border-bottom: 1px solid rgba(0, 0, 0, 0.3);
   height: 50px;
@@ -140,25 +179,25 @@ div.users div.user {
   color: white;
   text-shadow: 1px 1px 1px #181818;
 }
-div.users div.user:last-child {
+div#content div#users div.user:last-child {
   border-bottom-right-radius: 3px;
   border-bottom-left-radius: 3px;
   -webkit-border-bottom-right-radius: 3px;
   -webkit-border-bottom-left-radius: 3px;
   border-bottom: none;
 }
-div.users div.user:first-child {
+div#content div#users div.user:first-child {
   border-top-left-radius: 3px;
   border-top-right-radius: 3px;
   -webkit-border-top-left-radius: 3px;
   -webkit-border-top-right-radius: 3px;
 }
-div.users .pic {
+div#content div#users .pic {
   position: absolute;
   top: 5px;
   left: 5px;
 }
-div.users .pic img {
+div#content div#users .pic img {
   width: 40px;
   height: 40px;
   border-radius: 3px;
@@ -166,7 +205,7 @@ div.users .pic img {
   -moz-box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.4);
   box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.4);
 }
-div.users .name {
+div#content div#users .name {
   position: absolute;
   top: 18px;
   left: 55px;
@@ -175,35 +214,35 @@ div.users .name {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-div.users .access {
+div#content div#users .access {
   position: absolute;
   left: 210px;
   top: 11px;
 }
-div.users .location {
+div#content div#users .location {
   position: absolute;
   left: 390px;
   top: 18px;
 }
-div.users .last-login {
+div#content div#users .last-login {
   position: absolute;
   left: 550px;
   top: 18px;
 }
-div.users .session-count {
+div#content div#users .session-count {
   position: absolute;
   left: 700px;
   top: 18px;
 }
-div.users .ave-session {
+div#content div#users .ave-session {
   position: absolute;
   left: 800px;
   top: 18px;
 }
-div.controls {
+div#content div.controls {
   display: inline-block;
 }
-div.controls div.button {
+div#content div.controls div.button {
   border-radius: 0;
   margin-left: -1px;
   width: 50px;
@@ -213,7 +252,7 @@ div.controls div.button {
   border-color: #181818;
   background: rgba(0, 0, 0, 0.4);
 }
-div.controls div.button.selected {
+div#content div.controls div.button.selected {
   pointer-events: none;
   background-color: #111;
   -webkit-box-shadow: inset 0 0 1px 1px #000000;
@@ -222,13 +261,13 @@ div.controls div.button.selected {
   color: #ddd;
   cursor: default;
 }
-div.controls > div:last-child {
+div#content div.controls > div:last-child {
   border-top-right-radius: 3px;
   border-bottom-right-radius: 3px;
   -webkit-border-top-right-radius: 3px;
   -webkit-border-bottom-right-radius: 3px;
 }
-div.controls > div:first-child {
+div#content div.controls > div:first-child {
   border-top-left-radius: 3px;
   border-bottom-left-radius: 3px;
   -webkit-border-top-left-radius: 3px;

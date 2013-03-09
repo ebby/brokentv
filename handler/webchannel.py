@@ -28,6 +28,7 @@ class WebChannelDisconnectedHandler(BaseHandler):
 
       # End the user session
       user_sessions = UserSession.get_by_user(user)
+      last_session = None
       if len(user_sessions) and not user_sessions[0].tune_out:
         last_session = user_sessions[0]
         last_session.end_session()

@@ -99,6 +99,12 @@ class AddToCollectionHandler(BaseHandler):
         parsed_url = urlparse.urlparse(url)
         host = parsed_url.hostname
         qs = urlparse.parse_qs(parsed_url.query)
+        if 'user' in url:
+          logging.info('PUBLISHER')
+          response['type'] = 'publisher'
+          publisher = Publisher.add_from_url(url)
+          CollectionPublisher.add(col, publisher)
+          response['data'] = publisher.toJson()
         if 'list' in qs:
           response['type'] = 'playlist'
           playlist = Playlist.add_from_url(url)
@@ -161,19 +167,28 @@ class CollectionMediaHandler(BaseHandler):
       offset = self.request.get('offset') or 0
       res = {}
       medias = [m.toJson() for m in col.get_medias(20, pending=pending, offset=int(offset))]
+      res['publishers'] = [p.toJson() for p in col.get_publishers()]
       res['playlists'] = [p.toJson() for p in col.get_playlists()]
       res['medias'] = medias
       self.response.out.write(simplejson.dumps(res))
    
     def post(self):
       approve = self.request.get('approve') == 'true'
-      col = Collection.get_by_id(int(self.request.get('col')))
       media = Media.get_by_key_name(self.request.get('media'))
-      col_media = col.collectionMedias.filter('media =', media).get()
-      tcms = TopicCollectionMedia.all().filter('collection_media =', col_media).fetch(None)
-      if col_media and approve is not None:
-        col_media.approve(approve)
-        
+      if self.request.get('col'):
+        col = Collection.get_by_id(int(self.request.get('col')))
+        col_media = col.collectionMedias.filter('media =', media).get()
+        tcms = TopicCollectionMedia.all().filter('collection_media =', col_media).fetch(None)
+        if col_media and approve is not None:
+          col_media.approve(approve)
+      else:
+        cols = media.collectionMedias.fetch(None)
+        for col in cols:
+          col_media = col.collectionMedias.filter('media =', media).get()
+          tcms = TopicCollectionMedia.all().filter('collection_media =', col_media).fetch(None)
+          if col_media and approve is not None:
+            col_media.approve(approve)
+
 class FetchHandler(BaseHandler):
     def post(self):
       if self.request.get('col_id'):

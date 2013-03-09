@@ -6,15 +6,14 @@ div#sidebar {
   height: 100%;
   background: #aaa url(/static/img/linen-75.png);
   z-index: 100;
-  border-left: 1px solid rgba(0, 0, 0, .7);
   overflow: hidden;
   font-family: MuseoSans300;
   color: #f5f5f5;
   text-shadow: 1px 1px 1px #181818;
-  -webkit-transition: right .5s ease;
-     -moz-transition: right .5s ease;
-          transition: right .5s ease;
+  .transition(right, .5s, ease);
   z-index: 110;
+  border-left: 1px solid rgba(0, 0, 0, .7);
+  .box-shadow(e('inset 4px 0 6px -4px rgba(0, 0, 0, 0.7), 0 0 2px 1px rgba(146, 146, 146, 0.6)'));
   
   div.scrollable {
     width: 300px;
@@ -46,7 +45,10 @@ div#sidebar {
   
   &.toggled {
     right: 0px;
-    .box-shadow(e('inset 4px 0 6px -4px rgba(0, 0, 0, 0.7), 0 0 2px 1px rgba(146, 146, 146, 0.6)'));
+  }
+  &.collapsed {
+    border: none;
+    .box-shadow(none);
   }
   
   &.admin {
@@ -65,6 +67,7 @@ div#sidebar {
     border-bottom: 2px solid #AAA;
     .box-shadow(e('0 2px 3px 1px rgba(0, 0, 0, 0.2), inset 4px 2px 6px -3px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(24, 24, 24, 0.2)'));
     z-index: 20;
+    cursor: pointer;
     &.back {
       ul.tabs {
         display: none;
@@ -234,9 +237,12 @@ div#sidebar {
       visibility: visible;
       width: 100%;
       right: 0;
+      /* Hide scrollbars */
+      padding-right: 14px;
+      margin-right: -14px;
     }
     div.media-list {
-      overflow-y: scroll;
+      .scroll-y();
       div.list-info {
         margin: 10px;
         display: table;
@@ -296,9 +302,7 @@ div#sidebar {
       text-shadow: 1px 1px 1px white;
       top: 27px;
       position: relative;
-      -webkit-transition: top .5s ease;
-         -moz-transition: top .5s ease;
-              transition: top .5s ease;
+      .transition(top, .5s, ease);
       div.comment-button {
         width: 100px;
         height: 100%;
@@ -494,6 +498,7 @@ div#sidebar {
   }
 
   div.list-media {
+    width: 278px; 
     margin-bottom: 4px;
     border-radius: 3px; 
     position: relative;
@@ -682,7 +687,7 @@ div#sidebar {
         }
         min-width: 15px;
         height: 15px;
-        padding-left: 17px;
+        padding-left: 19px;
         font-size: 10px;
         float: right;
         position: relative;
@@ -696,7 +701,7 @@ div#sidebar {
         }
         min-width: 15px;
         height: 15px;
-        padding-left: 17px;
+        padding-left: 19px;
         font-size: 10px;
         float: right;
         position: relative;
@@ -773,7 +778,6 @@ div#sidebar {
     position: relative;
     div.comments {
       margin: 10px;
-      overflow-y: scroll;
       .transition(max-height, .5s, ease);
     }
     &.top-grad div.top-grad, &.bottom-grad div.bottom-grad {
@@ -862,7 +866,8 @@ div#sidebar {
         div.remove {
           .sprite-close-light();
           cursor: pointer;
-          margin-left: 2px;
+          margin-left: 4px;
+          margin-top: 2px;
           float: right;
         }
         div.reply {

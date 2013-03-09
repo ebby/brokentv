@@ -7,6 +7,8 @@ DEVELOPMENT = os.environ['SERVER_SOFTWARE'].startswith('Development')
 
 SUPER_ADMINS = ['1240963']
 
+SHARE_URL = 'xylocast.com/'
+
 SENDGRID = False
 
 # Make prod app

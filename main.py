@@ -48,10 +48,9 @@ jinja_environment = jinja2.Environment(
 
 
 class MainHandler(BaseHandler):
-    def get(self):
+    def get(self, path=None):
       template_data = {}
       template_data['host_url'] = self.request.host_url
-      template_data['hostname'] = 'xylovision'
       if self.request.get('prod') or not constants.DEVELOPMENT:
         template_data['js_location'] = constants.PROD_SIMPLE_JS if self.request.get('simple') \
             else constants.PROD_JS
@@ -59,14 +58,28 @@ class MainHandler(BaseHandler):
         template_data['js_location'] = constants.ADV_JS
       else:
         template_data['js_location'] = constants.SIMPLE_JS
-
+    
       if not constants.DEVELOPMENT or self.request.get('css') or self.request.get('prod'):
         template_data['css_location'] = constants.CSS_SOURCE
-
+    
+      # LINKS
+      channel_id = self.request.get('c')
+      media_id = self.request.get('m')
+      if path:
+        link = Link.get_by_path(path)
+        if link:
+          parsed = urlparse.urlparse(link.url)
+          qs = urlparse.parse_qs(parsed.query)
+          if qs.get('m'):
+            media_id = qs['m'][0]
+      self.session['channel_id'] = channel_id
+      self.session['media_id'] = media_id
+    
       template_data['facebook_app_id'] = constants.FACEBOOK_APP_ID;
       path = os.path.join(os.path.dirname(__file__), 'templates/home.html')
       self.response.out.write(template.render(path, template_data))
 
+  
 class AdminHandler(BaseHandler):
     def get(self):
       if not self.current_user.id in constants.SUPER_ADMINS:
@@ -75,6 +88,7 @@ class AdminHandler(BaseHandler):
       if not constants.DEVELOPMENT or self.request.get('css') or self.request.get('prod'):
         template_data['css_location'] = constants.ADMIN_CSS_SOURCE
       template_data['js_location'] = constants.ADMIN_JS_SOURCE
+      template_data['stats'] = simplejson.dumps(Stat.to_json())
       path = os.path.join(os.path.dirname(__file__), 'templates/admin.html')
       self.response.out.write(template.render(path, template_data))
 
@@ -136,12 +150,14 @@ def create_handlers_map():
     ('/_comment', rpc.CommentHandler),
     ('/_comment/(.*)', rpc.CommentHandler),
     ('/_info/(.*)', rpc.InfoHandler),
+    ('/_link', rpc.LinkHandler),
     ('/_optin', rpc.OptInHandler),
     ('/_started', rpc.StartedHandler),
     ('/_seen', rpc.SeenHandler),
     ('/_seen/(.*)', rpc.SeenHandler),
     ('/_session', rpc.SessionHandler),
     ('/_settings', rpc.SettingsHandler),
+    ('/_share', rpc.ShareHandler),
     ('/_star', rpc.StarHandler),
     ('/_star/(.*)', rpc.StarHandler),
     ('/_tweet/(.*)', rpc.TweetHandler),
@@ -189,7 +205,8 @@ def create_handlers_map():
     ('/stats', StatsHandler),
     ('/namestorm', NameStormHandler),
     ('/namestorm/(syl)', NameStormHandler),
-    ('/namestorm/(sug)', NameStormHandler)
+    ('/namestorm/(sug)', NameStormHandler),
+    ('/(.*)', MainHandler),
   ]
 
 def create_application():

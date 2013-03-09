@@ -290,21 +290,45 @@
         <li class="tab playlists">
           <div class="label">PLAYLISTS</div>
         </li>
+        <li class="tab publishers">
+          <div class="label">PUBLISHERS</div>
+        </li>
       </ul>
       <div class="pending-content content pending"></div>
       <div class="all-content content all"></div>
       <div class="playlists-content content playlists"></div>
+      <div class="publishers-content content publishers"></div>
       <div class="spinner" style="display:none"></div>
   </div>
 {/template}
 
 
 /**
- * @param playlist
+ * @param name
  */
 {template .playlist}
   <div class="playlist">
-    <div class="title">{$playlist.name}</div>
+    <div class="title">{$name}</div>
+    <div class="controls">
+      <div class="remove dark button">x</div>
+    </div>
+  </div>
+{/template}
+
+
+/**
+ * @param name
+ * @param? picture
+ */
+{template .publisher}
+  <div class="publisher">
+    {if $picture}
+      <img src="{$picture}"/>
+    {/if}
+    <div class="title">{$name}</div>
+    <div class="controls">
+      <div class="remove dark button">x</div>
+    </div>
   </div>
 {/template}
 

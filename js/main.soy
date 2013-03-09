@@ -21,6 +21,7 @@
       <div class="play" style="display: none"><div></div></div>
       <div class="pause" style="display: none"><div></div></div>
     </div>
+    <div id="logo"></div>
   </div>
   <div id="guide" class="guide animate{if $guide}{sp}toggled{else}{sp}collapsed{/if}">
     <div id="channels" class="channels"></div>
@@ -54,6 +55,9 @@
       <div class="border"></div>
     </div>
     <div class="right">
+      <div id="info-toggle" class="info-toggle dark button">
+        <div class="icon"></div>
+      </div>
       <div id="admin-toggle" class="admin-toggle dark button" style="display: none">
         <div class="icon"></div>
         <div id="toggle-pending" class="pending" style="display:none"></div>
@@ -70,7 +74,7 @@
       <div class="duration"></div>
     </div>
   </div>
-  <div id="sidebar" {if $sidebar}class="toggled"{/if}>
+  <div id="sidebar" class="{if $sidebar}toggled{else}collapsed{/if}">
     <div id="toolbar">
       <div class="back">
         <div class="back-button"><div>BACK</div></div>

@@ -80,8 +80,9 @@ div#sidebar div.info {
   }
   div.scrollable {
     height: 200px;
-    overflow-y: scroll;
-    overflow-x: hidden;
+    .scroll-y();
+    padding-right: 14px;
+    margin-right: -14px;
   }
   div.title {
     position: absolute;
@@ -91,7 +92,7 @@ div#sidebar div.info {
     color: whiteSmoke;
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
     font-size: 18px;
-    font-family: MuseoSans300;
+    font-family: MuseoSans100;
     width: 230px;
     overflow: hidden;
     background: rgba(0, 0, 0, .6);
@@ -163,13 +164,14 @@ div#sidebar div.info {
     }
     div.icon {
       position: absolute;
+      opacity: .8;
       top: 50%;
       left: 50%
     }
     div.play .icon {
       .sprite-info-play();
-      margin-top: -6px;
-      margin-left: -3px;
+      margin-top: -7px;
+      margin-left: -4px;
     }
     div.plus .icon {
       .sprite-info-plus();
@@ -178,23 +180,23 @@ div#sidebar div.info {
     }
     div.star .icon {
       .sprite-heart-light();
-      margin-top: -6px;
-      margin-left: -6px;
+      margin-top: -5px;
+      margin-left: -5px;
     }
     div.star.goog-custom-button-checked .icon {
       .sprite-heart-red();
-      margin-top: -6px;
-      margin-left: -6px;
+      margin-top: -5px;
+      margin-left: -5px;
     }
     div.facebook .icon {
       .sprite-facebook();
-      margin-top: -8px;
-      margin-left: -4px;
+      margin-top: -7px;
+      margin-left: -3px;
     }
     div.twitter .icon {
       .sprite-twitter();
-      margin-top: -8px;
-      margin-left: -8px;
+      margin-top: -6px;
+      margin-left: -6px;
     }
   }
   div.viewers {
@@ -235,6 +237,13 @@ div#sidebar div.info {
   }
   div.comments-holder, div.tweet-holder {
     top: 20px;
+  }
+  div.comments-holder {
+    div.comments {
+      .scroll-y();
+      padding-right: 14px;
+      margin-right: -14px;
+    }
   }
   div.tweet-holder {
     div.tweets {

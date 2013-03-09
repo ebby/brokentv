@@ -40,8 +40,13 @@ brkn.model.Analytics.prototype.login = function() {
 
 
 brkn.model.Analytics.prototype.endSession = function(channel, time, mediaCount) {
-  _gaq.push(['_trackEvent', 'Users', 'SessionTime',
-             brkn.model.Users.getInstance().currentUser.id, Math.round(time)]);
+  if (brkn.model.Users.getInstance().onlineFriends.length) {
+    _gaq.push(['_trackEvent', 'Users', 'SessionTimeWithFriends',
+               brkn.model.Users.getInstance().currentUser.id, Math.round(time)]);
+  } else {
+    _gaq.push(['_trackEvent', 'Users', 'SessionTimeNoFriends',
+               brkn.model.Users.getInstance().currentUser.id, Math.round(time)]);
+  }
   _gaq.push(['_trackEvent', 'Users', 'SessionMediaCount',
              brkn.model.Users.getInstance().currentUser.id, mediaCount]);
   _gaq.push(['_trackEvent', 'Users', 'Active',
@@ -86,6 +91,10 @@ brkn.model.Analytics.prototype.share = function(media, facebook, twitter) {
                          brkn.model.Users.getInstance().currentUser.id]);
   twitter && _gaq.push(['_trackEvent', 'Twitter', 'Share',
                         brkn.model.Users.getInstance().currentUser.id]);
+  
+  goog.net.XhrIo.send('/_share', goog.functions.NULL(), 'POST',
+      'facebook=' + facebook +
+      '&twitter=' + twitter);
 };
 
 goog.exportSymbol("_gaq", _gaq);

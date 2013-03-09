@@ -1,15 +1,13 @@
 from common import *
 
-
 class User(db.Model):
     id = db.StringProperty()
     access_level = db.IntegerProperty(default=AccessLevel.WAITLIST)
     created = db.DateTimeProperty(auto_now_add=True)
     updated = db.DateTimeProperty(auto_now=True)
     last_login = db.DateTimeProperty()
-    session_count = db.IntegerProperty(default=0)
-    ave_session = db.FloatProperty(default=0.0)
     name = db.StringProperty(required=True)
+    gender = db.StringProperty()
     profile_url = db.StringProperty()
     email = db.StringProperty()
     access_token = db.StringProperty()
@@ -20,10 +18,23 @@ class User(db.Model):
     twitter_id = db.IntegerProperty()
     twitter_handle = db.StringProperty()
     
+    # Configs
     show_guide = db.BooleanProperty(default=True)
     show_sidebar = db.BooleanProperty(default=True)
     post_facebook = db.BooleanProperty(default=False)
     post_twitter = db.BooleanProperty(default=False)
+    demo = db.BooleanProperty(default=False)
+    welcomed = db.BooleanProperty(default=False)
+    
+    # Stats
+    session_count = db.IntegerProperty(default=0)
+    ave_session_time = db.FloatProperty(default=0.0)
+    total_session_time = db.FloatProperty(default=0.0)
+    ave_session_time_alone = db.FloatProperty(default=0.0)
+    ave_session_time_friends = db.FloatProperty(default=0.0)
+    ave_session_medias = db.FloatProperty(default=0.0)
+    comment_count = db.IntegerProperty(default=0)
+    share_count = db.IntegerProperty(default=0)
     
     def set_twitter_info(self, info):
       self.twitter_token = info['token']
@@ -34,6 +45,11 @@ class User(db.Model):
 
     def to_session(self):
         return dict(name=self.name, profile_url=self.profile_url, id=self.id, access_token=self.access_token)
+      
+    @property
+    def first_name(self):
+      split = self.name.split(' ')
+      return split[0] if len(split) else self.name
       
     @classmethod
     def get_by_twitter_id(cls, id):
@@ -49,7 +65,7 @@ class User(db.Model):
       if admin:
         json['last_login'] = self.last_login.isoformat() if self.last_login else None
         json['session_count'] = self.session_count if self.session_count else 0
-        json['ave_session'] = self.ave_session if self.ave_session else 0
+        json['ave_session_time'] = self.ave_session_time if self.ave_session_time else 0
       if configs:
         # To Configure UI
         json['show_sidebar'] = self.show_sidebar

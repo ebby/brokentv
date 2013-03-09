@@ -103,7 +103,6 @@ brkn.sidebar.CommentList.prototype.decorateInternal = function(el) {
 
   this.noCommentsEl_ = goog.dom.createDom('div', 'no-comments', 'Start the conversation.');
   goog.dom.appendChild(this.getElement(), this.noCommentsEl_);
-  goog.style.showElement(this.noCommentsEl_, false);
 
   this.commentsEl_ = goog.dom.createDom('div', 'comments tweets');
   goog.dom.appendChild(this.getElement(), this.commentsEl_);
@@ -135,7 +134,6 @@ brkn.sidebar.CommentList.prototype.decorateInternal = function(el) {
             this.addTweet_(tweet);
             return tweet;
           }, this);
-          goog.style.showElement(this.noCommentsEl_, !tweets.length);
           this.mediasHeight_ = goog.style.getSize(this.commentsEl_).height;
           this.resize();
         }, this)); 
@@ -152,7 +150,6 @@ brkn.sidebar.CommentList.prototype.decorateInternal = function(el) {
             this.addComment_(comment);
             return comment;
           }, this);
-          goog.style.showElement(this.noCommentsEl_, !comments.length);
           this.mediasHeight_ = goog.style.getSize(this.commentsEl_).height;
           this.resize();
         }, this));

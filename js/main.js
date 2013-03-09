@@ -129,6 +129,17 @@ brkn.Main.prototype.enterDocument = function() {
       }
     }
   });
+  
+  brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_INFO, function() {
+    var login = goog.dom.getElement('login');
+    var content = goog.dom.getElement('static-content');
+    var pages = goog.dom.getElement('pages');
+
+    goog.dom.classes.remove(login, 'hide');
+    goog.dom.classes.add(login, 'show');
+    content.style.height = goog.style.getSize(pages).height + 80 + 'px';
+    brkn.Main.resizeStatic(true);
+  }, this);
 };
 
 
@@ -156,6 +167,14 @@ brkn.Main.init = function(response, channelToken, channels, programs,
 	main.decorate(document.body);
 	
 	brkn.model.Analytics.getInstance().login();
+	
+	// UserVoice
+  var uvOptions = {};
+  (function() {
+    var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
+    uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/WGHjF5nSR8jL1GxXyQNxWA.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
+  })();
 };
 
 brkn.Main.staticInit = function() {
@@ -171,50 +190,91 @@ brkn.Main.staticInit = function() {
     goog.style.showElement(fbLogin, true);
     goog.Timer.callOnce(goog.partial(goog.dom.classes.add, fbLogin, 'show'), 400);
   }, 100);
-  
-  var resize = function(expand) {
-    if (expand) {
-      content.style.top = Math.max(10,
-          goog.dom.getViewportSize().height - 280) + 'px';
-      var scrollAnim = new goog.fx.dom.Scroll(login,
-          [login.scrollLeft, login.scrollTop],
-          [login.scrollLeft, Math.min(goog.dom.getViewportSize().height - 435, content.scrollHeight + 190)],
-          300);
-      scrollAnim.play();
-    } else {
-      content.style.top = ''
-      content.style.height = ''
-      goog.dom.classes.set(content, '');
-    }
-  }
+
   goog.events.listen(login, goog.events.EventType.CLICK, function(e) {
     if (e.target.id == 'static-scrollable') {
-      var scrollAnim = new goog.fx.dom.Scroll(login,
-          [login.scrollLeft, login.scrollTop],
-          [login.scrollLeft, 0], 300);
-      scrollAnim.play();
+      var app = goog.dom.classes.has(login, 'app');
       expand = false;
-      goog.events.listen(scrollAnim, goog.fx.Animation.EventType.END, goog.partial(resize, expand));
+      if (app) {
+        brkn.Main.resizeStatic(expand);
+      } else {
+        var scrollAnim = new goog.fx.dom.Scroll(login,
+            [login.scrollLeft, login.scrollTop],
+            [login.scrollLeft, 0], 300);
+        scrollAnim.play();
+        goog.events.listen(scrollAnim, goog.fx.Animation.EventType.END, goog.partial(brkn.Main.resizeStatic, expand)); 
+      }
     }
   });
-  goog.events.listen(login, goog.events.EventType.SCROLL, function(e) {
-    if (login.scrollTop < 1) {
+  goog.events.listen(login, goog.events.EventType.SCROLL, function(e) {    
+    if (!goog.dom.classes.has(login, 'scrolling') && login.scrollTop < 1) {
       expand = false;
-      resize(expand);
+      brkn.Main.resizeStatic(expand);
     }
   });
   goog.events.listen(footer, goog.events.EventType.CLICK, function(e) {
     var section = goog.dom.getAncestorByClass(e.target, 'section');
+    var app = goog.dom.classes.has(login, 'app');
     if (section) {
       expand = true;
       goog.dom.classes.set(content, section.id);
-      content.style.height = goog.style.getSize(pages).height + 220 + 'px';
-      resize(expand);
+      content.style.height = goog.style.getSize(pages).height + (app ? 80 : 220) + 'px';
+      brkn.Main.resizeStatic(expand);
     }
   });
-  goog.events.listen(window, goog.events.EventType.RESIZE, goog.partial(resize, expand));
+  goog.events.listen(window, goog.events.EventType.RESIZE, goog.partial(brkn.Main.resizeStatic, expand));
   
   brkn.model.Analytics.getInstance().init();
+};
+
+
+/**
+ * @param {boolean} expand
+ */
+brkn.Main.resizeStatic = function(expand) {
+  var login = goog.dom.getElement('login');
+  var content = goog.dom.getElement('static-content');
+  var pages = goog.dom.getElement('pages');
+
+  var app = goog.dom.classes.has(login, 'app');
+  goog.dom.classes.enable(login, 'expanded', expand);
+  if (goog.dom.getElement('uvTab')) {
+    goog.dom.classes.enable(goog.dom.getElement('uvTab'), 'show', app && expand);
+  }
+  if (expand) {
+    if (app) {
+      content.style.bottom = -goog.style.getSize(pages).height - 80 + 'px';
+    } else {
+      content.style.top = Math.max(10, goog.dom.getViewportSize().height - 280) + 'px';
+    }
+     
+    var scrollTo = app ? Math.min(goog.dom.getViewportSize().height - 100, content.scrollHeight + 80) :
+          Math.min(goog.dom.getViewportSize().height - 435, content.scrollHeight + 190);
+
+    if (!app || (app && !login.scrollTop)) {
+      var scrollAnim = new goog.fx.dom.Scroll(login,
+          [login.scrollLeft, login.scrollTop],
+          [login.scrollLeft, scrollTo],
+          300);
+      goog.dom.classes.add(login, 'scrolling');
+      scrollAnim.play();
+      goog.events.listen(scrollAnim, goog.fx.Animation.EventType.END, function() {
+        goog.dom.classes.remove(login, 'scrolling');
+      }); 
+    } else {
+      login.scrollTop = scrollTo;
+    }
+  } else {
+    content.style.top = ''
+    content.style.height = ''
+    if (app) {
+      goog.Timer.callOnce(function() {
+        goog.dom.classes.remove(login, 'show');
+      }, 200);
+    } else {
+      goog.dom.classes.set(content, '');
+    }
+  }
 };
 
 
@@ -253,6 +313,7 @@ brkn.Main.login = function() {
 brkn.Main.getSessionAndInit = function(response) {
   var fbLogin = goog.dom.getElement('fb-login');
   var staticContent = goog.dom.getElement('static-content');
+  var login = goog.dom.getElement('login');
   
   goog.dom.classes.add(fbLogin, 'disabled');
   goog.dom.classes.add(fbLogin, 'spin');
@@ -263,9 +324,11 @@ brkn.Main.getSessionAndInit = function(response) {
           var reveal = function() {
             goog.Timer.callOnce(function() {
               goog.dom.classes.add(staticContent, 'hide');
-              goog.dom.classes.add(goog.dom.getElement('login'), 'hide');
+              goog.dom.classes.add(login, 'hide');
               goog.Timer.callOnce(function() {
-                goog.style.showElement(goog.dom.getElement('login'), false);
+                goog.style.showElement(goog.dom.getElement('homepage'), false);
+                goog.dom.classes.add(login, 'app');
+                goog.dom.classes.add(staticContent, 'about');
               }, 600);
             }, 600);
           };
@@ -273,16 +336,32 @@ brkn.Main.getSessionAndInit = function(response) {
           brkn.model.Player.getInstance().subscribeOnce(brkn.model.Player.Actions.PLAYING, reveal);
           brkn.Main.init(response, data['token'], data['channels'], data['programs'],
               data['current_user'], data['viewer_sessions']);
+        } else if (e.target.getStatus() == 500) {
+          brkn.Main.noLogin('error', 'Opps, check back later');
         } else {
-          brkn.Main.notAuthorized();
+          brkn.Main.noLogin('wait');
         }
       }, 'POST');
 };
 
-brkn.Main.notAuthorized = function() {
+/**
+ * @param {?string=} opt_class
+ * @param {?string=} opt_message
+ */
+brkn.Main.noLogin = function(opt_class, opt_message) {
   var fbLogin = goog.dom.getElement('fb-login');
   var loginPage = goog.dom.getElement('login');
 
+  if (opt_class) {
+    var power = goog.dom.getElementByClass('power', fbLogin);
+    goog.dom.classes.add(power, opt_class);
+  }
+  
+  if (opt_message) {
+    var waitlist = goog.dom.getElementByClass('waitlist', fbLogin);
+    goog.dom.setTextContent(waitlist, opt_message);
+  }
+  goog.dom.classes.remove(fbLogin, 'spin');
   goog.dom.classes.add(fbLogin, 'disabled');
   goog.style.showElement(fbLogin, true);
   goog.dom.classes.add(fbLogin, 'show');

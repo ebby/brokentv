@@ -84,6 +84,12 @@ brkn.Player.prototype.width_;
  */
 brkn.Player.prototype.height_;
 
+/**
+ * @type {string}
+ * @private
+ */
+brkn.Player.prototype.lastNote_;
+
 
 /** @inheritDoc */
 brkn.Player.prototype.enterDocument = function() {
@@ -171,6 +177,7 @@ brkn.Player.prototype.enterDocument = function() {
       this.seek_, this);
   brkn.model.Player.getInstance().subscribe(brkn.model.Player.Actions.BEFORE_END,
       function() {
+        // TODO: fade in
         this.updateStagecover_(undefined, true);
       }, this);
   brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_SIDEBAR,
@@ -247,9 +254,12 @@ brkn.Player.prototype.toggleExpand_ = function(e) {
  */
 brkn.Player.prototype.playProgram = function(program) {
   brkn.model.Player.getInstance().setCurrentProgram(program);
-  brkn.model.Notify.getInstance().publish(brkn.model.Notify.Actions.FLASH,
-      'Now Playing', program.media.name, undefined, program.media.thumbnail1,
-      '#info:' + program.media.id);
+  if (this.lastNote_ != program.id) {
+    brkn.model.Notify.getInstance().publish(brkn.model.Notify.Actions.FLASH,
+        'Now Playing', program.media.name, undefined, program.media.thumbnail1,
+        '#info:' + program.media.id);
+    this.lastNote_ = program.id;
+  }
   this.play(program.media);
 };
 

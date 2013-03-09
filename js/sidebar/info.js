@@ -221,6 +221,7 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
     
     // Description
     if (response['description']) {
+      this.media_.description = response['description'];
       goog.dom.getElementByClass('description', this.getElement()).innerHTML =
           goog.string.linkify.linkifyPlainText(response['description']);
     } else {
@@ -429,7 +430,8 @@ brkn.sidebar.Info.prototype.toDot_ = function(dotEl) {
   if (!dotEl) {
     return;
   }
-  this.currentDotEl_ && goog.dom.classes.remove(this.currentDotEl_, 'selected');
+  goog.array.forEach(goog.dom.getChildren(this.dotNavEl_),
+      function(el) {return goog.dom.classes.remove(el, 'selected')});
   this.currentDotEl_ = dotEl;
   goog.dom.classes.add(this.currentDotEl_, 'selected');
   var index = goog.array.findIndex(goog.dom.getChildren(this.dotNavEl_),
@@ -459,9 +461,9 @@ brkn.sidebar.Info.prototype.onAddComment_ = function(e) {
     FB.api('/me/feed', 'POST', {
       'message': e.text,
       'name': this.media_.name,
-      'link': 'http://www.broken.tv',
+      'link': this.media_.link,
       'picture': this.media_.thumbnail,
-      'caption': 'on Broken.TV',
+      'caption': 'on XYLO',
       'description': this.media_.description
     }, function(response) {});
   }
@@ -642,7 +644,7 @@ brkn.sidebar.Info.prototype.onFacebookButton_ = function() {
       {
         method: 'feed',
         name: this.media_.name,
-        link: 'http://www.xylocast.com',
+        link: this.media_.link,
         picture: this.media_.thumbnail,
         caption: 'on XYLO',
         description: this.media_.description
@@ -660,12 +662,12 @@ brkn.sidebar.Info.prototype.onFacebookButton_ = function() {
  * @private
  */
 brkn.sidebar.Info.prototype.onTwitterButton_ = function() {
-  var url = 'https://twitter.com/share?url=www.xylocast.com&text=I\'m watching ' + this.media_.name;
+  var url = 'https://twitter.com/share?url=' + this.media_.link +
+    '&text=I\'m watching ' + this.media_.name + ' ' + this.media_.link;
   var newWindow = window.open(url,'Tweet','height=320,width=550');
   newWindow.moveTo(screen.width/2-225,
       screen.height/2-150)
   newWindow.focus();
-
   brkn.model.Analytics.getInstance().share(this.media_.id, false, true);
 };
 

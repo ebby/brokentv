@@ -1,7 +1,6 @@
 div#sidebar div#sidebar-content div.admin {
   margin-top: -2px;
   display: none;
-  overflow-y: scroll;
   div.search {
     background: rgba(245, 245, 245, 0.6);
     width: 100%;
@@ -32,10 +31,10 @@ div#sidebar div#sidebar-content div.admin {
       font-family: MuseoSans700;
     }
   }
-  div.playlists {
-    div.playlist {
+  div.playlists, div.publishers {
+    div.playlist, div.publisher {
       position: relative;
-      width: 99%;
+      width: 280px;
       background: rgba(0, 0, 0, 0.65);
       border: 1px solid #333;
       overflow: hidden;
@@ -52,15 +51,27 @@ div#sidebar div#sidebar-content div.admin {
         border-bottom-right-radius: 3px;
         box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.8);
       }
-      div.title {
+      img {
+        border-radius: 3px;
         position: relative;
         left: 5px;
+        top: 5px;
+        display: inline-block;
+        width: 30px;
+        height: 30px;
+        margin-bottom: 5px;
+      }
+      div.title {
+        position: relative;
+        left: 15px;
         top: 5px;
         font-size: 13px;
         width: 240px;
         color: white;
         line-height: 27px;
         height: 36px;
+        display: inline-block;
+        vertical-align: top;
       } 
     }
   }
@@ -187,17 +198,13 @@ div#sidebar div#admin-list {
         background: rgba(245, 245, 245, 0.6);
       }
     }
-  }
-  div.spinner {
-    width: 100%;
-    height: 43px;
-    text-align: center;
-    background: rgba(0, 0, 0, 0.6);
-    line-height: 40px;
-    overflow: hidden;
-    .transition(height, .3s, linear);
-    &.finished {
-      height: 0;
+    &.publishers {
+      div.publishers {
+        display: block;
+      }
+      ul.tabs li.publishers {
+        background: rgba(245, 245, 245, 0.6);
+      }
     }
   }
   div.list-info {

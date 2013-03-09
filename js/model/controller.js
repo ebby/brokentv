@@ -61,5 +61,6 @@ brkn.model.Controller.Actions = {
 	RESTART: 'restart',
 	TOGGLE_GUIDE: 'toggle-guide',
 	TOGGLE_SIDEBAR: 'toggle-sidebar',
-	TOGGLE_ADMIN: 'toggle-admin'
+	TOGGLE_ADMIN: 'toggle-admin',
+	TOGGLE_INFO: 'toggle-info'
 };

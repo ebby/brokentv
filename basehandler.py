@@ -37,11 +37,13 @@ class BaseHandler(webapp2.RequestHandler):
                         id=str(profile["id"]),
                         access_level=(AccessLevel.ADMIN if constants.DEVELOPMENT else AccessLevel.WAITLIST),
                         name=profile["name"],
+                        gender=profile.get("gender"),
                         email=profile.get("email"),
                         profile_url=profile["link"],
                         access_token=cookie["access_token"],
                         location=profile['location']['name'] \
                             if 'location' in profile else None)
+                    Stat.add_user(user.gender)
                 elif user.access_token != cookie["access_token"]:
                     user.access_token = cookie["access_token"]
                 
@@ -52,7 +54,7 @@ class BaseHandler(webapp2.RequestHandler):
                 
                 # User is now logged in
                 self.session["user"] = user.to_session()
-                return user#self.session.get("user")
+                return user
         return None
 
     def dispatch(self):

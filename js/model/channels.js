@@ -69,12 +69,15 @@ brkn.model.Channels.prototype.get = function(id) {
 
 
 /**
+ * @param {?boolean=} opt_public Only public channels
  * @return {brkn.model.Channel} The next channel with current programming
  */
-brkn.model.Channels.prototype.findOnline = function() {
-  if (this.currentChannel && this.currentChannel.getCurrentProgram()) {
+brkn.model.Channels.prototype.findOnline = function(opt_public) {
+  if (this.currentChannel && this.currentChannel.getCurrentProgram() &&
+      ((opt_public && !this.currentChannel.myChannel) || !opt_public)) {
     return this.currentChannel;
-  } else if (this.lastChannel && this.lastChannel.getCurrentProgram()) {
+  } else if (this.lastChannel && this.lastChannel.getCurrentProgram() &&
+      ((opt_public && !this.lastChannel.myChannel) || !opt_public)) {
     return this.lastChannel;
   }
   var channel = this.channels[0];
@@ -123,6 +126,7 @@ brkn.model.Channels.prototype.loadViewersFromJson = function(viewerSessions) {
 			goog.bind(function(session) {
 				var u = brkn.model.Users.getInstance().get_or_add(session['user']);
 				users.add(u);
+				brkn.model.Users.getInstance().addOnline(u);
 				var channel = this.channelMap[session['channel_id']];
 				var tuneIn = goog.date.fromIsoString(session['tune_in'] + 'Z');
 				var tuneOut = session['tune_out'] ?
@@ -148,8 +152,10 @@ brkn.model.Channels.prototype.changeChannel = function(channel, opt_forced) {
     this.lastChannel = this.currentChannel;
     this.currentChannel = channel;
     this.updateOnlineUsers(channel.getCurrentProgram());
+    var program = channel.getCurrentProgram();
+    var withFriends = program && !!program.media.onlineViewers.length;
     goog.net.XhrIo.send('/_changechannel', goog.functions.NULL(), 'POST',
-        'channel=' + channel.id + (opt_forced ? '&forced=1' : ''));
+        'channel=' + channel.id + '&friends=' + withFriends + (opt_forced ? '&forced=true' : ''));
     brkn.model.Analytics.getInstance().changeChannel(channel, this.lastChannel);
   }
 };

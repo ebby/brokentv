@@ -35,29 +35,28 @@ class Collection(db.Model):
     logging.info('FETCHING: ' + collection.name)
     medias = fetch_youtube_channel(collection.channel_id, collection=collection,
                                    approve_all=approve_all)
-  
+
   def fetch(self, approve_all=False):
     if self.channel_id:
       deferred.defer(Collection.add_channel_media, self.id, approve_all,
                      _name='fetch-' + collection.name.replace(' ', '') + '-' + str(uuid.uuid1()))
-    
+
     publishers = self.get_publishers()
-    if self.keywords:
-      for publisher in publishers:
-        deferred.defer(Collection.add_publisher_media, self.id, publisher.id, approve_all,
-                       _name='fetch-' + publisher.name.replace(' ', '') + '-' + str(uuid.uuid1()))
-    
+    for publisher in publishers:
+      deferred.defer(Collection.add_publisher_media, self.id, publisher.id, approve_all,
+                     _name='fetch-' + publisher.name.replace(' ', '') + '-' + str(uuid.uuid1()))
+
   def add_media(self, media, approved=False):
     CollectionMedia.add(collection=self, media=media, approved=approved)
-    
+
   def remove_media(self, media):
     col_media = CollectionMedia.all().filter('media =', media).get()
     if col_media:
       col_media.delete()
-    
+
   def get_publishers(self):
     return CollectionPublisher.get_publishers(self)
-  
+
   def get_playlists(self):
     return [p.playlist for p in self.playlists.fetch(None)]
   
@@ -120,6 +119,15 @@ class CollectionPublisher(db.Model):
   def get_publishers(cls, collection):
     collection_publishers = CollectionPublisher.all().filter('collection =', collection).fetch(None);
     return [c_p.publisher for c_p in collection_publishers]
+  
+  @classmethod
+  def add(cls, collection, publisher):
+    col_pub = CollectionPublisher.all().filter('collection =', collection) \
+        .filter('publisher =', publisher).get()
+    if not col_pub:
+      col_pub = CollectionPublisher(collection=collection, publisher=publisher)
+      col_pub.put()
+    return col_pub
     
 # Media in this collection
 class CollectionMedia(db.Model):

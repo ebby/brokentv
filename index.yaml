@@ -31,6 +31,12 @@ indexes:
 
 - kind: Comment
   properties:
+  - name: acl
+  - name: media
+  - name: time
+
+- kind: Comment
+  properties:
   - name: is_parent
   - name: media
   - name: time

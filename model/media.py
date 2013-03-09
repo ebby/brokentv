@@ -1,6 +1,8 @@
 from common import *
 
 import urlparse
+
+from link import Link
 from user import User
 
 
@@ -20,6 +22,7 @@ class Media(db.Model):
   last_programmed = db.DateTimeProperty()
   last_twitter_fetch = db.DateTimeProperty()
   thumb_pos = db.IntegerProperty(default=50) # Percent to center of thumbnail
+  path = db.StringProperty()
   
   # Statistics
   started = db.StringListProperty(default=[]) # Users who let the program play
@@ -33,6 +36,13 @@ class Media(db.Model):
   @property
   def id(self):
     return self.key().name()
+
+  @property
+  def link(self): 
+    if not self.path:
+      self.path = Link.get_or_add('/?m=' + self.id).path
+      self.put()
+    return constants.SHARE_URL + self.path
 
   @classmethod
   def get(cls, id):
@@ -189,6 +199,7 @@ class Media(db.Model):
     json['duration'] = self.duration
     json['published'] = self.published.isoformat()
     json['description'] = self.description if get_desc else ''
+    json['link'] = self.link
     json['thumb_pos'] = self.thumb_pos
     json['star_count'] = self.star_count
     return json

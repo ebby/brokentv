@@ -36,6 +36,15 @@ brkn.admin.Users.prototype.createDom = function() {
 
 
 /** @inheritDoc */
+brkn.admin.Users.prototype.decorateInternal = function(el) {
+  goog.base(this, 'decorateInternal', el);
+  
+  var content = soy.renderAsElement(brkn.admin.users);
+  el.innerHTML = content.innerHTML;
+}
+
+
+/** @inheritDoc */
 brkn.admin.Users.prototype.enterDocument = function() {
   goog.base(this, 'enterDocument');
 

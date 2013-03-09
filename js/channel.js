@@ -474,12 +474,19 @@ brkn.Channel.prototype.updateProgram = function(program) {
  * @private
  */
 brkn.Channel.prototype.onRemoveProgram_ = function(program, programEl) {
-  goog.dom.removeNode(programEl);
+//  goog.dom.removeNode(programEl);
+//  goog.net.XhrIo.send(
+//    '/admin/_removeprogram',
+//    undefined,
+//    'POST',
+//    'program=' + program.id);
   goog.net.XhrIo.send(
-    '/admin/_removeprogram',
-    undefined,
-    'POST',
-    'program=' + program.id);
+      'admin/_media/collection',
+      goog.bind(function() {
+        alert('Disallowed on all channels.');
+      }, this),
+      'POST',
+      '&media=' + program.media.id + '&approve=' + false);
 };
 
 

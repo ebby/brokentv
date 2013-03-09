@@ -87,6 +87,13 @@ brkn.sidebar.Stream.prototype.activitiesEl_;
 brkn.sidebar.Stream.prototype.noActivitiesEl_;
 
 
+/**
+ * @type {Element}
+ * @private
+ */
+brkn.sidebar.Stream.prototype.spinner_;
+
+
 /** @inheritDoc */
 brkn.sidebar.Stream.prototype.decorateInternal = function(el) {
   goog.base(this, 'decorateInternal', el);
@@ -99,9 +106,9 @@ brkn.sidebar.Stream.prototype.decorateInternal = function(el) {
   this.activitiesEl_ = goog.dom.createDom('div', 'activities');
   goog.dom.appendChild(this.getElement(), this.activitiesEl_);
 
-  var spinner = goog.dom.createDom('div', 'spinner');
-  goog.dom.appendChild(this.getElement(), spinner);
-  goog.style.showElement(spinner, false);
+  this.spinner_ = goog.dom.createDom('div', 'spinner');
+  goog.dom.appendChild(this.getElement(), this.spinner_);
+  goog.style.showElement(this.spinner_, false);
   
   this.noActivitiesEl_ = goog.dom.createDom('div', 'no-comments', this.uid_ ?
       'Your activity will appear here.': 'Friends\'s activity will appear here.');
@@ -121,25 +128,33 @@ brkn.sidebar.Stream.prototype.decorateInternal = function(el) {
       .listen(this.getElement(), goog.events.EventType.SCROLL, goog.bind(function(e) {
         if (!this.finished_ && this.getElement().scrollTop + goog.dom.getViewportSize().height >
             this.getElement().scrollHeight - 60) {
-          goog.style.showElement(spinner, true);
-          goog.net.XhrIo.send(
-              '/_activity' + (this.uid_ ? '/' + this.uid_ : '') + '?offset=' + this.count_,
-              goog.bind(function(e) {
-                if (this.fetched_[e.target.getLastUri()]) {
-                  // Prevents multiple responses, which happens for some reason unknown.
-                  return;
-                }
-                this.fetched_[e.target.getLastUri()] = true;
-                var activities = /** @type {Array.<Object>} */ e.target.getResponseJson();
-                this.finished_ = !activities.length;
-                goog.dom.classes.enable(spinner, 'finished', this.finished_);
-                goog.style.showElement(spinner, this.finished_);
-                this.digest_(activities);
-              }, this));
+          this.fetchMore_();
         }
       }, this))
      .listen(window, 'resize', goog.partial(goog.Timer.callOnce, goog.bind(this.resize, this)));
   this.resize();
+};
+
+
+/**
+ * @private
+ */
+brkn.sidebar.Stream.prototype.fetchMore_ = function() {
+  goog.style.showElement(this.spinner_, true);
+  goog.net.XhrIo.send(
+      '/_activity' + (this.uid_ ? '/' + this.uid_ : '') + '?offset=' + this.count_,
+      goog.bind(function(e) {
+        if (this.fetched_[e.target.getLastUri()]) {
+          // Prevents multiple responses, which happens for some reason unknown.
+          return;
+        }
+        this.fetched_[e.target.getLastUri()] = true;
+        var activities = /** @type {Array.<Object>} */ e.target.getResponseJson();
+        this.finished_ = !activities.length;
+        goog.dom.classes.enable(this.spinner_, 'finished', this.finished_);
+        goog.style.showElement(this.spinner_, this.finished_);
+        this.digest_(activities);
+      }, this));
 };
 
 
@@ -264,7 +279,7 @@ brkn.sidebar.Stream.prototype.addActivity_ = function(opt_activity, opt_digest, 
     var mediaEl = soy.renderAsElement(brkn.sidebar.listMedia, { media: media });
     var img = goog.dom.getElementByClass('thumb', mediaEl);
     goog.dom.appendChild(mediasEl, mediaEl);
-    
+
     this.getHandler().listen(mediaEl, goog.events.EventType.CLICK, function() {
       brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.MEDIA_INFO, media);
     });
@@ -282,6 +297,12 @@ brkn.sidebar.Stream.prototype.addActivity_ = function(opt_activity, opt_digest, 
 
 
 brkn.sidebar.Stream.prototype.resize = function() {
-  goog.style.setHeight(this.getElement(), goog.dom.getViewportSize().height - 40 -
-      (goog.dom.getAncestorByClass(this.getElement(), 'tabbed') ? 40 : 10));
+  var height = goog.dom.getViewportSize().height - 40 -
+      (goog.dom.getAncestorByClass(this.getElement(), 'tabbed') ? 40 : 10);
+  
+  goog.style.setHeight(this.getElement(), height);
+  if (goog.style.getSize(this.activitiesEl_).height < height) {
+    // Fetch to fill in the height
+    this.fetchMore_();
+  }
 };

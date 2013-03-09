@@ -17,6 +17,14 @@ class Channel(db.Model):
   current_media = db.ReferenceProperty(Media)
   current_seek = db.IntegerProperty(default=0)
 
+  # Stats
+  opt_ins = db.IntegerProperty(default=0)
+  opt_outs = db.IntegerProperty(default=0)
+  session_count = db.IntegerProperty(default=0)
+  ave_session_time = db.FloatProperty(default=0.0)
+  total_session_time = db.FloatProperty(default=0.0)
+  ave_session_medias = db.FloatProperty(default=0.0)
+
   @property
   def id(self):
     return str(self.key().name())
@@ -32,7 +40,17 @@ class Channel(db.Model):
   @classmethod
   def get_all(cls):
     return Channel.all().fetch(None)
-
+  
+  @classmethod
+  def get_my_channel(cls, user):
+    channel = Channel.get_by_key_name(user.id)
+    if not channel:
+      # Create private user channel
+      name = user.first_name + '\'s channel'
+      channel = Channel(key_name=user.id, name=name, privacy=Privacy.PRIVATE, user=user)
+      channel.put()
+    return channel
+  
   def get_programming(self):
     channel_programs = ChannelProgram.all().filter('channel =', self).order('-time').fetch(limit=100)
     return [c_p.program for c_p in channel_programs]

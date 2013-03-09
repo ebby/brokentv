@@ -1,6 +1,6 @@
 from common import *
 
-def get_session(current_user, set_programming=True):
+def get_session(current_user, media_id=None, channel_id=None, set_programming=True):
   data = {}
 
   # RETREIVE CHANNELS AND PROGRAMMING
@@ -31,6 +31,13 @@ def get_session(current_user, set_programming=True):
 
   # Tack on the user's private channel if it exists, and programming
   user_channel = current_user.channel.get()
+  
+  if media_id:
+    media = Media.get_by_key_name(media_id)
+    if media:
+      current_channel = user_channel or Channel.get_my_channel(current_user)
+      program = Program.add_program(current_channel, media, time=datetime.datetime.now(), async=True)
+
   if user_channel:
     user_programs = Program.get_current_programs([user_channel])
     if user_programs:
@@ -46,30 +53,36 @@ def get_session(current_user, set_programming=True):
     
   # MAKE SURE WE HAVE CHANNELS
   channels = channels or Channel.get_public()
-  current_channel = channels[0] if len(channels) else None
-  assert current_channel != None, 'NO CHANNELS IN DATABASE'
+  assert len(channel) > 0, 'NO CHANNELS IN DATABASE'
+  
+  current_viewers = memcache.get('current_viewers') or {}
+  current_friends = [tuple for tuple in current_viewers.iteritems() if tuple[0] in current_user.friends]
+  with_friends = len(current_friends) > 0
 
-  # Add latest User Session, possibly end last session, possibly continue last session.
   user_sessions = UserSession.get_by_user(current_user)
-  if len(user_sessions):
+  
+  if media_id:
+    current_channel = user_channel or Channel.get_my_channel(current_user)
+  elif channel_id:
+    current_channel = Channel.get_by_key_name(channel_id)
+  elif len(user_sessions):
     current_channel = Channel.get_by_key_name(user_sessions[0].channel.key().name())
+
+  if not current_channel:
+    current_channel = channels[0] if len(channels) else None
 
   if len(user_sessions) and not user_sessions[0].tune_out:
     # Kill it, create new
     user_sessions[0].delete()
-    session = UserSession.new(current_user, current_channel)
-    # End it artificially
-    #session = user_sessions[0] 
-    #session.tune_out = session.tune_in + datetime.timedelta(seconds=180)
-    #session.put()
+    session = UserSession.new(current_user, current_channel, with_friends=with_friends)
   elif len(user_sessions) and user_sessions[0].tune_out and \
       (datetime.datetime.now() - user_sessions[0].tune_out).seconds < 180:
     # Re-purpose last session (typically if the user refreshed)
-    session = user_sessions[0] 
+    session = user_sessions[0]
     session.tune_out = None
     session.put()
   else:
-    session = UserSession.new(current_user, current_channel)
+    session = UserSession.new(current_user, current_channel, with_friends=with_friends)
     
   # TRACK ALL USERS
   def add_viewer(current_viewers, uid, session):
@@ -96,7 +109,9 @@ def get_session(current_user, set_programming=True):
   # Grab sessions for current_users (that we care about)
   # TODO cache last session for each user
   viewer_sessions = [session.toJson()]
-  for uid,sess in [tuple for tuple in current_viewers.iteritems() if tuple[0] in current_user.friends]:
+  for uid,sess in [tuple for tuple in current_viewers.iteritems() if \
+                   (tuple[0] in current_user.friends or \
+                    (current_user.demo and tuple[0] in constants.SUPER_ADMINS))]:
     viewer_sessions.append(sess)
   data['viewer_sessions'] = viewer_sessions
 
@@ -118,7 +133,9 @@ class SessionHandler(BaseHandler):
       if self.current_user.access_level < AccessLevel.USER:
         self.error(401)
       else:
-        data = get_session(self.current_user)
+        media_id = self.session.get('media_id', None)
+        channel_id = self.session.get('channel_id', None)
+        data = get_session(self.current_user, media_id=media_id, channel_id=channel_id)
         self.response.out.write(simplejson.dumps(data))
 
 class SettingsHandler(BaseHandler):
@@ -195,6 +212,7 @@ class CommentHandler(BaseHandler):
           client = oauth.TwitterClient(constants.TWITTER_CONSUMER_KEY,
                                        constants.TWITTER_CONSUMER_SECRET,
                                        self.request.host_url + '/_twitter/callback')
+          text += ' ' + media.link
           response = client.update_status(text, self.current_user.twitter_token,
                                           self.current_user.twitter_secret)
           if not response.get('errors'):
@@ -206,8 +224,21 @@ class CommentHandler(BaseHandler):
         self.current_user.post_facebook = facebook
         self.current_user.post_twitter = tweet
         self.current_user.put()
-        
+
+        Stat.add_comment(self.current_user, facebook, tweet)
         broadcast.broadcastNewComment(c, new_tweet);
+
+class LinkHandler(BaseHandler):
+    def post(self):
+      url = self.request.get('url')
+      link = Link.get_or_add(url)
+      self.response.out.write(simplejson.dumps({'link': constants.SHARE_URL + link.path}))
+
+class ShareHandler(BaseHandler):
+    def post(self):
+      facebook = self.request.get('facebook') == 'true'
+      twitter = self.request.get('twitter') == 'true'
+      Stat.add_share(self.current_user, facebook, twitter)
 
 class SeenHandler(BaseHandler):
     def get(self, id):
@@ -243,15 +274,11 @@ class ActivityHandler(BaseHandler):
 class ChangeChannelHandler(BaseHandler):
     def post(self):
       channel_id = self.request.get('channel')
-      forced = self.request.get('forced') == '1' # Forced by the client
+      with_friends = self.request.get('friends') == 'true'
+      forced = self.request.get('forced') == 'true' # Forced by the client, don't update opt_in/out
       channel = Channel.get_by_key_name(channel_id)
       if not channel and channel_id == self.current_user.id:
-        # Create private user channel
-        name = self.current_user.name.split(' ')[0] + '\'s channel'
-        channel = Channel(key_name=self.current_user.id, name=name, privacy=Privacy.PRIVATE,
-                          user=self.current_user)
-        channel.put()
-      channel_viewers = memcache.get('channel_viewers') or {}
+        channel = Channel.get_my_channel(self.current_user)
 
       user_sessions = UserSession.get_by_user(self.current_user)
       remove_user = False
@@ -276,7 +303,7 @@ class ChangeChannelHandler(BaseHandler):
           # End last session
           user_sessions[0].end_session()
           # New session for new channel
-          session = UserSession.new(self.current_user, channel)
+          session = UserSession.new(self.current_user, channel, with_friends=with_friends)
           
         if not forced:
           # Track the media opt-out behavior
@@ -285,7 +312,7 @@ class ChangeChannelHandler(BaseHandler):
           if last_program:
             Media.add_opt_out(last_program.media.key().name(), self.current_user.id)
       else:
-        session = UserSession.new(self.current_user, channel)
+        session = UserSession.new(self.current_user, channel, with_friends=with_friends)
         
       # Track current viewers by channel, useful for audience catering
       client = memcache.Client()
@@ -339,9 +366,8 @@ class StarHandler(BaseHandler):
     if self.request.get('delete'):
       collection.remove_media(media)
     else:
-      media.star_count += 1
-      media.put()
       collection.add_media(media, True)
+      Stat.add_star(media)
       broadcast.broadcastNewActivity(UserActivity.add_starred(self.current_user, media))
     
 class TweetHandler(BaseHandler):

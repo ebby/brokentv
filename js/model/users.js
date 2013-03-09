@@ -17,6 +17,11 @@ brkn.model.Users = function() {
 	 * @type {Object.<string, brkn.model.User>}
 	 */
 	this.userMap = {};
+	
+	/**
+   * @type {Array.<brkn.model.User>}
+   */
+  this.onlineFriends = [];
 };
 goog.inherits(brkn.model.Users, goog.pubsub.PubSub);
 goog.addSingletonGetter(brkn.model.Users);
@@ -41,6 +46,16 @@ brkn.model.Users.prototype.setCurrentUser = function(user) {
  */
 brkn.model.Users.prototype.add = function(user) {
 	this.userMap[user.id] = user;
+};
+
+
+/**
+ * @param {brkn.model.User} user The user
+ */
+brkn.model.Users.prototype.addOnline = function(user) {
+  if (!goog.array.find(this.onlineFriends, function(u) {return u.id == user.id})) {
+    this.onlineFriends.push(user); 
+  }
 };
 
 

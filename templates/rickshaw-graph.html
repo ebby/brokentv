@@ -1,0 +1,155 @@
+<div class="{{ name }} rickshaw">
+	<form class="side_panel {{ name }}">
+	  <section><div class="legend"></div></section>
+	  <section>
+	    <div class="renderer_form toggler">
+	      <input type="radio" name="renderer" id="area" class="area" value="area" checked>
+	      <label for="area">area</label>
+	      <input type="radio" name="renderer" id="bar" class="bar" value="bar">
+	      <label for="bar">bar</label>
+	      <input type="radio" name="renderer" id="line" class="line" value="line">
+	      <label for="line">line</label>
+	      <input type="radio" name="renderer" id="scatter" class="scatter" value="scatterplot">
+	      <label for="scatter">scatter</label>
+	    </div>
+	  </section>
+	  <section>
+	    <div class="offset_form">
+	      <label for="stack">
+	        <input type="radio" name="offset" class="stack" value="zero" checked>
+	        <span>stack</span>
+	      </label>
+	      <label for="stream">
+	        <input type="radio" name="offset" class="stream" value="wiggle">
+	        <span>stream</span>
+	      </label>
+	      <label for="pct">
+	        <input type="radio" name="offset" class="pct" value="expand">
+	        <span>pct</span>
+	      </label>
+	      <label for="value">
+	        <input type="radio" name="offset" class="value" value="value">
+	        <span>value</span>
+	      </label>
+	    </div>
+	    <div class="interpolation_form">
+	      <label for="cardinal">
+	        <input type="radio" name="interpolation" class="cardinal" value="cardinal" checked>
+	        <span>cardinal</span>
+	      </label>
+	      <label for="linear">
+	        <input type="radio" name="interpolation" class="linear" value="linear">
+	        <span>linear</span>
+	      </label>
+	      <label for="step">
+	        <input type="radio" name="interpolation" class="step" value="step-after">
+	        <span>step</span>
+	      </label>
+	    </div>
+	  </section>
+	  <section>
+	    <h6>Smoothing</h6>
+	    <div class="smoother"></div>
+	  </section>
+	  <section></section>
+	</form>
+	
+	<div class="chart_container">
+	  <div class="chart"></div>
+	  <div class="timeline"></div>
+	  <div class="slider"></div>
+	</div>
+</div>
+<script>
+
+	var palette = new Rickshaw.Color.Palette( { scheme: 'classic9' } );
+	
+	// instantiate our graph!
+	var graphSeries = [];
+	for (var i=0; i < series.length; i++) {
+    graphSeries.push({
+      color: palette.color(),
+      data: series[i]['data'],
+      name: series[i]['name']
+    });
+	};
+	
+	var graph = new Rickshaw.Graph( {
+	  element: $('.{{ name }} .chart')[0],
+	  width: 900,
+	  height: 500,
+	  renderer: 'area',
+	  stroke: true,
+	  series: graphSeries
+	} );
+	
+	graph.render();
+	
+	var slider = new Rickshaw.Graph.RangeSlider( {
+	  graph: graph,
+	  element: $('.{{ name }} .slider')
+	} );
+	
+	var hoverDetail = new Rickshaw.Graph.HoverDetail( {
+	  graph: graph
+	} );
+	
+	var annotator = new Rickshaw.Graph.Annotate( {
+	  graph: graph,
+	  element: $('.{{ name }} .timeline')[0]
+	} );
+	
+	var legend = new Rickshaw.Graph.Legend( {
+	  graph: graph,
+	  element: $('.{{ name }} .legend')[0]
+	
+	} );
+	
+	var shelving = new Rickshaw.Graph.Behavior.Series.Toggle( {
+	  graph: graph,
+	  legend: legend
+	} );
+	
+	var order = new Rickshaw.Graph.Behavior.Series.Order( {
+	  graph: graph,
+	  legend: legend
+	} );
+	
+	var highlighter = new Rickshaw.Graph.Behavior.Series.Highlight( {
+	  graph: graph,
+	  legend: legend
+	} );
+	
+	var smoother = new Rickshaw.Graph.Smoother( {
+	  graph: graph,
+	  element: $('.{{ name }} .smoother')
+	} );
+	
+	var ticksTreatment = 'glow';
+	
+	var xAxis = new Rickshaw.Graph.Axis.Time( {
+	  graph: graph,
+	  ticksTreatment: ticksTreatment
+	} );
+	
+	xAxis.render();
+	
+	var yAxis = new Rickshaw.Graph.Axis.Y( {
+	  graph: graph,
+	  tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
+	  ticksTreatment: ticksTreatment
+	} );
+	
+	yAxis.render();
+	
+	var controls = new RenderControls( {
+	  element: document.querySelector('form.{{ name }}'),
+	  graph: graph
+	} );
+	
+	function addAnnotation(force) {
+	  if (messages.length > 0 && (force || Math.random() >= 0.95)) {
+	    annotator.add(seriesData[2][seriesData[2].length-1].x, messages.shift());
+	  }
+	}
+</script>

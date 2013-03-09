@@ -18,13 +18,108 @@
     <script>
       // Re-namespace to avoid closure conflict.
       var appengine = goog.appengine; 
+
+      var stats = JSON.parse('{{ stats|safe }}');
     </script>
     <script src="{{ js_location }}"></script>
+    {% include "rickshaw-deps.html" %}
   </head>
   <body>
-    <div id="content"></div>
+    <div id="content" class="users">
+      <div class="users" id="users"></div>
+      <div class="stats" id="stats">
+      
+        <h1>Users</h1>
+        <script>
+          
+          var series = [{
+            name: 'Total Users',
+            data: stats.user_count
+          }, {
+            name: 'Daily Active Users',
+            data: stats.daily_active_users
+          }]
+        </script>
+        {% with "users" as name %}  
+        {% include "rickshaw-graph.html" %}
+        {% endwith %}
+        
+        <h1>Sessions</h1>
+        <script>
+          
+          var series = [{
+            name: 'Total Session Time',
+            data: stats.total_session_time
+          }, {
+            name: 'Session Count',
+            data: stats.session_count
+          }, {
+            name: 'Sessions w/ Friends',
+            data: stats.session_count_friends
+          }]
+        </script>
+        {% with "sessions" as name %}  
+        {% include "rickshaw-graph.html" %}
+        {% endwith %}
+        
+        <h1>User Averages</h1>
+        <script>
+          var series = [{
+            name: 'Ave. Session Count',
+            data: stats.ave_session_count
+          }, {
+            name: 'Ave. Session Time',
+            data: stats.ave_session_time
+          }, {
+            name: 'Ave. Sessions Time Alone',
+            data: stats.ave_session_time_alone
+          }, {
+            name: 'Ave. Sessions Time Friends',
+            data: stats.ave_session_time_friends
+          }, {
+            name: 'Ave. Sessions Medias',
+            data: stats.ave_session_medias
+          }]
+        </script>
+        {% with "averages" as name %}  
+        {% include "rickshaw-graph.html" %}
+        {% endwith %}
+
+        <h1>Actions</h1>
+        <script>
+          var series = [{
+            name: 'Facebook Shares',
+            data: stats.facebook_share
+          }, {
+            name: 'Twitter Shares',
+            data: stats.twitter_share
+          }, {
+            name: 'Comments',
+            data: stats.comment_count
+          }, {
+            name: 'Tweets',
+            data: stats.tweet_count
+          }, {
+            name: 'Facebook Posts',
+            data: stats.facebook_count
+          }, {
+            name: 'Stars',
+            data: stats.star_count
+          }]
+        </script>
+        {% with "actions" as name %}  
+        {% include "rickshaw-graph.html" %}
+        {% endwith %}
+      </div>
+    </div>
     <div id="header">
       <div class="logo">XYLO <span>admin</span></div>
+      <div id="sections" class="sections">
+        <div class="section users selected">USERS</div>
+        <div class="section stats">STATS</div>
+        <div class="section stats">CHANNELS</div>
+        <div class="section stats">CONTENT</div>
+      </div>
     </div>
     
     <script>

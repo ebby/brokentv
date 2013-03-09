@@ -17,73 +17,61 @@ brkn.model.Channel = function(channel) {
 	goog.base(this);
 	
 	/**
-	 * @type {String}
-	 * @private
+	 * @type {string}
 	 */
 	this.id = channel['id'];
 	
 	/**
-	 * @type {String}
-	 * @private
+	 * @type {string}
 	 */
 	this.name = channel['name'];
 
 	/**
-   * @type {String}
-   * @private
+   * @type {string}
    */
   this.myChannel = channel['my_channel'];
-  
-//  /**
-//   * @type {?brkn.model.Program}
-//   * @private
-//   */
-//  this.currentProgram = channel['current_program'] ?
-//      this.getOrAddProgram(channel['current_program']) : null;
 
   /**
    * @type {?brkn.model.Media}
-   * @private
    */
   this.currentMedia = channel['current_media'] ?
       brkn.model.Medias.getInstance().getOrAdd(channel['current_media']) : null;
 
   /**
    * @type {?number}
-   * @private
    */
   this.currentSeek = channel['current_seek'];
 
 	/**
 	 * @type {Array.<brkn.model.Program>}
-	 * @private
 	 */
 	this.programming = [];
 	
 	/**
    * @type {Object.<string, brkn.model.Program>}
-   * @private
    */
   this.programMap_ = {};
 
 	/**
 	 * @type {brkn.model.Program}
-	 * @private
 	 */
 	this.currentProgram = channel['current_program'] && new brkn.model.Program(channel['current_program']);
-	
+
 	/**
 	 * @type {Array.<brkn.model.Session>}
-	 * @private
 	 */
 	this.viewerSessions = [];
-	
+
 	/**
    * @type {Array.<brkn.model.Media>}
-   * @private
    */
   this.queue = [];
-	
+
+  /**
+   * @type {?boolean}
+   */
+  this.online = channel['online'] != undefined ? channel['online'] : null;
+
 	this.subscribe(brkn.model.Channel.Action.ADD_PROGRAM, this.addProgram, this);
 	this.subscribe(brkn.model.Channel.Action.ADD_QUEUE, this.addQueue, this);
 	this.subscribe(brkn.model.Channel.Action.ADD_VIEWER, this.addViewer, this);

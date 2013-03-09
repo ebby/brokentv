@@ -1,22 +1,84 @@
 div#login {
   width: 100%;
   height: 100%;
-  background: #181818 url(/static/img/homepage.jpg);
-  background-position: center -50px;
-  background-size: cover;
   position: absolute;
-  z-index: 10000;
+  z-index: 9998;
   overflow-x: hidden;
   overflow-y: scroll;
-  border-bottom: 1px solid rgba(0, 0, 0, .8);
-  .box-shadow(e('inset 0 0 1px 1px rgba(0, 0, 0, 0.59), inset 0 -3px 1px 0px rgba(255, 255, 255, 0.5), 0 0 2px 1px rgba(0, 0,0,.5)'));
   &.hide {
-    .transition(top, .6s, ease-in);
-    overflow: hidden;
-    top: -100%;
+    div#homepage {
+      .transition(top, .6s, ease-in);
+      overflow: hidden;
+      top: -100%;
+    }
+    div#static-scrollable {
+      display: none;
+    }
+    div#static-content {
+      .transition(height, 1s, ease-in);
+      height: 0;
+      overflow: hidden;
+      position: fixed;
+      div#footer {
+        display: none;
+      }
+    }
+  }
+  &.app {
+    .transition(opacity, .3s, ease);
+    background: rgba(0, 0, 0, .75);
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    div#static-scrollable {
+      display: none;
+    }
+    &.expanded {
+      div#static-content {
+        .transition(none);
+        height: 190px;
+      }
+    }
+    div#static-content {
+      .transition(height, .3s, ease);
+      height: 0px;
+    }
+    div.footer {
+      top: 20px;
+    }
+  
+    &.show {
+      visibility: visible;
+      opacity: 1;
+      pointer-events: all;
+      div#static-scrollable {
+        display: block;
+      }
+      div#static-content {
+        div.header {
+          display: none;
+        }
+        div#pages {
+          margin-top: 50px;
+        }
+      }
+    }
   }
   .bold {
     font-family: MuseoSans700;
+  }
+  div#homepage {
+    width: 100%;
+    height: 100%;
+    background: #181818 url(/static/img/homepage.jpg);
+    background-position: center -50px;
+    background-size: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin-top: -1%;
+    border-bottom: 1px solid rgba(0, 0, 0, .8);
+    .box-shadow(e('inset 0 0 1px 1px rgba(0, 0, 0, 0.59), inset 0 -3px 1px 0px rgba(255, 255, 255, 0.5), 0 0 2px 1px rgba(0, 0,0,.5)'));
   }
   div#static-scrollable {
     width: 100%;
@@ -24,6 +86,7 @@ div#login {
     position: absolute;
     top: 0;
     left: 0;
+    cursor: pointer;
   }
   div#static-content {
     width: 100%;
@@ -34,15 +97,7 @@ div#login {
     background: #dedede url(/static/img/content-texture.png);
     border-top: 1px solid rgba(0, 0, 0, .8);
     .box-shadow(e('inset 0 0 1px 1px rgba(0, 0, 0, 0.59), inset 0 3px 1px 0px rgba(255, 255, 255, 0.5), 0 0 2px 1px rgba(0, 0,0,.5)'));
-    &.hide {
-      .transition(height, 1s, ease-in);
-      height: 0;
-      overflow: hidden;
-      position: fixed;
-      div#footer {
-        display: none;
-      }
-    }
+    cursor: default;
     div.header {
       width: 760px;
       margin: auto;
@@ -88,11 +143,19 @@ div#login {
         height: 70px;
         display: inline-block;
         border-right: 1px solid #aaa;
+        border-radius: 3px 0 0 3px;
         div.bg {
           width: 100%;
           height: 100%;
-          background: url(/static/img/power.png) no-repeat;
+          background-image: url(/static/img/power.png);
+          background-repeat: no-repeat;
           background-position: 20px 19px;
+        }
+        &.error {
+          background-color: #B7432E;
+        }
+        &.wait {
+          background-color: #B49B4B;
         }
       }
       &.spin div.power div.bg {
@@ -213,7 +276,7 @@ div#login {
       position: absolute;
       bottom: 0;
       width: 900px;
-      font-size: 10px;
+      font-size: 11px;
       text-align: center;
       height: 25px;
       left: 50%;
@@ -226,6 +289,19 @@ div#login {
     }
   }
 }
+
+#uvTab {
+  display: none !important;
+  opacity: .8;
+  .transition(opacity, .3s, ease);
+  &:hover {
+    opacity: 1;
+  }
+  &.show {
+    display: block !important;
+  }
+}
+
 
 @keyframes spin {
   from { transform: rotate(0deg); }
