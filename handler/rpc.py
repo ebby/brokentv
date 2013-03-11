@@ -53,14 +53,16 @@ def get_session(current_user, media_id=None, channel_id=None, set_programming=Tr
     
   # MAKE SURE WE HAVE CHANNELS
   channels = channels or Channel.get_public()
-  assert len(channel) > 0, 'NO CHANNELS IN DATABASE'
+  assert len(channels) > 0, 'NO CHANNELS IN DATABASE'
   
   current_viewers = memcache.get('current_viewers') or {}
-  current_friends = [tuple for tuple in current_viewers.iteritems() if tuple[0] in current_user.friends]
+  current_friends = [tuple for tuple in current_viewers.iteritems() \
+                      if tuple[0] in current_user.friends \
+                      or (current_user.demo and tuple[0] in SUPER_ADMINS)]
   with_friends = len(current_friends) > 0
 
   user_sessions = UserSession.get_by_user(current_user)
-  
+  current_channel = None
   if media_id:
     current_channel = user_channel or Channel.get_my_channel(current_user)
   elif channel_id:
@@ -111,7 +113,7 @@ def get_session(current_user, media_id=None, channel_id=None, set_programming=Tr
   viewer_sessions = [session.toJson()]
   for uid,sess in [tuple for tuple in current_viewers.iteritems() if \
                    (tuple[0] in current_user.friends or \
-                    (current_user.demo and tuple[0] in constants.SUPER_ADMINS))]:
+                    (current_user.demo and tuple[0] in SUPER_ADMINS))]:
     viewer_sessions.append(sess)
   data['viewer_sessions'] = viewer_sessions
 
@@ -133,9 +135,20 @@ class SessionHandler(BaseHandler):
       if self.current_user.access_level < AccessLevel.USER:
         self.error(401)
       else:
+        data = {}
+        
+        user_agent = self.request.headers.get('user_agent')
+        if 'Mobile' in user_agent:
+          data['error'] = 'Mobile access is not supported yet.'
+        ie = re.search('/MSIE\s([\d]+)/', user_agent)
+        ff = re.search('/firefox\/([\d]+)/', user_agent)
+        if (ie and ie < 10) or (ff and ff < 6):
+          data['error'] = 'Please use a modern browser like Chrome.'
         media_id = self.session.get('media_id', None)
         channel_id = self.session.get('channel_id', None)
-        data = get_session(self.current_user, media_id=media_id, channel_id=channel_id)
+
+        if not data.get('error'):
+          data = get_session(self.current_user, media_id=media_id, channel_id=channel_id)
         self.response.out.write(simplejson.dumps(data))
 
 class SettingsHandler(BaseHandler):
@@ -195,7 +208,8 @@ class CommentHandler(BaseHandler):
       id = self.request.get('id')
       if delete and id:
         c = Comment.get_by_id(int(id))
-        c.delete()
+        if c:
+          c.delete()
         return
 
       media = Media.get_by_key_name(self.request.get('media_id'))
@@ -205,6 +219,8 @@ class CommentHandler(BaseHandler):
       parent_id = self.request.get('parent_id')
       if media and text:
         acl = self.current_user.friends + [self.current_user.id]
+        if self.current_user.demo:
+          acl += SUPER_ADMINS
         c = Comment.add(media, self.current_user, text,
                         acl=acl, parent_id=parent_id)
         new_tweet = None
@@ -221,9 +237,10 @@ class CommentHandler(BaseHandler):
             logging.warning('TWITTER ERROR: ' + str(response['errors']))
         
         # Update user prefs
-        self.current_user.post_facebook = facebook
-        self.current_user.post_twitter = tweet
-        self.current_user.put()
+        current_user = self.current_user
+        current_user.post_facebook = facebook
+        current_user.post_twitter = tweet
+        current_user.put()
 
         Stat.add_comment(self.current_user, facebook, tweet)
         broadcast.broadcastNewComment(c, new_tweet);
@@ -402,3 +419,9 @@ class TwitterCallbackHandler(BaseHandler):
     self.current_user.set_twitter_info(user_info)
     broadcast.broadcastTwitterAuth(self.current_user)
     self.response.out.write('<script>window.close()</script>')
+    
+class WelcomedHandler(BaseHandler):
+  def post(self):
+    current_user = self.current_user
+    current_user.welcomed = True
+    current_user.put()

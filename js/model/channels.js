@@ -70,7 +70,7 @@ brkn.model.Channels.prototype.get = function(id) {
 
 /**
  * @param {?boolean=} opt_public Only public channels
- * @return {brkn.model.Channel} The next channel with current programming
+ * @return {?brkn.model.Channel} The next channel with current programming
  */
 brkn.model.Channels.prototype.findOnline = function(opt_public) {
   if (this.currentChannel && this.currentChannel.getCurrentProgram() &&
@@ -80,23 +80,24 @@ brkn.model.Channels.prototype.findOnline = function(opt_public) {
       ((opt_public && !this.lastChannel.myChannel) || !opt_public)) {
     return this.lastChannel;
   }
-  var channel = this.channels[0];
-  var currentProgram = channel.getCurrentProgram()
+  var channel = null
+  var currentProgram = null;
   var index = 0;
   while (!currentProgram && index < this.channels.length) {
-    channel = !channel.myChannel ? this.channels[index] : channel;
-    currentProgram = channel.getCurrentProgram();
+    channel = !this.channels[index].myChannel ? this.channels[index] : null;
+    currentProgram = channel && channel.getCurrentProgram();
     index++;
   }
-  // If neither have content, stick with current
-  return !currentProgram ? this.currentChannel : channel;
+
+  return channel;
 };
 
 
 /**
  * @param {Object} channels Channels json object.
+ * @param {string} currentChannelId
  */
-brkn.model.Channels.prototype.loadFromJson = function(channels, currentChannel) {
+brkn.model.Channels.prototype.loadFromJson = function(channels, currentChannelId) {
 	goog.object.forEach((/** @type {Object.<string, Object>} */ channels),
 			goog.bind(function(channel, id) {
 				var c = new brkn.model.Channel(channel)
@@ -108,9 +109,9 @@ brkn.model.Channels.prototype.loadFromJson = function(channels, currentChannel) 
 			}, this));
 	
 	// Set current channel or first channel with content.
-	var channel = this.channelMap[currentChannel] || this.channels[0];
+	var channel = this.channelMap[currentChannelId] || this.channels[0];
 	this.currentChannel = channel;
-	this.currentChannel = this.findOnline();
+	this.currentChannel = this.findOnline() || this.currentChannel;
 	if (this.currentChannel) {
 	  this.updateOnlineUsers(this.currentChannel.getCurrentProgram());
 	}

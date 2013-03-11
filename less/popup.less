@@ -3,7 +3,7 @@ div#popup {
 	min-height: 55px;
 	background: rgba(255,255,255,.9);
 	border: 1px solid #ccc;
-	border-radius: 3px;
+	.border-radius(3px);
 	.box-shadow(0, 0, 5px, 2px, rgba(255, 255, 255, 0.3));
 	z-index: 999;
   position: absolute;
@@ -62,9 +62,7 @@ div#popup {
 				resize: none;
 				padding: 3px;
 				height: 16px;
-				-webkit-border-radius: 2px;
-				-moz-border-radius: 2px;
-				border-radius: 2px;
+				.border-radius(2px);
 				outline: none;
 		  }
 		  div.page2 {
@@ -81,7 +79,7 @@ div#popup {
 	      position: absolute;
 				left: 3px;
 				top: 3px;
-				border-radius: 3px;
+				.border-radius(3px);
 	    }
 	    div.title {
 	      position: absolute;
@@ -115,7 +113,7 @@ div#popup {
         width: 70px;
         height: 70px;
         border: 1px solid #ccc;
-        border-radius: 3px;
+        .border-radius(3px);
       }
     }
     div.buttons {

@@ -16,6 +16,7 @@ SENDGRID = False
 
 TWITTER_USER_BLACKLIST = [
   'vodionews',
+  'vodiomovies',
   'unlimitnews',
   'thevideotweets',
   'irishchronicle',

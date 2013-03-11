@@ -6,6 +6,8 @@ goog.require('goog.pubsub.PubSub');
 
 
 /**
+ * NEVER CALL THIS CONSTRUCTOR, USE brkn.model.Medias.getInstance().getOrAdd(mediaObj)
+ * 
  * @param {Object} media Media object
  * @constructor
  * @extends {goog.pubsub.PubSub}
@@ -32,6 +34,11 @@ brkn.model.Media = function(media) {
 	 * @type {string}
 	 */
 	this.hostId = media['host_id'];
+
+	/**
+   * @type {string}
+   */
+  this.hostLink = 'http://www.youtube.com/watch?v=' + media['host_id'];
 
 	/**
 	 * @type {number}
@@ -114,6 +121,7 @@ brkn.model.Media = function(media) {
   this.collectionId = media['collection_id'];
   
   this.subscribe(brkn.model.Media.Actions.ADD_COMMENT, this.addComment, this);
+  this.subscribe(brkn.model.Media.Actions.REMOVE_COMMENT, this.removeComment, this);
   this.subscribe(brkn.model.Media.Actions.WATCHING, this.addViewer, this);
 };
 goog.inherits(brkn.model.Media, goog.pubsub.PubSub);
@@ -136,6 +144,7 @@ brkn.model.Media.prototype.getPublishDate = function (opt_time) {
 brkn.model.Media.Actions = {
   ADD_COMMENT: 'add-comment',
   ADD_TWEET: 'add-tweet',
+  REMOVE_COMMENT: 'remove-comment',
   WATCHING: 'watching'
 };
 
@@ -151,6 +160,16 @@ brkn.model.Media.prototype.addComment = function(comment) {
         'commented on ' + this.name, comment.text, comment.user, comment.user.picture,
         '#media:' + this.id);
   }
+};
+
+
+/**
+ * @param {string} commentId
+ */
+brkn.model.Media.prototype.removeComment = function(commentId) {
+  goog.net.XhrIo.send('/_comment', goog.functions.NULL(), 'POST', 'delete=true&id=' + commentId);
+  goog.array.removeIf(this.comments, function(c) {return c.id == commentId});
+  this.commentCount -= 1;
 };
 
 

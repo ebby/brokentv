@@ -237,12 +237,12 @@ div#sidebar {
       visibility: visible;
       width: 100%;
       right: 0;
-      /* Hide scrollbars */
-      padding-right: 14px;
-      margin-right: -14px;
     }
     div.media-list {
       .scroll-y();
+      /* Hide scrollbars */
+      padding-right: 14px;
+      margin-right: -14px;
       div.list-info {
         margin: 10px;
         display: table;
@@ -261,7 +261,7 @@ div#sidebar {
           width: 60px;
           .box-shadow(0, 0, 2px, 0px, rgba(0, 0, 0, 0.8));
           background: rgba(0, 0, 0, 0.65);
-          border-radius: 3px;
+          .border-radius(3px);
           &:active {
             .box-shadow(0, 1px, 1px, rgba(255,255,255,.2));
           }
@@ -326,7 +326,7 @@ div#sidebar {
         &.fb-toggle div.icon {
           .sprite-comment-facebook();
           top: 4px;
-          left: 6px;
+          left: 11px;
         }
         .goog-custom-button-inner-box {
           margin-top: 5px;
@@ -376,7 +376,7 @@ div#sidebar {
       textarea {
         resize:none;
         height: auto;
-        border-radius: 3px;
+        .border-radius(3px);
         width: 280px;
         font-size: 13px;
         min-height: 16px;
@@ -397,7 +397,7 @@ div#sidebar {
         color: #333;
         font-size: 13px;
         text-shadow: 1px 1px 1px white;
-        border-radius: 3px;
+        .border-radius(3px);
         border: 1px solid #666;
         padding: 1px;
         display: inline;
@@ -488,7 +488,7 @@ div#sidebar {
     margin-left: -45px;
     margin-top: -45px;
     background: rgba(0, 0, 0, .6);
-    border-radius: 6px;
+    .border-radius(6px);
     div.loading-spinner {
       background: @spinner no-repeat center;
       background-size: 50px;
@@ -500,9 +500,9 @@ div#sidebar {
   div.list-media {
     width: 278px; 
     margin-bottom: 4px;
-    border-radius: 3px; 
+    .border-radius(3px); 
     position: relative;
-    background: rgba(50, 50, 50, 0.85);
+    background: rgba(50, 50, 50, 0.9);
     border: 1px solid #333;
     .box-shadow(0, 0, 1px, 0px, rgba(0, 0, 0, 0.8));
     cursor: pointer;
@@ -658,7 +658,7 @@ div#sidebar {
       img {
         width: 22px;
         height: 22px;
-        border-radius: 6px;
+        .border-radius(6px);
         vertical-align: top;
         border: 1px solid transparent;
       }
@@ -732,11 +732,12 @@ div#sidebar {
         left: 4px;
         top: 4px;
         position: absolute;
-        border-radius: 3px;
+        .border-radius(3px);
       }
       div.text {
         a.handle {
           font-family: MuseoSans700;
+          font-size: 13px;
         }
         a {
           color: #f5f5f5;
@@ -745,7 +746,7 @@ div#sidebar {
         position: relative;
         left: 37px;
         top: 3px;
-        font-size: 13px;
+        font-size: 12px;
         line-height: 16px;
         width: 230px;
       }
@@ -761,7 +762,7 @@ div#sidebar {
       div.dot {
         width: 6px;
         height: 6px;
-        border-radius: 6px;
+        .border-radius(6px);
         background: rgba(0, 0, 0, .3);
         display: inline-block;
         margin: 7px 5px;
@@ -812,7 +813,7 @@ div#sidebar {
       border: 1px solid #333;
       .box-shadow(e('0 0 2px 0px rgba(0, 0, 0, .8),  0 3px 1px -1px rgba(255, 255, 255, 0.5)'));
       padding-top: 5px;
-      padding-bottom: 20px;
+      padding-bottom: 21px;
       overflow: hidden;
       &:first-child {
         border-top-left-radius: 3px;
@@ -834,17 +835,20 @@ div#sidebar {
         left: 4px;
         top: 7px;
         position: absolute;
-        border-radius: 3px;
+        .border-radius(3px);
       }
       div.text {
         a {
           color: #f5f5f5;
           font-family: MuseoSans300;
+          &.username {
+            font-size: 13px;
+          }
         }
         position: relative;
         left: 37px;
         top: 3px;
-        font-size: 13px;
+        font-size: 12px;
         line-height: 16px;
         width: 240px;
       }
@@ -856,24 +860,27 @@ div#sidebar {
       }
       div.comment-options {
         position: absolute;
-        width: 35px;
-        height: 15px;
+        height: 9px;
         top: 5px;
         right: 5px;
         visibility: hidden;
         opacity: 0;
         .transition(opacity, .2s, ease);
+        background: rgba(0, 0, 0, .8);
+        padding: 5px;
+        .border-radius(3px);
+        border: 1px solid #181818;
         div.remove {
           .sprite-close-light();
           cursor: pointer;
           margin-left: 4px;
-          margin-top: 2px;
           float: right;
         }
         div.reply {
           .sprite-reply();
           cursor: pointer;
           float: right;
+          margin-top: -2px;
         }
       }
       &:hover div.comment-options {
@@ -887,7 +894,7 @@ div#sidebar {
     width: 260px;
     border: 1px solid #919191;
     .box-shadow(inset, 0, 0, 2px, 0px, rgba(0, 0, 0, 0.2));
-    border-radius: 3px;
+    .border-radius(3px);
     font-size: 12px;
     text-align: center;
     color: #666;

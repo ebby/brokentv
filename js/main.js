@@ -94,6 +94,9 @@ brkn.Main.prototype.enterDocument = function() {
   this.player_.decorate(goog.dom.getElement('stage'));
   this.notify_.decorate(goog.dom.getElement('notify'));
 
+  if (!brkn.model.Users.getInstance().currentUser.welcomed) {
+    this.welcome_(brkn.model.Users.getInstance().currentUser);
+  }
   
   // iPad
   this.getHandler().listen(document.body, 'touchmove', function(e) {
@@ -140,6 +143,20 @@ brkn.Main.prototype.enterDocument = function() {
     content.style.height = goog.style.getSize(pages).height + 80 + 'px';
     brkn.Main.resizeStatic(true);
   }, this);
+};
+
+
+/**
+ * @param {brkn.model.User} user
+ * @private
+ */
+brkn.Main.prototype.welcome_ = function(user) {
+  var welcome = goog.dom.getElement('welcome');
+  goog.style.showElement(welcome, true);
+  this.getHandler().listen(welcome, goog.events.EventType.CLICK, function() {
+    goog.style.showElement(welcome, false);
+    goog.net.XhrIo.send('/_welcomed', goog.functions.NULL(), 'POST');
+  })
 };
 
 
@@ -321,9 +338,14 @@ brkn.Main.getSessionAndInit = function(response) {
       function(e) {
         if (e.target.getStatus() == 200) {
           var data = e.target.getResponseJson();
+          if (data['error']) {
+            var error = goog.dom.getElement('error');
+            goog.dom.setTextContent(error, data['error']);
+            brkn.Main.noLogin('error', 'Yikes...');
+            return;
+          }
           var reveal = function() {
             goog.Timer.callOnce(function() {
-              goog.dom.classes.add(staticContent, 'hide');
               goog.dom.classes.add(login, 'hide');
               goog.Timer.callOnce(function() {
                 goog.style.showElement(goog.dom.getElement('homepage'), false);

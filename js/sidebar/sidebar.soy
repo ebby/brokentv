@@ -14,7 +14,18 @@
         <img src="{$media.publisher.picture}">
         <div class="name">{$media.publisher.name}</div>
       </div>
-      <div class="title">{$media.name}</div>
+      <div class="title">
+        <div class="text">{$media.name}</div>
+        <div class="links">
+          <div class="local">
+            <input onClick="this.select();" class="link-input" type="text"
+            value="{$media.link|noAutoescape}" readonly="readonly"/>
+          </div>
+          <a target="_blank" href="{$media.hostLink|noAutoescape}">
+            <div class="host"></div>
+          </a>
+        </div>
+      </div>
       <div class="scrollable ios-scroll">
         <div class="desc-link">
           <a href="#">DESCRIPTION</a>
@@ -87,14 +98,15 @@
  * @param text
  * @param timestamp
  * @param owner
+ * @param prefix
  */
 {template .comment}
-  <div class="comment{if $comment.parentId}{sp}reply{/if}" id="comment-{$comment.id}">
+  <div class="comment{if $comment.parentId}{sp}reply{/if}" id="{$prefix}-{$comment.id}">
     <a href="#user:{$comment.user.id}">
       <img src="{$comment.user.picture}"/>
     </a>
     <div class="text">
-      <a href="#user:{$comment.user.id}">{$comment.user.name}</a>{sp}
+      <a class="username" href="#user:{$comment.user.id}">{$comment.user.name}</a>{sp}
       {$text|noAutoescape}
     </div>
     <div class="timestamp">{$timestamp}</div>
@@ -293,11 +305,15 @@
         <li class="tab publishers">
           <div class="label">PUBLISHERS</div>
         </li>
+        <li class="tab categories">
+          <div class="label">CATEGORIES</div>
+        </li>
       </ul>
       <div class="pending-content content pending"></div>
       <div class="all-content content all"></div>
       <div class="playlists-content content playlists"></div>
       <div class="publishers-content content publishers"></div>
+      <div class="categories-content content categories"></div>
       <div class="spinner" style="display:none"></div>
   </div>
 {/template}
@@ -312,6 +328,16 @@
     <div class="controls">
       <div class="remove dark button">x</div>
     </div>
+  </div>
+{/template}
+
+
+/**
+ * @param name
+ */
+{template .category}
+  <div class="category button">
+    {$name}
   </div>
 {/template}
 

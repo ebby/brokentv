@@ -16,9 +16,9 @@ class Email():
 
     if self.sendgrid:
       # make a message object
-      self.message = sendgrid.Message("ebby@xylovision.com", message['subject'], html)
+      self.message = sendgrid.Message("ebby@xylocast.com", message['subject'], html)
     else:
-      self.message = mail.EmailMessage(sender="XYLO <ebby@xylovision.com>",
+      self.message = mail.EmailMessage(sender="Ebby at XYLO <ebby@xylocast.com>",
                                        subject=message['subject'], html=html)
 
 

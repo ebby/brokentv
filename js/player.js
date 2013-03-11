@@ -115,11 +115,20 @@ brkn.Player.prototype.enterDocument = function() {
   
   this.getHandler()
       .listen(window, 'resize', goog.bind(this.resize, this))
+      .listen(document, 'webkitfullscreenchange', goog.bind(function(e) {
+        goog.dom.classes.toggle(this.fullscreenEl_, 'full');
+      }, this))
+      .listen(document, 'mozfullscreenchange', goog.bind(function(e) {
+        goog.dom.classes.toggle(this.fullscreenEl_, 'full');
+      }, this))
+      .listen(document, 'fullscreenchange', goog.bind(function(e) {
+        goog.dom.classes.toggle(this.fullscreenEl_, 'full');
+      }, this))
       .listen(this.fullscreenEl_, goog.events.EventType.CLICK, goog.bind(function(e) {
-        if (goog.dom.classes.toggle(this.fullscreenEl_, 'full')) {
+        if (!goog.dom.classes.has(this.fullscreenEl_, 'full')) {
           var mainEl = goog.dom.getElementByClass('main');
           mainEl.requestFullScreen && mainEl.requestFullScreen();
-          mainEl.webkitRequestFullScreen && mainEl.webkitRequestFullScreen();
+          mainEl.webkitRequestFullScreen && mainEl.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
           mainEl.mozRequestFullScreen && mainEl.mozRequestFullScreen();
         } else {
           document.cancelFullScreen && document.cancelFullScreen();
@@ -256,7 +265,7 @@ brkn.Player.prototype.playProgram = function(program) {
   brkn.model.Player.getInstance().setCurrentProgram(program);
   if (this.lastNote_ != program.id) {
     brkn.model.Notify.getInstance().publish(brkn.model.Notify.Actions.FLASH,
-        'Now Playing', program.media.name, undefined, program.media.thumbnail1,
+        'Now playing', program.media.name, undefined, program.media.thumbnail1,
         '#info:' + program.media.id);
     this.lastNote_ = program.id;
   }
@@ -282,7 +291,9 @@ brkn.Player.prototype.play = function(media, opt_tries) {
         'showinfo': 0,
         'iv_load_policy': 3,
         'modestbranding': 1,
-        'wmode': 'opaque'
+        'wmode': 'opaque',
+        'origin': HOST_URL,
+        'enablejsapi': 1
       },
       'events': {
           'onStateChange': goog.bind(this.playerStateChange_, this),
@@ -372,7 +383,6 @@ brkn.Player.prototype.playerStateChange_ = function(event) {
   this.updateStagecover_();
   switch (event.data) {
     case YT.PlayerState.CUED:
-      window.console.log()
       var seek = this.currentProgram_.async ? this.currentProgram_.seek :
           (goog.now() - this.currentProgram_.time.getTime())/1000;
       this.player_.seekTo(seek);
@@ -392,7 +402,6 @@ brkn.Player.prototype.playerStateChange_ = function(event) {
             nextProgram);
       } else {
         brkn.model.Player.getInstance().setCurrentProgram(null);
-        window.console.log(brkn.model.Channels.getInstance().findOnline());
         brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.CHANGE_CHANNEL,
             brkn.model.Channels.getInstance().findOnline(), true);
       }

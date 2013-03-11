@@ -8,7 +8,7 @@ div#sidebar div#sidebar-content div.admin {
     border-bottom: 1px solid rgba(112, 108, 108, 0.7);
     input[type=text] {
       height: auto;
-      border-radius: 3px;
+      .border-radius(3px);
       width: 280px;
       font-size: 13px;
       min-height: 16px;
@@ -52,7 +52,7 @@ div#sidebar div#sidebar-content div.admin {
         box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.8);
       }
       img {
-        border-radius: 3px;
+        .border-radius(3px);
         position: relative;
         left: 5px;
         top: 5px;
@@ -75,12 +75,32 @@ div#sidebar div#sidebar-content div.admin {
       } 
     }
   }
+  div.categories {
+    
+    div.button {
+      .border-radius(0);
+      margin-left: -1px;
+      width: auto;
+      height: 20px;
+      font-size: 11px;
+      line-height: 20px;
+      border-color: #181818;
+      background: rgba(0, 0, 0, .4);
+      .border-radius(0);
+      padding: 3px 5px;
+      &.enabled {
+        background-color: #111;
+        .box-shadow(inset, 0, 0, 1px, 1px, #000);
+        color: #ddd;
+      }
+    }
+  }
   div.controls {
     position: absolute;
     right: 4px;
     top: 4px;
     div.button {
-      border-radius: 0;
+      .border-radius(0);
       margin-left: -1px;
       width: 30px;
       height: 20px;
@@ -206,6 +226,14 @@ div#sidebar div#admin-list {
         background: rgba(245, 245, 245, 0.6);
       }
     }
+    &.categories {
+      div.categories {
+        display: block;
+      }
+      ul.tabs li.categories {
+        background: rgba(245, 245, 245, 0.6);
+      }
+    }
   }
   div.list-info {
     margin: 10px;
@@ -224,7 +252,7 @@ div#sidebar div#admin-list {
         width: 60px;
         height: 60px;
         box-shadow: 0 0 2px 1px rgba(255, 255, 255, .3), 0 0 1px 2px rgba(0, 0, 0, 0.7);
-        border-radius: 3px;
+        .border-radius(3px);
       }
     }
     div.description {

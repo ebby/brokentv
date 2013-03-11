@@ -8,6 +8,7 @@ from programming import Programming
 #--------------------------------------
 
 class StorySortHandler(BaseHandler):
+    @BaseHandler.super_admin
     def get(self):
       name = self.request.get('channel')
       sim = self.request.get('sim')
@@ -56,6 +57,7 @@ class StorySortHandler(BaseHandler):
       self.response.out.write(template.render(path, template_data))
 
 class UsersHandler(BaseHandler):
+    @BaseHandler.super_admin
     def get(self, id=None):
       offset = self.request.get('offset') or 0
       if id:
@@ -66,31 +68,52 @@ class UsersHandler(BaseHandler):
         self.response.out.write(simplejson.dumps([u.toJson(admin=True) for u in users]))
 
 class AccessLevelHandler(BaseHandler):
+    @BaseHandler.super_admin
     def post(self):
       user = User.get_by_key_name(self.request.get('uid'))
       access_level = int(self.request.get('level'))
       if user.access_level == 0 and access_level == 1:
-        welcome_email = emailer.Email(emailer.Message.WELCOME)
+        welcome_email = emailer.Email(emailer.Message.WELCOME, {'name' : user.first_name})
         welcome_email.send(user)
+
       user.access_level = access_level
       user.put()
       self.response.out.write('')
+      
+class DemoHandler(BaseHandler):
+    @BaseHandler.super_admin
+    def post(self):
+      user = User.get_by_key_name(self.request.get('uid'))
+      demo = self.request.get('demo') == 'true'
+      if user:
+        user.demo = demo
+        user.put()
+      self.response.out.write('') 
 
 class PositionThumbHandler(BaseHandler):
+    @BaseHandler.admin
     def post(self):
       media = Media.get_by_key_name(self.request.get('media'))
       pos = int(self.request.get('pos'))
       media.thumb_pos = pos
       media.put()
 
-class AdminAddProgramHandler(BaseHandler):
+class AddProgramHandler(BaseHandler):
+    @BaseHandler.admin
     def post(self):
       channel = Channel.get_by_key_name(self.request.get('channel'))
       media = Media.get_by_key_name(self.request.get('media'))
       program = Program.add_program(channel, media)
       self.response.out.write(simplejson.dumps(program.toJson(False)))
-        
+
+class CategoriesHandler(BaseHandler):
+    @BaseHandler.admin
+    def get(self):
+      cats = Category.get_all()
+      self.response.out.write(simplejson.dumps([cat.to_json() for cat in cats]))
+
 class AddToCollectionHandler(BaseHandler):
+    @BaseHandler.admin
     def post(self, id):
       col = Collection.get_by_id(int(id))
       url = self.request.get('url')
@@ -117,12 +140,53 @@ class AddToCollectionHandler(BaseHandler):
           response['data'] = media.toJson()
         self.response.out.write(simplejson.dumps(response))
 
+class EditCollectionHandler(BaseHandler):
+    @BaseHandler.admin
+    def post(self, id):
+      col = Collection.get_by_id(int(id))
+      cat_id = self.request.get('cat_id')
+      enabled = self.request.get('enabled') == 'true'
+      if cat_id:
+        if enabled and cat_id not in col.categories:
+          col.categories.append(cat_id)
+        elif not enabled and cat_id in col.categories:
+          col.categories.remove(cat_id)
+        elif not enabled and not len(col.categories):
+          all_cats = Category.get_all()
+          for cat in all_cats:
+            if cat.id != cat_id:
+              col.categories.append(cat.id)
+        col.put()
+      self.response.out.write('')
+      
+
+class RemoveFromCollectionHandler(BaseHandler):
+    @BaseHandler.admin
+    def post(self, id):
+      col = Collection.get_by_id(int(id))
+      pub_id = self.request.get('pub_id')
+      pl_id = self.request.get('pl_id')
+      if col:
+        if pub_id:
+          publisher = Publisher.get_by_key_name(pub_id)
+          cp = CollectionPublisher.all().filter('publisher =', publisher).get()
+          if cp:
+            cp.delete()
+        if pl_id:
+          playlist = Playlist.get_by_key_name(pub_id)
+          cp = CollectionPlaylist.all().filter('playlist =', playlist).get()
+          if cp:
+            cp.delete()
+      self.response.out.write('')
+
 class CollectionsHandler(BaseHandler):
+    @BaseHandler.admin
     def get(self, channel_id):
       channel = Channel.get_by_key_name(channel_id)
       cols = channel.collections.fetch(None)
       self.response.out.write(simplejson.dumps([cc.collection.toJson() for cc in cols]))
       
+    @BaseHandler.admin
     def post(self):
       channel_id = self.request.get('cid')
       name = self.request.get('name')
@@ -132,7 +196,8 @@ class CollectionsHandler(BaseHandler):
         collection.put()
         ChannelCollection.add(channel=channel, collection=collection)
         self.response.out.write(simplejson.dumps(collection.toJson()))
-        
+
+    @BaseHandler.admin  
     def delete(self, id):
       if id:
         collection = Collection.get_by_id(int(id))
@@ -152,6 +217,7 @@ class CollectionsHandler(BaseHandler):
         self.response.out.write(simplejson.dumps({'deleted': True}))
 
 class TopicMediaHandler(BaseHandler):
+    @BaseHandler.admin
     def get(self, channel_id):
       offset = self.request.get('offset') or 0
 
@@ -161,17 +227,20 @@ class TopicMediaHandler(BaseHandler):
       self.response.out.write(simplejson.dumps(topics))
       
 class CollectionMediaHandler(BaseHandler):
+    @BaseHandler.admin
     def get(self, col_id):
       col = Collection.get_by_id(int(col_id))
       pending = self.request.get('pending') == '1'
       offset = self.request.get('offset') or 0
       res = {}
       medias = [m.toJson() for m in col.get_medias(20, pending=pending, offset=int(offset))]
+      res['categories'] = col.categories
       res['publishers'] = [p.toJson() for p in col.get_publishers()]
       res['playlists'] = [p.toJson() for p in col.get_playlists()]
       res['medias'] = medias
       self.response.out.write(simplejson.dumps(res))
    
+    @BaseHandler.admin
     def post(self):
       approve = self.request.get('approve') == 'true'
       media = Media.get_by_key_name(self.request.get('media'))
@@ -190,6 +259,7 @@ class CollectionMediaHandler(BaseHandler):
             col_media.approve(approve)
 
 class FetchHandler(BaseHandler):
+    @BaseHandler.admin
     def post(self):
       if self.request.get('col_id'):
         col = Collection.get_by_id(int(self.request.get('col')))
@@ -202,6 +272,7 @@ class FetchHandler(BaseHandler):
             cc.collection.fetch(False)
             
 class ProgramHandler(BaseHandler):
+    @BaseHandler.admin
     def post(self):
       if self.request.get('channel_id'):
         channel = Channel.get_by_key_name(self.request.get('channel_id'))
@@ -209,17 +280,15 @@ class ProgramHandler(BaseHandler):
           Programming.set_programming(channel.id, queue='programming', fetch_twitter=(not constants.DEVELOPMENT))
         
 class InitProgrammingHandler(BaseHandler):
+    @BaseHandler.super_admin
     def get(self):
-      if not self.current_user.id in constants.SUPER_ADMINS:
-        return
       fetch = self.request.get('fetch') == 'true'
       Programming(fetch) # Do fetch if no media
       self.response.out.write('done')
 
 class SetProgrammingHandler(BaseHandler):
+    @BaseHandler.super_admin
     def get(self):
-      if not self.current_user.id in constants.SUPER_ADMINS:
-        return
       channel_name = self.request.get('channel')
       twitter = self.request.get('fetch') == 'true'
       duration = self.request.get('duration') or 600
@@ -233,6 +302,7 @@ class SetProgrammingHandler(BaseHandler):
       self.response.out.write('done')
 
 class ChannelsHandler(BaseHandler):
+    @BaseHandler.admin
     def get(self):
       channels = []
       if self.current_user.id in SUPER_ADMINS:
@@ -240,7 +310,8 @@ class ChannelsHandler(BaseHandler):
       else:
         channels = [ca.admin for ca in self.current_user.channels]
       self.response.out.write(simplejson.dumps([c.toJson() for c in channels if c.privacy == Privacy.PUBLIC]))
-      
+    
+    @BaseHandler.super_admin  
     def post(self):
       if self.current_user.id in SUPER_ADMINS and self.request.get('uid'):
         channel = Channel.get_by_key_name(self.request.get('channel_id'))
@@ -256,7 +327,8 @@ class ChannelsHandler(BaseHandler):
             Programming.set_programming(channel.id, queue='programming',
                                         fetch_twitter=(not constants.DEVELOPMENT))
           self.response.out.write(simplejson.dumps(channel.toJson()))
-          
+    
+    @BaseHandler.super_admin    
     def delete(self, id):
       if self.current_user.id in SUPER_ADMINS and id:
         channel = Channel.get_by_key_name(id)
@@ -270,6 +342,7 @@ class ChannelsHandler(BaseHandler):
         self.response.out.write(simplejson.dumps({ 'deleted': True }))
           
 class ChannelOnlineHandler(BaseHandler):
+    @BaseHandler.admin
     def post(self, cid):
       channel = Channel.get_by_key_name(cid)
       if self.current_user.id in SUPER_ADMINS or self.current_user in channel.admins.fetch(None):
@@ -281,6 +354,7 @@ class ChannelOnlineHandler(BaseHandler):
         self.response.out.write(simplejson.dumps(channel.toJson()))
         
 class RemovePublisher(BaseHandler):
+    @BaseHandler.super_admin
     def get(self, id):
       publisher = Publisher.get_by_key_name(id)
       if publisher:
@@ -290,7 +364,8 @@ class RemovePublisher(BaseHandler):
       self.response.out.write('done')
       
 
-class AdminRemoveProgramHandler(BaseHandler):
+class RemoveProgramHandler(BaseHandler):
+    @BaseHandler.admin
     def post(self):
       program = Program.get_by_id(int(self.request.get('program')))
       channel = program.channel;
@@ -299,7 +374,8 @@ class AdminRemoveProgramHandler(BaseHandler):
       Program.get_current_programs([channel])
       broadcastProgramChanges(channel, effected)
       
-class AdminRescheduleProgramHandler(BaseHandler):
+class RescheduleProgramHandler(BaseHandler):
+    @BaseHandler.admin
     def post(self):
       program = Program.get_by_id(int(self.request.get('program')))
       new_time = datetime.datetime.fromtimestamp(float(self.request.get('time')))

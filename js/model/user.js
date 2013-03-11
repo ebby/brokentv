@@ -34,6 +34,16 @@ brkn.model.User = function(user) {
    * @type {string}
    */
   this.location = user['location'] || '';
+  
+  /**
+   * @type {boolean}
+   */
+  this.welcomed = user['welcomed'];
+
+  /**
+   * @type {boolean}
+   */
+  this.demo = user['demo'];
 
 	/**
    * @type {brkn.model.Session}
@@ -50,9 +60,9 @@ brkn.model.User = function(user) {
 	 * @type {string}
 	 */
 	this.color = Raphael.getColor();
-//	while (this.color == '#00bf85' || this.color == '#00bf2f') {
-//	  this.color = Raphael.getColor(); // Don't allow green, we use for presence.
-//	}
+	while (this.color == '#00bf85' || this.color == '#00bf2f') {
+	  this.color = Raphael.getColor(); // Don't allow green, we use for presence.
+	}
 
 	/**
    * @type {number}

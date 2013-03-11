@@ -38,7 +38,8 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp import util
 
-from basehandler import BaseHandler
+from basehandler import *
+from sessionrequest import SessionRequest
 from model import *
 from handler import *
 from namemodels import *
@@ -58,10 +59,10 @@ class MainHandler(BaseHandler):
         template_data['js_location'] = constants.ADV_JS
       else:
         template_data['js_location'] = constants.SIMPLE_JS
-    
+
       if not constants.DEVELOPMENT or self.request.get('css') or self.request.get('prod'):
         template_data['css_location'] = constants.CSS_SOURCE
-    
+
       # LINKS
       channel_id = self.request.get('c')
       media_id = self.request.get('m')
@@ -74,16 +75,14 @@ class MainHandler(BaseHandler):
             media_id = qs['m'][0]
       self.session['channel_id'] = channel_id
       self.session['media_id'] = media_id
-    
+  
       template_data['facebook_app_id'] = constants.FACEBOOK_APP_ID;
       path = os.path.join(os.path.dirname(__file__), 'templates/home.html')
       self.response.out.write(template.render(path, template_data))
 
-  
 class AdminHandler(BaseHandler):
+    @BaseHandler.super_admin
     def get(self):
-      if not self.current_user.id in constants.SUPER_ADMINS:
-        self.redirect('/')
       template_data = {}
       if not constants.DEVELOPMENT or self.request.get('css') or self.request.get('prod'):
         template_data['css_location'] = constants.ADMIN_CSS_SOURCE
@@ -93,6 +92,7 @@ class AdminHandler(BaseHandler):
       self.response.out.write(template.render(path, template_data))
 
 class StatsHandler(BaseHandler):
+    @BaseHandler.super_admin
     def get(self):
       logging.info(self.current_user.id in constants.SUPER_ADMINS)
       if not self.current_user.id in constants.SUPER_ADMINS:
@@ -105,6 +105,7 @@ class StatsHandler(BaseHandler):
       self.response.out.write(template.render(path, template_data))
 
 class NameStormHandler(BaseHandler):
+    @BaseHandler.super_admin
     def get(self):
       data = {}
       data['syllables'] = simplejson.dumps([s.name for s in Syllable.all().order('-name').fetch(None)])
@@ -163,23 +164,28 @@ def create_handlers_map():
     ('/_tweet/(.*)', rpc.TweetHandler),
     ('/_twitter', rpc.TwitterHandler),
     ('/_twitter/callback', rpc.TwitterCallbackHandler),
+    ('/_welcomed', rpc.WelcomedHandler),
 
     # Admin
     ('/admin/_access', admin.AccessLevelHandler),
     ('/admin/_add/collection/(.*)', admin.AddToCollectionHandler),
+    ('/admin/_edit/collection/(.*)', admin.EditCollectionHandler),
+    ('/admin/_remove/collection/(.*)', admin.RemoveFromCollectionHandler),
+    ('/admin/_categories', admin.CategoriesHandler),
     ('/admin/_channels', admin.ChannelsHandler),
     ('/admin/_channels/(.*)', admin.ChannelsHandler),
     ('/admin/_channel/online/(.*)', admin.ChannelOnlineHandler),
     ('/admin/_collections', admin.CollectionsHandler),
     ('/admin/_collections/(.*)', admin.CollectionsHandler),
+    ('/admin/_demo', admin.DemoHandler),
     ('/admin/_fetch', admin.FetchHandler),
     ('/admin/_program', admin.ProgramHandler),
     ('/admin/_media/collection', admin.CollectionMediaHandler),
     ('/admin/_media/collection/(.*)', admin.CollectionMediaHandler),
     ('/admin/_media/publisher/(.*)', rpc.PublisherMediaHandler),
-    ('/admin/_addprogram', admin.AdminAddProgramHandler),
-    ('/admin/_rescheduleprogram', admin.AdminRescheduleProgramHandler),
-    ('/admin/_removeprogram', admin.AdminRemoveProgramHandler),
+    ('/admin/_addprogram', admin.AddProgramHandler),
+    ('/admin/_rescheduleprogram', admin.RescheduleProgramHandler),
+    ('/admin/_removeprogram', admin.RemoveProgramHandler),
     ('/admin/_removepublisher/(.*)', admin.RemovePublisher),
     ('/admin/_posthumb', admin.PositionThumbHandler),
     ('/admin/_topicmedias/(.*)', admin.TopicMediaHandler),

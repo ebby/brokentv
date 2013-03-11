@@ -1,6 +1,7 @@
 goog.provide('brkn.model.Channel');
 goog.provide('brkn.model.Channel.Action');
 
+goog.require('brkn.model.Notify');
 goog.require('brkn.model.Program');
 goog.require('brkn.model.Session');
 
@@ -103,6 +104,11 @@ brkn.model.Channel.prototype.addProgram = function(program) {
 brkn.model.Channel.prototype.addQueue = function(media, add) {
   if (add) {
     this.queue.push(media);
+    
+    brkn.model.Notify.getInstance().publish(brkn.model.Notify.Actions.FLASH,
+        'Added to queue', media.name, undefined, media.thumbnail1,
+        '#info:' + media.id);
+    
     brkn.model.Analytics.getInstance().playAsync(media);
   } else {
     goog.array.removeIf(this.queue, function(m) {

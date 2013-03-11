@@ -16,6 +16,10 @@ handlers:
 - url: /less
   static_dir: less/
   expiration: '0'
+  
+- url: /doubleclick
+  static_dir: static/pages
+  expiration: '0'
 
 - url: .*
   script: main.app

@@ -31,13 +31,16 @@
       
         <h1>Users</h1>
         <script>
-          
+
           var series = [{
             name: 'Total Users',
             data: stats.user_count
           }, {
             name: 'Daily Active Users',
             data: stats.daily_active_users
+          }, {
+            name: 'Gender Ratio',
+            data: stats.gender_ratio
           }]
         </script>
         {% with "users" as name %}  
@@ -65,9 +68,6 @@
         <h1>User Averages</h1>
         <script>
           var series = [{
-            name: 'Ave. Session Count',
-            data: stats.ave_session_count
-          }, {
             name: 'Ave. Session Time',
             data: stats.ave_session_time
           }, {

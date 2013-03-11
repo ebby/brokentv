@@ -17,6 +17,7 @@ class Collection(db.Model):
   lifespan = db.IntegerProperty() # Age of allowed content in days
   last_fetch = db.DateTimeProperty()
   pending = db.IntegerProperty(default=0)
+  categories = db.StringListProperty(default=[])
   
   @property
   def id(self):

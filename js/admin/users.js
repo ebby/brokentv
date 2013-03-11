@@ -76,13 +76,19 @@ brkn.admin.Users.prototype.addUser = function(user) {
     var button = goog.dom.getAncestorByClass(e.target, 'button');
     if (button) {
       var uid = goog.dom.getAncestorByClass(e.target, 'user').id;
-      var controls = goog.dom.getElementByClass('controls', userEl);
-      var level = goog.dom.classes.has(button, '2') ? 2 : goog.dom.classes.has(button, '0') ? 0 : 1;
-      goog.net.XhrIo.send('/admin/_access', goog.functions.NULL,
-          'POST', 'uid=' + uid + '&level=' + level);
-      goog.array.forEach(goog.dom.getChildren(controls), function(button) {
-        goog.dom.classes.enable(button, 'selected', goog.dom.classes.has(button, level.toString()));
-      });
+      var controls = goog.dom.getAncestorByClass(e.target, 'controls');
+      if (controls) {
+        var level = goog.dom.classes.has(button, '2') ? 2 : goog.dom.classes.has(button, '0') ? 0 : 1;
+        goog.net.XhrIo.send('/admin/_access', goog.functions.NULL,
+            'POST', 'uid=' + uid + '&level=' + level);
+        goog.array.forEach(goog.dom.getChildren(controls), function(button) {
+          goog.dom.classes.enable(button, 'selected', goog.dom.classes.has(button, level.toString()));
+        });
+      } else if (goog.dom.classes.has(button, 'demo')) {
+        var demo = goog.dom.classes.toggle(button, 'selected');
+        goog.net.XhrIo.send('/admin/_demo', goog.functions.NULL,
+            'POST', 'demo=' + demo + '&uid=' + uid);
+      }
     }
   });
 };

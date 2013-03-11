@@ -1,12 +1,14 @@
 import webapp2
 import constants
 import facebook
+import logging
 
 from webapp2_extras import sessions
 
 from model import *
+from sessionrequest import SessionRequest
 
-class BaseHandler(webapp2.RequestHandler):
+class BaseHandler(SessionRequest):
     """Provides access to the active Facebook user in self.current_user
 
     The property is lazy-loaded on first access, using the cookie saved
@@ -56,7 +58,7 @@ class BaseHandler(webapp2.RequestHandler):
                 self.session["user"] = user.to_session()
                 return user
         return None
-
+    
     def dispatch(self):
         """ This snippet of code is taken from the webapp2 framework documentation.
         See more at http://webapp-improved.appspot.com/api/webapp2_extras/sessions.html
@@ -72,4 +74,23 @@ class BaseHandler(webapp2.RequestHandler):
         """ This snippet of code is taken from the webapp2 framework documentation.
         See more at http://webapp-improved.appspot.com/api/webapp2_extras/sessions.html
         """
-        return self.session_store.get_session()
+        return self.session_store.get_session()  
+
+    @staticmethod
+    def super_admin(method):
+        def check(handler, *args, **kwargs):
+          # SHOULD RESET SESSION FOR SECURITY. CAN CURRENTLY LOG OUT OF FB AND STILL ACCESS ADMIN
+          if handler.current_user and handler.current_user.id in constants.SUPER_ADMINS:
+            return method(handler, *args, **kwargs)
+          handler.redirect('/')
+        return check
+  
+    @staticmethod 
+    def admin(method):
+        def check(handler, *args, **kwargs): 
+          if handler.current_user and handler.current_user.id in constants.SUPER_ADMINS:
+            return method(handler, *args, **kwargs)
+          if handler.current_user.access_level == constants.AccessLevel.ADMIN:
+            return method(handler, *args, **kwargs)
+          handler.redirect('/')
+        return check

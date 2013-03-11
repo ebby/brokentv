@@ -269,7 +269,9 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
     goog.style.showElement(this.noCommentsEl_, !comments.length);
     comments = goog.array.map(comments, function(comment) {
       var c = new brkn.model.Comment(comment);
-      this.addComment_(c);
+      if (!c.parentId) {
+        this.addComment_(c);
+      }
       return c;
     }, this);
     goog.style.showElement(this.spinner_, false);
@@ -415,6 +417,7 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
           }, this));
   
   this.media_.subscribe(brkn.model.Media.Actions.ADD_COMMENT, this.addComment_, this);
+  this.media_.subscribe(brkn.model.Media.Actions.REMOVE_COMMENT, this.removeComment_, this);
   this.media_.subscribe(brkn.model.Media.Actions.ADD_TWEET, function(tweet) {
     this.addTweet_(tweet, true);
   }, this);
@@ -520,6 +523,7 @@ brkn.sidebar.Info.prototype.addComment_ = function(comment) {
 
   goog.style.showElement(this.noCommentsEl_, false);
   var commentEl = soy.renderAsElement(brkn.sidebar.comment, {
+    prefix: 'infocomment',
     comment: comment,
     text: goog.string.linkify.linkifyPlainText(comment.text),
     timestamp: goog.date.relative.format(comment.time.getTime()),
@@ -527,6 +531,7 @@ brkn.sidebar.Info.prototype.addComment_ = function(comment) {
   });
   brkn.model.Clock.getInstance().addTimestamp(comment.time,
       goog.dom.getElementByClass('timestamp', commentEl));
+
   if (comment.parentId) {
     goog.dom.insertSiblingAfter(commentEl, this.lastCommentEl_[comment.parentId]);
   } else {
@@ -583,15 +588,24 @@ brkn.sidebar.Info.prototype.commentClick_ = function(e) {
       brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.REPLY_COMMENT,
           comment.parentId ? this.commentsMap_[comment.parentId] : comment, comment.user);
     } else if (goog.dom.classes.has(targetEl, 'remove')) {
-      goog.net.XhrIo.send('/_comment', goog.functions.NULL(), 'POST', 'delete=true&id=' + commentId);
-      
-      var nextSibling = commentEl.nextSibling;
-      goog.dom.removeNode(commentEl);
-      while (goog.dom.classes.has(nextSibling, 'reply')) {
-        nextSibling = nextSibling.nextSibling;
-        goog.dom.removeNode(nextSibling);
-      }
+      this.media_.publish(brkn.model.Media.Actions.REMOVE_COMMENT, commentId);
     }
+  }
+};
+
+
+/**
+ * @param {string} commentId
+ * @private
+ */
+brkn.sidebar.Info.prototype.removeComment_ = function(commentId) {
+  var commentEl = goog.dom.getElement('infocomment-' + commentId);
+  var nextSibling = commentEl.nextSibling;
+  goog.dom.removeNode(commentEl);
+  goog.array.removeIf(this.comments_, function(c) {return c.id == commentId});
+  while (nextSibling && goog.dom.classes.has(nextSibling, 'reply')) {
+    nextSibling = nextSibling.nextSibling;
+    goog.dom.removeNode(nextSibling);
   }
 };
 

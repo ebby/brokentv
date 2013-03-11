@@ -22,7 +22,6 @@ div#sidebar div.info {
       left: 50%;
       margin-top: -20px;
       pointer-events: none;
-      /* -webkit-filter: grayscale() brightness(40%); */
       &.fix-height {
         height: 150%;
         width: auto;
@@ -33,7 +32,7 @@ div#sidebar div.info {
       top: 10px;
       background: rgba(0, 0, 0, .6);
       display: inline-block;
-      border-radius: 3px;
+      .border-radius(3px);
       position: absolute;
       cursor: pointer;
       img {
@@ -54,13 +53,13 @@ div#sidebar div.info {
         display: inline-block;
       }
     }
-    &.scrolled div.publisher {
+    &.scrolled div.publisher, &scrolled div.links {
       pointer-events: none;
     }
   }
   img.thumb {
     height: 70px;
-    border-radius: 6px;
+    .border-radius(6px);
     position: absolute;
     .box-shadow(e('0 0 3px 0 rgba(0, 0, 0, 0.5), 0 0 1px 1px rgba(255, 255, 255, .9)'));
     border: 0px solid whiteSmoke;
@@ -94,11 +93,43 @@ div#sidebar div.info {
     font-size: 18px;
     font-family: MuseoSans100;
     width: 230px;
-    overflow: hidden;
     background: rgba(0, 0, 0, .6);
-    border-radius: 3px;
+    .border-radius(3px);
     padding: 5px;
     pointer-events: none;
+    div.text {
+      overflow: hidden;
+      max-height: 98px;
+    }
+    div.links {
+      position: absolute;
+      bottom: -32px;
+      left: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: inline-block;
+      .border-radius(3px);
+      height: 25px;
+      >div, >a {
+        display: inline-block;
+        vertical-align: top;
+        pointer-events: all;
+      }
+      div.local {
+        input {
+          cursor: pointer;
+          background: rgba(0, 0, 0, .5);
+          border: 1px solid #181818;
+          .border-radius(3px);
+          color: #f5f5f5;
+          margin-left: 5px;
+          padding: 1px 3px 3px 3px;
+        }
+      }
+      div.host {
+        .sprite-youtube();
+        margin: 4px 5px;
+      }
+    }
   }
   div.desc-link {
     a {
@@ -151,7 +182,7 @@ div#sidebar div.info {
       display: block;
       background: rgba(0, 0, 0, 0.6);
       border: 1px solid rgba(45, 52, 70, 0.4);
-      border-radius: 0;
+      .border-radius(0);
       .box-shadow(e('inset 0 0 1px 1px rgba(140, 140, 140, 0.70), 0 0 1px #5e5e5e'));
       margin-top: -1px;
       width: 40px;
@@ -212,7 +243,7 @@ div#sidebar div.info {
       background: rgba(0, 0, 0, .2);
       width: 28px;
       height: 28px;
-      border-radius: 14px;
+      .border-radius(14px);
       .box-shadow(inset, 0px, 0px, 2px, 1px, rgba(0, 0, 0, 0.6));
       display: inline-block;
       margin-left: 9px;
@@ -222,7 +253,7 @@ div#sidebar div.info {
         height: 20px;
         margin-left: 4px;
         margin-top: 4px;
-        border-radius: 10px;
+        .border-radius(10px);
         .box-shadow(0, 0, 2px, 1px, rgba(0, 0, 0, .4));
       }
       &:active {
@@ -253,7 +284,7 @@ div#sidebar div.info {
     div.tweet {
       width: 280px;
       display: inline-block;
-      border-radius: 3px;
+      .border-radius(3px);
       vertical-align: middle;
       margin: 0 9px;
       white-space: normal;

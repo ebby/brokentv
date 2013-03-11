@@ -1,4 +1,4 @@
-var RTMP_HOST;
+var HOST_URL;
 
 var appengine = {};
 

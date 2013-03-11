@@ -111,7 +111,7 @@ brkn.sidebar.Stream.prototype.decorateInternal = function(el) {
   goog.style.showElement(this.spinner_, false);
   
   this.noActivitiesEl_ = goog.dom.createDom('div', 'no-comments', this.uid_ ?
-      'Your activity will appear here.': 'Friends\'s activity will appear here.');
+      'Your activity will appear here.': 'Friends\' activity will appear here.');
   goog.dom.appendChild(this.getElement(), this.noActivitiesEl_);
   
 
@@ -263,6 +263,11 @@ brkn.sidebar.Stream.prototype.addActivity_ = function(opt_activity, opt_digest, 
     default:
       return;
   }
+  
+  if (!medias.length) {
+    return;
+  }
+  
   brkn.model.Clock.getInstance().addTimestamp(time,
       goog.dom.getElementByClass('timestamp', activityEl));
   

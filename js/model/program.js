@@ -31,7 +31,7 @@ brkn.model.Program = function(opt_program, opt_media) {
 	 * @type {?brkn.model.Media}
 	 * @private
 	 */
-	this.media = program ? new brkn.model.Media(program['media']) : media;
+	this.media = program ? brkn.model.Medias.getInstance().getOrAdd(program['media']) : media;
 	brkn.model.Medias.getInstance().add(this.media);
 
 	/**

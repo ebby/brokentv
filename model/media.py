@@ -91,14 +91,14 @@ class Media(db.Model):
                     host_views=int(item['statistics']['viewCount']) if item['statistics']['viewCount'] else 0)
         media.put()
 
-        if collection:
+        if collection and (item.get('categoryId') in collection.categories or not len(collection.categories)):
           collection_media = CollectionMedia.add(collection, media, approved=(True if approve else None))
-        
+
         if item.get('topicDetails'):
           for topic_id in item['topicDetails']['topicIds']:
             topic = Topic.add(topic_id)
             TopicMedia.add(topic, media)
-            if collection:
+            if collection_media:
               TopicCollectionMedia.add(topic, collection_media)
 
       medias.append(media)

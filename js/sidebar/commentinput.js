@@ -196,6 +196,9 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
  * @private
  */
 brkn.sidebar.CommentInput.prototype.reply_ = function(comment, user) {
+  if (this.token_) {
+    this.removeReply_();
+  }
   this.parentComment = comment.id.toString();
   this.token_ = goog.dom.createDom('div', 'token', '@' + user.firstName());
   goog.dom.appendChild(this.inputHolder_, this.token_);

@@ -81,7 +81,8 @@ div.controller {
     pointer-events: all;
     left: 205px;
     cursor: pointer;
-    border-radius: 300px;
+    .border-radius(300px);
+    .transition(width, .5s, ease);
 
     &.drag {
       div.elapsed, div.seek {
@@ -96,7 +97,7 @@ div.controller {
       height: 4px;
       background: #497882;
       .box-shadow(e('inset 0 -1px 1px 0 rgba(255,255,255,.2)'));
-      border-radius: 300px;
+      .border-radius(300px);
       &.animate {
         .transition(width, 1s, linear);
       }
@@ -149,7 +150,7 @@ div.controller {
     opacity: 1;
     width: 10px;
     height: 10px;
-    border-radius: 10px;
+    .border-radius(10px);
     bottom: -3px;
     right: -3px;
     margin-left: -4px;
@@ -206,7 +207,7 @@ div.controller {
       position: absolute;
       top: -3px;
       right: -3px;
-      border-radius: 3px;
+      .border-radius(3px);
       font-size: 10px;
       text-align: center;
       line-height: 14px;
@@ -219,7 +220,7 @@ div.controller {
 	  left: 80px;
 	  top: 4px;
 	  div.button {
-	    border-radius: 0;
+	    .border-radius(0);
 	    margin-left: -1px;
 	    width: 35px;
 	    height: 25px;

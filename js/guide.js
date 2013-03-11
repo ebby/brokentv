@@ -493,12 +493,20 @@ brkn.Guide.prototype.updateNowButtons_ = function(opt_hide) {
     this.expand_();
   }
   nowRight.style.right = brkn.model.Controller.getInstance().sidebarToggled ? '300px' : 0;
-  goog.dom.classes.enable(nowRight, 'now', !!(-elapsed <
+//  goog.dom.classes.enable(nowRight, 'now', !!(-elapsed <
+//      goog.style.getPosition(this.getElement()).x - viewWidth || opt_hide));
+//  goog.dom.classes.enable(nowLeft, 'now', !!(-elapsed >
+//      goog.style.getPosition(this.getElement()).x + brkn.Guide.NAME_WIDTH || opt_hide));
+  
+  goog.dom.classes.enable(nowRight, 'now', !!(-goog.style.getPosition(this.tickerEl_).x <
       goog.style.getPosition(this.getElement()).x - viewWidth || opt_hide));
-  goog.dom.classes.enable(nowLeft, 'now', !!(-elapsed >
-      goog.style.getPosition(this.getElement()).x + brkn.Guide.NAME_WIDTH || opt_hide));
-  goog.style.showElement(nowRight, this.cursor_[0].hasNextProgram(this.guideOffset_));
-  goog.style.showElement(nowLeft, this.cursor_[0].hasPrevProgram(this.guideOffset_));
+  goog.dom.classes.enable(nowLeft, 'now', !!(-goog.style.getPosition(this.tickerEl_).x >
+  goog.style.getPosition(this.getElement()).x || opt_hide));
+
+  goog.style.showElement(nowRight, this.cursor_[0].hasNextProgram(this.guideOffset_) ||
+      goog.dom.classes.has(nowRight, 'now'));
+  goog.style.showElement(nowLeft, this.cursor_[0].hasPrevProgram(this.guideOffset_) ||
+      goog.dom.classes.has(nowLeft, 'now'));
 };
 
 
@@ -580,7 +588,7 @@ brkn.Guide.prototype.tick_ = function() {
     goog.style.showElement(this.myTickerEl_, !!myCurrentProgram);
     goog.dom.classes.enable(this.tickerEl_, 'go-live', !isMyChannel && !!currentProgram &&
         !!myCurrentProgram && currentProgram.id != myCurrentProgram.id && 
-        Math.abs(myElapsed - elapsed) > 30);
+        Math.abs(myElapsed - elapsed) > 15);
 //    goog.dom.classes.enable(this.tickerEl_, 'can-go-live', !isMyChannel &&
 //        Math.abs(myElapsed - elapsed) > 15);
     goog.dom.classes.enable(this.myTickerEl_, 'show', !Math.abs(myElapsed - elapsed) > 15);
@@ -637,16 +645,17 @@ brkn.Guide.prototype.align_ = function(opt_setAligned, opt_offset, opt_setScroll
     var viewWidth = goog.dom.getViewportSize().width - 
         (brkn.model.Controller.getInstance().sidebarToggled ? 300 : 0);
 
+//    if (!opt_offset && brkn.model.Controller.getInstance().guideToggled &&
+//        elapsed > -offset + viewWidth - 300) {
+//      // If program is off-screen, keep up.
+//      window.console.log('PROGRAM IS OFF SCREEN')
+//      offset = (opt_live ? -elapsed : -myElapsed) + viewWidth - 350;
+//    }
+
     if (!opt_offset && brkn.model.Controller.getInstance().guideToggled &&
         elapsed > -offset + viewWidth - 300) {
-      // If program is off-screen, keep up.
-      offset = (opt_live ? -elapsed : -myElapsed) + viewWidth - 350;
-    }
-    
-    if (!opt_offset && brkn.model.Controller.getInstance().guideToggled &&
-        elapsed > -offset + viewWidth - 300) {
-      // If still off-screen (last program is done), align to ticker
-      offset = -goog.style.getPosition(this.tickerEl_).x - 210;
+      // If off-screen (last program is done), align to ticker
+      offset = -goog.style.getPosition(this.tickerEl_).x + viewWidth - 200;
     }
     
     offset = Math.max(offset, -goog.style.getSize(this.getElement()).width + viewWidth)

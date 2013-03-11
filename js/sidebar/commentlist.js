@@ -34,6 +34,12 @@ brkn.sidebar.CommentList = function(media, opt_comments, opt_twitter, opt_tweets
   this.comments_ = opt_comments || [];
 
   /**
+   * @type {Object.<number, brkn.model.Comment>}
+   * @private
+   */
+  this.commentsMap_ = {};
+
+  /**
    * @type {boolean}
    * @private
    */
@@ -108,7 +114,8 @@ brkn.sidebar.CommentList.prototype.decorateInternal = function(el) {
   goog.dom.appendChild(this.getElement(), this.commentsEl_);
 
   this.getHandler()
-      .listen(window, 'resize', goog.partial(goog.Timer.callOnce, goog.bind(this.resize, this)));
+      .listen(window, 'resize', goog.partial(goog.Timer.callOnce, goog.bind(this.resize, this)))
+      .listen(this.commentsEl_, goog.events.EventType.CLICK, goog.bind(this.commentClick_, this));
 
   if (this.comments_.length) {
     goog.array.forEach(this.comments_, function(comment) {
@@ -154,6 +161,7 @@ brkn.sidebar.CommentList.prototype.decorateInternal = function(el) {
           this.resize();
         }, this));
     this.media_.subscribe(brkn.model.Media.Actions.ADD_COMMENT, this.addComment_, this);
+    this.media_.subscribe(brkn.model.Media.Actions.REMOVE_COMMENT, this.removeComment_, this);
   }
   this.resize(brkn.sidebar.CommentInput.INPUT_HEIGHT);
 };
@@ -191,15 +199,53 @@ brkn.sidebar.CommentList.prototype.addTweet_ = function(tweet, opt_first) {
 
 
 /**
+ * @param {Event} e
+ * @private
+ */
+brkn.sidebar.CommentList.prototype.commentClick_ = function(e) {
+  var targetEl = /** @type {Element} */ e.target;
+  var commentEl = goog.dom.getAncestorByClass(targetEl, 'comment');
+  if (commentEl) {
+    var commentId = parseInt(commentEl.id.split('-')[1], 10);
+    var comment = this.commentsMap_[commentId];
+    if (goog.dom.classes.has(targetEl, 'reply')) {
+      brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.REPLY_COMMENT,
+          comment.parentId ? this.commentsMap_[comment.parentId] : comment, comment.user);
+    } else if (goog.dom.classes.has(targetEl, 'remove')) {
+      this.media_.publish(brkn.model.Media.Actions.REMOVE_COMMENT, commentId);
+    }
+  }
+};
+
+
+/**
+ * @param {string} commentId
+ * @private
+ */
+brkn.sidebar.CommentList.prototype.removeComment_ = function(commentId) {
+  var commentEl = goog.dom.getElement('listcomment-' + commentId);
+  var nextSibling = commentEl.nextSibling;
+  goog.dom.removeNode(commentEl);
+  while (nextSibling && goog.dom.classes.has(nextSibling, 'reply')) {
+    nextSibling = nextSibling.nextSibling;
+    goog.dom.removeNode(nextSibling);
+  }
+};
+
+
+/**
  * @param {brkn.model.Comment} comment
  * @private
  */
 brkn.sidebar.CommentList.prototype.addComment_ = function(comment) {
   goog.style.showElement(this.noCommentsEl_, false);
+  this.commentsMap_[comment.id] = comment;
   var commentEl = soy.renderAsElement(brkn.sidebar.comment, {
+    prefix: 'listcomment',
     comment: comment,
     text: goog.string.linkify.linkifyPlainText(comment.text),
-    timestamp: goog.date.relative.format(comment.time.getTime())
+    timestamp: goog.date.relative.format(comment.time.getTime()),
+    owner: (comment.user.id == brkn.model.Users.getInstance().currentUser.id)
   });
   brkn.model.Clock.getInstance().addTimestamp(comment.time,
       goog.dom.getElementByClass('timestamp', commentEl));

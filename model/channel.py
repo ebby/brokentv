@@ -83,10 +83,10 @@ class Channel(db.Model):
   def get_next_time(self):
     next_time = self.next_time or datetime.datetime.utcnow()
     return max(datetime.datetime.utcnow(), next_time)
-  
+
   def get_collections(self):
     return [chan_col.collection for chan_col in self.collections.fetch(20)]
-  
+
   def get_suggested(self):
     col = self.suggested
     if not col:
@@ -94,6 +94,8 @@ class Channel(db.Model):
       col.put()
       self.suggested = col
       self.put()
+    if not col.channels.get():
+      ChannelCollection.add(self, col)
     return col
 
   def toJson(self, get_programming=False):

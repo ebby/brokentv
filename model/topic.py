@@ -9,8 +9,7 @@ class Topic(db.Model):
   type_id = db.StringProperty()
   type = db.StringProperty()
   description = db.TextProperty()
-  
-  
+
   @property
   def id(self):
     return self.key().name()

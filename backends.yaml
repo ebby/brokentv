@@ -1,7 +1,6 @@
 backends:
 - name: programming
   start: programming.app
-  options: dynamic
 - name: twitter
   options: dynamic
   start: twitter.app

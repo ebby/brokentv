@@ -54,6 +54,7 @@ class User(db.Model):
     @classmethod
     def get_by_twitter_id(cls, id):
       return User.all().filter('twitter_id =', id).get()
+        
 
     def toJson(self, admin=False, configs=False):
       json = {}
@@ -62,7 +63,9 @@ class User(db.Model):
       json['profile_url'] = self.profile_url
       json['location'] = self.location
       json['access_level'] = self.access_level
+      json['welcomed'] = self.welcomed
       if admin:
+        json['demo'] = self.demo
         json['last_login'] = self.last_login.isoformat() if self.last_login else None
         json['session_count'] = self.session_count if self.session_count else 0
         json['ave_session_time'] = self.ave_session_time if self.ave_session_time else 0

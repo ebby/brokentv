@@ -11,14 +11,14 @@ div#login {
       overflow: hidden;
       top: -100%;
     }
-    div#static-scrollable {
-      display: none;
+    &.expanded {
+      div#static-scrollable {
+        cursor: pointer;
+      }
     }
     div#static-content {
-      .transition(height, 1s, ease-in);
+      .transition(height, .6s, ease-in);
       height: 0;
-      overflow: hidden;
-      position: fixed;
       div#footer {
         display: none;
       }
@@ -32,6 +32,7 @@ div#login {
     pointer-events: none;
     div#static-scrollable {
       display: none;
+      cursor: pointer;
     }
     &.expanded {
       div#static-content {
@@ -86,7 +87,6 @@ div#login {
     position: absolute;
     top: 0;
     left: 0;
-    cursor: pointer;
   }
   div#static-content {
     width: 100%;
@@ -125,11 +125,20 @@ div#login {
       color: #3d3d3d;
       text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.9);
     }
+    div#error {
+      position: absolute;
+      top: 80px;
+      left: 0;
+      color: #B7432E;
+      font-size: 14px;
+      text-shadow: none;
+      font-family: MuseoSans500;
+    }
     div.fb-login {
       background: #f5f5f5;
       width: 230px;
       height: 70px;
-      border-radius: 3px;
+      .border-radius(3px);
       .box-shadow(e('0 0 5px 2px rgba(9, 9, 9, 0.5), 0 0 0 3px rgb(230, 230, 230), 0 0 0 4px rgba(121, 121, 121, .5)'));
       position: absolute;
       right: 3px;
@@ -143,7 +152,7 @@ div#login {
         height: 70px;
         display: inline-block;
         border-right: 1px solid #aaa;
-        border-radius: 3px 0 0 3px;
+        .border-radius(3px, 0, 0, 3px);
         div.bg {
           width: 100%;
           height: 100%;
@@ -203,6 +212,7 @@ div#login {
         left: 3px;
         top: 28px;
         font-size: 14px;
+        width: 146px;
       }
       &.waitlist div.waitlist {
         display: inline-block;
@@ -254,7 +264,7 @@ div#login {
         .transition(opacity, .3s, ease);
         height: 0;
         background: rgba(0, 0, 0, .1);
-        border-radius: 6px;
+        .border-radius(6px);
         border: 1px solid #a9a9a9;
         .box-shadow(inset, 0, 0, 1px, 0, rgba(0, 0, 0, .2));
       }

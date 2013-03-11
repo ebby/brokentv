@@ -70,7 +70,7 @@ div#sidebar div.stream {
       background: #ccc;
       width: 34px;
       height: 34px;
-      border-radius: 18px;
+      .border-radius(18px);
       .box-shadow(inset, 0px, 0px, 2px, 1px, rgba(0, 0, 0, 0.6));
       display: inline-block;
       margin-left: 9px;
@@ -79,7 +79,7 @@ div#sidebar div.stream {
         height: 26px;
         margin-left: 4px;
         margin-top: 4px;
-        border-radius: 15px;
+        .border-radius(15px);
         .box-shadow(0, 0, 2px, 1px, rgba(0, 0, 0, .4));
       }
       &:active {
@@ -109,5 +109,8 @@ div#sidebar div.stream {
   }
   div.medias {
     margin: 10px; 
+  }
+  div.no-comments {
+    margin-top: 10px;
   }
 }

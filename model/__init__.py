@@ -9,6 +9,7 @@ from playlist import *
 from comment import *
 from tweet import *
 from topic import *
+from category import *
 from useractivity import *
 from stat import *
 from link import *

@@ -37,6 +37,7 @@ class Stat(db.Model):
     for stat in data:
       timestamp = time.mktime(stat.date.timetuple())
       json.setdefault('user_count', []).append({'x': timestamp, 'y': stat.user_count})
+      json.setdefault('gender_ratio', []).append({'x': timestamp, 'y': round(100 * (stat.female_users / stat.user_count))})
       json.setdefault('daily_active_users', []).append({'x': timestamp, 'y': len(stat.daily_active_users)})
       json.setdefault('session_count', []).append({'x': timestamp, 'y': stat.session_count})
       json.setdefault('session_count_friends', []).append({'x': timestamp, 'y': stat.session_count_friends})
@@ -70,7 +71,8 @@ class Stat(db.Model):
       today.put()
       return today
     elif latest.date != datetime.date.today():
-      today = Stat(user_count=latest.user_count)
+      today = Stat(user_count=latest.user_count, male_users=latest.male_users,
+                   female_users=latest.female_users)
 
       week_ago = Stat.get_by_date(datetime.date.today() - datetime.timedelta(days=7))
       if week_ago:
@@ -85,17 +87,18 @@ class Stat(db.Model):
     return latest
 
   @classmethod
-  @db.transactional
   def add_user(cls, gender):
     Stat.add_user_trans(Stat.get_today().key(), gender)
     
+  @classmethod
+  @db.transactional
   def add_user_trans(cls, today_key, gender):
-    today = Stat.get_today()
+    today = db.get(today_key)
     today.user_count += 1
     if gender == 'male':
-      male_users += 1
+      today.male_users += 1
     if gender == 'female':
-      female_users += 1
+      today.female_users += 1
     today.put()
 
   @classmethod

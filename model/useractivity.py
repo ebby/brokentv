@@ -17,19 +17,28 @@ class UserActivity(db.Model):
   
   @classmethod
   def add_session(cls, user, session):
-    u_a = UserActivity(type=ActivityType.SESSION, user=user, session=session, acl=user.friends)
+    acl = user.friends
+    if user.demo:
+      acl += SUPER_ADMINS
+    u_a = UserActivity(type=ActivityType.SESSION, user=user, session=session, acl=acl)
     u_a.put()
     return u_a
   
   @classmethod
   def add_comment(cls, user, comment):
-    u_a = UserActivity(type=ActivityType.COMMENT, user=user, comment=comment, acl=user.friends)
+    acl = user.friends
+    if user.demo:
+      acl += SUPER_ADMINS
+    u_a = UserActivity(type=ActivityType.COMMENT, user=user, comment=comment, acl=acl)
     u_a.put()
     return u_a
   
   @classmethod
   def add_starred(cls, user, media):
-    u_a = UserActivity(type=ActivityType.STARRED, user=user, media=media, acl=user.friends)
+    acl = user.friends
+    if user.demo:
+      acl += SUPER_ADMINS
+    u_a = UserActivity(type=ActivityType.STARRED, user=user, media=media, acl=acl)
     u_a.put()
     return u_a
 

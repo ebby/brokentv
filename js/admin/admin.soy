@@ -12,6 +12,7 @@
       <div class="last-login">LAST LOGIN</div>
       <div class="session-count">SESSION COUNT</div>
       <div class="ave-session">AVE SESSION</div>
+      <div class="demo">DEMO</div>
     </div>
     <div class="user-list">
   </div>
@@ -36,5 +37,6 @@
     <div class="last-login">{$lastLogin}</div>
     <div class="session-count">{$user.sessionCount}</div>
     <div class="ave-session">{$user.aveSession}</div>
+    <div class="button dark demo{if $user.demo}{sp}selected{/if}">DEMO</div>
   </div>
 {/template}

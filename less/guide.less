@@ -72,7 +72,7 @@ div#guide {
       width: 45px;
       padding: 5px;
       margin-left: -14px;
-      border-radius: 3px;
+      .border-radius(3px);
       background: #dedede;
       .box-shadow(e('0 0 4px 1px rgba(0, 0, 0, .4), 0px 1px 0 0px rgba(0, 0, 0,.4)'));
       font-size: 11px;
@@ -80,6 +80,8 @@ div#guide {
       color: #181818;
       text-shadow: 1px 1px 1px white;
       border: 1px solid rgba(0, 0, 0, .6);
+      pointer-events: all;
+      cursor: pointer;
       &:after, &:before {
         bottom: 100%;
         border: solid transparent;
@@ -114,14 +116,14 @@ div#guide {
       left: 3px;
       width: 25px;
       height: 24px;
-      border-radius: 10px;
+      .border-radius(10px);
       .box-shadow(0, 2px, 0px, 0px, rgba(0, 0, 0, 0.5));
       img {
         width: 21px;
         height: 20px;
         margin-left: 2px;
         margin-top: 2px;
-        border-radius: 10px;
+        .border-radius(10px);
       }
       &:after, &:before {
         bottom: 96%;
@@ -263,7 +265,7 @@ div#guide {
         background: #3d3d3d @grad;
         margin-top: 5px;
         div.program {
-          border-radius: 0;
+          .border-radius(0);
           border: none;
           border-left: 1px solid #2d3446;
           padding-right: 10px;
@@ -381,7 +383,7 @@ div#guide {
 					color: #999;
 					text-shadow: 1px 1px 1px white;
 					z-index: 0;
-					border-radius: 5px;
+					.border-radius(5px);
 					.box-shadow(inset, 0px, 0px, 1px, 1px, rgba(0, 0, 0, .4));
           border: 1px solid whiteSmoke;
           padding: 1px;
@@ -420,7 +422,7 @@ div#guide {
 					  opacity: .2;
 					  background-size: 110% auto;
 					  background-position: 50% 37%;
-					  border-radius: 3px;
+					  .border-radius(3px);
 					  &.fix-height {
               background-size: auto 100%;
             }
@@ -491,7 +493,7 @@ div#guide {
 	          height: 98%;
 	          left: -1%;
 	          top: -1%;
-	          border-radius: 16px;
+	          .border-radius(16px);
 	          border: 8px solid #f5f5f5;
 	        }
         }
@@ -520,9 +522,7 @@ div#guide {
 	      bottom: 10px;
 	      z-index: 1;
 	      pointer-events: none;
-	      -webkit-transition: height .3s;
-			     -moz-transition: height .3s;
-			          transition: height .3s;
+	      .transition(height, .3s, ease);
 	      div.viewer {
 	        position: relative;
 	        margin-left: 6px;
@@ -533,7 +533,7 @@ div#guide {
 	        	background: #ccc;
 	        	top: 11px;
 	        	width: 100%;
-	        	.box-shadow(0px, 1px, 1px, 0px, rgba(255, 255, 255, .6));
+	        	.box-shadow(e('0px 1px 1px 0px rgba(255, 255, 255, .6), 0 -1px 1px 0px rgba(255,255,255, .3)'));
 	        	pointer-events: all;
 	        	cursor: pointer;
 	        	display: none;
@@ -548,9 +548,9 @@ div#guide {
 		          top: -5px;
 		          width: 13px;
 		          height: 13px;
-		          border-radius: 10px;
+		          .border-radius(10px);
 		          background: inherit;
-		          .box-shadow(0px, 1px, 1px, 0px, rgba(255, 255, 255, .6));
+		          .box-shadow(e('0px 1px 1px 0px rgba(255, 255, 255, .6), 0 -1px 1px 0px rgba(255,255,255, .3)'));
 		        }
 		        &::after {
 		          content: '';
@@ -559,14 +559,15 @@ div#guide {
 		          top: -1px;
 		          width: 5px;
 		          height: 5px;
-		          border-radius: 10px;
+		          .border-radius(10px);
 		          background: white;
+		          .box-shadow(0px, 1px, 1px, 0px, rgba(255, 255, 255, .6));
 		        }
 		        div.pic {
 		          background: inherit;
 							width: 28px;
 							height: 28px;
-							border-radius: 14px;
+							.border-radius(14px);
 							right: -5px;
 							top: -12px;
 							.box-shadow(0px, 1px, 1px, 0px, rgba(255, 255, 255, .6));
@@ -576,7 +577,7 @@ div#guide {
 			          height: 20px;
 			          margin-left: 4px;
 			          margin-top: 4px;
-			          border-radius: 10px;
+			          .border-radius(10px);
 			          .box-shadow(0, 0, 2px, 1px, rgba(0, 0, 0, .4));
 			        }
 			        &:active {
@@ -600,7 +601,7 @@ div#guide {
       margin-left: 200px;
       vertical-align: middle;
       height: 100%;
-      border-radius: 5px;
+      .border-radius(5px);
       border: 1px solid transparent;
       padding: 1px;
       cursor: pointer;
@@ -628,11 +629,11 @@ div#guide {
       background-color: #dfdfdf;
       color: #f5f5f5;
       border-color: #f5f5f5;
-      border-radius: 4px;
+      .border-radius(4px);
       .box-shadow(inset, 0px, 0px, 1px, 1px, rgba(0, 0, 0, .4));
       .transition(opacity, 3s, ease-out);
       display: none;
-      border-radius: 6px 6px 4px 4px;
+      .border-radius(6px, 6px, 4px, 4px);
       div.select-header {
         position: absolute;
         top: 1px;
@@ -647,7 +648,7 @@ div#guide {
         font-size: 10px;
         font-family: MuseoSans700;
         line-height: 20px;
-        border-radius: 4px 4px 0 0;
+        .border-radius(4px, 4px, 0, 0);
         div.close {
           .sprite-close-light();
           cursor: pointer;
@@ -672,7 +673,7 @@ div#guide {
           margin-left: 4px;
           border: 1px solid #ccc;
           .box-shadow(none);
-          border-radius: 5px;
+          .border-radius(5px);
           font-size: 12px;
           font-weight: normal;
           line-height: 15px;
@@ -681,9 +682,7 @@ div#guide {
           resize: none;
           padding: 3px;
           height: 16px;
-          -webkit-border-radius: 2px;
-          -moz-border-radius: 2px;
-          border-radius: 2px;
+          .border-radius(2px);
           outline: none;
         }
         div.page2 {
@@ -693,7 +692,7 @@ div#guide {
           height: 100%;
           top: 0;
           background: #f5f5f5;
-          border-radius: 6px;
+          .border-radius(6px);
         }
       }
       div.confirm-media {

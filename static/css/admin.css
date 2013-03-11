@@ -1,5 +1,7 @@
 .button {
   display: inline-block;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
   border-radius: 3px;
   border: 1px solid #2d3446;
   width: 70px;
@@ -135,6 +137,7 @@ div#content {
   top: 0;
   width: 100%;
   height: 100%;
+  overflow-y: scroll;
 }
 div#content > div {
   display: none;
@@ -152,7 +155,7 @@ div#content div#stats {
 div#content div#users {
   margin: 10px auto;
   margin-top: 50px;
-  width: 900px;
+  width: 1000px;
 }
 div#content div#users div.header {
   font-size: 11px;
@@ -169,6 +172,8 @@ div#content div#users div.user-list {
   -moz-box-shadow: inset 0 0 2px 1px rgba(0, 0, 0, .3);
   box-shadow: inset 0 0 2px 1px rgba(0, 0, 0, .3);
   margin: 0 10px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
   border-radius: 3px;
 }
 div#content div#users div.user {
@@ -200,6 +205,8 @@ div#content div#users .pic {
 div#content div#users .pic img {
   width: 40px;
   height: 40px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
   border-radius: 3px;
   -webkit-box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.4);
   -moz-box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.4);
@@ -239,10 +246,17 @@ div#content div#users .ave-session {
   left: 800px;
   top: 18px;
 }
-div#content div.controls {
-  display: inline-block;
+div#content div#users .demo {
+  position: absolute;
+  left: 900px;
+  top: 18px;
 }
-div#content div.controls div.button {
+div#content div#users .demo.button {
+  top: 12px;
+}
+div#content div.button {
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
   border-radius: 0;
   margin-left: -1px;
   width: 50px;
@@ -251,14 +265,27 @@ div#content div.controls div.button {
   line-height: 20px;
   border-color: #181818;
   background: rgba(0, 0, 0, 0.4);
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
 }
-div#content div.controls div.button.selected {
-  pointer-events: none;
+div#content div.button.selected {
   background-color: #111;
   -webkit-box-shadow: inset 0 0 1px 1px #000000;
   -moz-box-shadow: inset 0 0 1px 1px #000000;
   box-shadow: inset 0 0 1px 1px #000000;
   color: #ddd;
+}
+div#content div.controls {
+  display: inline-block;
+}
+div#content div.controls div.button {
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border-radius: 0;
+}
+div#content div.controls div.button.selected {
+  pointer-events: none;
   cursor: default;
 }
 div#content div.controls > div:last-child {

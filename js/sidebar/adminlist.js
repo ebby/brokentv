@@ -23,12 +23,13 @@ goog.require('goog.ui.Textarea.EventType');
  * @param {Array.<brkn.model.Media>} pending
  * @param {Array.<Object>} playlists
  * @param {Array.<Object>} publishers
+ * @param {Array.<Object>} categories
  * @param {?string=} opt_thumb
  * @param {?string=} opt_desc
  * @constructor
  * @extends {goog.ui.Component}
  */
-brkn.sidebar.AdminList = function(collectionId, pending, playlists, publishers,
+brkn.sidebar.AdminList = function(collectionId, pending, playlists, publishers, categories,
     opt_thumb, opt_desc) {
   goog.base(this);
 
@@ -69,6 +70,12 @@ brkn.sidebar.AdminList = function(collectionId, pending, playlists, publishers,
   this.publishers_ = publishers;
   
   /**
+   * @type {Array.<Object>}
+   * @private
+   */
+  this.categories_ = categories;
+  
+  /**
    * @type {?string}
    * @private
    */
@@ -99,7 +106,7 @@ brkn.sidebar.AdminList = function(collectionId, pending, playlists, publishers,
    * @type {Array.<string>}
    * @private
    */
-  this.tabs_ = ['pending', 'all', 'playlists', 'publishers'];
+  this.tabs_ = ['pending', 'all', 'playlists', 'publishers', 'categories'];
 };
 goog.inherits(brkn.sidebar.AdminList, goog.ui.Component);
 
@@ -138,6 +145,15 @@ brkn.sidebar.AdminList.prototype.decorateInternal = function(el) {
   this.publishersEl_ = goog.dom.getElementByClass('publishers-content', el);
   goog.array.forEach(this.publishers_, this.addPublisher_, this);
 
+  this.categoriesEl_ = goog.dom.getElementByClass('categories-content', el);
+  goog.net.XhrIo.send('/admin/_categories', goog.bind(function(e) {
+    var cats = e.target.getResponseJson();
+    goog.array.forEach(cats, function(cat) {
+      this.addCategory_(cat,
+          (goog.array.contains(this.categories_, cat['id']) || !this.categories_.length));
+    }, this);
+  }, this)); 
+
   this.resize();
 };
 
@@ -171,6 +187,7 @@ brkn.sidebar.AdminList.prototype.enterDocument = function() {
       }, this))
       this.getHandler().listen(this.getElement(), goog.events.EventType.SCROLL, goog.bind(function(e) {
         if (this.collectionId_ && !fetchInProgress && !this.finished_[this.currentTab_] &&
+            (this.currentTab_ == 'pending' || this.currentTab_ == 'all') &&
             this.getElement().scrollTop + goog.dom.getViewportSize().height >
             this.getElement().scrollHeight - this.getElement().clientTop) {
           fetchInProgress = true;
@@ -290,6 +307,13 @@ brkn.sidebar.AdminList.prototype.addPlaylist_ = function(playlist) {
     name: playlist['name']
   });
   goog.dom.appendChild(this.playlistsEl_, playlistEl);
+  
+  var remove = goog.dom.getElementByClass('remove', playlistEl);
+  this.getHandler().listen(remove, goog.events.EventType.CLICK, function(e) {
+    goog.net.XhrIo.send('admin/_remove/collection/' + this.collectionId_, goog.bind(function() {
+      goog.dom.removeNode(playlistEl);
+    }, this), 'POST', 'pub_id=' + playlist['id']);
+  });
 };
 
 
@@ -303,6 +327,34 @@ brkn.sidebar.AdminList.prototype.addPublisher_ = function(publisher) {
     picture: publisher['picture']
   });
   goog.dom.appendChild(this.publishersEl_, publisherEl);
+
+  var remove = goog.dom.getElementByClass('remove', publisherEl);
+  this.getHandler().listen(remove, goog.events.EventType.CLICK, function(e) {
+    goog.net.XhrIo.send('admin/_remove/collection/' + this.collectionId_, goog.bind(function() {
+      goog.dom.removeNode(publisherEl);
+    }, this), 'POST', 'pub_id=' + publisher['id']);
+  });
+};
+
+
+/**
+ * @param {Object} category 
+ * @param {?boolean} opt_enabled
+ * @private
+ */
+brkn.sidebar.AdminList.prototype.addCategory_ = function(category, opt_enabled) {
+  var catEl = soy.renderAsElement(brkn.sidebar.category, {
+    name: category['name'],
+    id: category['id']
+  });
+  goog.dom.appendChild(this.categoriesEl_, catEl);
+  goog.dom.classes.enable(catEl, 'enabled', !!opt_enabled);
+
+  this.getHandler().listen(catEl, goog.events.EventType.CLICK, function(e) {
+    var enabled = goog.dom.classes.toggle(catEl, 'enabled');
+    goog.net.XhrIo.send('admin/_edit/collection/' + this.collectionId_, goog.functions.NULL(),
+        'POST', 'cat_id=' + category['id'] + '&enabled=' + enabled);
+  });
 };
 
 
@@ -331,7 +383,6 @@ brkn.sidebar.AdminList.prototype.addMedia_ = function(parent, media, opt_top) {
   var approve = goog.dom.getElementByClass('approve', mediaEl);
   var remove = goog.dom.getElementByClass('remove', mediaEl);
   dragger.defaultAction = function(x, y) {
-    window.console.log('here');
     var delta = y - 24
     if (delta >= -50 && delta <= 50) {
       goog.style.setStyle(thumb, 'background-position-y', 50 - delta + '%');
