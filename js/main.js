@@ -196,12 +196,22 @@ brkn.Main.init = function(response, channelToken, channels, programs,
 
 brkn.Main.staticInit = function() {
   var fbLogin = goog.dom.getElement('fb-login');
+  var homepage = goog.dom.getElement('homepage');
   var login = goog.dom.getElement('login');
   var scrollable = goog.dom.getElement('static-scrollable');
   var content = goog.dom.getElement('static-content');
   var pages = goog.dom.getElement('pages');
   var footer = goog.dom.getElement('footer');
   var expand = false;
+  
+  // Hide in JS so background shows if JS doesn't load.
+  goog.dom.classes.add(homepage, 'hide');
+  var img = goog.dom.createDom('img');
+  img.src = '/static/img/homepage.jpg';
+  goog.events.listen(img, goog.events.EventType.LOAD, function() {
+    goog.dom.classes.remove(homepage, 'hide');
+    goog.dom.classes.add(homepage, 'show');
+  });
   
   goog.Timer.callOnce(function() {
     goog.style.showElement(fbLogin, true);
