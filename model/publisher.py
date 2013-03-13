@@ -17,7 +17,7 @@ class Publisher(db.Model):
   
   @property
   def id(self):
-    return str(self.key().name())
+    return self.key().name()
 
   def get_medias(self, limit, offset=0):
     # add .order('-published')
@@ -25,20 +25,22 @@ class Publisher(db.Model):
         .fetch(limit=limit, offset=offset)
     return [p_m.media for p_m in pub_medias]
   
-  def toJson(self):
+  def toJson(self, get_desc=True):
     json = {}
-    json['id'] = self.key().name()
+    json['id'] = self.id
     json['name'] = self.name
-    json['description'] = self.description
-    json['picture'] = '/images/publisher/' + str(self.key().name())
+    if get_desc:
+      json['description'] = self.description
+    json['picture'] = '/images/publisher/' + self.id
     json['link'] = self.link
     return json
 
   @classmethod
   def add_from_url(cls, url):
-    user_id = urlparse.urlsplit(url).path.split('/')[-1].lower()
-    publisher = Publisher.add(constants.MediaHost.YOUTUBE, user_id)
-    return publisher
+    user_id = urlparse.urlsplit(url).path.split('/')[2].lower()
+    if user_id:
+      publisher = Publisher.add(constants.MediaHost.YOUTUBE, user_id)
+      return publisher
 
   @classmethod
   def add(self, host, host_id, name=None, channel_id=None):
@@ -60,6 +62,7 @@ class Publisher(db.Model):
           logging.error(e)
           return
         picture = urlfetch.fetch(user_entry.thumbnail.url)
+        self.name = user_entry.title.text
         self.picture = db.Blob(picture.content)
         self.description = user_entry.content.text
         self.link = user_entry.link[0].href

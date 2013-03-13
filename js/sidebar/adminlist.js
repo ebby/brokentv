@@ -258,7 +258,7 @@ brkn.sidebar.AdminList.prototype.fetchLink_ = function(input) {
             }
           } else if (response['type'] == 'publisher') {
             var publisher = response['data'];
-            if (!goog.array.find(this.publishers_, function(p) {return p.id == publisher.id})) {
+            if (publisher && !goog.array.find(this.publishers_, function(p) {return p.id == publisher.id})) {
               this.publishers_.push(publisher);
               this.addPublisher_(publisher);
               this.navigate_(goog.dom.getElementsByTagNameAndClass('li', 'publishers')[0]);
@@ -323,7 +323,7 @@ brkn.sidebar.AdminList.prototype.addPlaylist_ = function(playlist) {
  */
 brkn.sidebar.AdminList.prototype.addPublisher_ = function(publisher) {
   var publisherEl = soy.renderAsElement(brkn.sidebar.publisher, {
-    name: publisher['name'],
+    name: publisher['name'] || publisher['id'],
     picture: publisher['picture']
   });
   goog.dom.appendChild(this.publishersEl_, publisherEl);

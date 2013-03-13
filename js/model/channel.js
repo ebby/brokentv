@@ -295,6 +295,7 @@ brkn.model.Channel.Action = {
 	ADD_QUEUE: 'add-queue',
 	ADD_VIEWER: 'add-viewer',
 	REMOVE_VIEWER: 'remove-viewer',
-	UPDATE_PROGRAM: 'update-program'
+	UPDATE_PROGRAM: 'update-program',
+	ONLINE: 'online'
 };
 

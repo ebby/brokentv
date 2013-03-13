@@ -175,9 +175,10 @@ brkn.Main.init = function(response, channelToken, channels, programs,
 	  brkn.model.Users.getInstance().setCurrentUser(currentUser);
 	}
 
-	brkn.model.Channels.getInstance().loadFromJson(channels, currentUser['current_channel']);
+	brkn.model.Channels.getInstance().loadFromJson(channels);
 	brkn.model.Programs.getInstance().loadFromJson(programs);
 	brkn.model.Channels.getInstance().loadViewersFromJson(viewerSessions);
+	brkn.model.Channels.getInstance().setCurrentChannel(currentUser['current_channel']);
 	brkn.model.Clock.getInstance().init();
 	
 	var main = new brkn.Main(channelToken);
@@ -360,7 +361,7 @@ brkn.Main.getSessionAndInit = function(response) {
               goog.Timer.callOnce(function() {
                 goog.style.showElement(goog.dom.getElement('homepage'), false);
                 goog.dom.classes.add(login, 'app');
-                goog.dom.classes.add(staticContent, 'about');
+                goog.dom.classes.add(staticContent, 'faq');
               }, 600);
             }, 600);
           };

@@ -9,6 +9,9 @@ SUPER_ADMINS = ['1240963']
 
 SHARE_URL = 'xylocast.com/'
 
+SLEEP_PROGRAMMING = DEVELOPMENT
+APPROVE_ALL = True
+
 SENDGRID = False
 
 # Make prod app

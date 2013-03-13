@@ -123,11 +123,11 @@ class AddToCollectionHandler(BaseHandler):
         host = parsed_url.hostname
         qs = urlparse.parse_qs(parsed_url.query)
         if 'user' in url:
-          logging.info('PUBLISHER')
           response['type'] = 'publisher'
           publisher = Publisher.add_from_url(url)
-          CollectionPublisher.add(col, publisher)
-          response['data'] = publisher.toJson()
+          if publisher:
+            CollectionPublisher.add(col, publisher)
+          response['data'] = publisher.toJson() if publisher else None
         if 'list' in qs:
           response['type'] = 'playlist'
           playlist = Playlist.add_from_url(url)
@@ -251,9 +251,9 @@ class CollectionMediaHandler(BaseHandler):
         if col_media and approve is not None:
           col_media.approve(approve)
       else:
-        cols = media.collectionMedias.fetch(None)
-        for col in cols:
-          col_media = col.collectionMedias.filter('media =', media).get()
+        col_medias = media.collectionMedias.fetch(None)
+        for cm in col_medias:
+          col_media = cm.collection.collectionMedias.filter('media =', media).get()
           tcms = TopicCollectionMedia.all().filter('collection_media =', col_media).fetch(None)
           if col_media and approve is not None:
             col_media.approve(approve)
@@ -264,12 +264,31 @@ class FetchHandler(BaseHandler):
       if self.request.get('col_id'):
         col = Collection.get_by_id(int(self.request.get('col')))
         if self.current_user.id in constants.SUPER_ADMINS or self.current_user.id in col.admin:
-          col.fetch(False)
+          col.fetch(constants.APPROVE_ALL)
       elif self.request.get('channel_id'):
         channel = Channel.get_by_key_name(self.request.get('channel_id'))
         if self.current_user.id in constants.SUPER_ADMINS or self.current_user in channel.admins.fetch(None):
           for cc in channel.collections.fetch(None):
-            cc.collection.fetch(False)
+            cc.collection.fetch(constants.APPROVE_ALL)
+            
+class ConstantsHandler(BaseHandler):
+    @BaseHandler.super_admin
+    def get(self):
+      self.response.out.write('To be implemented')
+      
+class ClearHandler(BaseHandler):
+    @BaseHandler.super_admin
+    def get(self):
+      cid = self.request.get('channel_id')
+      all = self.request.get('all') == 'true'
+      if cid:
+        channel = Channel.get_by_key_name(cid)
+        programming.Programming.clear_channel(channel)
+      elif all:
+        programming.Programming.clear()
+      else:
+        programming.Programming.clear_channels()
+      self.response.out.write('Done')
             
 class ProgramHandler(BaseHandler):
     @BaseHandler.admin

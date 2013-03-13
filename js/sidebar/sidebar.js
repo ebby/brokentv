@@ -276,9 +276,11 @@ brkn.Sidebar.prototype.onNextProgram_ = function(opt_program) {
   var program = opt_program || brkn.model.Channels.getInstance().currentChannel.getCurrentProgram();
   if (program) {
     this.currentMedia_ = program.media;
-    goog.dispose(this.info_);
-    this.info_ = new brkn.sidebar.Info(this.currentMedia_);
-    this.info_.decorate(goog.dom.getElement('info'));
+    if (!this.info_ || this.currentMedia_.id != this.info_.getModel().id) {
+      goog.dispose(this.info_);
+      this.info_ = new brkn.sidebar.Info(this.currentMedia_);
+      this.info_.decorate(goog.dom.getElement('info'));
+    }
   }
 };
 
@@ -291,9 +293,11 @@ brkn.Sidebar.prototype.onChangeChannel_ = function(opt_channel) {
   this.currentMedia_ = channel.getCurrentProgram() && channel.getCurrentProgram().media;
   if (this.currentMedia_) {
     // In case the channel is empty
-    goog.dispose(this.info_);
-    this.info_ = new brkn.sidebar.Info(this.currentMedia_);
-    this.info_.decorate(goog.dom.getElement('info')); 
+    if (!this.info_ || this.currentMedia_.id != this.info_.getModel().id) {
+      goog.dispose(this.info_);
+      this.info_ = new brkn.sidebar.Info(this.currentMedia_);
+      this.info_.decorate(goog.dom.getElement('info'));
+    }
   }
 };
 
@@ -409,9 +413,12 @@ brkn.Sidebar.prototype.showConversation = function(media, opt_comments, opt_twee
  * @param {?string=} opt_thumb
  * @param {?string=} opt_desc
  * @param {?string=} opt_link
+ * @param {?string=} opt_descUrl
  */
-brkn.Sidebar.prototype.showMediaList = function(name, opt_medias, opt_url, opt_thumb, opt_desc, opt_link) {
-  var mediaList = new brkn.sidebar.MediaList(opt_medias, opt_url, opt_thumb, opt_desc, opt_link);
+brkn.Sidebar.prototype.showMediaList = function(name, opt_medias, opt_url, opt_thumb, opt_desc,
+    opt_link, opt_descUrl) {
+  var mediaList = new brkn.sidebar.MediaList(opt_medias, opt_url, opt_thumb, opt_desc,
+      opt_link, opt_descUrl);
   mediaList.decorate(this.mediaListEl_);
   brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NAVIGATE,
       this.mediaListEl_, false, name, opt_thumb, opt_desc);

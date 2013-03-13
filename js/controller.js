@@ -416,7 +416,8 @@ brkn.Controller.prototype.resize = function() {
       this.rightEl_.style.width = '';
     }
     goog.Timer.callOnce(goog.bind(function() {
-      goog.dom.classes.enable(this.getElement(), 'window', showWindow);
+      goog.dom.classes.enable(this.getElement(), 'window', showWindow &&
+          goog.dom.classes.has(this.getElement(), 'collapsed'));
     }, this), 400);
   } else if (brkn.model.Player.getInstance().getCurrentProgram()) {
     goog.style.showElement(this.progressEl_, true);

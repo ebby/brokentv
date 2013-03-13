@@ -5,10 +5,12 @@ import gdata.youtube.service
 import gdata.alt.appengine
 import inits
 import logging
+import random
 import uuid
 import tweepy
 import sys
 import webapp2
+import pickle
 
 from google.appengine.api import taskqueue
 from google.appengine.api import memcache
@@ -66,7 +68,7 @@ class Programming():
                                               playlist=self.playlists[playlist])
       self.collections[name] = collection
       if fetch:
-        collection.fetch(approve_all=True)
+        collection.fetch(approve_all=constants.APPROVE_ALL)
     
     for name, properties in inits.CHANNELS.iteritems():
       channel = Channel.get_or_insert(key_name=Channel.make_key(name),
@@ -97,8 +99,8 @@ class Programming():
       offset = 0
       while not len(medias):
         medias = col.get_medias(limit=limit, offset=offset, last_programmed = 3200)
-        logging.info('MEDIAS COUNT: ' + str(len(medias)))
-        backup = backup if len(backup) else medias
+        backup = backup if (random.random() > .5 and len(backup)) \
+            or (random.random() <= .5 and not len(medias)) else medias
         if not len(medias):
           logging.info('NO MORE MEDIA FOR: ' + col.name)
           backup_medias += backup
@@ -129,21 +131,28 @@ class Programming():
                      _queue='twitter',
                      _countdown=30)
     
+    
+    # Stored programming
+    programming = memcache.get('programming') or {}
+    # Truncate old programs
+    programming[channel_id] = Programming.cutoff_programs(programming.get(channel_id), 600)
+
     programs = []
-    for media in all_medias:  
+    for media in all_medias:
       program = Program.add_program(channel, media)
+      programming.get(channel_id, []).append(program.toJson(fetch_channel=False, fetch_media=True, media_desc=False, pub_desc=False))
       programs.append(program)
       logging.info('ADDING: ' + media.name + ' at: ' + program.time.isoformat())
+      if len(pickle.dumps(programming)) > 1000000:
+        # We can only fit 1mb into memcache
+        break
     broadcast.broadcastNewPrograms(channel, programs)
 
-    # Update memcache
-    programming = simplejson.loads(memcache.get('programming') or '{}')
-
     # Add new programs to filtered, current programs
-    programming[channel_id] = Programming.cutoff_programs(programming.get(channel_id), 1800) + \
-        [p.toJson(fetch_channel=False, fetch_media=True, media_desc=False) for p in programs]
-    memcache.set('programming', simplejson.dumps(programming))
-    
+#    programming[channel_id] = Programming.cutoff_programs(programming.get(channel_id), 600) + \
+#        [p.toJson(fetch_channel=False, fetch_media=True, media_desc=False, pub_desc=False) for p in programs]
+    memcache.set('programming', programming)
+
     # Update channel's next_time
     channels = memcache.get('channels') or []
     for i,c in enumerate(channels):
@@ -152,16 +161,17 @@ class Programming():
     memcache.set('channels', channels)
 
     # Schedule our next programming selection
-    if schedule_next and (kickoff or (len(all_medias) and len(onlineUsers.keys()))):
+    if schedule_next and (not constants.SLEEP_PROGRAMMING or
+                          (constants.SLEEP_PROGRAMMING and len(all_medias) and (kickoff or len(onlineUsers.keys())))):
       if len(programs) > 1:
-        next_gen = (programs[-2].time - datetime.datetime.now()).seconds
+        next_gen = (programs[-2].time - datetime.datetime.now()).seconds / 4
       elif len(programs) == 1:
-        next_gen = programs[0].media.duration / 2
+        next_gen = programs[0].media.duration / 4
       else:
-        next_gen = 0
+        next_gen = 10
       next_gen = min(next_gen,
                      reduce(lambda x, y: x + y, [p.media.duration for p in programs], 0))
-      next_gen = min(next_gen, duration - 120)
+      next_gen = min(next_gen, duration / 2)
       logging.info('COUNTDOWN FOR ' + channel.name + ': ' + str(next_gen))
       deferred.defer(Programming.set_programming, channel.key().name(), fetch_twitter=fetch_twitter,
                      _name=channel.name.replace(' ', '') + '-' + str(uuid.uuid1()),
@@ -213,7 +223,7 @@ class Programming():
             or v in media.opt_out or v in media.started]
 
   '''
-    Subset of programs within 'cutoff' seconds from current time
+    Subset of past programs within 'cutoff' seconds from current time
   '''
   @classmethod
   def cutoff_programs(cls, programs, cutoff):
@@ -251,15 +261,20 @@ class Programming():
       if media.last_twitter_fetch and \
           (datetime.datetime.now() - media.last_twitter_fetch).seconds < 3600:
         continue
-      for tweet in tweepy.Cursor(api.search, q=media.host_id, rpp=100, result_type="recent",
-                                 include_entities=True, lang="en").items():
-        total += 1
-        if not tweet.from_user.lower() in constants.TWITTER_USER_BLACKLIST and not \
-            any(phrase in tweet.text.lower() for phrase in constants.TWITTER_PHRASE_BLACKLIST):
-          Tweet.add_from_result(tweet, media)
-      media.last_twitter_fetch = datetime.datetime.now()
-      media.put()
-      logging.info(str(total) + ' TWEETS FETCHED')
+
+      try:
+        tweets = tweepy.Cursor(api.search, q=media.host_id, rpp=100, result_type="recent",
+                               include_entities=True, lang="en").items()
+        for tweet in tweets:
+          total += 1
+          if not tweet.from_user.lower() in constants.TWITTER_USER_BLACKLIST and not \
+              any(phrase in tweet.text.lower() for phrase in constants.TWITTER_PHRASE_BLACKLIST):
+            Tweet.add_from_result(tweet, media)
+        media.last_twitter_fetch = datetime.datetime.now()
+        media.put()
+        logging.info(str(total) + ' TWEETS FETCHED')
+      except TweepError, e:
+        logging.info('query: ' + media.host_id + '\nreason: ' + e.reason + '\nresponse: ' + e.response)
 
   @classmethod
   def add_youtube_feeds(cls):
@@ -304,7 +319,39 @@ class Programming():
           time.sleep(0.5)
       except Exception, e:
         pass
-      
+
+  @classmethod
+  def clear_channels(cls):
+    channels = Channel.all().fetch(None)
+    memcache.delete('channels')
+    memcache.delete('programming')
+    
+    for c in channels:
+      chan_programs = c.programs.filter('time >', datetime.datetime.now()).order('time').fetch(None)
+      for cp in chan_programs:
+        try:
+          cp.program.delete()
+        except:
+          pass
+        cp.delete()
+
+  @classmethod
+  def clear_channel(cls, c):
+    c.next_time = None
+    c.programming = []
+    c.put()
+    programming = memcache.get('programming') or {}
+    programming[c.id] = []
+    memcache.set('programming', programming)
+    
+    chan_programs = c.programs.filter('time >', datetime.datetime.now()).order('time').fetch(None)
+    for cp in chan_programs:
+      try:
+        cp.program.delete()
+      except:
+        pass
+      cp.delete()
+
   @classmethod
   def clear_model(cls, model):
     channels = Channel.all().fetch(None)

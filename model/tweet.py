@@ -25,7 +25,7 @@ class Tweet(db.Model):
                                text=db.Text(result.text),
                                time=result.created_at,
                                handle=result.from_user,
-                               name=result.from_user_name,
+                               name=db.Text(result.from_user_name),
                                user_id=result.from_user_id,
                                picture_url=result.profile_image_url,
                                picture_url_https=result.profile_image_url_https)

@@ -100,6 +100,12 @@ brkn.Channel = function(model, timeline, startTime, startTimeOffset, minTime) {
    * @private
    */
   this.changeTime_ = 6;
+  
+  /**
+   * @type {boolean}
+   * @private
+   */
+  this.online = true;
 };
 goog.inherits(brkn.Channel, goog.ui.Component);
 
@@ -641,9 +647,14 @@ brkn.Channel.prototype.onSuggestProgram_ = function(video) {
  * Updater
  */
 brkn.Channel.prototype.update = function() {
+  if (!this.online && !!this.getModel().programming.length) {
+    // We just came online, broadcast event
+    this.getModel().publish(brkn.model.Channel.Action.ONLINE, true);
+  }
+
   // Hide if no content
-  var hide = !this.getModel().programming.length;
-  goog.dom.classes.enable(this.getElement(), 'offline', hide);
+  this.online = !!this.getModel().programming.length;
+  goog.dom.classes.enable(this.getElement(), 'offline', !this.online);
   if (!this.getModel().programming.length) {
     return;
   }

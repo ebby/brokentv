@@ -638,25 +638,32 @@ div#guide {
   cursor: url(/static/img/openhand.cur);
 }
 div#guide.animate {
-  -webkit-transition: height .5s ease, opacity .5s ease, left 1s ease-in-out;
-  -moz-transition: height .5s ease, opacity .5s ease, left 1s ease-in-out;
-  -o-transition: height .5s ease, opacity .5s ease, left 1s ease-in-out;
-  -ms-transition: height .5s ease, opacity .5s ease, left 1s ease-in-out;
-  transition: height .5s ease, opacity .5s ease, left 1s ease-in-out;
+  -webkit-transition: height .5s ease, opacity .5s ease, left 1s linear;
+  -moz-transition: height .5s ease, opacity .5s ease, left 1s linear;
+  -o-transition: height .5s ease, opacity .5s ease, left 1s linear;
+  -ms-transition: height .5s ease, opacity .5s ease, left 1s linear;
+  transition: height .5s ease, opacity .5s ease, left 1s linear;
 }
 div#guide.animate div.channels div.channel div.name {
-  -webkit-transition: left 1s ease-in-out;
-  -moz-transition: left 1s ease-in-out;
-  -o-transition: left 1s ease-in-out;
-  -ms-transition: left 1s ease-in-out;
-  transition: left 1s ease-in-out;
+  -webkit-transition: left 1s linear;
+  -moz-transition: left 1s linear;
+  -o-transition: left 1s linear;
+  -ms-transition: left 1s linear;
+  transition: left 1s linear;
 }
-div#guide.animate div.channels div.channel div.programs div.program div.channel div.title {
-  -webkit-transition: left 0.1s linear;
-  -moz-transition: left 0.1s linear;
-  -o-transition: left 0.1s linear;
-  -ms-transition: left 0.1s linear;
-  transition: left 0.1s linear;
+div#guide.animate div.channels div.channel div.programs div.program.playing div.channel div.title {
+  -webkit-transition: left 1s linear;
+  -moz-transition: left 1s linear;
+  -o-transition: left 1s linear;
+  -ms-transition: left 1s linear;
+  transition: left 1s linear;
+}
+div#guide.animate.toggled div.channels div.channel div.programs div.program.playing div.title {
+  -webkit-transition: left 1s linear;
+  -moz-transition: left 1s linear;
+  -o-transition: left 1s linear;
+  -ms-transition: left 1s linear;
+  transition: left 1s linear;
 }
 div#guide.drag,
 div#guide.drag div.channel div.name,
@@ -698,6 +705,11 @@ div#guide.faded {
 }
 div#guide.faded:hover {
   opacity: 1;
+}
+div#guide.sidebar-toggled div.header div.browse.right {
+  -webkit-box-shadow: inset 1px 0px 2px -1px #dedede, inset -4px 0 2px -2px #181818;
+  -moz-box-shadow: inset 1px 0px 2px -1px #dedede, inset -4px 0 2px -2px #181818;
+  box-shadow: inset 1px 0px 2px -1px #dedede, inset -4px 0 2px -2px #181818;
 }
 div#guide div.ticker,
 div#guide div.my-ticker {
@@ -877,7 +889,7 @@ div.header {
   width: 100%;
   font-size: 10px;
   color: #f5f5f5;
-  text-shadow: 1px 1px 1px #333;
+  text-shadow: 0 0 1px #181818;
 }
 div.header div.name {
   width: 10%;
@@ -928,6 +940,11 @@ div.header div.browse.right {
   -webkit-box-shadow: inset 1px 0px 2px -1px #dedede;
   -moz-box-shadow: inset 1px 0px 2px -1px #dedede;
   box-shadow: inset 1px 0px 2px -1px #dedede;
+  -webkit-transition: right 0.5s ease;
+  -moz-transition: right 0.5s ease;
+  -o-transition: right 0.5s ease;
+  -ms-transition: right 0.5s ease;
+  transition: right 0.5s ease;
   right: 0;
 }
 div.header div.browse:active {
@@ -1120,6 +1137,7 @@ div.channels div.channel div.programs div.program {
   box-shadow: inset 0px 0px 1px 1px rgba(0, 0, 0, 0.4);
   border: 1px solid whiteSmoke;
   padding: 1px;
+  cursor: pointer !important;
   -webkit-transition: width 0.3s ease;
   -moz-transition: width 0.3s ease;
   -o-transition: width 0.3s ease;
@@ -2235,8 +2253,11 @@ div#sidebar div#sidebar-content div.media-list div.list-info div.description {
   padding-left: 10px;
   color: #181818;
   text-shadow: 1px 1px 1px white;
-  font-family: MuseoSans500;
+  font-family: MuseoSans300;
   font-size: 13px;
+}
+div#sidebar div#sidebar-content div.media-list div.list-info div.description a {
+  color: #181818;
 }
 div#sidebar div#sidebar-content div.media-list div.medias {
   margin: 10px;
@@ -2363,7 +2384,7 @@ div#sidebar div.comment-input div.input-holder textarea {
   border: 1px solid #CCC;
   resize: none;
   margin-left: 10px;
-  margin-top: 8px;
+  margin-top: 9px;
   margin-bottom: 5px;
   font-family: MuseoSans300;
   -webkit-touch-callout: text;
@@ -2958,11 +2979,6 @@ div#login.hide {
   background: transparent;
 }
 div#login.hide div#homepage {
-  -webkit-transition: top 0.6s ease-in;
-  -moz-transition: top 0.6s ease-in;
-  -o-transition: top 0.6s ease-in;
-  -ms-transition: top 0.6s ease-in;
-  transition: top 0.6s ease-in;
   overflow: hidden;
   top: -100%;
 }
@@ -3028,6 +3044,14 @@ div#login.app.show div#static-content div.header {
 div#login.app.show div#static-content div#pages {
   margin-top: 50px;
 }
+div#login .faq,
+div#login #faq {
+  display: none;
+}
+div#login.app .faq,
+div#login.app #faq {
+  display: inline-block;
+}
 div#login .bold {
   font-family: MuseoSans700;
 }
@@ -3051,11 +3075,11 @@ div#login div#homepage.hide {
 }
 div#login div#homepage.show {
   opacity: 1;
-  -webkit-transition: opacity 0.5s ease;
-  -moz-transition: opacity 0.5s ease;
-  -o-transition: opacity 0.5s ease;
-  -ms-transition: opacity 0.5s ease;
-  transition: opacity 0.5s ease;
+  -webkit-transition: opacity .5s ease-in, top .6s ease-in;
+  -moz-transition: opacity .5s ease-in, top .6s ease-in;
+  -o-transition: opacity .5s ease-in, top .6s ease-in;
+  -ms-transition: opacity .5s ease-in, top .6s ease-in;
+  transition: opacity .5s ease-in, top .6s ease-in;
 }
 div#login div#static-scrollable {
   width: 100%;
@@ -3246,7 +3270,8 @@ div#login div#static-content div.fb-login.disabled {
 div#login div#static-content.about div#pages div.about,
 div#login div#static-content.jobs div#pages div.jobs,
 div#login div#static-content.tos div#pages div.tos,
-div#login div#static-content.privacy div#pages div.privacy {
+div#login div#static-content.privacy div#pages div.privacy,
+div#login div#static-content.faq div#pages div.faq {
   visibility: visible;
   opacity: 1;
   height: auto;
@@ -3255,7 +3280,8 @@ div#login div#static-content.privacy div#pages div.privacy {
 div#login div#static-content.about div#footer a#about,
 div#login div#static-content.jobs div#footer a#jobs,
 div#login div#static-content.tos div#footer a#tos,
-div#login div#static-content.privacy div#footer a#privacy {
+div#login div#static-content.privacy div#footer a#privacy,
+div#login div#static-content.faq div#footer a#faq {
   text-decoration: underline;
 }
 div#login div#static-content div#pages {

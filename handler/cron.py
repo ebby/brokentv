@@ -13,6 +13,6 @@ class FetchHandler(webapp2.RequestHandler):
 
     cols = Collection.all().fetch(None)
     for col in cols:
-      col.fetch(True)
+      col.fetch(constants.APPROVE_ALL)
     logging.info('CRON FETCH STARTED')
   

@@ -73,6 +73,6 @@ class User(db.Model):
         # To Configure UI
         json['show_sidebar'] = self.show_sidebar
         json['show_guide'] = self.show_guide
-        json['post_twitter'] = self.post_facebook
-        json['post_facebook'] = self.post_twitter
+        json['post_twitter'] = self.post_twitter
+        json['post_facebook'] = self.post_facebook
       return json

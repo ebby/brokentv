@@ -12,7 +12,7 @@ def get_session(current_user, media_id=None, channel_id=None, set_programming=Tr
     cached_channels = [c.toJson() for c in channels]
     memcache.set('channels', cached_channels)
 
-  cached_programming = simplejson.loads(memcache.get('programming') or '{}')
+  cached_programming = memcache.get('programming') or {}
   new_programming = False
   for channel in cached_channels:
     next_time = iso8601.parse_date(channel['next_time']).replace(tzinfo=None) \
@@ -196,6 +196,12 @@ class InfoHandler(BaseHandler):
         response['comments'] = [c.toJson() for c in Comment.get_by_media(media)]
         response['tweets'] = [t.to_json() for t in media.get_tweets()]
         self.response.out.write(simplejson.dumps(response))
+        
+class PublisherHandler(BaseHandler):
+    def get(self, id):
+      pub = Publisher.get_by_key_name(id)
+      if pub:
+        self.response.out.write(simplejson.dumps(pub.toJson()))
 
 class CommentHandler(BaseHandler):
     def get(self, id):

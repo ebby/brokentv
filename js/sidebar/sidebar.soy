@@ -226,7 +226,7 @@
         <img class="thumb" src="{$thumbnail}">
       </div>{if $link}</a>{/if}
     </div>
-    <div class="description" {if $description}style="display:table-cell"{/if}>{$description}</div>
+    <div class="description" style="display:table-cell">{$description|noAutoescape}</div>
   </div>
 {/template}
 

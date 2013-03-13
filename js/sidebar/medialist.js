@@ -22,10 +22,11 @@ goog.require('goog.ui.Textarea.EventType');
  * @param {?string=} opt_thumb
  * @param {?string=} opt_desc
  * @param {?string=} opt_link
+ * @param {?string=} opt_descUrl
  * @constructor
  * @extends {goog.ui.Component}
  */
-brkn.sidebar.MediaList = function(opt_mediaList, opt_url, opt_thumb, opt_desc, opt_link) {
+brkn.sidebar.MediaList = function(opt_mediaList, opt_url, opt_thumb, opt_desc, opt_link, opt_descUrl) {
   goog.base(this);
 
   /**
@@ -68,6 +69,12 @@ brkn.sidebar.MediaList = function(opt_mediaList, opt_url, opt_thumb, opt_desc, o
    * @type {?string}
    * @private
    */
+  this.descUrl_ = opt_descUrl || null;
+  
+  /**
+   * @type {?string}
+   * @private
+   */
   this.link_ = opt_link || null;
 
   /**
@@ -90,6 +97,13 @@ brkn.sidebar.MediaList = function(opt_mediaList, opt_url, opt_thumb, opt_desc, o
   this.mediasHeight_ = 0;
 };
 goog.inherits(brkn.sidebar.MediaList, goog.ui.Component);
+
+
+/**
+ * @type {Element}
+ * @private
+ */
+brkn.sidebar.MediaList.prototype.listInfoEl_;
 
 
 /**
@@ -129,13 +143,23 @@ brkn.sidebar.MediaList.prototype.decorateInternal = function(el) {
   goog.dom.classes.add(this.getElement(), 'ios-scroll');
   
   if (this.description_ || this.thumbnail_) {
-    var listInfoEl = soy.renderAsElement(brkn.sidebar.listInfo, {
-      thumbnail: this.thumbnail_,
-      description: this.description_,
-      link: this.link_
-    });
-    goog.dom.appendChild(this.getElement(), listInfoEl);
-    this.infoHeight_ = goog.style.getSize(listInfoEl).height;
+    this.setListInfo_();
+  }
+
+  if (!this.description_ && this.descUrl_) {
+    goog.net.XhrIo.send(
+        this.descUrl_,
+        goog.bind(function(e) {
+          var data = e.target.getResponseJson();
+          if (this.listInfoEl_) {
+            var descEl = goog.dom.getElementByClass('description', this.listInfoEl_);
+            descEl.innerHTML = goog.string.linkify.linkifyPlainText(data['description']);
+            this.infoHeight_ = goog.style.getSize(this.listInfoEl_).height;
+            this.resize();
+          } else {
+            this.setListInfo_(); 
+          }
+        }, this));
   }
   
   this.spinner_ = goog.dom.createDom('div', 'loading',
@@ -219,6 +243,21 @@ brkn.sidebar.MediaList.prototype.removeMedia = function(media) {
     goog.dispose(mediaEl);
     goog.object.remove(this.mediaEls_, media.id);
   }
+};
+
+
+/**
+ * @private
+ */
+brkn.sidebar.MediaList.prototype.setListInfo_ = function() {
+  this.listInfoEl_ = soy.renderAsElement(brkn.sidebar.listInfo, {
+    thumbnail: this.thumbnail_,
+    description: this.description_ ? goog.string.linkify.linkifyPlainText(this.description_) : '',
+    link: this.link_
+  });
+  goog.dom.appendChild(this.getElement(), this.listInfoEl_);
+  this.infoHeight_ = goog.style.getSize(this.listInfoEl_).height;
+  this.resize();
 };
 
 

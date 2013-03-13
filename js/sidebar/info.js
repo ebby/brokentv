@@ -265,7 +265,7 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
     
     // Comments
     var comments = /** @type {Array.<Object>} */ response['comments'];
-    goog.style.showElement(this.commentsEl_.parentElement, true);
+    this.commentsEl_ && goog.style.showElement(this.commentsEl_.parentElement, true);
     goog.style.showElement(this.noCommentsEl_, !comments.length);
     comments = goog.array.map(comments, function(comment) {
       var c = new brkn.model.Comment(comment);
@@ -287,10 +287,11 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
           goog.bind(function() {
             brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.MEDIA_LIST,
                 this.media_.publisher.name, undefined,
-                '/admin/_media/publisher/' + this.media_.publisher['id'],
+                '/admin/_media/publisher/' + this.media_.publisher.id,
                 this.media_.publisher.picture,
                 this.media_.publisher.description,
-                this.media_.publisher.link);
+                this.media_.publisher.link,
+                '/_publisher/' + this.media_.publisher.id);
           }, this))
       .listen(this.starToggle_, goog.ui.Component.EventType.ACTION, goog.bind(function() {
             brkn.model.Medias.getInstance().publish(brkn.model.Medias.Action.STAR, this.media_,
@@ -634,8 +635,8 @@ brkn.sidebar.Info.prototype.resize = function(opt_extra, opt_scrollComments) {
   if (this.commentsEl_ && this.commentsEl_.parentElement) {
     goog.style.setStyle(this.commentsEl_, 'max-height', goog.dom.getViewportSize().height -
         goog.style.getPosition(this.commentsEl_.parentElement).y - 110 - this.resizeExtra_ + 'px');
+    this.scrollGrad_();
   }
-  this.scrollGrad_();
   
   if (opt_scrollComments) {
     // Give the comment div a second/2 to resize, then scroll to bottom.

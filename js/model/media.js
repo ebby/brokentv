@@ -56,7 +56,7 @@ brkn.model.Media = function(media) {
   this.link = media['link'] || 'xylocast.com/?m=' + this.id;
   
   /**
-   * @type {Object}
+   * @type {brkn.model.Publisher}
    */
   this.publisher = new brkn.model.Publisher(media['publisher']);
   

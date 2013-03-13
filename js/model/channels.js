@@ -95,9 +95,8 @@ brkn.model.Channels.prototype.findOnline = function(opt_public) {
 
 /**
  * @param {Object} channels Channels json object.
- * @param {string} currentChannelId
  */
-brkn.model.Channels.prototype.loadFromJson = function(channels, currentChannelId) {
+brkn.model.Channels.prototype.loadFromJson = function(channels) {
 	goog.object.forEach((/** @type {Object.<string, Object>} */ channels),
 			goog.bind(function(channel, id) {
 				var c = new brkn.model.Channel(channel)
@@ -107,14 +106,20 @@ brkn.model.Channels.prototype.loadFromJson = function(channels, currentChannelId
 				  this.myChannel = c;
 				}
 			}, this));
-	
-	// Set current channel or first channel with content.
-	var channel = this.channelMap[currentChannelId] || this.channels[0];
-	this.currentChannel = channel;
-	this.currentChannel = this.findOnline() || this.currentChannel;
-	if (this.currentChannel) {
-	  this.updateOnlineUsers(this.currentChannel.getCurrentProgram());
-	}
+};
+
+
+/**
+ * @param {string} currentChannelId
+ */
+brkn.model.Channels.prototype.setCurrentChannel = function(currentChannelId) {
+  // Set current channel or first channel with content.
+  var channel = this.channelMap[currentChannelId] || this.channels[0];
+  this.currentChannel = channel;
+  this.currentChannel = this.findOnline() || this.currentChannel;
+  if (this.currentChannel) {
+    this.updateOnlineUsers(this.currentChannel.getCurrentProgram());
+  }
 };
 
 

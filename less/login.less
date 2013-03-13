@@ -9,7 +9,6 @@ div#login {
   &.hide {
     background: transparent;
     div#homepage {
-      .transition(top, .6s, ease-in);
       overflow: hidden;
       top: -100%;
     }
@@ -67,6 +66,14 @@ div#login {
       }
     }
   }
+
+  .faq, #faq {
+    display: none;
+  }
+  &.app .faq, &.app #faq {
+    display: inline-block;
+  }
+
   .bold {
     font-family: MuseoSans700;
   }
@@ -87,7 +94,7 @@ div#login {
     }
     &.show {
       opacity: 1;
-      .transition(opacity, .5s, ease);
+      .transition(e('opacity .5s ease-in, top .6s ease-in'));
     }
   }
   div#static-scrollable {
@@ -246,14 +253,14 @@ div#login {
       }
     }
     &.about div#pages div.about, &.jobs div#pages div.jobs, &.tos div#pages div.tos,
-        &.privacy div#pages div.privacy {
+        &.privacy div#pages div.privacy, &.faq div#pages div.faq {
       visibility: visible;
       opacity: 1;
       height: auto;
       padding: 10px;
     }
     &.about div#footer a#about, &.jobs div#footer a#jobs, &.tos div#footer a#tos,
-        &.privacy div#footer a#privacy {
+        &.privacy div#footer a#privacy, &.faq div#footer a#faq {
       text-decoration: underline;
     }
     div#pages {

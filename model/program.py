@@ -13,17 +13,18 @@ class Program(db.Model):
   seek = db.IntegerProperty(default=0)
 
   @classmethod
-  def get_current_programs(cls, channels):    
-    cutoff = datetime.datetime.now() - datetime.timedelta(hours=1)
-    programming = simplejson.loads(memcache.get('programming') or '{}')
+  def get_current_programs(cls, channels, limit=5):    
+    cutoff = datetime.datetime.now() - datetime.timedelta(minutes=10)
+    programming = memcache.get('programming') or {}
 
     for channel in channels:
       programs = [x.program for x in
-                  channel.programs.filter('time >', cutoff).order('time').fetch(None)]
+                  channel.programs.filter('time >', cutoff).order('time').fetch(limit=limit)]
       
-      programming[channel.id] = [p.toJson(fetch_channel=False, media_desc=False) for p in programs]
+      programming[channel.id] = [p.toJson(fetch_channel=False, media_desc=False, pub_desc=False) \
+                                 for p in programs]
 
-    memcache.set('programming', simplejson.dumps(programming))
+    memcache.set('programming', programming)
     return programming
 
   @classmethod
@@ -84,10 +85,10 @@ class Program(db.Model):
     self.put()
     return effected
   
-  def toJson(self, fetch_channel=True, fetch_media=True, media_desc=True):
+  def toJson(self, fetch_channel=True, fetch_media=True, media_desc=True, pub_desc=True):
     json = {}
     json['id'] = self.key().id()
-    json['media'] = self.media.toJson(media_desc) if fetch_media else self.media.key().name()
+    json['media'] = self.media.toJson(get_desc=media_desc, pub_desc=pub_desc) if fetch_media else self.media.key().name()
     json['time'] = self.time.isoformat() if self.time else None
     json['channel'] = self.channel.toJson() if fetch_channel else {'id': self.channel.id}
     json['async'] = self.async or False

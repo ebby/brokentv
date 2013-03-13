@@ -27,7 +27,6 @@ class Collection(db.Model):
   def add_publisher_media(cls, collection_id, publisher_id, approve_all):
     collection = Collection.get_by_id(int(collection_id))
     publisher = Publisher.get_by_key_name(publisher_id)
-    logging.info('FETCHING: ' + publisher.name)
     publisher_medias = publisher.fetch(collection=collection, approve_all=approve_all)
     
   @classmethod
@@ -45,7 +44,7 @@ class Collection(db.Model):
     publishers = self.get_publishers()
     for publisher in publishers:
       deferred.defer(Collection.add_publisher_media, self.id, publisher.id, approve_all,
-                     _name='fetch-' + publisher.name.replace(' ', '') + '-' + str(uuid.uuid1()))
+                     _name='fetch-' + publisher.id + '-' + str(uuid.uuid1()))
 
   def add_media(self, media, approved=False):
     CollectionMedia.add(collection=self, media=media, approved=approved)

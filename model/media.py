@@ -91,6 +91,7 @@ class Media(db.Model):
                     host_views=int(item['statistics']['viewCount']) if item['statistics']['viewCount'] else 0)
         media.put()
 
+        collection_media = None
         if collection and (item.get('categoryId') in collection.categories or not len(collection.categories)):
           collection_media = CollectionMedia.add(collection, media, approved=(True if approve else None))
 
@@ -189,16 +190,17 @@ class Media(db.Model):
       obj.opt_out.append(uid)
       obj.put()
 
-  def toJson(self, get_desc=True):
+  def toJson(self, get_desc=True, pub_desc=True):
     json = {}
     json['id'] = self.key().name()
     json['name'] = self.name
-    json['publisher'] = self.publisherMedias.get().publisher.toJson() if self.publisherMedias.get() else ''
+    json['publisher'] = self.publisherMedias.get().publisher.toJson(pub_desc) if self.publisherMedias.get() else ''
     json['host_id'] = self.host_id
     json['host'] = self.host
     json['duration'] = self.duration
     json['published'] = self.published.isoformat()
-    json['description'] = self.description if get_desc else ''
+    if get_desc:
+      json['description'] = self.description
     json['link'] = self.link
     json['thumb_pos'] = self.thumb_pos
     json['star_count'] = self.star_count

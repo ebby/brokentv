@@ -77,7 +77,11 @@ class Channel(db.Model):
     last_program = self.programs.order('-time').get()
     next_time = datetime.datetime.now()
     if last_program:
-      next_time = last_program.program.time + datetime.timedelta(seconds=last_program.program.media.duration)
+      try:
+        next_time = last_program.program.time + datetime.timedelta(seconds=last_program.program.media.duration)
+      except Exception, e:
+        logging.warning('Missing program: ' + e.message)
+        last_program.delete()
     self.next_time = max(datetime.datetime.now(), next_time)
 
   def get_next_time(self):
