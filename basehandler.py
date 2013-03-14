@@ -77,12 +77,19 @@ class BaseHandler(SessionRequest):
         return self.session_store.get_session()  
 
     @staticmethod
+    def logged_in(method):
+        def check(handler, *args, **kwargs):
+          if handler.current_user:
+            return method(handler, *args, **kwargs)
+          handler.error(401)
+        return check
+
+    @staticmethod
     def super_admin(method):
         def check(handler, *args, **kwargs):
-          # SHOULD RESET SESSION FOR SECURITY. CAN CURRENTLY LOG OUT OF FB AND STILL ACCESS ADMIN
           if handler.current_user and handler.current_user.id in constants.SUPER_ADMINS:
             return method(handler, *args, **kwargs)
-          handler.redirect('/')
+          handler.error(401)
         return check
   
     @staticmethod 
@@ -92,5 +99,5 @@ class BaseHandler(SessionRequest):
             return method(handler, *args, **kwargs)
           if handler.current_user.access_level == constants.AccessLevel.ADMIN:
             return method(handler, *args, **kwargs)
-          handler.redirect('/')
+          handler.error(401)
         return check

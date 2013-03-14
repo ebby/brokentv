@@ -87,6 +87,12 @@ brkn.Guide = function() {
    * @private
    */
   this.firstAlign_ = true;
+  
+  /**
+   * @type {boolean}
+   * @private
+   */
+  this.dragging_ = false;
 
   /** 
    * @type {Array}
@@ -332,12 +338,6 @@ brkn.Guide.prototype.enterDocument = function() {
           true);
     }, this))
     .listen(window, goog.events.EventType.RESIZE, goog.bind(this.align_, this))
-    .listen(this.channelsEl_, goog.events.EventType.SCROLL,
-        goog.bind(function() {
-          if (!this.scrolling_) {
-            this.align_(false, undefined, true)
-          }
-        }, this))
     .listen(this.tickerEl_, goog.events.EventType.CLICK,
         goog.bind(this.align_, this, true, undefined, false))
     .listen(nowLeft, goog.events.EventType.CLICK, goog.bind(this.onLeft_, this))
@@ -345,12 +345,16 @@ brkn.Guide.prototype.enterDocument = function() {
     .listen(this.dragger_,
         goog.fx.Dragger.EventType.BEFOREDRAG,
         goog.bind(function() {
+          goog.dom.classes.remove(this.getElement(), 'animate');
           goog.dom.classes.add(this.getElement(), 'drag');
+          this.dragging_ = true;
         }, this))
     .listen(this.dragger_,
         goog.fx.Dragger.EventType.END,
         goog.bind(function() {
           goog.dom.classes.remove(this.getElement(), 'drag');
+          goog.dom.classes.add(this.getElement(), 'animate');
+          this.dragging_ = false;
           this.aligned_ = false;
           this.updateNowButtons_();
         }, this))
@@ -360,7 +364,9 @@ brkn.Guide.prototype.enterDocument = function() {
           e.preventDefault();
           e.stopPropagation();
           e = e.getBrowserEvent();
+          goog.dom.classes.remove(this.getElement(), 'animate');
           goog.dom.classes.add(this.getElement(), 'drag');
+          this.dragging_ = true;
           var delta = e.wheelDelta ? e.wheelDelta : e.detail ? -e.detail : 0;
           var x = goog.style.getPosition(this.getElement()).x + delta;
           if (x < 0 && x > (-1 * this.width_ + goog.dom.getViewportSize().width)) {
@@ -370,6 +376,8 @@ brkn.Guide.prototype.enterDocument = function() {
                 + -x + 'px !important}';
           }
           goog.dom.classes.remove(this.getElement(), 'drag');
+          goog.dom.classes.add(this.getElement(), 'animate');
+          this.dragging_ = false;
           this.aligned_ = false;
           this.updateNowButtons_();
         }, this));
@@ -628,13 +636,13 @@ brkn.Guide.prototype.tick_ = function() {
     
     goog.style.setPosition(this.tickerEl_, elapsed);
     goog.style.setPosition(this.myTickerEl_, myElapsed);
-    //goog.style.showElement(this.tickerEl_, !!currentProgram);
+    // goog.style.showElement(this.tickerEl_, !!currentProgram);
     goog.style.showElement(this.myTickerEl_, !!myCurrentProgram);
     goog.dom.classes.enable(this.tickerEl_, 'go-live', !isMyChannel && !!currentProgram &&
         !!myCurrentProgram && currentProgram.id != myCurrentProgram.id && 
-        Math.abs(myElapsed - elapsed) > 25);
-//    goog.dom.classes.enable(this.tickerEl_, 'can-go-live', !isMyChannel &&
-//        Math.abs(myElapsed - elapsed) > 15);
+        Math.abs(myElapsed - elapsed) > 45);
+    // goog.dom.classes.enable(this.tickerEl_, 'can-go-live', !isMyChannel &&
+    //     Math.abs(myElapsed - elapsed) > 15);
     goog.dom.classes.enable(this.myTickerEl_, 'show', !Math.abs(myElapsed - elapsed) > 15);
     goog.dom.classes.enable(this.myTickerEl_, 'show-me', !isMyChannel &&
         Math.abs(myElapsed - elapsed) > 15);
@@ -642,7 +650,8 @@ brkn.Guide.prototype.tick_ = function() {
     if (this.firstAlign_) {
       this.firstAlign_ = false;
       this.align_(true, undefined, false);
-    } else {
+      goog.dom.classes.add(this.getElement(), 'animate');
+    } else if (!this.dragging_) {
       this.align_();
     }
   }
@@ -672,8 +681,12 @@ brkn.Guide.prototype.align_ = function(opt_setAligned, opt_offset, opt_setScroll
     program = channel && channel.getCurrentProgram();
   }
   this.cursor_[1] = program;
-  
-  if ((this.aligned_ || opt_offset) && program && this.minTime_) {
+
+  if (!this.aligned_) {
+    goog.dom.classes.remove(this.getElement(), 'tick-along');
+  }
+
+  if ((this.aligned_ || opt_offset) && this.minTime_) {
     var myCurrentProgram = brkn.model.Player.getInstance().getCurrentProgram();
     var myCurrentProgress = brkn.model.Player.getInstance().getCurrentTime();
     var elapsed = (goog.now() - this.minTime_.getTime())/1000 * this.pixelsPerSecond_;
@@ -688,23 +701,29 @@ brkn.Guide.prototype.align_ = function(opt_setAligned, opt_offset, opt_setScroll
       this.expand_();
     }
 
-    var offset = -(program.time.getTime() - this.minTime_.getTime())/1000 * this.pixelsPerSecond_ + 5;
     var viewWidth = goog.dom.getViewportSize().width - 
         (brkn.model.Controller.getInstance().sidebarToggled ? 300 : 0);
 
-//    if (!opt_offset && brkn.model.Controller.getInstance().guideToggled &&
-//        elapsed > -offset + viewWidth - 300) {
-//      // If program is off-screen, keep up.
-//      window.console.log('PROGRAM IS OFF SCREEN')
-//      offset = (opt_live ? -elapsed : -myElapsed) + viewWidth - 350;
-//    }
-
-    if (!opt_offset && (brkn.model.Controller.getInstance().guideToggled || opt_setAligned) &&
-        elapsed > -offset + viewWidth - 300) {
-      // If off-screen (last program is done), align to ticker
-      offset = -goog.style.getPosition(this.tickerEl_).x + viewWidth - 200;
+    var offset = 0;
+    if (program) {
+      offset = -(program.time.getTime() - this.minTime_.getTime())/1000 * this.pixelsPerSecond_ + 5;
     }
 
+    // Align to current playing program
+    //    if (!opt_offset && brkn.model.Controller.getInstance().guideToggled &&
+    //        elapsed > -offset + viewWidth - 300) {
+    //      // If program is off-screen, keep up.
+    //      window.console.log('PROGRAM IS OFF SCREEN')
+    //      offset = (opt_live ? -elapsed : -myElapsed) + viewWidth - 350;
+    //    }
+
+    if (!program || (!opt_offset && brkn.model.Controller.getInstance().guideToggled &&
+        elapsed > -offset + viewWidth - 300)) {
+      // If off-screen (last program is done), align to ticker
+      offset = -goog.style.getPosition(this.tickerEl_).x + viewWidth - 200;
+      goog.dom.classes.add(this.getElement(), 'tick-along');
+    }
+   
     offset = Math.max(offset, -goog.style.getSize(this.getElement()).width + viewWidth)
     offset = Math.min(offset, 0);
     goog.style.setPosition(this.getElement(), offset);

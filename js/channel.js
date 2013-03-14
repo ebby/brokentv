@@ -309,6 +309,10 @@ brkn.Channel.prototype.enterDocument = function() {
 brkn.Channel.prototype.updateCurrentProgram_ = function() {
   if (this.currentProgram_) {
     goog.dom.classes.remove(this.programs_[this.currentProgram_], 'playing');
+    var title = goog.dom.getElementByClass('title', this.programs_[this.currentProgram_]);
+    if (title) {
+      title.style.left = '';
+    }
   }
   this.currentProgram_ = null;
   
@@ -665,7 +669,7 @@ brkn.Channel.prototype.update = function() {
   }
  
   // Potentially move title for current program
-  if (this.currentProgram_) {
+  if (this.currentProgram_ && this.changeTime_ > 0) {
     var currentProgram = this.programs_[this.currentProgram_];
     var delta = goog.style.getPosition(currentProgram).x +
         goog.style.getPosition(goog.dom.getElement('guide')).x;

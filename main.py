@@ -50,6 +50,8 @@ jinja_environment = jinja2.Environment(
 
 class MainHandler(BaseHandler):
     def get(self, path=None):
+      self.session['user'] = None
+      
       template_data = {}
       template_data['host_url'] = self.request.host_url
       if self.request.get('prod') or not constants.DEVELOPMENT:
@@ -153,6 +155,7 @@ def create_handlers_map():
     ('/_info/(.*)', rpc.InfoHandler),
     ('/_link', rpc.LinkHandler),
     ('/_optin', rpc.OptInHandler),
+    ('/_programming/(.*)', rpc.ProgramHandler),
     ('/_publisher/(.*)', rpc.PublisherHandler),
     ('/_started', rpc.StartedHandler),
     ('/_seen', rpc.SeenHandler),

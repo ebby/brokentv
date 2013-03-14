@@ -70,11 +70,11 @@ else :
   STATS_JS_SOURCE = '/static/js/stats-min.js'
   ADMIN_JS_SOURCE = '/static/js/admin-min.js'
   
-  TWITTER_CONSUMER_KEY = 'hiEtXnWvrHwBscT698zP3w'
-  TWITTER_CONSUMER_SECRET = 'bGY381qzadl7rlcYeKWW3pFLTcYAoIgQYT4awjxXOc'
-  TWITTER_ACCESS_TOKEN = '423216326-IuRUPJRwLtdPRW9a9etVSVZy5EuWHsjXo3a4BOBT'
-  TWITTER_TOKEN_SECRET = 'y02WSt6kTqhaB6kALBBp5B2fqu1KQLUpAYiUl7qs'
-  TWITTER_CALLBACK = 'http://www.xylovision.com/_twitter/callback'
+  TWITTER_CONSUMER_KEY = 'jd3rN8a2Z3nYSFLdJRZg'
+  TWITTER_CONSUMER_SECRET = 'xfqxhXlYcyVKJ446CWu6Rwjn4tEgTV48ry40uySxgE'
+  TWITTER_ACCESS_TOKEN = '1265134423-MWrzcVeVoM1uPQXK1l1RyzN2mFkiAFydQQcqxcY'
+  TWITTER_TOKEN_SECRET = 'ifzqJCjArehXLJIMQ2RzLT6vWmzg2oNFrdvL5PHCOy0'
+  TWITTER_CALLBACK = 'http://www.xylocast.com/_twitter/callback'
 
 class AccessLevel:
   WAITLIST = 0

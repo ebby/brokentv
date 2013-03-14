@@ -83,102 +83,102 @@ class Programming():
     memcache.set('channels', [c.toJson(get_programming=False) for c in self.channels.itervalues()])
       
   @classmethod
-  def set_programming(cls, channel_id, duration=600, schedule_next=True, fetch_twitter=True,
+  def set_programming(cls, channel_id, duration=1200, schedule_next=True, fetch_twitter=True,
                       queue='programming', target=None, kickoff=False):
-    channel = Channel.get_by_key_name(channel_id)
-    channel.update_next_time()
-    viewers = (memcache.get('channel_viewers') or {}).get(str(channel_id), [])
-    onlineUsers = memcache.get('web_channels') or {}
-    cols = channel.get_collections()
-    all_medias = []
-    backup_medias = []
-    for col in cols:
-      medias = []
-      backup = []
-      limit = 50
-      offset = 0
-      while not len(medias):
-        medias = col.get_medias(limit=limit, offset=offset, last_programmed = 3200)
-        backup = backup if (random.random() > .5 and len(backup)) \
-            or (random.random() <= .5 and not len(medias)) else medias
-        if not len(medias):
-          logging.info('NO MORE MEDIA FOR: ' + col.name)
-          backup_medias += backup
-          break
-        # Don't repeat the same program within an hour
-        medias = [c for c in medias if not c.last_programmed or
-                 (datetime.datetime.now() - c.last_programmed).seconds > 3600]
-        # At most, 30% of the audience has already "witnessed" this program
-        medias = [m for m in medias if not len(viewers) or
-                  float(len(Programming.have_seen(m, viewers)))/len(viewers) < .3]
-        offset += limit
-      all_medias += medias
-    
-    if not len(all_medias):
-      logging.info('BACKUP MEDIAS: ' + str(len(backup_medias)))
-      all_medias = backup_medias
-    
-    # StorySort algorithm
-    all_medias = Programming.story_sort(all_medias)
-    
-    # Grab 10 minutes of programming
-    all_medias = Programming.timed_subset(all_medias, duration)
-    
-    if fetch_twitter:
-      # Find related twitter posts
-      deferred.defer(Programming.fetch_related_tweets, all_medias,
-                     _name='twitter-' + channel.name.replace(' ', '') + '-' + str(uuid.uuid1()),
-                     _queue='twitter',
-                     _countdown=30)
-    
-    
+
     # Stored programming
     programming = memcache.get('programming') or {}
-    # Truncate old programs
-    programming[channel_id] = Programming.cutoff_programs(programming.get(channel_id), 600)
+    onlineUsers = memcache.get('web_channels') or {}
+    if not programming.get(channel_id) or \
+        not len(Programming.next_programs(programming.get(channel_id), duration)):
+      channel = Channel.get_by_key_name(channel_id)
+      channel.update_next_time()
+      viewers = (memcache.get('channel_viewers') or {}).get(str(channel_id), [])
+      cols = channel.get_collections()
+      all_medias = []
+      backup_medias = []
+      for col in cols:
+        medias = []
+        backup = []
+        limit = 50
+        offset = 0
+        while not len(medias):
+          medias = col.get_medias(limit=limit, offset=offset, last_programmed = 3200)
+          backup = backup if (random.random() > .5 and len(backup)) \
+              or (random.random() <= .5 and not len(medias)) else medias
+          if not len(medias):
+            logging.info('NO MORE MEDIA FOR: ' + col.name)
+            backup_medias += backup
+            break
+          # Don't repeat the same program within an hour
+          medias = [c for c in medias if not c.last_programmed or
+                   (datetime.datetime.now() - c.last_programmed).seconds > 3600]
+          # At most, 30% of the audience has already "witnessed" this program
+          medias = [m for m in medias if not len(viewers) or
+                    float(len(Programming.have_seen(m, viewers)))/len(viewers) < .3]
+          offset += limit
+        all_medias += medias
 
-    programs = []
-    for media in all_medias:
-      program = Program.add_program(channel, media)
-      programming.get(channel_id, []).append(program.toJson(fetch_channel=False, fetch_media=True, media_desc=False, pub_desc=False))
-      programs.append(program)
-      logging.info('ADDING: ' + media.name + ' at: ' + program.time.isoformat())
-      if len(pickle.dumps(programming)) > 1000000:
-        # We can only fit 1mb into memcache
-        break
-    broadcast.broadcastNewPrograms(channel, programs)
+      if not len(all_medias):
+        logging.info('BACKUP MEDIAS: ' + str(len(backup_medias)))
+        all_medias = backup_medias
 
-    # Add new programs to filtered, current programs
-#    programming[channel_id] = Programming.cutoff_programs(programming.get(channel_id), 600) + \
-#        [p.toJson(fetch_channel=False, fetch_media=True, media_desc=False, pub_desc=False) for p in programs]
-    memcache.set('programming', programming)
+      # StorySort algorithm
+      all_medias = Programming.story_sort(all_medias)
 
-    # Update channel's next_time
-    channels = memcache.get('channels') or []
-    for i,c in enumerate(channels):
-      if c['id'] == channel_id:
-        channels[i] = channel.toJson(get_programming=False)
-    memcache.set('channels', channels)
+      # Grab 10 minutes of programming
+      all_medias = Programming.timed_subset(all_medias, duration)
+
+      if fetch_twitter:
+        # Find related twitter posts
+        deferred.defer(Programming.fetch_related_tweets, all_medias,
+                       _name='twitter-' + channel.name.replace(' ', '') + '-' + str(uuid.uuid1()),
+                       _queue='twitter',
+                       _countdown=30)
+
+      # Truncate old programs
+      programming[channel_id] = Programming.cutoff_programs(programming.get(channel_id), 300)
+  
+      programs = []
+      for media in all_medias:
+        program = Program.add_program(channel, media)
+        programming.get(channel_id, []).append(program.toJson(fetch_channel=False, fetch_media=True, media_desc=False, pub_desc=False))
+        programs.append(program)
+        logging.info('ADDING: ' + media.name + ' at: ' + program.time.isoformat())
+        if len(pickle.dumps(programming)) > 1000000:
+          # We can only fit 1mb into memcache
+          break
+      broadcast.broadcastNewPrograms(channel, programs)
+  
+      # Add new programs to filtered, current programs
+      #    programming[channel_id] = Programming.cutoff_programs(programming.get(channel_id), 600) + \
+      #        [p.toJson(fetch_channel=False, fetch_media=True, media_desc=False, pub_desc=False) for p in programs]
+      memcache.set('programming', programming)
+  
+      # Update channel's next_time
+      channels = memcache.get('channels') or []
+      for i,c in enumerate(channels):
+        if c['id'] == channel_id:
+          channels[i] = channel.toJson(get_programming=False)
+      memcache.set('channels', channels)
 
     # Schedule our next programming selection
     if schedule_next and (not constants.SLEEP_PROGRAMMING or
-                          (constants.SLEEP_PROGRAMMING and len(all_medias) and (kickoff or len(onlineUsers.keys())))):
+                          (constants.SLEEP_PROGRAMMING and (kickoff or len(onlineUsers.keys())))):
       if len(programs) > 1:
-        next_gen = (programs[-2].time - datetime.datetime.now()).seconds / 4
+        next_gen = (programs[-2].time - datetime.datetime.now()).seconds / 2
       elif len(programs) == 1:
-        next_gen = programs[0].media.duration / 4
+        next_gen = programs[0].media.duration / 2
       else:
         next_gen = 10
       next_gen = min(next_gen,
                      reduce(lambda x, y: x + y, [p.media.duration for p in programs], 0))
       next_gen = min(next_gen, duration / 2)
       logging.info('COUNTDOWN FOR ' + channel.name + ': ' + str(next_gen))
-      deferred.defer(Programming.set_programming, channel.key().name(), fetch_twitter=fetch_twitter,
-                     _name=channel.name.replace(' ', '') + '-' + str(uuid.uuid1()),
+      deferred.defer(Programming.set_programming, channel_id, fetch_twitter=fetch_twitter,
+                     _name=channel_id + '-' + str(uuid.uuid1()),
                      _countdown=next_gen,
                      _queue=queue)
-
-    return programs
   
   '''
     Our secret sauce sorting algorithm
@@ -239,6 +239,30 @@ class Programming():
       cutoff_index += 1
     return programs[cutoff_index:]
   
+
+  '''
+    Subset of programs starting after now and ending within 'duration' from now
+  '''
+  @classmethod
+  def next_programs(cls, programs, duration):
+    # duration in seconds, programs are json
+    if not programs or not len(programs):
+      return []
+    index = 0
+    start_index = None
+    end_index = len(programs)
+    for p in programs:
+      time = iso8601.parse_date(p['time']).replace(tzinfo=None)
+      if time > datetime.datetime.now() and \
+          (time + datetime.timedelta(seconds=p['media']['duration']) < \
+           (datetime.datetime.now() + datetime.timedelta(seconds=duration))):
+        start_index = index if start_index is None else start_index
+        end_index = index + 1
+      index += 1
+    start_index = start_index if start_index is not None else len(programs)
+    return programs[start_index:end_index]
+
+
   '''
     Subset of medias with approx duration of span (in seconds)
   '''

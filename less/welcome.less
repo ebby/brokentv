@@ -1,3 +1,24 @@
+.welcome-sprite(@x: 0, @y: 0, @width: 0, @height: 0) {
+    background-image: url(/static/img/welcome-sprite.png);
+    background-position:  @x @y;
+    background-repeat: no-repeat;
+    width: @width;
+    height: @height;
+}
+
+.sprite-thanks() {
+    .welcome-sprite(-5px, -5px, 330px, 230px);
+}
+
+.sprite-welcome-guide() {
+    .welcome-sprite(-5px, -245px, 400px, 73px);
+}
+
+.sprite-welcome-sidebar() {
+    .welcome-sprite(-345px, -5px, 300px, 153px);
+}
+
+
 div#welcome {
   position: absolute;
   top: 0;
@@ -12,28 +33,22 @@ div#welcome {
     opacity: .8;
   }
   div.thanks {
-    background: url(/static/img/thanks.png);
-    width: 330px;
-    height: 230px;
+    .sprite-thanks();
     position: absolute;
     top: 10px;
     left: 10px;
   }
   div.guide {
-    background: url(/static/img/welcome-guide.png);
+    .sprite-welcome-guide();
     bottom: 60px;
     left: 10px;
     position: absolute;
-    width: 400px;
-    height: 73px;
   }
   div.sidebar {
-    background: url(/static/img/welcome-sidebar.png);
+    .sprite-welcome-sidebar();
     top: 50%;
     margin-top: -75px;
     right: 320px;
     position: absolute;
-    width: 300px;
-    height: 153px;
   }
 }

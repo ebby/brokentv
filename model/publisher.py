@@ -51,7 +51,7 @@ class Publisher(db.Model):
     return publisher
 
   def fetch(self, collection=None, approve_all=False):
-    medias = []
+    all_medias = []
 
     if self.host == MediaHost.YOUTUBE:
       if not self.channel_id:
@@ -69,6 +69,7 @@ class Publisher(db.Model):
         self.channel_id = re.search('/channel/(.*)', self.link).groups()[0]
         self.put()
 
+      medias = []
       youtube3 = get_youtube3_service()
       next_page_token = ''
       while next_page_token is not None:
@@ -90,18 +91,19 @@ class Publisher(db.Model):
         ).execute()
         medias = Media.add_from_snippet(videos_response.get("items", []), collection=collection,
                                         approve=approve_all)
+        all_medias += medias
         for media in medias:
           logging.info('FETCHED: ' + media.name)
           PublisherMedia.add(publisher=self, media=media)
         next_page_token = search_response.get('tokenPagination', {}).get('nextPageToken')
 
-      if len(medias):
-        msg = emailer.Email(emailer.Message.FETCH, data={'count': len(medias)})
-        for uid in constants.SUPER_ADMINS:
-          user = User.get_by_key_name(uid)
-          msg.send(user)
       self.last_fetch = datetime.datetime.now()
       self.put()
+    if len(all_medias) and not approve_all:
+      msg = emailer.Email(emailer.Message.FETCH, data={'count': len(medias)})
+      for uid in constants.SUPER_ADMINS:
+        user = User.get_by_key_name(uid)
+        msg.send(user)
 
 class PublisherMedia(db.Model):
   publisher = db.ReferenceProperty(Publisher, collection_name='publisherMedias')

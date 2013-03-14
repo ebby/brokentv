@@ -16,17 +16,14 @@ div#guide {
       div.name {
         .transition(left, 1s, linear);
       }
-      div.programs div.program.playing div.channel div.title {
-        .transition(left, 1s, linear);
-      }
     }
   }
   
-  &.animate.toggled div.channels div.channel div.programs div.program.playing div.title {
+  &.tick-along.animate.toggled div.channels div.channel div.programs div.program.playing div.title {
     .transition(left, 1s, linear);
   }
   
-  &.drag, &.drag div.channel div.name, &.aligning div.channel div.name {
+  &.drag, &.drag div.channel div.name {
     .transition(e('none !important'));
     .grabbing();
   }
@@ -467,6 +464,9 @@ div#guide {
 					}
 	        &.current {
 	          background: rgba(255, 255, 255, .3);
+	        }
+	        &:not(.playing) div.title {
+	          left: 5px !important;
 	        }
 	        div.remove {
 	          display: none;

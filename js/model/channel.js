@@ -165,6 +165,7 @@ brkn.model.Channel.prototype.getCurrentProgram = function(opt_offset) {
     return this.currentProgram;
   }
 	if (!this.programming.length) {
+	  this.fetchCurrentProgramming();
 		return null;
 	}
 	var program = this.currentProgram;
@@ -191,7 +192,6 @@ brkn.model.Channel.prototype.getCurrentProgram = function(opt_offset) {
   while (goog.now() > program.time.getTime() &&
       goog.now() >= program.time.getTime() + program.media.duration * 1000) {
     var nextProgram = this.getNextProgram();
-
     if (this.myChannel) {
       if (nextProgram && nextProgram.async && nextProgram.seek) {
         // If this is the program associated with the current media.
@@ -204,11 +204,9 @@ brkn.model.Channel.prototype.getCurrentProgram = function(opt_offset) {
         nextProgram = this.getNextQueue(); 
       }
     }
-
   	if (!nextProgram) {
       break;
   	}
-  	
   	program = nextProgram;
   }
   if (goog.now() >= program.time.getTime() &&
@@ -216,8 +214,26 @@ brkn.model.Channel.prototype.getCurrentProgram = function(opt_offset) {
     this.currentProgram = program;
     return this.currentProgram;
   } else {
+    this.fetchCurrentProgramming();
     return null;
   }
+};
+
+
+/**
+ * Fetch programming updates from server
+ */
+brkn.model.Channel.prototype.fetchCurrentProgramming = function() {
+  goog.net.XhrIo.send('/_programming/' + this.id, goog.bind(function(e) {
+    var programs = /** Array.<Object> */ e.target.getResponseJson();
+    goog.array.forEach(programs, function(p) {
+      var hasProgram = this.getProgram(p['id']);
+      if (!hasProgram) {
+        var newProgram = this.getOrAddProgram(p);
+        this.publish(brkn.model.Channel.Action.ADD_PROGRAM, newProgram);
+      }
+    }, this);
+  }, this));
 };
 
 
