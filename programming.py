@@ -45,7 +45,8 @@ class Programming():
       self.playlists[name] = playlist
       if fetch:
         deferred.defer(playlist.fetch, approve_all=True,
-                       _name='fetch-' + playlist.name.replace(' ', '') + '-' + str(uuid.uuid1()))
+                       _name='fetch-' + playlist.name.replace(' ', '') + '-' + str(uuid.uuid1()),
+                       _queue='youtube')
     
     for name, properties in inits.COLLECTIONS.iteritems():
       collection = Collection.all().filter('name =', name).get()
@@ -83,14 +84,18 @@ class Programming():
     memcache.set('channels', [c.toJson(get_programming=False) for c in self.channels.itervalues()])
       
   @classmethod
-  def set_programming(cls, channel_id, duration=1200, schedule_next=True, fetch_twitter=True,
+  def set_programming(cls, channel_id, duration=1200, schedule_next=False, fetch_twitter=True,
                       queue='programming', target=None, kickoff=False):
-
     # Stored programming
     programming = memcache.get('programming') or {}
     onlineUsers = memcache.get('web_channels') or {}
+    
+    logging.info('programming: ' + channel_id)
+    logging.info('next programs: ' + str(len(Programming.next_programs(programming.get(channel_id), duration, prelude=120))))
+    
+    programs = []
     if not programming.get(channel_id) or \
-        not len(Programming.next_programs(programming.get(channel_id), duration)):
+        not len(Programming.next_programs(programming.get(channel_id), duration, prelude=120)):
       channel = Channel.get_by_key_name(channel_id)
       channel.update_next_time()
       viewers = (memcache.get('channel_viewers') or {}).get(str(channel_id), [])
@@ -100,7 +105,7 @@ class Programming():
       for col in cols:
         medias = []
         backup = []
-        limit = 50
+        limit = 100
         offset = 0
         while not len(medias):
           medias = col.get_medias(limit=limit, offset=offset, last_programmed = 3200)
@@ -125,6 +130,9 @@ class Programming():
 
       # StorySort algorithm
       all_medias = Programming.story_sort(all_medias)
+      
+      # Only one publisher per story
+      all_medias = Programming.unique_publishers(all_medias)
 
       # Grab 10 minutes of programming
       all_medias = Programming.timed_subset(all_medias, duration)
@@ -138,16 +146,17 @@ class Programming():
 
       # Truncate old programs
       programming[channel_id] = Programming.cutoff_programs(programming.get(channel_id), 300)
-  
-      programs = []
+
       for media in all_medias:
-        program = Program.add_program(channel, media)
-        programming.get(channel_id, []).append(program.toJson(fetch_channel=False, fetch_media=True, media_desc=False, pub_desc=False))
-        programs.append(program)
-        logging.info('ADDING: ' + media.name + ' at: ' + program.time.isoformat())
-        if len(pickle.dumps(programming)) > 1000000:
-          # We can only fit 1mb into memcache
-          break
+        program = Program.add_program(channel, media, min_time=datetime.datetime.now(),
+                                      max_time=(datetime.datetime.now() + datetime.timedelta(seconds=duration)))
+        if program:
+          programming.get(channel_id, []).append(program.toJson(fetch_channel=False, fetch_media=True, media_desc=False, pub_desc=False))
+          programs.append(program)
+          logging.info('ADDING: ' + media.name + ' at: ' + program.time.isoformat())
+          if len(pickle.dumps(programming)) > 1000000:
+            # We can only fit 1mb into memcache
+            break
       broadcast.broadcastNewPrograms(channel, programs)
   
       # Add new programs to filtered, current programs
@@ -165,20 +174,23 @@ class Programming():
     # Schedule our next programming selection
     if schedule_next and (not constants.SLEEP_PROGRAMMING or
                           (constants.SLEEP_PROGRAMMING and (kickoff or len(onlineUsers.keys())))):
+      logging.info('NUMBER OF PROGRAMS: ' + str(len(programs)))
       if len(programs) > 1:
         next_gen = (programs[-2].time - datetime.datetime.now()).seconds / 2
       elif len(programs) == 1:
         next_gen = programs[0].media.duration / 2
       else:
-        next_gen = 10
+        next_gen = 60
       next_gen = min(next_gen,
-                     reduce(lambda x, y: x + y, [p.media.duration for p in programs], 0))
+                     reduce(lambda x, y: x + y, [p.media.duration for p in programs], 0) \
+                     if len(programs) else 10)
       next_gen = min(next_gen, duration / 2)
-      logging.info('COUNTDOWN FOR ' + channel.name + ': ' + str(next_gen))
+      logging.info('COUNTDOWN FOR ' + channel_id + ': ' + str(next_gen))
       deferred.defer(Programming.set_programming, channel_id, fetch_twitter=fetch_twitter,
                      _name=channel_id + '-' + str(uuid.uuid1()),
                      _countdown=next_gen,
                      _queue=queue)
+    return programs
   
   '''
     Our secret sauce sorting algorithm
@@ -198,9 +210,9 @@ class Programming():
       c = 1
       d = 1
       e = max(len(media.opt_out), 1) # Each comment outweighs an opt-out
-      f = 999999999
+      f = 10
       g = 1
-      h = 50
+      h = .1
       score = a * float(media.host_views)/max_views \
             + b * len(media.seen) \
             + c * len(media.opt_in) \
@@ -213,6 +225,23 @@ class Programming():
       return int(score)
 
     return sorted(medias, key=story_score, reverse=True)
+  
+  '''
+    Our secret sauce sorting algorithm
+  '''
+  @classmethod
+  def unique_publishers(cls, medias):
+    if not len(medias):
+      return medias
+    
+    publishers = {}
+    unique_medias = []
+    for media in medias:
+      publisher = media.publisherMedias.get().publisher
+      if not publishers.get(publisher.id):
+        unique_medias.append(media)
+        publishers[publisher.id] = True
+    return unique_medias
   
   '''
     Subset of users who have seen the media item
@@ -244,7 +273,7 @@ class Programming():
     Subset of programs starting after now and ending within 'duration' from now
   '''
   @classmethod
-  def next_programs(cls, programs, duration):
+  def next_programs(cls, programs, duration, prelude=0):
     # duration in seconds, programs are json
     if not programs or not len(programs):
       return []
@@ -253,7 +282,7 @@ class Programming():
     end_index = len(programs)
     for p in programs:
       time = iso8601.parse_date(p['time']).replace(tzinfo=None)
-      if time > datetime.datetime.now() and \
+      if time > (datetime.datetime.now() - datetime.timedelta(seconds=prelude)) and \
           (time + datetime.timedelta(seconds=p['media']['duration']) < \
            (datetime.datetime.now() + datetime.timedelta(seconds=duration))):
         start_index = index if start_index is None else start_index
@@ -358,6 +387,16 @@ class Programming():
         except:
           pass
         cp.delete()
+        
+  @classmethod
+  def clear_programs(cls, cid=None, all=False):
+    if cid:
+      channel = Channel.get_by_key_name(cid)
+      Programming.clear_channel(channel)
+    elif all:
+      Programming.clear()
+    else:
+      Programming.clear_channels()
 
   @classmethod
   def clear_channel(cls, c):

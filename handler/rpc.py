@@ -175,7 +175,9 @@ class ProgramHandler(BaseHandler):
     duration = int(duration) if duration else 1200
     channel = Channel.get_by_key_name(channel_id)
     cached_programming = memcache.get('programming') or {}
-    programs = programming.Programming.next_programs(cached_programming[channel_id], duration)
+    programs = []
+    if cached_programming.get(channel_id):
+      programs = programming.Programming.next_programs(cached_programming[channel_id], duration)
     self.response.out.write(simplejson.dumps(programs))
   
   @BaseHandler.logged_in

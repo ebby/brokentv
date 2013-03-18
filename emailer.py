@@ -43,4 +43,8 @@ class Message():
            'subject' : 'Welcome to XYLO!',
            'template': 'welcome.html'
           }
+  WAITLIST = {
+           'subject' : 'You\'re on the list for XYLO!',
+           'template': 'waitlist.html'
+          }
   

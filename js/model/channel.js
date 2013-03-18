@@ -67,6 +67,12 @@ brkn.model.Channel = function(channel) {
    * @type {Array.<brkn.model.Media>}
    */
   this.queue = [];
+  
+  /**
+   * @type {number}
+   * @private
+   */
+  this.lastTime_ = 0;
 
   /**
    * @type {?boolean}
@@ -94,6 +100,24 @@ brkn.model.Channel.prototype.currentProgramIndex;
 brkn.model.Channel.prototype.addProgram = function(program) {
 	this.programming.push(program);
 	this.programMap_[program.id] = program;
+	if (program.time.getTime() + program.media.duration*1000 > this.lastTime_) {
+	  this.lastTime_ = program.time.getTime() + program.media.duration*1000 - 120000;
+	  brkn.model.Clock.getInstance().addEvent(this.lastTime_,
+	      goog.bind(this.maybeFetchProgramming, this, this.lastTime_));
+	  // Backup attempt
+	  brkn.model.Clock.getInstance().addEvent(this.lastTime_ + 60000,
+        goog.bind(this.maybeFetchProgramming, this, this.lastTime_ + 60000));
+	}
+};
+
+
+/**
+ * @param {goog.date.DateTime} time The last programmed time on this channel
+ */
+brkn.model.Channel.prototype.maybeFetchProgramming = function(time) {
+  if (this.lastTime_ <= time) {
+    this.fetchCurrentProgramming();
+  }
 };
 
 
@@ -165,7 +189,6 @@ brkn.model.Channel.prototype.getCurrentProgram = function(opt_offset) {
     return this.currentProgram;
   }
 	if (!this.programming.length) {
-	  this.fetchCurrentProgramming();
 		return null;
 	}
 	var program = this.currentProgram;
@@ -214,7 +237,6 @@ brkn.model.Channel.prototype.getCurrentProgram = function(opt_offset) {
     this.currentProgram = program;
     return this.currentProgram;
   } else {
-    this.fetchCurrentProgramming();
     return null;
   }
 };
@@ -226,6 +248,11 @@ brkn.model.Channel.prototype.getCurrentProgram = function(opt_offset) {
 brkn.model.Channel.prototype.fetchCurrentProgramming = function() {
   goog.net.XhrIo.send('/_programming/' + this.id, goog.bind(function(e) {
     var programs = /** Array.<Object> */ e.target.getResponseJson();
+    if (!programs.length) {
+      // Try again in 1 second
+      brkn.model.Clock.getInstance().addEvent(goog.now() + 1000,
+          goog.bind(this.maybeFetchProgramming, this, goog.now() + 1000));
+    }
     goog.array.forEach(programs, function(p) {
       var hasProgram = this.getProgram(p['id']);
       if (!hasProgram) {

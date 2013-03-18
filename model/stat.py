@@ -88,7 +88,9 @@ class Stat(db.Model):
 
   @classmethod
   def add_user(cls, gender):
-    Stat.add_user_trans(Stat.get_today().key(), gender)
+    today = Stat.get_today()
+    user_number = Stat.add_user_trans(today.key(), gender)
+    return today.user_count
     
   @classmethod
   @db.transactional

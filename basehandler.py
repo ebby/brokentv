@@ -45,7 +45,10 @@ class BaseHandler(SessionRequest):
                         access_token=cookie["access_token"],
                         location=profile['location']['name'] \
                             if 'location' in profile else None)
-                    Stat.add_user(user.gender)
+                    user_number = Stat.add_user(user.gender)
+                    waitlist_email = emailer.Email(emailer.Message.WAITLIST,
+                                                   {'name' : user.first_name, 'waitlist' : user_number})
+                    waitlist_email.send(user)
                 elif user.access_token != cookie["access_token"]:
                     user.access_token = cookie["access_token"]
                 

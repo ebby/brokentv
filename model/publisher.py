@@ -49,6 +49,29 @@ class Publisher(db.Model):
                                         name=name,
                                         channel_id=channel_id)
     return publisher
+  
+  @classmethod
+  def fetch_details(cls, publisher_id):
+    publisher = Publisher.get_by_key_name(publisher_id)
+    if publisher.host == MediaHost.YOUTUBE:
+      if not publisher.channel_id:
+        yt_service = get_youtube_service()
+        try:
+          user_entry = yt_service.GetYouTubeUserEntry(username=publisher.host_id)
+        except Exception as e:
+          logging.error(e)
+          return
+        desc = user_entry.content.text
+        desc = desc.decode('utf-8').replace("\n", r" ") if desc else None
+        
+        picture = urlfetch.fetch(user_entry.thumbnail.url)
+        publisher.name = user_entry.title.text
+        publisher.picture = db.Blob(picture.content)
+        publisher.description = db.Text(desc)
+        publisher.link = user_entry.link[0].href
+        publisher.channel_id = re.search('/channel/(.*)', publisher.link).groups()[0]
+        publisher.put()
+    return publisher
 
   def fetch(self, collection=None, approve_all=False):
     all_medias = []
@@ -61,10 +84,13 @@ class Publisher(db.Model):
         except Exception as e:
           logging.error(e)
           return
+        desc = user_entry.content.text
+        desc = desc.decode('utf-8').replace("\n", r" ") if desc else None
+        
         picture = urlfetch.fetch(user_entry.thumbnail.url)
         self.name = user_entry.title.text
         self.picture = db.Blob(picture.content)
-        self.description = user_entry.content.text
+        self.description = desc
         self.link = user_entry.link[0].href
         self.channel_id = re.search('/channel/(.*)', self.link).groups()[0]
         self.put()
@@ -89,12 +115,12 @@ class Publisher(db.Model):
           id=search_ids,
           part="id,snippet,topicDetails,contentDetails,statistics"
         ).execute()
-        medias = Media.add_from_snippet(videos_response.get("items", []), collection=collection,
+        medias = Media.add_from_snippet(videos_response.get("items", []),
+                                        collection=collection,
+                                        publisher=self,
+                                        enforce_category=len(collection.categories) > 0,
                                         approve=approve_all)
         all_medias += medias
-        for media in medias:
-          logging.info('FETCHED: ' + media.name)
-          PublisherMedia.add(publisher=self, media=media)
         next_page_token = search_response.get('tokenPagination', {}).get('nextPageToken')
 
       self.last_fetch = datetime.datetime.now()

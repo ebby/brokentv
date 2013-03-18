@@ -63,7 +63,7 @@ brkn.sidebar.Profile.prototype.enterDocument = function() {
   this.tabsEl_ = goog.dom.getElementByClass('tabs', this.getElement());
 
   goog.net.XhrIo.send(
-      '/_star',
+      '/_star/' + this.user_.id,
       goog.bind(function(e) {
         var medias = /** @type {Array.<Object>} */ e.target.getResponseJson();
         medias = goog.array.map(medias, function(m) {

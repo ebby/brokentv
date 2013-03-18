@@ -110,9 +110,11 @@ brkn.model.BrowserChannel.prototype.onMessage_ = function(rawMessage) {
   	          var currentProgram = brkn.model.Channels.getInstance().currentChannel &&
   	              brkn.model.Channels.getInstance().currentChannel.getCurrentProgram();
   	          if (!currentProgram) {
-  	            // If no current programming, change to this channel.
+  	            // If no current programming, change to this channel and play.
   	            brkn.model.Channels.getInstance().publish(
   	                brkn.model.Channels.Actions.CHANGE_CHANNEL, channel);
+  	            brkn.model.Channels.getInstance().publish(
+  	                brkn.model.Channels.Actions.NEXT_PROGRAM, p);
   	          }
 //  	          if (currentProgram && p.id == currentProgram.id) {
 //  	            // If this program is now on, play it.

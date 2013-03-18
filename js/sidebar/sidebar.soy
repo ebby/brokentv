@@ -204,7 +204,7 @@
         </a>
         <div class="text">
           <a class="user" href="#user:{$comment.user.id}">{$comment.user.name}</a>{sp}{sp}
-          {$comment.text}
+          "{$comment.text}"
           <div class="timestamp">{$comment.relativeTime}</div>
         </div>
       </div>
@@ -313,7 +313,14 @@
       <div class="all-content content all"></div>
       <div class="playlists-content content playlists"></div>
       <div class="publishers-content content publishers"></div>
-      <div class="categories-content content categories"></div>
+      <div class="categories-content content categories">
+        <div class="label">GUIDE CATEGORIES</div>
+        <div class="categories-list"></div>
+        <div class="label">FEED IDS</div>
+        <div class="feed-ids"></div>
+        <div class="label">FEED CATEGORIES</div>
+        <div class="feed-cats"></div>
+      </div>
       <div class="spinner" style="display:none"></div>
   </div>
 {/template}

@@ -2,7 +2,7 @@ from common import *
 
 
 #--------------------------------------
-# ADMIN HANDLERS
+# CRON HANDLERS
 #--------------------------------------
 
 class FetchHandler(webapp2.RequestHandler):
@@ -15,4 +15,12 @@ class FetchHandler(webapp2.RequestHandler):
     for col in cols:
       col.fetch(constants.APPROVE_ALL)
     logging.info('CRON FETCH STARTED')
-  
+
+class SetProgrammingHandler(webapp2.RequestHandler):
+  def get(self):
+    channels = Channel.get_public()
+    for c in channels:
+      programming.Programming.set_programming(c.key().name(), queue='programming',
+                                              fetch_twitter=(not constants.DEVELOPMENT),
+                                              schedule_next=False)
+    

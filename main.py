@@ -210,6 +210,7 @@ def create_handlers_map():
     
     # Cron
     ('/cron/fetch', cron.FetchHandler),
+    ('/cron/program', cron.SetProgrammingHandler),
     
     # Pages
     ('/', MainHandler),

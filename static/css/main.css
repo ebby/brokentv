@@ -2739,12 +2739,23 @@ div#login {
   overflow-y: scroll;
   background: #181818;
 }
+div#login.expanded div#homepage {
+  top: 50px;
+  background-position: top center;
+}
 div#login.hide {
   background: transparent;
 }
 div#login.hide div#homepage {
   overflow: hidden;
   top: -100%;
+}
+div#login.hide div#homepage.show {
+  -webkit-transition: top 0.6s ease-in;
+  -moz-transition: top 0.6s ease-in;
+  -o-transition: top 0.6s ease-in;
+  -ms-transition: top 0.6s ease-in;
+  transition: top 0.6s ease-in;
 }
 div#login.hide.expanded div#static-scrollable {
   cursor: pointer;
@@ -2822,9 +2833,8 @@ div#login .bold {
 div#login div#homepage {
   width: 100%;
   height: 100%;
-  background: #181818 url(/static/img/homepage.jpg);
-  background-position: center -50px;
-  background-size: cover;
+  background: #030303 url(/static/img/homepage-mini.jpg) no-repeat;
+  background-position: center;
   position: absolute;
   top: 0;
   left: 0;
@@ -2833,17 +2843,22 @@ div#login div#homepage {
   -webkit-box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.59), inset 0 -3px 1px 0px rgba(255, 255, 255, 0.5), 0 0 2px 1px rgba(0, 0,0,.5);
   -moz-box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.59), inset 0 -3px 1px 0px rgba(255, 255, 255, 0.5), 0 0 2px 1px rgba(0, 0,0,.5);
   box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.59), inset 0 -3px 1px 0px rgba(255, 255, 255, 0.5), 0 0 2px 1px rgba(0, 0,0,.5);
+  -webkit-transition: top 0.3s ease-in;
+  -moz-transition: top 0.3s ease-in;
+  -o-transition: top 0.3s ease-in;
+  -ms-transition: top 0.3s ease-in;
+  transition: top 0.3s ease-in;
 }
 div#login div#homepage.hide {
   opacity: 0;
 }
 div#login div#homepage.show {
   opacity: 1;
-  -webkit-transition: opacity .5s ease-in, top .6s ease-in;
-  -moz-transition: opacity .5s ease-in, top .6s ease-in;
-  -o-transition: opacity .5s ease-in, top .6s ease-in;
-  -ms-transition: opacity .5s ease-in, top .6s ease-in;
-  transition: opacity .5s ease-in, top .6s ease-in;
+  -webkit-transition: opacity .5s ease-in, top .3s ease;
+  -moz-transition: opacity .5s ease-in, top .3s ease;
+  -o-transition: opacity .5s ease-in, top .3s ease;
+  -ms-transition: opacity .5s ease-in, top .3s ease;
+  transition: opacity .5s ease-in, top .3s ease;
 }
 div#login div#static-scrollable {
   width: 100%;
@@ -4109,8 +4124,19 @@ div#sidebar div#sidebar-content div.admin div.topics div.topic div.title {
 div#sidebar div#admin-list {
   overflow-y: scroll !important;
 }
+div#sidebar div#admin-list div.tabbed div.label {
+  font-size: 9px;
+}
 div#sidebar div#admin-list div.tabbed div.content {
   margin: 10px;
+}
+div#sidebar div#admin-list div.tabbed div.content div.label {
+  font-size: 10px;
+  color: #181818;
+  margin-bottom: 7px;
+  text-shadow: 1px 1px 1px white;
+  font-family: MuseoSans700;
+  margin: 10px 0;
 }
 div#sidebar div#admin-list div.tabbed.pending div.pending {
   display: block;
@@ -4285,16 +4311,30 @@ div#welcome div.guide {
   left: 10px;
   position: absolute;
 }
+div#welcome div.friends {
+  background: url(/static/img/welcome/welcome-friends.png);
+  bottom: 40px;
+  right: 455px;
+  position: absolute;
+  width: 275px;
+  height: 85px;
+}
 div#welcome div.sidebar {
-  background-image: url(/static/img/welcome-sprite.png);
-  background-position: -345px -5px;
-  background-repeat: no-repeat;
-  width: 300px;
-  height: 153px;
-  top: 50%;
+  background: url(/static/img/welcome/welcome-sidebar.png);
+  top: 20%;
   margin-top: -75px;
   right: 320px;
   position: absolute;
+  width: 300px;
+  height: 153px;
+}
+div#welcome div.close {
+  background: url(/static/img/welcome/welcome-close.png);
+  top: 10px;
+  right: 10px;
+  position: absolute;
+  width: 25px;
+  height: 24px;
 }
 @font-face {
   font-family: 'MuseoSans100';

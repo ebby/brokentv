@@ -3,7 +3,6 @@ from common import *
 from channel import Channel
 from media import Media
 
-from google.appengine.ext import deferred
 
 class Program(db.Model):
   media = db.ReferenceProperty(Media)
@@ -30,15 +29,18 @@ class Program(db.Model):
   @classmethod
   @db.transactional
   def atomic_add(cls, media, channel, time=None, async=False):
+    logging.info('NEXT TIME: ' + channel.get_next_time().replace(microsecond=0).isoformat())
+    if not time:
+      time = channel.get_next_time().replace(microsecond=0)
     program = Program(media=media, channel=channel,
-                      time=(time or channel.get_next_time().replace(microsecond=0)),
+                      time=time,
                       async=async)
     program.put()
     return program
 
   @classmethod
-  def add_program(cls, channel, media, time=None, async=False):
-    if media:
+  def add_program(cls, channel, media, time=None, async=False, min_time=None, max_time=None):
+    if media and min_time.replace(microsecond=0) <= channel.get_next_time().replace(microsecond=0) <= max_time.replace(microsecond=0):
       # Microseconds break equalities when passing datetimes between front/backend
       program = Program.atomic_add(media=media, channel=channel, time=time, async=async)
 
@@ -52,7 +54,7 @@ class Program(db.Model):
         channel.seek = 0
       channel.put()
 
-      media.last_programmed = datetime.datetime.now()
+      media.last_programmed = program.time
       media.programmed_count += 1
       media.put()
 

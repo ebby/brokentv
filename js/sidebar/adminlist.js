@@ -23,7 +23,7 @@ goog.require('goog.ui.Textarea.EventType');
  * @param {Array.<brkn.model.Media>} pending
  * @param {Array.<Object>} playlists
  * @param {Array.<Object>} publishers
- * @param {Array.<Object>} categories
+ * @param {Object} categories
  * @param {?string=} opt_thumb
  * @param {?string=} opt_desc
  * @constructor
@@ -73,7 +73,19 @@ brkn.sidebar.AdminList = function(collectionId, pending, playlists, publishers, 
    * @type {Array.<Object>}
    * @private
    */
-  this.categories_ = categories;
+  this.categories_ = categories['categories'];
+  
+  /**
+   * @type {Array.<string>}
+   * @private
+   */
+  this.feedCategories_ = categories['feed_categories'];
+  
+  /**
+   * @type {Array.<string>}
+   * @private
+   */
+  this.feedId_ = categories['feed_id'];
   
   /**
    * @type {?string}
@@ -112,6 +124,25 @@ goog.inherits(brkn.sidebar.AdminList, goog.ui.Component);
 
 
 /**
+ * @type {Array.<string>}
+ * @constant
+ */
+brkn.sidebar.AdminList.FEED_IDS = ['top_rated', 'top_favorites', 'most_shared', 'most_recent',
+                                   'most_discussed', 'most_responded', 'recently_featured',
+                                   'on_the_web', 'most_viewed'];
+
+
+/**
+ * @type {Array.<string>}
+ * @constant
+ */
+brkn.sidebar.AdminList.FEED_CATEGORIES = ['All', 'Film', 'Autos', 'Music', 'Animals', 'Sports',
+                                          'Travel', 'Games', 'Videoblog', 'People', 'Comedy',
+                                          'Entertainment', 'News', 'Howto', 'Education', 'Tech',
+                                          'Nonprofit', 'Movies', 'Shows', 'Shortmov'];
+
+
+/**
  * @type {Element}
  * @private
  */
@@ -145,14 +176,25 @@ brkn.sidebar.AdminList.prototype.decorateInternal = function(el) {
   this.publishersEl_ = goog.dom.getElementByClass('publishers-content', el);
   goog.array.forEach(this.publishers_, this.addPublisher_, this);
 
-  this.categoriesEl_ = goog.dom.getElementByClass('categories-content', el);
+  this.categoriesEl_ = goog.dom.getElementByClass('categories-list', el);
+  this.feedIdsEl_ = goog.dom.getElementByClass('feed-ids', el);
+  this.feedCatsEl_ = goog.dom.getElementByClass('feed-cats', el);
   goog.net.XhrIo.send('/admin/_categories', goog.bind(function(e) {
     var cats = e.target.getResponseJson();
     goog.array.forEach(cats, function(cat) {
-      this.addCategory_(cat,
+      this.addCategory_(cat, 'category',
           (goog.array.contains(this.categories_, cat['id']) || !this.categories_.length));
     }, this);
-  }, this)); 
+  }, this));
+
+  goog.array.forEach(brkn.sidebar.AdminList.FEED_CATEGORIES, function(cat) {
+    this.addCategory_(cat, 'feed_category',
+        (goog.array.contains(this.feedCategories_, cat)));
+  }, this);
+
+  goog.array.forEach(brkn.sidebar.AdminList.FEED_IDS, function(id) {
+    this.addCategory_(id, 'feed_id', this.feedId_ == id);
+  }, this);
 
   this.resize();
 };
@@ -338,22 +380,38 @@ brkn.sidebar.AdminList.prototype.addPublisher_ = function(publisher) {
 
 
 /**
- * @param {Object} category 
+ * @param {Object|string} category
+ * @param {string} type
  * @param {?boolean} opt_enabled
  * @private
  */
-brkn.sidebar.AdminList.prototype.addCategory_ = function(category, opt_enabled) {
-  var catEl = soy.renderAsElement(brkn.sidebar.category, {
-    name: category['name'],
-    id: category['id']
-  });
-  goog.dom.appendChild(this.categoriesEl_, catEl);
+brkn.sidebar.AdminList.prototype.addCategory_ = function(category, type, opt_enabled) {
+  if (type == 'category') {
+    var catEl = soy.renderAsElement(brkn.sidebar.category, {
+      name: category['name'],
+      id: category['id']
+    });
+    goog.dom.appendChild(this.categoriesEl_, catEl);
+  } else {
+    var catEl = soy.renderAsElement(brkn.sidebar.category, {
+      name: category,
+      id: category
+    });
+    goog.dom.appendChild((type == 'feed_id' ? this.feedIdsEl_ : this.feedCatsEl_), catEl);
+  }
   goog.dom.classes.enable(catEl, 'enabled', !!opt_enabled);
 
+  var edit = type == 'category' ? 'cat_id=' + category['id'] :
+      type == 'feed_id' ? 'feed_id=' + category : 'feed_cat=' + category
   this.getHandler().listen(catEl, goog.events.EventType.CLICK, function(e) {
+    if (type == 'feed_id') {
+      goog.array.forEach(goog.dom.getChildren(this.feedIdsEl_), function(el) {
+        goog.dom.classes.remove(el, 'enabled');
+      })
+    }
     var enabled = goog.dom.classes.toggle(catEl, 'enabled');
     goog.net.XhrIo.send('admin/_edit/collection/' + this.collectionId_, goog.functions.NULL(),
-        'POST', 'cat_id=' + category['id'] + '&enabled=' + enabled);
+        'POST', edit + '&enabled=' + enabled);
   });
 };
 

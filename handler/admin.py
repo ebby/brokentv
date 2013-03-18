@@ -13,18 +13,18 @@ class StorySortHandler(BaseHandler):
       name = self.request.get('channel')
       sim = self.request.get('sim')
       pending = self.request.get('pending') == '1' or False
+      limit = int(self.request.get('limit')) if self.request.get('limit') else 100
       offset = int(self.request.get('offset')) if self.request.get('offset') else 0
       template_data = {}
-      
+
       channel = Channel.all().filter('name =', name or 'Broken News').get()
       cols = channel.get_collections()
       medias = []
       for col in cols:
-        medias += col.get_medias(limit=100, offset=offset, pending=pending)
+        medias += col.get_medias(limit=limit, offset=offset, pending=pending)
       template_data['raw_medias'] = medias
       viewers = ['1240963']
-      
-      
+
       for i, m in enumerate(medias):
         m.seen_percent = int(float(len(m.seen))/len(viewers) * 100)
         if sim:
@@ -48,11 +48,11 @@ class StorySortHandler(BaseHandler):
       # At most, 30% of the audience has already seen this program
       medias = [m for m in medias if not len(viewers) or
                float(len(Programming.have_seen(m, viewers)))/len(viewers) < .3]
-      
+
       # StorySort it
       sorted_medias = Programming.story_sort(medias)
       template_data['sorted_medias'] = sorted_medias
-      
+
       path = os.path.join(os.path.dirname(__file__), '../templates/storysort.html')
       self.response.out.write(template.render(path, template_data))
 
@@ -75,7 +75,6 @@ class AccessLevelHandler(BaseHandler):
       if user.access_level == 0 and access_level == 1:
         welcome_email = emailer.Email(emailer.Message.WELCOME, {'name' : user.first_name})
         welcome_email.send(user)
-
       user.access_level = access_level
       user.put()
       self.response.out.write('')
@@ -145,6 +144,8 @@ class EditCollectionHandler(BaseHandler):
     def post(self, id):
       col = Collection.get_by_id(int(id))
       cat_id = self.request.get('cat_id')
+      feed_id = self.request.get('feed_id')
+      feed_cat = self.request.get('feed_cat')
       enabled = self.request.get('enabled') == 'true'
       if cat_id:
         if enabled and cat_id not in col.categories:
@@ -156,6 +157,15 @@ class EditCollectionHandler(BaseHandler):
           for cat in all_cats:
             if cat.id != cat_id:
               col.categories.append(cat.id)
+        col.put()
+      if feed_id:
+        col.feed_id = feed_id if enabled else None
+        col.put()
+      if feed_cat:
+        if enabled:
+          col.feed_categories.append(feed_cat)
+        elif feed_cat in col.feed_categories:
+          col.feed_categories.remove(feed_cat)
         col.put()
       self.response.out.write('')
       
@@ -172,6 +182,9 @@ class RemoveFromCollectionHandler(BaseHandler):
           cp = CollectionPublisher.all().filter('publisher =', publisher).get()
           if cp:
             cp.delete()
+          cms = CollectionMedia.all().filter('publisher =', publisher).fetch(None)
+          for cm in cms:
+            cm.delete()
         if pl_id:
           playlist = Playlist.get_by_key_name(pub_id)
           cp = CollectionPlaylist.all().filter('playlist =', playlist).get()
@@ -200,20 +213,9 @@ class CollectionsHandler(BaseHandler):
     @BaseHandler.admin  
     def delete(self, id):
       if id:
-        collection = Collection.get_by_id(int(id))
-        for cm in collection.collectionMedias.fetch(None):
-          cm.delete()
-        for cp in collection.publishers.fetch(None):
-          cp.delete()
-        for cp in collection.playlists.fetch(None):
-          cp.delete()
-        for cc in collection.collections.fetch(None):
-          cc.delete()
-        for cc in collection.channels.fetch(None):
-          cc.delete()
-        for tcm in collection.topic_medias.fetch(None):
-          tcm.delete()
-        collection.delete()
+        deferred.defer(Collection.delete_all, id,
+                       _name='delete-collection-' + str(id) + '-' + str(uuid.uuid1()),
+                       _queue='youtube')
         self.response.out.write(simplejson.dumps({'deleted': True}))
 
 class TopicMediaHandler(BaseHandler):
@@ -234,7 +236,11 @@ class CollectionMediaHandler(BaseHandler):
       offset = self.request.get('offset') or 0
       res = {}
       medias = [m.toJson() for m in col.get_medias(20, pending=pending, offset=int(offset))]
-      res['categories'] = col.categories
+      res['categories'] = {
+                           'categories' : col.categories,
+                           'feed_id' : col.feed_id,
+                           'feed_categories': col.feed_categories
+                           }
       res['publishers'] = [p.toJson() for p in col.get_publishers()]
       res['playlists'] = [p.toJson() for p in col.get_playlists()]
       res['medias'] = medias
@@ -275,12 +281,14 @@ class ConstantsHandler(BaseHandler):
     @BaseHandler.super_admin
     def get(self):
       self.response.out.write('To be implemented')
-      
+
 class ClearHandler(BaseHandler):
     @BaseHandler.super_admin
     def get(self):
       cid = self.request.get('channel_id')
       all = self.request.get('all') == 'true'
+      clear_programs(cid, all)
+      # backup
       if cid:
         channel = Channel.get_by_key_name(cid)
         programming.Programming.clear_channel(channel)
@@ -289,14 +297,20 @@ class ClearHandler(BaseHandler):
       else:
         programming.Programming.clear_channels()
       self.response.out.write('Done')
-            
+
+def clear_programs(cls, cid=None, all=False):
+  deferred.defer(programming.Programming.clear_programs, cid=cid, all=all,
+                 _name='clear-channel-' + str(cid) + '-' + str(uuid.uuid1()),
+                 _queue='youtube')
+
 class ProgramHandler(BaseHandler):
     @BaseHandler.admin
     def post(self):
       if self.request.get('channel_id'):
         channel = Channel.get_by_key_name(self.request.get('channel_id'))
         if self.current_user.id in constants.SUPER_ADMINS or self.current_user in channel.admins.fetch(None):
-          Programming.set_programming(channel.id, queue='programming', fetch_twitter=(not constants.DEVELOPMENT))
+          Programming.set_programming(channel.id, queue='programming', schedule_next=False,
+                                      fetch_twitter=(not constants.DEVELOPMENT))
         
 class InitProgrammingHandler(BaseHandler):
     @BaseHandler.super_admin
@@ -316,7 +330,7 @@ class SetProgrammingHandler(BaseHandler):
       else:
         channels = Channel.get_public()
       for channel in channels:
-        Programming.set_programming(channel.id, duration=int(duration), schedule_next=False,
+        Programming.set_programming(channel.id, duration=int(duration),
                                     fetch_twitter=(not constants.DEVELOPMENT and twitter))
       self.response.out.write('done')
 

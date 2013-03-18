@@ -278,7 +278,7 @@ brkn.sidebar.Admin.prototype.addCollection_ = function(col) {
             });
             var playlists = /** @type {Array.<Object>} */ res['playlists'];
             var publishers = /** @type {Array.<Object>} */ res['publishers'];
-            var categories = /** @type {Array.<Object>} */ res['categories'];
+            var categories = /** @type {Object} */ res['categories'];
             var adminList = new brkn.sidebar.AdminList(col.id, medias, playlists, publishers,
                 categories);
             adminList.decorate(this.adminListEl_);

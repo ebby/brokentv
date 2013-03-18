@@ -1,5 +1,5 @@
 application: broken-tv
-version: 5
+version: 6
 runtime: python27
 api_version: 1
 threadsafe: true
@@ -37,5 +37,6 @@ inbound_services:
 builtins:
 - deferred: on
 - appstats: on
+- remote_api: on
 
   

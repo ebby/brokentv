@@ -7,11 +7,11 @@ from user import User
 
 
 class Media(db.Model):
-  YOUTUBE_DATA = 'https://gdata.youtube.com/feeds/api/videos/%s?v=2&alt=json'
+  YOUTUBE_DATA = 'https://gdata.youtube.com/feeds/api/videos/%s?v=2&alt=json&fields=entry(id,author)'
   TWITTER_SEARCH = 'http://search.twitter.com/search.json?q=%s'
 
   type = db.IntegerProperty(default=0)
-  name = db.StringProperty()
+  name = db.TextProperty()
   host_id = db.StringProperty()
   host = db.StringProperty(default='youtube')
   published = db.DateTimeProperty()
@@ -66,7 +66,7 @@ class Media(db.Model):
     return Media.add_from_entry([entry])[0]
   
   @classmethod
-  def add_from_snippet(cls, items, collection=None, approve=False):
+  def add_from_snippet(cls, items, collection=None, publisher=None, enforce_category=False, approve=False):
     from publisher import Publisher
     from publisher import PublisherMedia
     from collection import CollectionMedia
@@ -78,22 +78,27 @@ class Media(db.Model):
     for item in items:
       id = item['id']
       media = Media.get_by_key_name(MediaHost.YOUTUBE + id)
-      if not media or True:
+      if not media:
         duration = re.search('PT((\d*)H)?((\d*)M)?((\d*)S)?', item['contentDetails']['duration']).groups()
         duration = float(3600*float(duration[1] or 0) + 60*float(duration[3] or 0) + float(duration[5] or 0))
         media = cls(key_name=(MediaHost.YOUTUBE + id),
                     type=MediaType.VIDEO,
                     host_id=id,
-                    name=item['snippet']['title'],
+                    name=db.Text(item['snippet']['title']),
                     published=iso8601.parse_date(item['snippet']['publishedAt']).replace(tzinfo=None),
                     duration=duration,
-                    description=item['snippet']['description'].replace("\n", r" ") if item['snippet']['description'] else '',
+                    description=db.Text(item['snippet']['description'].replace("\n", r" ") if item['snippet']['description'] else ''),
                     host_views=int(item['statistics']['viewCount']) if item['statistics']['viewCount'] else 0)
         media.put()
 
         collection_media = None
-        if collection and (item.get('categoryId') in collection.categories or not len(collection.categories)):
-          collection_media = CollectionMedia.add(collection, media, approved=(True if approve else None))
+        logging.info('CAT ID: ' + str(item['snippet'].get('categoryId')) + ' is in list: ' + str(item['snippet'].get('categoryId') in collection.categories))
+        if collection and \
+            (not enforce_category or (item['snippet'].get('categoryId') in collection.categories)):
+          logging.info('ADDING TO COLLECTION: ' + str(collection.id))
+          collection_media = CollectionMedia.add(collection, media, publisher=publisher, approved=(True if approve else None))
+
+        PublisherMedia.add(publisher=publisher, media=media)
 
         if item.get('topicDetails'):
           for topic_id in item['topicDetails']['topicIds']:
@@ -101,7 +106,8 @@ class Media(db.Model):
             TopicMedia.add(topic, media)
             if collection_media:
               TopicCollectionMedia.add(topic, collection_media)
-
+        
+        logging.info('FETCHED: ' + media.name)
       medias.append(media)
     return medias
         
@@ -125,7 +131,7 @@ class Media(db.Model):
         media = cls(key_name=(MediaHost.YOUTUBE + id),
                     type=MediaType.VIDEO,
                     host_id=id,
-                    name=name,
+                    name=db.Text(name),
                     published=iso8601.parse_date(entry.published.text).replace(tzinfo=None),
                     duration=float(entry.media.duration.seconds),
                     description=desc,
@@ -147,7 +153,7 @@ class Media(db.Model):
     for entry in entries:
       media = cls(type=MediaType.VIDEO,
                   host_id=entry['media$group']['yt$videoid']['$t'],
-                  name=entry['title']['$t'],
+                  name=db.Text(entry['title']['$t']),
                   duration=float(entry['media$group']['yt$duration']['seconds']),
                   description=entry['media$group']['media$description']['$t'])
       media.put()

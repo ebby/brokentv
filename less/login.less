@@ -6,11 +6,20 @@ div#login {
   overflow-x: hidden;
   overflow-y: scroll;
   background: #181818;
+  &.expanded {
+    div#homepage {
+      top: 50px;
+      background-position: top center;
+    }
+  }
   &.hide {
     background: transparent;
     div#homepage {
       overflow: hidden;
       top: -100%;
+      &.show {
+        .transition(top, .6s, ease-in);
+      }
     }
     &.expanded {
       div#static-scrollable {
@@ -80,21 +89,21 @@ div#login {
   div#homepage {
     width: 100%;
     height: 100%;
-    background: #181818 url(/static/img/homepage.jpg);
-    background-position: center -50px;
-    background-size: cover;
+    background: #030303 url(/static/img/homepage-mini.jpg) no-repeat;
+    background-position: center;
     position: absolute;
     top: 0;
     left: 0;
     margin-top: -1%;
     border-bottom: 1px solid rgba(0, 0, 0, .8);
     .box-shadow(e('inset 0 0 1px 1px rgba(0, 0, 0, 0.59), inset 0 -3px 1px 0px rgba(255, 255, 255, 0.5), 0 0 2px 1px rgba(0, 0,0,.5)'));
+    .transition(top, .3s, ease-in);
     &.hide {
       opacity: 0;
     }
     &.show {
       opacity: 1;
-      .transition(e('opacity .5s ease-in, top .6s ease-in'));
+      .transition(e('opacity .5s ease-in, top .3s ease'));
     }
   }
   div#static-scrollable {
