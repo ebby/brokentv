@@ -63,11 +63,9 @@ brkn.model.BrowserChannel.prototype.onMessage_ = function(rawMessage) {
 	    var user = brkn.model.Users.getInstance().get_or_add(message['user']);
 	    var channel = brkn.model.Channels.getInstance().get(message['channel_id']);
 	    var time = goog.date.fromIsoString(message['time'] + 'Z');
-	    var session = new brkn.model.Session(message['session_id'], user, channel, time);
 	    if (user.currentSession) {
 	      user.currentSession.end(time); 
 	    }
-	    user.currentSession = session;
 	    if (message['last_channel_id']) {
   	    var lastChannel = brkn.model.Channels.getInstance().get(message['last_channel_id']);
   	    lastChannel.publish(brkn.model.Channel.Action.REMOVE_VIEWER, user);
@@ -75,18 +73,23 @@ brkn.model.BrowserChannel.prototype.onMessage_ = function(rawMessage) {
   	    lastProgram && lastProgram.media.publish(brkn.model.Media.Actions.WATCHING, user,
   	        lastChannel, true);
 	    }
-	    channel.publish(brkn.model.Channel.Action.ADD_VIEWER, session);
-
-	    var program = channel.getCurrentProgram();
-	    program && program.media.publish(brkn.model.Media.Actions.WATCHING, user, channel);
+	    if (channel) { /* Might be a private channel */
+	      var session = new brkn.model.Session(message['session_id'], user, channel, time);
+	      user.currentSession = session;
+	      channel.publish(brkn.model.Channel.Action.ADD_VIEWER, session);
+	      var program = channel.getCurrentProgram();
+	      program && program.media.publish(brkn.model.Media.Actions.WATCHING, user, channel);
+	    }
 	    break;
 	  case 'new_comment':
 	    var comment = new brkn.model.Comment(message['comment']);
-	    var tweet = message['tweet'] ? new brkn.model.Tweet(message['tweet']) : null;
-	    var media = brkn.model.Medias.getInstance().getOrAdd(message['comment']['media']);
-	    if (media) {
-	      media.publish(brkn.model.Media.Actions.ADD_COMMENT, comment);
-	      tweet && media.publish(brkn.model.Media.Actions.ADD_TWEET, tweet);
+	    if (comment.user.id != brkn.model.Users.getInstance().currentUser.id) {
+  	    var tweet = message['tweet'] ? new brkn.model.Tweet(message['tweet']) : null;
+  	    var media = brkn.model.Medias.getInstance().getOrAdd(message['comment']['media']);
+  	    if (media) {
+  	      media.publish(brkn.model.Media.Actions.ADD_COMMENT, comment);
+  	      tweet && media.publish(brkn.model.Media.Actions.ADD_TWEET, tweet);
+  	    }
 	    }
 	    break;
 	  case 'new_activity':

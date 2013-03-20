@@ -268,6 +268,12 @@ class CommentHandler(BaseHandler):
 
       Stat.add_comment(self.current_user, facebook, tweet)
       broadcast.broadcastNewComment(c, new_tweet);
+      
+      response = {
+                  'comment': c.toJson(),
+                  'tweet': new_tweet.to_json() if new_tweet else None
+                  }
+      self.response.out.write(simplejson.dumps(response))
 
 class LinkHandler(BaseHandler):
   @BaseHandler.logged_in

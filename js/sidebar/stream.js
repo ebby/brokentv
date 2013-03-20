@@ -282,12 +282,20 @@ brkn.sidebar.Stream.prototype.addActivity_ = function(opt_activity, opt_digest, 
   goog.array.forEach(medias, function(m) {
     var media = new brkn.model.Media(m);
     var mediaEl = soy.renderAsElement(brkn.sidebar.listMedia, { media: media });
+    var previewEl = goog.dom.getElementByClass('preview', mediaEl);
     var img = goog.dom.getElementByClass('thumb', mediaEl);
     goog.dom.appendChild(mediasEl, mediaEl);
 
-    this.getHandler().listen(mediaEl, goog.events.EventType.CLICK, function() {
-      brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.MEDIA_INFO, media);
-    });
+    this.getHandler()
+        .listen(mediaEl, goog.events.EventType.CLICK, function() {
+          brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.MEDIA_INFO, media);
+        })
+        .listen(previewEl, goog.events.EventType.CLICK, function(e) {
+          e.stopPropagation();
+          var program = brkn.model.Program.async(media);
+          brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.PLAY_ASYNC, program);
+          brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.MEDIA_INFO, media);
+        })
   }, this);
 
   if (opt_insertTop) {

@@ -257,7 +257,7 @@ brkn.Controller.prototype.enterDocument = function() {
             if (brkn.model.Player.getInstance().getCurrentProgram()) {
               var elapsed = brkn.model.Player.getInstance().getCurrentTime() /
                   brkn.model.Player.getInstance().getCurrentProgram().media.duration;
-              if (elapsed > .98) {
+              if (elapsed > .988) {
                 brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.BEFORE_END);
               }
               if (brkn.model.Channels.getInstance().currentChannel.myChannel &&

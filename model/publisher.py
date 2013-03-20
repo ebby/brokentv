@@ -65,7 +65,7 @@ class Publisher(db.Model):
         desc = desc.decode('utf-8').replace("\n", r" ") if desc else None
         
         picture = urlfetch.fetch(user_entry.thumbnail.url)
-        publisher.name = user_entry.title.text
+        publisher.name = user_entry.title.text.decode('utf-8')
         publisher.picture = db.Blob(picture.content)
         publisher.description = db.Text(desc)
         publisher.link = user_entry.link[0].href
@@ -120,6 +120,7 @@ class Publisher(db.Model):
                                         publisher=self,
                                         enforce_category=len(collection.categories) > 0,
                                         approve=approve_all)
+
         all_medias += medias
         next_page_token = search_response.get('tokenPagination', {}).get('nextPageToken')
 

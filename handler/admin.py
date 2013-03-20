@@ -43,7 +43,7 @@ class StorySortHandler(BaseHandler):
 
       # Don't repeat the same program within an hour
       medias = [c for c in medias if not c.last_programmed or
-                (datetime.datetime.now() - c.last_programmed).seconds > 3200]
+                (datetime.datetime.now() - c.last_programmed).seconds > 1600]
 
       # At most, 30% of the audience has already seen this program
       medias = [m for m in medias if not len(viewers) or
@@ -285,11 +285,16 @@ class ConstantsHandler(BaseHandler):
 class ClearHandler(BaseHandler):
     @BaseHandler.super_admin
     def get(self):
+      next = self.request.get('next') == 'true'
       cid = self.request.get('channel_id')
       all = self.request.get('all') == 'true'
-      clear_programs(cid, all)
       # backup
-      if cid:
+      if next:
+        channels = Channel.get_public()
+        for channel in channels:
+          channel.next_time = None
+          channel.put()
+      elif cid:
         channel = Channel.get_by_key_name(cid)
         programming.Programming.clear_channel(channel)
       elif all:
@@ -400,12 +405,13 @@ class RemovePublisher(BaseHandler):
 class RemoveProgramHandler(BaseHandler):
     @BaseHandler.admin
     def post(self):
-      program = Program.get_by_id(int(self.request.get('program')))
-      channel = program.channel;
-      effected = program.remove()
-      # Update memcache
-      Program.get_current_programs([channel])
-      broadcastProgramChanges(channel, effected)
+      program = Program.get_by_id(long(self.request.get('program')))
+      logging.info('REMOVING ' + program.media.name)
+      if program:
+        channel = program.channel;
+        effected = program.remove()
+        logging.info(effected)
+        broadcast.broadcastProgramChanges(channel, effected)
       
 class RescheduleProgramHandler(BaseHandler):
     @BaseHandler.admin

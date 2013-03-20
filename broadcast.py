@@ -43,7 +43,7 @@ def broadcastProgramChanges(channel, programs):
   response = {}
   response['type'] = 'update_programs'
   response['channel_id'] = channel.id
-  response['programs'] = [p.toJson(False, False) for p in programs]
+  response['programs'] = [p.toJson(False) for p in programs]
   channels = memcache.get('web_channels') or {}
   for client in channels.iterkeys():
     webchannel.send_message(client, simplejson.dumps(response))

@@ -274,11 +274,20 @@ brkn.sidebar.CommentInput.prototype.onAddComment_ = function(e) {
     this.setFocused(true);
     this.dispatchEvent({
       type: 'add',
-      callback: goog.bind(function() {
+      callback: goog.bind(function(e) {
           this.commentInput_.setValue('');
           this.commentInput_.setEnabled(true);
           this.commentInput_.setFocused(true);
           this.removeReply_();
+          
+          var response = e.target.getResponseJson();
+          var comment = new brkn.model.Comment(response['comment']);
+          var tweet = response['tweet'] ? new brkn.model.Tweet(response['tweet']) : null;
+          var media = brkn.model.Medias.getInstance().getOrAdd(response['comment']['media']);
+          if (media) {
+            media.publish(brkn.model.Media.Actions.ADD_COMMENT, comment);
+            tweet && media.publish(brkn.model.Media.Actions.ADD_TWEET, tweet);
+          }
         }, this),
       facebook: this.fbToggle_.isChecked(),
       twitter: this.tweetToggle_.isChecked(),

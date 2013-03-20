@@ -31,7 +31,14 @@ class Channel(db.Model):
 
   @classmethod
   def make_key(cls, name):
-    return name.replace(' ', '-').lower()
+    return name.replace(' ', '-').replace('.', '').lower()
+
+  @classmethod
+  def add(cls, name):
+    channel = Channel.get_or_insert(Channel.make_key(name), name=name)
+    channel.put()
+    return channel
+    
 
   @classmethod
   def get_public(cls):
@@ -83,10 +90,22 @@ class Channel(db.Model):
         logging.warning('Missing program: ' + e.message)
         last_program.delete()
     self.next_time = max(datetime.datetime.now(), next_time)
+    self.put()
 
   def get_next_time(self):
-    next_time = self.next_time or datetime.datetime.utcnow()
-    return max(datetime.datetime.utcnow(), next_time)
+    #next_time = self.next_time if self.next_time else datetime.datetime.now()
+    
+    last_program = self.programs.order('-time').get()
+    next_time = datetime.datetime.now()
+    if last_program:
+      try:
+        next_time = last_program.program.time + datetime.timedelta(seconds=last_program.program.media.duration)
+      except Exception, e:
+        logging.warning('Missing program: ' + e.message)
+        last_program.delete()
+
+    logging.info('GET NEXT TIME: ' + str(next_time) + ' SAVED TIME: ' + str(self.next_time))
+    return max(datetime.datetime.now(), next_time)
 
   def get_collections(self):
     return [chan_col.collection for chan_col in self.collections.fetch(20)]

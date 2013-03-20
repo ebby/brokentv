@@ -151,12 +151,12 @@ brkn.sidebar.MediaList.prototype.decorateInternal = function(el) {
         this.descUrl_,
         goog.bind(function(e) {
           var data = e.target.getResponseJson();
-          if (this.listInfoEl_) {
+          if (data['description'] && this.listInfoEl_) {
             var descEl = goog.dom.getElementByClass('description', this.listInfoEl_);
             descEl.innerHTML = goog.string.linkify.linkifyPlainText(data['description']);
             this.infoHeight_ = goog.style.getSize(this.listInfoEl_).height;
             this.resize();
-          } else {
+          } else if (data['description']) {
             this.setListInfo_(); 
           }
         }, this));
@@ -211,15 +211,25 @@ brkn.sidebar.MediaList.prototype.addMedia = function(media) {
   var mediaEl = soy.renderAsElement(brkn.sidebar.listMedia, {
     media: media
   });
+  var previewEl = goog.dom.getElementByClass('preview', mediaEl);
   goog.dom.appendChild(this.mediasEl_, mediaEl);
   if (this.isAdmin_) {
     this.dragDropGroup_.addItem(mediaEl);
   }
-  this.getHandler().listen(mediaEl,
-      goog.events.EventType.CLICK,
-      goog.bind(function() {
-        brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.MEDIA_INFO, media);
-      }, this));
+  this.getHandler()
+    .listen(mediaEl,
+        goog.events.EventType.CLICK,
+        goog.bind(function() {
+          brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.MEDIA_INFO, media);
+        }, this))
+    .listen(previewEl,
+        goog.events.EventType.CLICK,
+        goog.bind(function(e) {
+          e.stopPropagation();
+          var program = brkn.model.Program.async(media);
+          brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.PLAY_ASYNC, program);
+          brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.MEDIA_INFO, media);
+        }, this));
   this.mediaEls_[media.id] = mediaEl;
 };
 

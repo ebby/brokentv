@@ -65,42 +65,42 @@ class Collection(db.Model):
       publisher_map = {}
       for entry in entries:
         id = re.search('video:(.*)', entry['id']['$t']).group(1)
-        logging.info('ADD FEED VIDEO: ' + id)
         publisher = Publisher.add(host=MediaHost.YOUTUBE, host_id=entry['author'][0]['yt$userId']['$t'])
         deferred.defer(Publisher.fetch_details, publisher.id,
                        _name='publisher-' + publisher.id + '-' + str(uuid.uuid1()),
                        _queue='youtube')
         ids += id + ','
         publisher_map[id] = publisher
-      if ids:
+      if len(ids):
         youtube3 = get_youtube3_service()
         videos_response = youtube3.videos().list(
           id=ids,
           part='id,snippet,topicDetails,contentDetails,statistics'
         ).execute()
+        logging.info('ADD FEED VIDEO: ' + id)
         medias = Media.add_from_snippet(videos_response.get('items', []), collection=collection,
                                         publisher=publisher, approve=approve_all)
     return medias
 
   def fetch(self, approve_all=False):
     if self.feed_id:
-      if 'all' in self.feed_categories:
+      if 'All' in self.feed_categories:
         job_name = self.name.replace(' ', '') + '-all'
-        deferred.defer(Collection.add_feed_media, self.id, approve_all=approve_all, 
+        deferred.defer(Collection.add_feed_media, self.id, approve_all=False, 
                        _name='fetch-' + job_name + '-' + str(uuid.uuid1()), _queue='youtube')
       for feed_cat in self.feed_categories:
         job_name = self.name.replace(' ', '') + '-' + feed_cat
-        deferred.defer(Collection.add_feed_media, self.id, feed_category=feed_cat, approve_all=approve_all, 
+        deferred.defer(Collection.add_feed_media, self.id, feed_category=feed_cat, approve_all=False, 
                        _name='fetch-' + job_name + '-' + str(uuid.uuid1()), _queue='youtube')
 
     if self.channel_id:
-      deferred.defer(Collection.add_channel_media, self.id, approve_all,
+      deferred.defer(Collection.add_channel_media, self.id, approve_all=approve_all,
                      _name='fetch-' + self.name.replace(' ', '') + '-' + str(uuid.uuid1()),
                      _queue='youtube')
 
     publishers = self.get_publishers()
     for publisher in publishers:
-      deferred.defer(Collection.add_publisher_media, self.id, publisher.id, approve_all,
+      deferred.defer(Collection.add_publisher_media, self.id, publisher.id, approve_all=approve_all,
                      _name='fetch-' + publisher.id + '-' + str(uuid.uuid1()), _queue='youtube')
 
   def add_media(self, media, approved=False):
@@ -130,14 +130,14 @@ class Collection(db.Model):
     if self.lifespan:
       cutoff = datetime.datetime.now() - datetime.timedelta(days=self.lifespan)
       col_medias = col_medias.filter('published >', cutoff)
-    
+
     col_medias = col_medias.order('-published').fetch(limit=limit, offset=offset)
     medias = [c_m.media for c_m in col_medias]
 
     if deep:
       for col_playlist in self.playlists.fetch(None):
         medias += col_playlist.playlist.get_medias(limit, offset, lifespan=self.lifespan)
-      
+
       for col_col in self.collections.fetch(None):
         medias += col_col.child_col.get_medias(limit, offset)
 
@@ -210,11 +210,11 @@ class CollectionMedia(db.Model):
   publisher = db.ReferenceProperty(Publisher)
   published = db.DateTimeProperty() # For sorted queries
   approved = db.IntegerProperty(default=Approval.PENDING)
+  last_programmed = db.DateTimeProperty()
   
   @classmethod
   def add(cls, collection, media, publisher=None, approved=None):
-    collection_media = CollectionMedia.all().filter('collection =', collection) \
-        .filter('media =', media).get()
+    collection_media = collection.collectionMedias.filter('media =', media).get()
     if not collection_media:
       collection_media = CollectionMedia(collection=collection, media=media, publisher=publisher,
                                          published=media.published)
@@ -228,7 +228,7 @@ class CollectionMedia(db.Model):
   def approve(self, approved):
     self.approved = Approval.APPROVED if approved else Approval.REJECTED
     self.put()
-    for tcm in self.topic_media.fetch(None):
+    for tcm in self.topic_collection_medias.fetch(None):
       tcm.approved = Approval.APPROVED if approved else Approval.REJECTED
       tcm.put()
     Collection.incr_pending(self.collection.key(), -1)

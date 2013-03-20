@@ -1970,13 +1970,16 @@ div#sidebar div#sidebar-content div.slide.current {
   width: 100%;
   right: 0;
 }
-div#sidebar div#sidebar-content div.media-list {
-  overflow-x: hidden;
-  overflow-y: scroll !important;
+div#sidebar div#sidebar-content div.screen.current div.media-list,
+div#sidebar div#sidebar-content div.slide.current div.media-list {
   /* Hide scrollbars */
 
   padding-right: 14px;
   margin-right: -14px;
+}
+div#sidebar div#sidebar-content div.media-list {
+  overflow-x: hidden;
+  overflow-y: scroll !important;
 }
 div#sidebar div#sidebar-content div.media-list div.list-info {
   margin: 10px;
@@ -2284,34 +2287,6 @@ div#sidebar div.list-media.show {
 div#sidebar div.list-media.remove {
   opacity: 0;
 }
-div#sidebar div.list-media:hover div.media div.preview {
-  background: -webkit-linear-gradient(top, #000000, #aaaaaa);
-  background-size: auto 100%;
-}
-div#sidebar div.list-media:hover div.media div.preview div.thumb {
-  -webkit-transition: opacity .3s ease, background-position .3s ease;
-  -moz-transition: opacity .3s ease, background-position .3s ease;
-  -o-transition: opacity .3s ease, background-position .3s ease;
-  -ms-transition: opacity .3s ease, background-position .3s ease;
-  transition: opacity .3s ease, background-position .3s ease;
-  opacity: .7;
-  background-position-y: 40% !important;
-}
-div#sidebar div.list-media:hover div.media div.preview div.title,
-div#sidebar div.list-media:hover div.media div.preview div.published {
-  color: #f7f7f7;
-  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5), -1px -1px rgba(0, 0, 0, 0.5), 1px -1px 1px rgba(0, 0, 0, 0.5), -1px 1px rgba(0, 0, 0, 0.5);
-}
-div#sidebar div.list-media:hover div.media div.preview div.approve,
-div#sidebar div.list-media:hover div.media div.preview div.remove,
-div#sidebar div.list-media:hover div.media div.preview div.repos,
-div#sidebar div.list-media:hover div.media div.preview div.play {
-  filter: invert(100%);
-  -webkit-filter: invert(100%);
-  -moz-filter: invert(100%);
-  -o-filter: invert(100%);
-  -ms-filter: invert(100%);
-}
 div#sidebar div.list-media:active {
   -webkit-box-shadow: 0 1px 1px 1px rgba(255, 255, 255, 0.5);
   -moz-box-shadow: 0 1px 1px 1px rgba(255, 255, 255, 0.5);
@@ -2331,6 +2306,38 @@ div#sidebar div.list-media div.media {
   margin-top: -1px;
   border-top-left-radius: 3px;
   border-top-right-radius: 3px;
+  position: relative;
+}
+div#sidebar div.list-media div.media:hover div.preview {
+  background: -webkit-linear-gradient(top, #000000, #aaaaaa);
+  background-size: auto 100%;
+}
+div#sidebar div.list-media div.media:hover div.preview div.thumb {
+  -webkit-transition: opacity 0.3s ease;
+  -moz-transition: opacity 0.3s ease;
+  -o-transition: opacity 0.3s ease;
+  -ms-transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease;
+  opacity: .7;
+}
+div#sidebar div.list-media div.media:hover div.preview div.list-play {
+  display: block;
+  opacity: .95;
+}
+div#sidebar div.list-media div.media:hover div.preview div.title,
+div#sidebar div.list-media div.media:hover div.preview div.published {
+  color: #f7f7f7;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5), -1px -1px rgba(0, 0, 0, 0.5), 1px -1px 1px rgba(0, 0, 0, 0.5), -1px 1px rgba(0, 0, 0, 0.5);
+}
+div#sidebar div.list-media div.media:hover div.preview div.approve,
+div#sidebar div.list-media div.media:hover div.preview div.remove,
+div#sidebar div.list-media div.media:hover div.preview div.repos,
+div#sidebar div.list-media div.media:hover div.preview div.play {
+  filter: invert(100%);
+  -webkit-filter: invert(100%);
+  -moz-filter: invert(100%);
+  -o-filter: invert(100%);
+  -ms-filter: invert(100%);
 }
 div#sidebar div.list-media div.media div.preview {
   display: inline-block;
@@ -2352,6 +2359,16 @@ div#sidebar div.list-media div.media div.preview div.thumb {
   border-top-left-radius: 3px;
   border-top-right-radius: 3px;
 }
+div#sidebar div.list-media div.media div.preview div.list-play {
+  background: url(/static/img/sprite/list-play.png);
+  width: 20px;
+  height: 20px;
+  top: 50%;
+  margin-top: -10px;
+  right: 8px;
+  position: absolute;
+  opacity: .6;
+}
 div#sidebar div.list-media div.media div.preview div.title {
   left: 5px;
   top: 5px;
@@ -2362,7 +2379,7 @@ div#sidebar div.list-media div.media div.preview div.title {
   line-height: 20px;
   position: absolute;
   overflow: hidden;
-  margin-right: 10px;
+  margin-right: 30px;
   font-family: MuseoSans300;
 }
 div#sidebar div.list-media div.media div.preview div.title.marquee {

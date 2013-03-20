@@ -237,12 +237,14 @@ div#sidebar {
       visibility: visible;
       width: 100%;
       right: 0;
+      div.media-list {
+        /* Hide scrollbars */
+        padding-right: 14px;
+        margin-right: -14px;
+      }
     }
     div.media-list {
       .scroll-y();
-      /* Hide scrollbars */
-      padding-right: 14px;
-      margin-right: -14px;
       div.list-info {
         margin: 10px;
         display: table;
@@ -519,29 +521,6 @@ div#sidebar {
     &.remove {
       opacity: 0;
     }
-    &:hover div.media {
-      div.preview {
-        background: -webkit-linear-gradient(top, black, #aaa);
-        background-size: auto 100%;
-        div.thumb {
-          .transition(e('opacity .3s ease, background-position .3s ease'));
-          opacity: .7;
-          background-position-y: 40% !important;
-        }
-        div.title, div.published {
-          color: #f7f7f7;
-          text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5), -1px -1px rgba(0, 0, 0, 0.5),
-              1px -1px 1px rgba(0, 0, 0, 0.5), -1px 1px rgba(0, 0, 0, 0.5);
-        }
-        div.approve, div.remove, div.repos, div.play {
-          filter: invert(100%);
-          -webkit-filter: invert(100%);
-          -moz-filter: invert(100%);
-          -o-filter: invert(100%);
-          -ms-filter: invert(100%);
-        }
-      }
-    }
     &:active {
       .box-shadow(0, 1px, 1px, 1px, rgba(255, 255, 255, 0.5));
       border-color: #666;
@@ -561,6 +540,33 @@ div#sidebar {
       margin-top: -1px;
       border-top-left-radius: 3px;
       border-top-right-radius: 3px;
+      position: relative;
+      &:hover {
+        div.preview {
+          background: -webkit-linear-gradient(top, black, #aaa);
+          background-size: auto 100%;
+          div.thumb {
+            .transition(opacity, .3s, ease);
+            opacity: .7;
+          }
+          div.list-play {
+            display: block;
+            opacity: .95;
+          }
+          div.title, div.published {
+            color: #f7f7f7;
+            text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5), -1px -1px rgba(0, 0, 0, 0.5),
+                1px -1px 1px rgba(0, 0, 0, 0.5), -1px 1px rgba(0, 0, 0, 0.5);
+          }
+          div.approve, div.remove, div.repos, div.play {
+            filter: invert(100%);
+            -webkit-filter: invert(100%);
+            -moz-filter: invert(100%);
+            -o-filter: invert(100%);
+            -ms-filter: invert(100%);
+          }
+        }
+      }
       div.preview {
         display: inline-block;
         width: 100%;
@@ -580,6 +586,16 @@ div#sidebar {
           border-top-left-radius: 3px;
           border-top-right-radius: 3px;
         }
+        div.list-play {
+          background: url(/static/img/sprite/list-play.png);
+          width: 20px;
+          height: 20px;
+          top: 50%;
+          margin-top: -10px;
+          right: 8px;
+          position: absolute;
+          opacity: .6;
+        }
         div.title {
           left: 5px;
           top: 5px;
@@ -590,7 +606,7 @@ div#sidebar {
           line-height: 20px;
           position: absolute;
           overflow: hidden;
-          margin-right: 10px;
+          margin-right: 30px;
           font-family: MuseoSans300;
           &.marquee {
             .transition(margin-left, 10s, linear);

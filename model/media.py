@@ -91,23 +91,21 @@ class Media(db.Model):
                     host_views=int(item['statistics']['viewCount']) if item['statistics']['viewCount'] else 0)
         media.put()
 
-        collection_media = None
-        logging.info('CAT ID: ' + str(item['snippet'].get('categoryId')) + ' is in list: ' + str(item['snippet'].get('categoryId') in collection.categories))
-        if collection and \
-            (not enforce_category or (item['snippet'].get('categoryId') in collection.categories)):
-          logging.info('ADDING TO COLLECTION: ' + str(collection.id))
-          collection_media = CollectionMedia.add(collection, media, publisher=publisher, approved=(True if approve else None))
+      collection_media = None
+      if collection and \
+          (not enforce_category or (item['snippet'].get('categoryId') in collection.categories)):
+        collection_media = CollectionMedia.add(collection, media, publisher=publisher, approved=(True if approve else None))
 
-        PublisherMedia.add(publisher=publisher, media=media)
+      PublisherMedia.add(publisher=publisher, media=media)
 
-        if item.get('topicDetails'):
-          for topic_id in item['topicDetails']['topicIds']:
-            topic = Topic.add(topic_id)
-            TopicMedia.add(topic, media)
-            if collection_media:
-              TopicCollectionMedia.add(topic, collection_media)
-        
-        logging.info('FETCHED: ' + media.name)
+      if item.get('topicDetails'):
+        for topic_id in item['topicDetails']['topicIds']:
+          topic = Topic.add(topic_id)
+          TopicMedia.add(topic, media)
+          if collection_media:
+            TopicCollectionMedia.add(topic, collection_media)
+      
+      logging.info('FETCHED: ' + media.name)
       medias.append(media)
     return medias
         

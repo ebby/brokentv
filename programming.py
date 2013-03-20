@@ -89,48 +89,48 @@ class Programming():
     # Stored programming
     programming = memcache.get('programming') or {}
     onlineUsers = memcache.get('web_channels') or {}
-    
+
     logging.info('programming: ' + channel_id)
-    logging.info('next programs: ' + str(len(Programming.next_programs(programming.get(channel_id), duration, prelude=120))))
     
+    next_programs = Programming.next_programs(programming.get(channel_id, []), duration, prelude=300)
+    gap = Programming.gap(programming.get(channel_id, []), duration)
+    
+    logging.info('GAP: ' + str(gap))
+
     programs = []
-    if not programming.get(channel_id) or \
-        not len(Programming.next_programs(programming.get(channel_id), duration, prelude=120)):
+    if not programming.get(channel_id) or gap > 60:
       channel = Channel.get_by_key_name(channel_id)
-      channel.update_next_time()
+      #channel.update_next_time()
       viewers = (memcache.get('channel_viewers') or {}).get(str(channel_id), [])
       cols = channel.get_collections()
       all_medias = []
       backup_medias = []
+      limit = 100
       for col in cols:
         medias = []
-        backup = []
-        limit = 100
+        filtered_medias = []
         offset = 0
-        while not len(medias):
-          medias = col.get_medias(limit=limit, offset=offset, last_programmed = 3200)
-          backup = backup if (random.random() > .5 and len(backup)) \
-              or (random.random() <= .5 and not len(medias)) else medias
+        while True:
+          medias = col.get_medias(limit=limit, offset=offset)
           if not len(medias):
-            logging.info('NO MORE MEDIA FOR: ' + col.name)
-            backup_medias += backup
             break
-          # Don't repeat the same program within an hour
-          medias = [c for c in medias if not c.last_programmed or
-                   (datetime.datetime.now() - c.last_programmed).seconds > 3600]
-          # At most, 30% of the audience has already "witnessed" this program
-          medias = [m for m in medias if not len(viewers) or
-                    float(len(Programming.have_seen(m, viewers)))/len(viewers) < .3]
-          offset += limit
-        all_medias += medias
+          backup_medias += medias    
 
-      if not len(all_medias):
-        logging.info('BACKUP MEDIAS: ' + str(len(backup_medias)))
-        all_medias = backup_medias
+          # Don't repeat the same program within an hour
+          filtered_medias = [c for c in medias if not c.last_programmed or
+                   (datetime.datetime.now() - c.last_programmed).seconds > 3600]
+          
+          # At most, 30% of the audience has already "witnessed" this program
+          filtered_medias = [m for m in filtered_medias if not len(viewers) or
+                    float(len(Programming.have_seen(m, viewers)))/len(viewers) < .3]
+          all_medias += filtered_medias
+          offset += limit
+
+      all_medias = backup_medias if not len(all_medias) else all_medias
 
       # StorySort algorithm
       all_medias = Programming.story_sort(all_medias)
-      
+
       # Only one publisher per story
       all_medias = Programming.unique_publishers(all_medias)
 
@@ -150,6 +150,7 @@ class Programming():
       for media in all_medias:
         program = Program.add_program(channel, media, min_time=datetime.datetime.now(),
                                       max_time=(datetime.datetime.now() + datetime.timedelta(seconds=duration)))
+        logging.info(program)
         if program:
           programming.get(channel_id, []).append(program.toJson(fetch_channel=False, fetch_media=True, media_desc=False, pub_desc=False))
           programs.append(program)
@@ -159,12 +160,8 @@ class Programming():
             break
       broadcast.broadcastNewPrograms(channel, programs)
   
-      # Add new programs to filtered, current programs
-      #    programming[channel_id] = Programming.cutoff_programs(programming.get(channel_id), 600) + \
-      #        [p.toJson(fetch_channel=False, fetch_media=True, media_desc=False, pub_desc=False) for p in programs]
       memcache.set('programming', programming)
-  
-      # Update channel's next_time
+
       channels = memcache.get('channels') or []
       for i,c in enumerate(channels):
         if c['id'] == channel_id:
@@ -267,7 +264,20 @@ class Programming():
         break
       cutoff_index += 1
     return programs[cutoff_index:]
-  
+
+  '''
+    Amount of un-programmed time between now and duration
+  '''
+  @classmethod
+  def gap(cls, programs, duration):
+    scheduled = 0
+    for program in programs:
+      time = iso8601.parse_date(program['time']).replace(tzinfo=None)
+      if time > datetime.datetime.now():
+        logging.info(program['media']['name'] + ' at: ' + program['time'])
+        scheduled += int(program['media']['duration'])
+    logging.info(scheduled)
+    return max(0, duration - scheduled)
 
   '''
     Subset of programs starting after now and ending within 'duration' from now
@@ -380,7 +390,9 @@ class Programming():
     memcache.delete('programming')
     
     for c in channels:
-      chan_programs = c.programs.filter('time >', datetime.datetime.now()).order('time').fetch(None)
+      c.next_time = None
+      c.put()
+      chan_programs = c.programs.fetch(None)
       for cp in chan_programs:
         try:
           cp.program.delete()
@@ -406,8 +418,8 @@ class Programming():
     programming = memcache.get('programming') or {}
     programming[c.id] = []
     memcache.set('programming', programming)
-    
-    chan_programs = c.programs.filter('time >', datetime.datetime.now()).order('time').fetch(None)
+
+    chan_programs = c.programs.fetch(None)
     for cp in chan_programs:
       try:
         cp.program.delete()
