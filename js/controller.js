@@ -393,7 +393,7 @@ brkn.Controller.prototype.toggleGuide_ = function(show) {
  */
 brkn.Controller.prototype.resize = function() {
   goog.style.setWidth(this.getElement(), goog.dom.getViewportSize().width -
-      (this.sidebarToggle_.isChecked() ? 300 : 0));
+      (this.sidebarToggle_.isChecked() ? 320 : 0));
   if (!brkn.model.Channels.getInstance().currentChannel.myChannel) {
     goog.style.showElement(this.progressEl_, false);
     
@@ -423,7 +423,7 @@ brkn.Controller.prototype.resize = function() {
     goog.style.showElement(this.progressEl_, true);
     this.setAsync_(brkn.model.Player.getInstance().getCurrentProgram());
     this.progressWidth_ = goog.dom.getViewportSize().width -
-        (this.sidebarToggle_.isChecked() ? 560 : 260) - 50;
+        (this.sidebarToggle_.isChecked() ? 580 : 260) - 50;
     goog.style.setWidth(this.progressEl_, this.progressWidth_);
   }
 };

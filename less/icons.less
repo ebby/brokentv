@@ -1,0 +1,122 @@
+@charset "UTF-8";
+
+@font-face {
+  font-family: 'icons';
+  src: url('/static/webfonts/icons.eot?88235317');
+  src: url('/static/webfonts/icons.eot?88235317#iefix') format('embedded-opentype'),
+       url('/static/webfonts/icons.woff?88235317') format('woff'),
+       url('/static/webfonts/icons.ttf?88235317') format('truetype'),
+       url('/static/webfonts/icons.svg?88235317#icons') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+/* Chrome hack: SVG is rendered more smooth in Windozze. 100% magic, uncomment if you need it. */
+/* Note, that will break hinting! In other OS-es font will be not as sharp as it could be */
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  @font-face {
+    font-family: 'icons';
+    src: url('static/webfonts/icons.svg?88235317#icons') format('svg');
+  }
+}
+
+.icon () {
+  font-family: 'icons';
+  font-style: normal;
+  font-weight: normal;
+  speak: none;
+  text-decoration: inherit;
+/* opacity .8 */
+  font-variant: normal;
+/* Uncomment for 3D effect */
+/* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+}
+
+.icon-info() {
+  .icon();
+  &:before { content: '\2139'; } /* 'ℹ' */
+}
+.icon-link-ext() {
+  .icon();
+  &:before { content: '\f08e'; } /* '' */
+}
+.icon-pause() {
+  .icon();
+  &:before { content: '\2389'; } /* '⎉' */
+}
+.icon-play() {
+  .icon();
+  &:before { content: '\25b6'; } /* '▶' */
+}
+.icon-heart-empty() {
+  .icon();
+  &:before { content: '\e801'; } /* '' */
+}
+.icon-heart() {
+  .icon();
+  &:before { content: '\e800'; } /* '' */
+}
+.icon-admin() {
+  .icon();
+  &:before { content: '\e804'; } /* '' */
+}
+.icon-check() {
+ .icon();
+  &:before { content: '\2713'; } /* '✓' */
+}
+.icon-close() {
+  .icon();
+  &:before { content: '\2715'; } /* '✕' */
+}
+.icon-ccw() {
+  .icon();
+  &:before { content: '\27f2'; } /* '⟲' */
+}
+.icon-reply() {
+  .icon();
+  &:before { content: '\e712'; } /* '' */
+}
+.icon-comment() {
+  .icon();
+  &:before { content: '\e803'; } /* '' */
+}
+.icon-fullscreen() {
+  .icon();
+  &:before { content: '\e744'; } /* '' */
+}
+.icon-closescreen() {
+  .icon();
+  &:before { content: '\e746'; } /* '' */
+}
+.icon-power() {
+  .icon();
+  &:before { content: '\e78e'; } /* '' */
+}
+.icon-menu() {
+  .icon();
+  &:before { content: '\2630'; } /* '☰' */
+}
+.icon-twitter() {
+  .icon();
+  &:before { content: '\f309'; } /* '' */
+}
+.icon-facebook() {
+  .icon();
+  &:before { content: '\f30c'; } /* '' */
+}
+.icon-volume-down() {
+  .icon();
+  &:before { content: '🔇'; } /* '\1f507' */
+}
+.icon-volume-up() {
+  .icon();
+  &:before { content: '🔊'; } /* '\1f50a' */
+}
+.icon-link() {
+  .icon();
+  &:before { content: '🔗'; } /* '\1f517' */
+}
+.icon-plus() {
+  .icon();
+  &:before { content: '\2b'; } /* '+' */
+}

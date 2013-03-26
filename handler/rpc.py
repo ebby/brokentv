@@ -138,12 +138,14 @@ class SessionHandler(BaseHandler):
       data = {}
       
       user_agent = self.request.headers.get('user_agent')
-      if 'Mobile' in user_agent:
-        data['error'] = 'Mobile access is not supported yet.'
-      ie = re.search('/MSIE\s([\d]+)/', user_agent)
-      ff = re.search('/firefox\/([\d]+)/', user_agent)
-      if (ie and ie < 10) or (ff and ff < 6):
-        data['error'] = 'Please use a modern browser like Chrome.'
+      if self.current_user.id not in constants.SUPER_ADMINS:
+        if 'Mobile' in user_agent:
+          data['error'] = 'Mobile access is not supported yet.'
+        ie = re.search('/MSIE\s([\d]+)/', user_agent)
+        ff = re.search('/firefox\/([\d]+)/', user_agent)
+        if (ie and ie < 10) or (ff and ff < 6):
+          data['error'] = 'Please use a modern browser like Chrome.'
+
       media_id = self.session.get('media_id', None)
       channel_id = self.session.get('channel_id', None)
 
@@ -241,12 +243,14 @@ class CommentHandler(BaseHandler):
     tweet = self.request.get('tweet') == 'true'
     facebook = self.request.get('facebook') == 'true'
     parent_id = self.request.get('parent_id')
+
     if media and text:
       acl = self.current_user.friends + [self.current_user.id]
       if self.current_user.demo:
         acl += SUPER_ADMINS
       c = Comment.add(media, self.current_user, text,
                       acl=acl, parent_id=parent_id)
+      
       new_tweet = None
       if tweet:
         client = oauth.TwitterClient(constants.TWITTER_CONSUMER_KEY,
@@ -265,10 +269,10 @@ class CommentHandler(BaseHandler):
       current_user.post_facebook = facebook
       current_user.post_twitter = tweet
       current_user.put()
-
+      
       Stat.add_comment(self.current_user, facebook, tweet)
       broadcast.broadcastNewComment(c, new_tweet);
-      
+
       response = {
                   'comment': c.toJson(),
                   'tweet': new_tweet.to_json() if new_tweet else None

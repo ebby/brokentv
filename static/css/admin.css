@@ -3,7 +3,7 @@
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
-  border: 1px solid #2d3446;
+  border: 1px solid rgba(50, 50, 50, 0.8);
   width: 70px;
   height: 15px;
   font-size: 13px;

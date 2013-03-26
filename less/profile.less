@@ -1,14 +1,18 @@
 div#sidebar div#sidebar-content div.screen.profile,
 div#sidebar div#sidebar-content div.slide.profile {
   div.tabbed ul.tabs li.tab.starred div.label {
-    padding-left: 17px;
+    padding-left: 10px;
     position: relative;
   }
   div.heart {
-    .sprite-heart-dark();
+    .icon-heart();
+    color: #7d7d7d;
     position: absolute;
     top: 0px;
     left: 63px;
+  }
+  div.tabbed.starred ul.tabs li.tab.starred div.heart {
+    color: #dedede;
   }
   div.stream div.no-comments {
     margin-top: 0;

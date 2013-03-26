@@ -6,11 +6,11 @@ div#sidebar div.info {
   }
   div.picture {
     display: inline-block;
-    width: 300px;
+    width: 320px;
     height: 200px;
     position: relative;
     overflow: hidden;
-    background: #f5f5f5;
+    background: #888;
     border-bottom: 1px solid #181818;
     .box-shadow(e('0 0 2px 2px rgba(77, 77, 77, 0.7), 0 0 1px #5e5e5e'));
     img.thumb {
@@ -56,6 +56,46 @@ div#sidebar div.info {
     &.scrolled div.publisher, &scrolled div.links {
       pointer-events: none;
     }
+    &.scrolled {
+      background: #555;
+    }
+    div.links {
+      position: absolute;
+      top: 4px;
+      right: -50px;
+      text-shadow: 1px 1px 1px #181818;
+      display: inline-block;
+      .border-radius(3px);
+      height: 25px;
+      >div, >a {
+        display: inline-block;
+        vertical-align: top;
+        pointer-events: all;
+        &:hover {
+          text-decoration: none;
+        }
+      }
+      div.local {
+        .icon-link();
+        margin: 0 4px;
+        color: #f5f5f5;
+        input {
+          display: none;
+          cursor: pointer;
+          background: rgba(0, 0, 0, .5);
+          border: 1px solid #181818;
+          .border-radius(3px);
+          color: #f5f5f5;
+          margin-left: 5px;
+          padding: 1px 3px 3px 3px;
+        }
+      }
+      div.host {
+        .icon-link-ext();
+        margin: 2px 5px;
+        color: #f5f5f5;
+      }
+    }
   }
   img.thumb {
     height: 70px;
@@ -88,77 +128,47 @@ div#sidebar div.info {
     left: 9px;
     top: 40px;
     padding-right: 10px;
-    color: whiteSmoke;
-    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
+    color: white;
+    text-shadow: 1px 1px 1px black;
     font-size: 18px;
-    font-family: MuseoSans100;
+    font-family: MuseoSans300;
     width: 230px;
-    background: rgba(0, 0, 0, .6);
     .border-radius(3px);
-    padding: 5px;
+    padding: 5px 0;
     pointer-events: none;
     div.text {
       overflow: hidden;
       max-height: 98px;
     }
-    div.links {
-      position: absolute;
-      bottom: -32px;
-      left: 0;
-      background: rgba(0, 0, 0, 0.6);
-      display: inline-block;
-      .border-radius(3px);
-      height: 25px;
-      >div, >a {
-        display: inline-block;
-        vertical-align: top;
-        pointer-events: all;
-      }
-      div.local {
-        input {
-          cursor: pointer;
-          background: rgba(0, 0, 0, .5);
-          border: 1px solid #181818;
-          .border-radius(3px);
-          color: #f5f5f5;
-          margin-left: 5px;
-          padding: 1px 3px 3px 3px;
-        }
-      }
-      div.host {
-        .sprite-youtube();
-        margin: 4px 5px;
-      }
-    }
   }
   div.desc-link {
     a {
       font-size: 10px;
-      color: #181818;
-      text-shadow: 1px 1px 1px white;
+      color: #f5f5f5;
+      text-shadow: 1px 1px 1px #181818;
       font-family: MuseoSans700;
     }
     position: relative;
-    width: 240px;
+    width: 260px;
     margin-top: 181px;
     font-size: 12px;
-    margin-left: 9px;
+    margin-left: 10px;
     padding-bottom: 5px;
-    border-bottom: 1px solid #181818;
+    border-bottom: 1px solid #dedede;
   }
   div.description {
-    width: 240px;
+    width: 260px;
     min-height: 150px;
     position: relative;
     margin-right: 5px;
-    padding: 8px 10px;
-    color: #181818;
-    text-shadow: none;
+    padding: 8px 15px;
+    color: #f5f5f5;
+    text-shadow: 1px 1px 1px #181818;
     line-height: 18px;
     font-family: MuseoSans300;
     font-size: 12px;
     a {
-      color: #181818;
+      color: #f5f5f5;
       font-family: MuseoSans300;
       text-decoration: underline;
     }
@@ -167,8 +177,8 @@ div#sidebar div.info {
     position: absolute;
     right: 0;
     top: 0;
-    color: black;
-    text-shadow: 1px 1px 1px rgba(255,255,255,.7);
+    color: #f5f5f5;
+    text-shadow: 1px 1px 1px #181818;
     line-height: 18px;
     font-family: MuseoSans500;
     font-size: 10px;
@@ -180,7 +190,7 @@ div#sidebar div.info {
     .box-shadow(-1px, 0, 1px, 0px, rgba(200, 200, 200, 0.6));
     div.button {
       display: block;
-      background: rgba(0, 0, 0, 0.6);
+      background: rgba(65, 65, 65, 0.9);
       border: 1px solid rgba(45, 52, 70, 0.4);
       .border-radius(0);
       .box-shadow(e('inset 0 0 1px 1px rgba(140, 140, 140, 0.70), 0 0 1px #5e5e5e'));
@@ -190,7 +200,7 @@ div#sidebar div.info {
       position: relative;
       &:active, &.goog-custom-button-active, &.goog-custom-button-disabled,
       &.goog-custom-button-checked {
-        background-color: rgba(80, 80, 80, 0.6);
+        background-color: rgba(100, 100, 100, 0.6);
       }
     }
     div.icon {
@@ -200,32 +210,37 @@ div#sidebar div.info {
       left: 50%
     }
     div.play .icon {
-      .sprite-info-play();
-      margin-top: -7px;
-      margin-left: -4px;
+      .icon-play();
+      font-size: 17px;
+      margin-top: -10px;
+      margin-left: -5px;
     }
     div.plus .icon {
-      .sprite-info-plus();
-      margin-top: -6px;
+      .icon-plus();
+      font-size: 18px;
+      margin-top: -9px;
       margin-left: -6px;
     }
     div.star .icon {
-      .sprite-heart-light();
+      .icon-heart();
+      font-size: 11px;
       margin-top: -5px;
       margin-left: -5px;
     }
     div.star.goog-custom-button-checked .icon {
-      .sprite-heart-red();
+      .icon-heart();
+      font-size: 11px;
+      color: red;
       margin-top: -5px;
       margin-left: -5px;
     }
     div.facebook .icon {
-      .sprite-facebook();
+      .icon-facebook();
       margin-top: -7px;
       margin-left: -3px;
     }
     div.twitter .icon {
-      .sprite-twitter();
+      .icon-twitter();
       margin-top: -6px;
       margin-left: -6px;
     }
@@ -282,11 +297,11 @@ div#sidebar div.info {
       overflow: hidden;
     }
     div.tweet {
-      width: 280px;
+      width: 298px;
       display: inline-block;
       .border-radius(3px);
       vertical-align: middle;
-      margin: 0 9px;
+      margin: 0 10px;
       white-space: normal;
     }
   }

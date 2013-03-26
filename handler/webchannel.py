@@ -41,7 +41,8 @@ class WebChannelDisconnectedHandler(BaseHandler):
         client = memcache.Client()
         for i in range(3):
           channel_viewers = client.gets('channel_viewers')
-          channel_viewers[user_sessions[0].channel.id].remove(client_id)
+          if client_id in channel_viewers[user_sessions[0].channel.id]:
+            channel_viewers[user_sessions[0].channel.id].remove(client_id)
           set = client.cas('channel_viewers', channel_viewers)
           if set:
             break

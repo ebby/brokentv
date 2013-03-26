@@ -179,11 +179,15 @@ div#login {
         border-right: 1px solid #aaa;
         .border-radius(3px, 0, 0, 3px);
         div.bg {
-          width: 100%;
-          height: 100%;
-          background-image: url(/static/img/power.png);
-          background-repeat: no-repeat;
-          background-position: 20px 19px;
+          .icon-power();
+          font-size: 41px;
+          font-size: 35px;
+          color: #7d7d7d;
+          width: 32px;
+          height: 36px;
+          left: 19px;
+          top: 19px;
+          position: relative;
         }
         &.error {
           background-color: #B7432E;
@@ -322,15 +326,29 @@ div#login {
         color: #4d4d4d;
         margin: 0 2px;
       }
+      a.icon {
+        &:hover {
+          text-decoration: none;
+        }
+      }
       div.home-facebook {
         margin: 0px 2px -2px 2px;
         display: inline-block;
-        .sprite-home-facebook(); 
+        font-size: 14px;
+        .icon-facebook(); 
+        &:hover {
+          text-decoration: none;
+        }
       }
       div.home-twitter {
         margin: 0px 2px -1px 2px;
         display: inline-block;
-        .sprite-home-twitter();
+        .icon-twitter();
+        &:before {
+          position: relative;
+          top: 1px;
+        }
+        font-size: 15px;
       }
     }
   }

@@ -442,7 +442,7 @@ brkn.sidebar.Info.prototype.toDot_ = function(dotEl) {
       function(element) {return element == dotEl});
   var scrollAnim = new goog.fx.dom.Scroll(this.tweetsEl_,
       [this.tweetsEl_.scrollLeft, this.tweetsEl_.scrollTop],
-      [index * 300, this.tweetsEl_.scrollTop], 200);
+      [index * 320, this.tweetsEl_.scrollTop], 200);
   scrollAnim.play();
   this.resize();
 };

@@ -321,9 +321,8 @@ brkn.Player.prototype.resize = function() {
   var playerEl = goog.dom.getElement('ytplayer');
   var stagecover = goog.dom.getElement('stagecover');
   var message = goog.dom.getElementByClass('message', stagecover)
-  var guideHeight = goog.dom.getElement('guide').style.height;
-  guideHeight = guideHeight.substring(0, guideHeight.length - 2);
-  var sidebarWidth = goog.dom.classes.has(goog.dom.getElement('sidebar'), 'toggled')  ? 300 : 0;
+  var guideHeight = 40;
+  var sidebarWidth = goog.dom.classes.has(goog.dom.getElement('sidebar'), 'toggled')  ? 320 : 0;
   this.width_ = goog.dom.getViewportSize().height - guideHeight;
   this.height_ = goog.dom.getViewportSize().width - sidebarWidth;
   goog.style.setHeight(playerEl, goog.dom.getViewportSize().height - guideHeight);

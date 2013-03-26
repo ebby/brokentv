@@ -32,7 +32,7 @@ class Program(db.Model):
     program = None
     if not time:
       time = channel.next_time or datetime.datetime.now()
-    if True: #async or min_time.replace(microsecond=0) <= channel.get_next_time().replace(microsecond=0) <= max_time.replace(microsecond=0):
+    if async or min_time.replace(microsecond=0) <= time.replace(microsecond=0) <= max_time.replace(microsecond=0):
       program = Program(media=media, channel=channel,
                         time=time,
                         async=async)

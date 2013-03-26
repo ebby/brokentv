@@ -369,6 +369,12 @@ brkn.Main.getSessionAndInit = function(response) {
           brkn.model.Player.getInstance().subscribeOnce(brkn.model.Player.Actions.PLAYING, reveal);
           brkn.Main.init(response, data['token'], data['channels'], data['programs'],
               data['current_user'], data['viewer_sessions']);
+          
+          var isIpad = !!navigator.userAgent.match(/iPad/i);
+          var isIphone = !!navigator.userAgent.match(/iPhone/i);
+          if (isIpad || isIphone) {
+            reveal();
+          }
         } else if (e.target.getStatus() == 500) {
           brkn.Main.noLogin('error', 'Opps, check back later');
         } else {

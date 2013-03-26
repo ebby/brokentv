@@ -184,7 +184,7 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
   
   brkn.model.Sidebar.getInstance().subscribe(brkn.model.Sidebar.Actions.REPLY_COMMENT,
       this.reply_, this);
-  brkn.model.Users.getInstance().subscribe(brkn.model.User.Actions.TWITTER_AUTH, function() {
+  brkn.model.Users.getInstance().currentUser.subscribe(brkn.model.User.Actions.TWITTER_AUTH, function() {
     this.tweetToggle_.setChecked(true);
   }, this);
 };
@@ -269,17 +269,9 @@ brkn.sidebar.CommentInput.prototype.setFocused = function(focus) {
  */
 brkn.sidebar.CommentInput.prototype.onAddComment_ = function(e) {
   if (this.commentInput_.getValue()) {
-    this.commentInput_.setActive(false);
-    this.commentInput_.setEnabled(false);
-    this.setFocused(true);
     this.dispatchEvent({
       type: 'add',
       callback: goog.bind(function(e) {
-          this.commentInput_.setValue('');
-          this.commentInput_.setEnabled(true);
-          this.commentInput_.setFocused(true);
-          this.removeReply_();
-          
           var response = e.target.getResponseJson();
           var comment = new brkn.model.Comment(response['comment']);
           var tweet = response['tweet'] ? new brkn.model.Tweet(response['tweet']) : null;
@@ -294,6 +286,8 @@ brkn.sidebar.CommentInput.prototype.onAddComment_ = function(e) {
       text: this.commentInput_.getValue(),
       parentId: this.parentComment
     });
+    this.commentInput_.setValue('');
+    this.removeReply_();
   }
 };
 
@@ -304,11 +298,11 @@ brkn.sidebar.CommentInput.prototype.onAddComment_ = function(e) {
 brkn.sidebar.CommentInput.prototype.onFacebookToggle_ = function(e) {
   if (!this.fbPublish_ && this.fbToggle_.isChecked()) {
     goog.style.showElement(goog.dom.getElement('overlay'), true);
-    FB.login(function(response) {
+    FB.login(goog.bind(function(response) {
       goog.style.showElement(goog.dom.getElement('overlay'), false);
       this.facebookPublish_ = !!response['authResponse'];
       this.fbToggle_.setChecked(this.facebookPublish_);
-    }, { scope: 'publish_stream' });
+    }, this), { scope: 'publish_stream' });
   }
 };
 

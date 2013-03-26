@@ -667,6 +667,12 @@ brkn.Channel.prototype.update = function() {
     // Update path
     this.constructPath();
   }
+  
+//  var delta = goog.style.getPosition(currentProgram).x + goog.style.getPosition(goog.dom.getElement('guide')).x;
+//  goog.object.forEach(this.programs_, function(p) {
+//    var title = goog.dom.getElementByClass('title', p);
+//    goog.style.setPosition(title, delta < 5 ? -delta + 10 : 5);
+//  });
  
   // Potentially move title for current program
   if (this.currentProgram_ && this.changeTime_ > 0) {

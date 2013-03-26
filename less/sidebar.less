@@ -1,22 +1,22 @@
 div#sidebar {
   position: absolute;
-  right: -300px;
+  right: -320px;
   top: 0;
-  width: 300px;
+  width: 320px;
   height: 100%;
-  background: #aaa url(/static/img/linen-75.png);
+  background: #dadada url(/static/img/content-texture.png);
   z-index: 100;
   overflow: hidden;
   font-family: MuseoSans300;
-  color: #f5f5f5;
-  text-shadow: 1px 1px 1px #181818;
+  color: #181818;
+  text-shadow: 1px 1px 1px #ccc;
   .transition(right, .5s, ease);
   z-index: 110;
   border-left: 1px solid rgba(0, 0, 0, .7);
   .box-shadow(e('inset 4px 0 6px -4px rgba(0, 0, 0, 0.7), 0 0 2px 1px rgba(146, 146, 146, 0.6)'));
   
   div.scrollable {
-    width: 300px;
+    width: 320px;
   }
   
   &.dark {
@@ -62,7 +62,7 @@ div#sidebar {
   div#toolbar {
     width: 100%;
     height: 40px;
-    background: #f7f7f7;
+    background: #fefefe;
     position: relative;
     border-bottom: 2px solid #AAA;
     .box-shadow(e('0 2px 3px 1px rgba(0, 0, 0, 0.2), inset 4px 2px 6px -3px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(24, 24, 24, 0.2)'));
@@ -83,7 +83,7 @@ div#sidebar {
         }
         div.back-button {
           width: 64px;
-          opacity: 1;
+          opacity: .85;
         }
       }
     }
@@ -113,6 +113,7 @@ div#sidebar {
         top: 5px;
         cursor: pointer;
         .transition(e('opacity .3s ease, width, .3s, ease'));
+        background: white;
         .sprite-backbutton();
         width: 0;
         &:active {
@@ -161,8 +162,8 @@ div#sidebar {
           text-align: center;
           font-family: MuseoSans700;
           font-size: 11px;
-          color: #7d7d7d;
-          text-shadow: 1px 1px 1px white;
+          color: #8d8d8d;
+          text-shadow: 1px 1px 0 white;
         }
       }
     }
@@ -182,7 +183,7 @@ div#sidebar {
       }
       &:after {
         border-color: rgba(245, 245, 245, 0);
-        border-top-color: #f5f5f5;
+        border-top-color: #fefefe;
         border-width: 10px;
         left: 50%;
         margin-left: -10px;
@@ -218,7 +219,7 @@ div#sidebar {
       width: 100%;
       height: 100%;
       top: 43px;
-      right: -300px;
+      right: -320px;
       overflow: hidden;
       .transition(e('opacity .3s ease, width .3s ease, right .3s ease, left .3s ease'));
       -webkit-overflow-scroll: touch;
@@ -309,7 +310,7 @@ div#sidebar {
       position: relative;
       .transition(top, .5s, ease);
       div.comment-button {
-        width: 100px;
+        width: 106px;
         height: 100%;
         display: inline-block;
         border-right: 1px solid #ccc;
@@ -324,14 +325,18 @@ div#sidebar {
           border-right: none;
         }
         &.tweet-toggle div.icon {
-          .sprite-comment-twitter();
-          top: 5px;
-          left: 10px;
-        }
-        &.fb-toggle div.icon {
-          .sprite-comment-facebook();
+          .icon-twitter();
           top: 4px;
           left: 11px;
+          font-size: 13px;
+          color: #bbb;
+        }
+        &.fb-toggle div.icon {
+          .icon-facebook();
+          top: 5px;
+          left: 10px;
+          font-size: 13px;
+          color: #bbb;
         }
         .goog-custom-button-inner-box {
           margin-top: 5px;
@@ -341,7 +346,7 @@ div#sidebar {
           background-color: rgba(255,255,255, .8);
         }
         &.goog-custom-button-checked div.check {
-          .sprite-check();
+          .icon-check();
         }
         &.goog-custom-button-disabled {
           background: none !important;
@@ -382,7 +387,7 @@ div#sidebar {
         resize:none;
         height: auto;
         .border-radius(3px);
-        width: 280px;
+        width: 300px;
         font-size: 13px;
         min-height: 16px;
         outline: none;
@@ -448,14 +453,18 @@ div#sidebar {
     }
     div.content {
       display: none;
-      width: 300px;
+      width: 320px;
     }
     &.activity {
       div.activity {
         display: block;
       }
       ul.tabs li.activity {
-        background: rgba(245, 245, 245, 0.6);
+        background: rgba(100, 100, 100, 0.7);
+        div.label {
+          color: #dedede;
+          text-shadow: 1px 1px 1px #181818;
+        }
       }
     }
     &.starred {
@@ -463,7 +472,11 @@ div#sidebar {
         display: block;
       }
       ul.tabs li.starred {
-        background: rgba(245, 245, 245, 0.6);
+        background: rgba(100, 100, 100, 0.7);
+        div.label {
+          color: #dedede;
+          text-shadow: 1px 1px 1px #181818;
+        }
       }
     }
     &.comments {
@@ -471,7 +484,12 @@ div#sidebar {
         display: block;
       }
       ul.tabs li.comments {
-        background: rgba(245, 245, 245, 0.6);
+        background: rgba(100, 100, 100, 0.7);
+        color: #dedede;
+        div.label {
+          color: #dedede;
+          text-shadow: 1px 1px 1px #181818;
+        }
       }
     }
     &.tweets {
@@ -479,7 +497,12 @@ div#sidebar {
         display: block;
       }
       ul.tabs li.tweets {
-        background: rgba(245, 245, 245, 0.6);
+        background: rgba(100, 100, 100, 0.7);
+        color: #dedede;
+        div.label {
+          color: #dedede;
+          text-shadow: 1px 1px 1px #181818;
+        }
       }
     }
   }
@@ -503,13 +526,13 @@ div#sidebar {
   }
 
   div.list-media {
-    width: 278px; 
-    margin-bottom: 4px;
+    width: 298px; 
+    margin-bottom: 10px;
     .border-radius(3px); 
     position: relative;
-    background: rgba(50, 50, 50, 0.9);
-    border: 1px solid #333;
-    .box-shadow(0, 0, 1px, 0px, rgba(0, 0, 0, 0.8));
+    background: #EBEBEB;
+    border: 1px solid white;
+    .box-shadow(0, 0, 2px, 1px, rgba(0, 0, 0, 0.3));
     cursor: pointer;
     color: #f5f5f5;
     text-shadow: 1px 1px 1px #181818;
@@ -522,8 +545,7 @@ div#sidebar {
       opacity: 0;
     }
     &:active {
-      .box-shadow(0, 1px, 1px, 1px, rgba(255, 255, 255, 0.5));
-      border-color: #666;
+      .box-shadow(0, 0, 0, 1px, rgba(0, 0, 0, 0.1));
     }
     &:last-child:active {
       div.publisher {
@@ -573,7 +595,7 @@ div#sidebar {
         height: 100%;
         position: relative;
         overflow: hidden;
-        background: #f5f5f5;
+        background: #535353;
         border-top-left-radius: 3px;
         border-top-right-radius: 3px;
         margin-top: 1px;
@@ -599,10 +621,10 @@ div#sidebar {
         div.title {
           left: 5px;
           top: 5px;
-          color: #181818;
-          text-shadow: 1px 1px 1px white;
+          color: #dedede;
+          text-shadow: 1px 1px 1px #181818;
           height: 100%;
-          font-size: 14px;
+          font-size: 13px;
           line-height: 20px;
           position: absolute;
           overflow: hidden;
@@ -673,6 +695,8 @@ div#sidebar {
       margin-bottom: 4px;
       width: 272px;
       padding: 3px;
+      color: #181818;
+      text-shadow: 1px 1px 1px white;
       font-family: MuseoSans500;
       img {
         width: 22px;
@@ -697,30 +721,37 @@ div#sidebar {
       position: absolute;
       right: 3px;
       bottom: 7px;
+      color: #181818;
+      text-shadow: 1px 1px 1px white;
       div.comment-count {
         div.icon {
-          .sprite-comment-count();
+          .icon-comment();
+          font-size: 15px;
+          margin-top: -2px;
+          color: #666;
           position: absolute;
           top: 0;
           left: 0;
         }
         min-width: 15px;
         height: 15px;
-        padding-left: 19px;
+        padding-left: 17px;
         font-size: 10px;
         float: right;
         position: relative;
       }
       div.star-count {
         div.icon {
-          .sprite-star-count();
+          .icon-heart();
+          font-size: 12px;
+          color: #666;
           position: absolute;
           top: 0;
           left: 0;
         }
         min-width: 15px;
         height: 15px;
-        padding-left: 19px;
+        padding-left: 15px;
         font-size: 10px;
         float: right;
         position: relative;
@@ -733,18 +764,19 @@ div#sidebar {
   }
   div.tweet-holder {
     position: relative;
-    width: 300px;
+    width: 320px;
     div.label {
       margin-left: 10px;
     }
     div.tweet {
       position: relative;
-      background: rgba(0, 0, 0, 0.65);
-      border: 1px solid #333;
+      width: 298px;
+      background: rgba(0, 0, 0, 0.15);
+      border: 1px solid #888;
       padding-bottom: 20px;
       overflow: hidden;
-      .box-shadow(0, 0, 2px, 0px, rgba(0, 0, 0, .8));
-      
+      .box-shadow(0, 1px, 0, 1px, rgba(255, 255, 255, .5));
+
       img {
         width: 28px;
         height: 28px;
@@ -755,11 +787,12 @@ div#sidebar {
       }
       div.text {
         a.handle {
+          color: #181818;
           font-family: MuseoSans700;
           font-size: 13px;
         }
         a {
-          color: #f5f5f5;
+          color: #181818;
           font-family: MuseoSans300;
         }
         position: relative;
@@ -805,48 +838,51 @@ div#sidebar {
     }
     div.top-grad {
       display: none;
-      width: 282px;
+      width: 302px;
       height: 10px;
       position: absolute;
       top: 20px;
       background: @radial-grad no-repeat center;
       left: 9px;
       border-top: 2px solid rgba(0, 0, 0, 0.5);
+      opacity: .6;
       .box-shadow(0, -3px, 3px, -1px, rgba(0, 0,0, .2));
     }
     div.bottom-grad {
       display: none;
-      width: 282px;
+      width: 302px;
       height: 10px;
       position: absolute;
       bottom: -1px;
       background: @radial-grad-up no-repeat center;
       left: 9px;
       border-bottom: 2px solid rgba(0, 0, 0, 0.5);
+      opacity: .6;
       .box-shadow(0, 3px, 3px, -1px, rgba(0, 0,0, .2));
     }
     div.comment {
       position: relative;
-      width: 278px;
-      background: rgba(0, 0, 0, 0.65);
-      border: 1px solid #333;
-      .box-shadow(e('0 0 2px 0px rgba(0, 0, 0, .8),  0 3px 1px -1px rgba(255, 255, 255, 0.5)'));
+      width: 297px;
+      background: rgba(0, 0, 0, 0.15);
+      border: 1px solid #888;
       padding-top: 5px;
       padding-bottom: 21px;
       overflow: hidden;
+      margin-top: -1px;
+      .box-shadow(0, 1px, 0, 1px, rgba(255, 255, 255, .5));
       &:first-child {
         border-top-left-radius: 3px;
         border-top-right-radius: 3px;
+        margin-top: 0;
       }
       &:last-child {
         border-bottom-left-radius: 3px;
         border-bottom-right-radius: 3px;
-        .box-shadow(0, 0, 2px, 0px, rgba(0, 0, 0, .8));
       }
       &.reply {
-        background: rgba(0, 0, 0, .4);
+        background: rgba(0, 0, 0, .05);
         border-left: 5px solid #181818;
-        width: 274px;
+        width: 293px;
       }
       img {
         width: 28px;
@@ -858,10 +894,11 @@ div#sidebar {
       }
       div.text {
         a {
-          color: #f5f5f5;
+          color: #181818;
           font-family: MuseoSans300;
           &.username {
             font-size: 13px;
+            font-family: MuseoSans700;
           }
         }
         position: relative;
@@ -884,33 +921,38 @@ div#sidebar {
         right: 5px;
         visibility: hidden;
         opacity: 0;
+        color: #f5f5f5;
+        text-shadow: 1px 1px 1px #181818;
         .transition(opacity, .2s, ease);
-        background: rgba(0, 0, 0, .8);
+        background: rgba(0, 0, 0, .5);
         padding: 5px;
         .border-radius(3px);
-        border: 1px solid #181818;
+        border: 1px solid #888;
         div.remove {
-          .sprite-close-light();
+          .icon-close();
           cursor: pointer;
-          margin-left: 4px;
+          margin-left: 6px;
           float: right;
+          margin-top: -1px;
+          font-size: 12px;
         }
         div.reply {
-          .sprite-reply();
+          .icon-reply();
           cursor: pointer;
           float: right;
           margin-top: -2px;
+          font-size: 12px;
         }
       }
       &:hover div.comment-options {
         visibility: visible;
-        opacity: 1;
+        opacity: .7;
       }
     }
   }
   div.no-comments, div.no-info {
     background: rgba(255,255,255,.2);
-    width: 260px;
+    width: 276px;
     border: 1px solid #919191;
     .box-shadow(inset, 0, 0, 2px, 0px, rgba(0, 0, 0, 0.2));
     .border-radius(3px);

@@ -33,7 +33,7 @@ brkn.Guide = function() {
    * @type {number}
    * @private
    */
-  this.interval_ = 5;
+  this.interval_ = 10;
 
   /**
    * @type {number}
@@ -109,6 +109,13 @@ goog.inherits(brkn.Guide, goog.ui.Component);
  * @constant
  */
 brkn.Guide.NAME_WIDTH = 200;
+
+
+/**
+ * @type {number}
+ * @constant
+ */
+brkn.Guide.GUIDE_HEIGHT = 190;
 
 
 /**
@@ -235,7 +242,7 @@ brkn.Guide.prototype.enterDocument = function() {
   var goLiveEl = goog.dom.getElement('go-live');
   this.headerEl_ = goog.dom.getElement('header');
   this.channelsEl_ = goog.dom.getElement('channels');
-  this.horizon_ = 3;
+  this.horizon_ = 1;
   this.width_ = goog.dom.getViewportSize().width * this.horizon_;
   this.controllerHeight_ = goog.style.getSize(goog.dom.getElement('controller')).height;
 
@@ -313,6 +320,7 @@ brkn.Guide.prototype.enterDocument = function() {
   this.dragger_ = new goog.fx.Dragger(this.getElement());
   var channelNameStyle = this.channelNameStyle_;
   var el = this.getElement();
+  var channelsEl = this.channelsEl_;
   this.dragger_.defaultAction = function(x, y) {
     if (x < 0 && x > (-goog.style.getSize(el).width + goog.dom.getViewportSize().width)) {
       // Has no access to this object's scope
@@ -440,7 +448,7 @@ brkn.Guide.prototype.toggleGuide_ = function(show) {
   this.align_(true, undefined, false);
   goog.dom.classes.add(this.getElement(), 'animate');
 
-  var height = Math.min(this.channelsEl_.scrollHeight, 210);
+  var height = Math.min(this.channelsEl_.scrollHeight, brkn.Guide.GUIDE_HEIGHT);
   goog.dom.classes.enable(this.getElement(), 'toggled', show);
   goog.style.setHeight(this.getElement(), show ? height + this.controllerHeight_ + 19 :
       this.controllerHeight_);
@@ -526,7 +534,7 @@ brkn.Guide.prototype.updateNowButtons_ = function(opt_hide) {
   var nowLeft = goog.dom.getElement('now-left');
   var nowRight = goog.dom.getElement('now-right');
   var elapsed = (goog.now() - this.minTime_.getTime())/1000 * this.pixelsPerSecond_;
-  var sidebarWidth = brkn.model.Controller.getInstance().sidebarToggled ? 300 : 0;
+  var sidebarWidth = brkn.model.Controller.getInstance().sidebarToggled ? 320 : 0;
   var viewWidth = goog.dom.getViewportSize().width - sidebarWidth;
   var timelineWidth = goog.style.getSize(this.getElement()).width - sidebarWidth - 200;
   var currentPixels = this.cursor_[0].hasNextProgram(this.guideOffset_ + 1) ?
@@ -535,7 +543,7 @@ brkn.Guide.prototype.updateNowButtons_ = function(opt_hide) {
   if (currentPixels > timelineWidth - elapsed) {
     this.expand_();
   }
-  nowRight.style.right = brkn.model.Controller.getInstance().sidebarToggled ? '300px' : 0;
+  nowRight.style.right = brkn.model.Controller.getInstance().sidebarToggled ? '320px' : 0;
  
   // Base NOW on current program, not live program
   //  goog.dom.classes.enable(nowRight, 'now', !!(-elapsed <
@@ -697,12 +705,12 @@ brkn.Guide.prototype.align_ = function(opt_setAligned, opt_offset, opt_setScroll
 
     // Expand timeline if need be
     while (elapsed + goog.dom.getViewportSize().width > this.width_ -
-        (brkn.model.Controller.getInstance().sidebarToggled ? 300 : 0)) {
+        (brkn.model.Controller.getInstance().sidebarToggled ? 320 : 0)) {
       this.expand_();
     }
 
     var viewWidth = goog.dom.getViewportSize().width - 
-        (brkn.model.Controller.getInstance().sidebarToggled ? 300 : 0);
+        (brkn.model.Controller.getInstance().sidebarToggled ? 320 : 0);
 
     var offset = 0;
     if (program) {
@@ -718,7 +726,7 @@ brkn.Guide.prototype.align_ = function(opt_setAligned, opt_offset, opt_setScroll
     //    }
 
     if (!program || (!opt_offset && brkn.model.Controller.getInstance().guideToggled &&
-        elapsed > -offset + viewWidth - 300)) {
+        elapsed > -offset + viewWidth - 320)) {
       // If off-screen (last program is done), align to ticker
       offset = -goog.style.getPosition(this.tickerEl_).x + viewWidth - 200;
       goog.dom.classes.add(this.getElement(), 'tick-along');
@@ -757,7 +765,7 @@ brkn.Guide.prototype.align_ = function(opt_setAligned, opt_offset, opt_setScroll
  * @private
  */
 brkn.Guide.prototype.resize_ = function() {
-  var channelsHeight = Math.min(this.channelsEl_.scrollHeight, 210);
+  var channelsHeight = Math.min(this.channelsEl_.scrollHeight, brkn.Guide.GUIDE_HEIGHT);
   goog.style.setHeight(this.channelsEl_, goog.dom.classes.has(this.getElement(), 'toggled')
       ? channelsHeight : this.controllerHeight_);
   goog.style.setHeight(this.getElement(), goog.dom.classes.has(this.getElement(), 'collapsed') ?

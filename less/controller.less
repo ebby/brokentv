@@ -175,8 +175,9 @@ div.controller {
     width: 35px;
 		height: 25px;
     .icon {
-      .sprite-comment();
-      margin: 4px 0 0 8px;
+      .icon-menu();
+      margin: 2px 0 0 1px;
+      font-size: 20px;
     }
   }
   div.button.info-toggle {
@@ -197,8 +198,9 @@ div.controller {
     width: 35px;
     height: 25px;
     .icon {
-      .sprite-gear();
-      margin: 3px 0 0 9px;
+      .icon-admin();
+      margin: 2px 0 0 1px;
+      font-size: 20px;
     }
     div.pending {
       height: 13px;
@@ -226,6 +228,7 @@ div.controller {
 	    height: 25px;
 	    background-repeat: no-repeat;
 			background-position: center;
+			vertical-align: top;
 	  }
 	  div.button:last-child {
 	    border-top-right-radius: 3px;
@@ -240,30 +243,47 @@ div.controller {
       -webkit-border-bottom-left-radius: 3px;
 	  }
 	  div.restart .icon {
-	    .sprite-restart();
-	    margin: 5px 0 0 7px;
+	    .icon-ccw();
+	    font-size: 16px;
+	    opacity: .9;
+      text-shadow: 1px 1px 1px rgba(0, 0, 0, .8);
+	    margin: 4px 0 0 0;
 	  }
 	  div.play {
 	    .icon {
-	      .sprite-pause();
-	      margin: 6px 0 0 13px;
+	      .icon-pause();
+	      font-size: 17px;
+	      opacity: .9;
+	      text-shadow: 1px 1px 1px rgba(0, 0, 0, .8);
+	      margin: 4px 0 0 2px;
 	    }
 	    &.goog-custom-button-checked {
 	      background-color: transparent;
 	      .box-shadow(e('inset 0 0 1px rgba(255,255,255,.1), 0 0 1px rgba(255,255,255,.5)'));
 	      .icon {
-	        .sprite-play();
-	        margin: 6px 0 0 15px;
+	        color: #f5f5f5;
+	        .icon-play();
+	        opacity: .9;
+          text-shadow: 1px 1px 1px rgba(0, 0, 0, .8);
+	        font-size: 17px;
+	        margin: 4px 0 0 2px;
 	      }
 	    }
 	  }
 	  div.volume {
 	    .icon {
-	      .sprite-volume-up();
-	      margin: 6px 0 0 8px;
+	      .icon-volume-up();
+	      font-size: 17px;
+	      opacity: .9;
+        text-shadow: 1px 1px 1px rgba(0, 0, 0, .8);
+	      margin: 4px 0 0 1px;
 	    }
 	    &.mute .icon, &.goog-custom-button-checked .icon {
-	      .sprite-volume-down();
+	      .icon-volume-down();
+        font-size: 17px;
+        opacity: .9;
+        text-shadow: 1px 1px 1px rgba(0, 0, 0, .8);
+        margin: 4px 0 0 2px;
 	    }
 	  }
 	}
