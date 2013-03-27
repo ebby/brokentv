@@ -134,7 +134,7 @@ class Programming():
       # Only one publisher per story
       all_medias = Programming.unique_publishers(all_medias)
 
-      # Grab 10 minutes of programming
+      # Grab "duration" seconds of programming
       all_medias = Programming.timed_subset(all_medias, duration)
 
       if fetch_twitter:
@@ -259,8 +259,9 @@ class Programming():
     cutoff_index = 0
     for p in programs:
       time = iso8601.parse_date(p['time']).replace(tzinfo=None)
-      if (datetime.datetime.now() - time).seconds < cutoff:
-        # Stop when within 30 minutes
+      if (datetime.datetime.now() - time).seconds < cutoff and \
+          (time + datetime.timedelta(seconds=p['media']['duration'])) < datetime.datetime.now():
+        # Program started more than "cutoff" seconds ago and it ended before the current time.
         break
       cutoff_index += 1
     return programs[cutoff_index:]

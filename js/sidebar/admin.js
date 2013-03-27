@@ -122,48 +122,48 @@ brkn.sidebar.Admin.prototype.enterDocument = function() {
         this.resize();
       }, this));
   } else {
-//    goog.net.XhrIo.send(
-//        '/admin/_topicmedias/' + this.channelId_,
-//        goog.bind(function(e) {
-//          var topicMedias = /** @type {Array.<Object>} */ e.target.getResponseJson();
-//          goog.object.forEach(topicMedias, function(medias, topic) {
-//            goog.style.showElement(this.topicsEl_.parentElement, true);
-//            if (medias && medias.length) {
-//              var topicEl = soy.renderAsElement(brkn.sidebar.topic, {
-//                topic: topic,
-//                pending: medias.length
-//              });
-//              goog.dom.appendChild(this.topicsEl_, topicEl);
-//              goog.events.listen(topicEl, goog.events.EventType.CLICK, goog.bind(function(e) {
-//                medias = goog.array.map(medias, function(m) {
-//                  return new brkn.model.Media(m);
-//                });
-//                var adminList = new brkn.sidebar.AdminList('', medias, [], [], []);
-//                adminList.decorate(this.adminListEl_);
-//                brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NAVIGATE,
-//                    this.adminListEl_, false, topic);
-//              }, this));
-//              brkn.model.Sidebar.getInstance().subscribe(brkn.model.Sidebar.Actions.APPROVED, function(media) {
-//                if (goog.array.find(medias, function(m){return m.id == media.id})) {
-//                  var pendingEl = goog.dom.getElementByClass('pending', topicEl);
-//                  var newCount = goog.dom.getTextContent(pendingEl) - 1;
-//                  if (newCount <= 0) {
-//                    goog.dom.removeNode(topicEl);
-//                    goog.dispose(topicEl);
-//                  } else {
-//                    goog.dom.setTextContent(pendingEl, (/** @type {string} */ newCount));
-//                  }
-//                }
-//              }, this);
-//            }
-//          }, this);
-//          if (this.totalPending_) {
-//            brkn.model.Controller.getInstance().setPending(this.totalPending_);
-//          }
-//          
-//          this.topicsHeight_ = goog.style.getSize(this.topicsEl_.parentElement).height;
-//          this.resize();
-//        }, this));
+    goog.net.XhrIo.send(
+        '/admin/_topicmedias/' + this.channelId_,
+        goog.bind(function(e) {
+          var topicMedias = /** @type {Array.<Object>} */ e.target.getResponseJson();
+          goog.object.forEach(topicMedias, function(medias, topic) {
+            goog.style.showElement(this.topicsEl_.parentElement, true);
+            if (medias && medias.length) {
+              var topicEl = soy.renderAsElement(brkn.sidebar.topic, {
+                topic: topic,
+                pending: medias.length
+              });
+              goog.dom.appendChild(this.topicsEl_, topicEl);
+              goog.events.listen(topicEl, goog.events.EventType.CLICK, goog.bind(function(e) {
+                medias = goog.array.map(medias, function(m) {
+                  return new brkn.model.Media(m);
+                });
+                var adminList = new brkn.sidebar.AdminList('', medias, [], [], []);
+                adminList.decorate(this.adminListEl_);
+                brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NAVIGATE,
+                    this.adminListEl_, false, topic);
+              }, this));
+              brkn.model.Sidebar.getInstance().subscribe(brkn.model.Sidebar.Actions.APPROVED, function(media) {
+                if (goog.array.find(medias, function(m){return m.id == media.id})) {
+                  var pendingEl = goog.dom.getElementByClass('pending', topicEl);
+                  var newCount = goog.dom.getTextContent(pendingEl) - 1;
+                  if (newCount <= 0) {
+                    goog.dom.removeNode(topicEl);
+                    goog.dispose(topicEl);
+                  } else {
+                    goog.dom.setTextContent(pendingEl, (/** @type {string} */ newCount));
+                  }
+                }
+              }, this);
+            }
+          }, this);
+          if (this.totalPending_) {
+            brkn.model.Controller.getInstance().setPending(this.totalPending_);
+          }
+          
+          this.topicsHeight_ = goog.style.getSize(this.topicsEl_.parentElement).height;
+          this.resize();
+        }, this));
     
     
     goog.net.XhrIo.send(

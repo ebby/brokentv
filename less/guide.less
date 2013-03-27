@@ -4,10 +4,10 @@ div#guide {
   bottom: 0px;
   height: 40px;
   overflow: hidden;
+  -webkit-overflow-scrolling: touch;
   background: #f7f7f7;
   width: 100%;
   color: #ccc;
-  opacity: .9;
   .transition(e('height .5s ease, opacity .5s ease'));
   .grab();
   &:hover {
@@ -294,6 +294,7 @@ div#guide {
             text-shadow: 1px 1px 1px rgba(0, 0, 0, .7);
             padding-right: 0;
             text-overflow: ellipsis;
+            white-space: nowrap;
           }
           div.remove, div.repos {
             display: none;
@@ -374,9 +375,9 @@ div#guide {
       }
       div.programs {
         display: inline-block;
-        white-space: nowrap;
         width: 100%;
         height: 50px;
+        white-space: nowrap;
         min-width: 540px;
         position: relative;
         vertical-align: top;
@@ -452,9 +453,8 @@ div#guide {
 						top: 5px;
 						height: 40px;
 						color: rgba(255, 255, 255, 0.7);
-						font-size: 13px;
+						font-size: 11px;
 						position: absolute;
-						white-space: nowrap;
 						overflow: hidden;
 						padding-right: 25px;
 						&.marquee {

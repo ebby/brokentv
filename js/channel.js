@@ -418,11 +418,11 @@ brkn.Channel.prototype.addProgram = function(program) {
 	      if (!brkn.model.Controller.getInstance().guideToggled) {
 	        return;
 	      }
-    	  var titleOffset = titleWidth + goog.style.getPosition(titleEl).x;
-    	  if (titleOffset > programWidth) {
-    	    goog.style.setStyle(titleEl, 'margin-left', -(titleOffset - programWidth - 10) + 'px');
-    	    goog.dom.classes.add(titleEl, 'marquee');
-    	  }
+//    	  var titleOffset = titleWidth + goog.style.getPosition(titleEl).x;
+//    	  if (titleOffset > programWidth) {
+//    	    goog.style.setStyle(titleEl, 'margin-left', -(titleOffset - programWidth - 10) + 'px');
+//    	    goog.dom.classes.add(titleEl, 'marquee');
+//    	  }
     	  if (!this.adminMode_) {
     	    goog.style.setStyle(img, 'background-position-y', program.media.thumbPos +
     	        10 * Math.max(program.media.thumbSize.width/programWidth, 1) + '%');
@@ -432,8 +432,8 @@ brkn.Channel.prototype.addProgram = function(program) {
     	  if (!brkn.model.Controller.getInstance().guideToggled) {
           return;
         }
-        goog.style.setStyle(titleEl, 'margin-left', '');
-        goog.dom.classes.remove(titleEl, 'marquee');
+//        goog.style.setStyle(titleEl, 'margin-left', '');
+//        goog.dom.classes.remove(titleEl, 'marquee');
         if (!this.adminMode_) {
           goog.style.setStyle(img, 'background-position-y', program.media.thumbPos + '%');
         }
