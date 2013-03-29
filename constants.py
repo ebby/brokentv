@@ -5,7 +5,7 @@ CONFIG['webapp2_extras.sessions'] = dict(secret_key='JHG234K5HG34JH5B3K4J53N4KJ5
 
 DEVELOPMENT = os.environ.get('SERVER_SOFTWARE', '').startswith('Development')
 
-SUPER_ADMINS = ['1240963']
+SUPER_ADMINS = ['1240963', '100003192433087']
 
 SHARE_URL = 'xylocast.com/'
 

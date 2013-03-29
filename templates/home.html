@@ -18,7 +18,9 @@
 		<script src="/static/js/raphael-min.js" type="text/javascript"></script>
 		<script>
       var HOST_URL = '{{ host_url }}';
-		
+      var IPAD = !!navigator.userAgent.match(/iPad/i);
+      var IPHONE = !!navigator.userAgent.match(/iPhone/i);
+
 			// Re-namespace to avoid closure conflict.
 			var appengine = goog.appengine; 
 		</script>

@@ -84,7 +84,7 @@ class Programming():
     memcache.set('channels', [c.toJson(get_programming=False) for c in self.channels.itervalues()])
       
   @classmethod
-  def set_programming(cls, channel_id, duration=1200, schedule_next=False, fetch_twitter=True,
+  def set_programming(cls, channel_id, duration=2400, schedule_next=False, fetch_twitter=True,
                       queue='programming', target=None, kickoff=False):
     # Stored programming
     programming = memcache.get('programming') or {}
@@ -259,8 +259,8 @@ class Programming():
     cutoff_index = 0
     for p in programs:
       time = iso8601.parse_date(p['time']).replace(tzinfo=None)
-      if (datetime.datetime.now() - time).seconds < cutoff and \
-          (time + datetime.timedelta(seconds=p['media']['duration'])) < datetime.datetime.now():
+      if (datetime.datetime.now() - time).seconds < cutoff or \
+          (time + datetime.timedelta(seconds=p['media']['duration'])) > datetime.datetime.now():
         # Program started more than "cutoff" seconds ago and it ended before the current time.
         break
       cutoff_index += 1

@@ -1,5 +1,9 @@
 var HOST_URL;
 
+var IPHONE;
+
+var IPAD;
+
 var appengine = {};
 
 /** 

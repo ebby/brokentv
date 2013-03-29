@@ -33,7 +33,8 @@ brkn.Main = function(channelToken) {
 	 * @type {brkn.model.BrowserChannel}
 	 * @private
 	 */
-	this.BrowserChannel_ = brkn.model.BrowserChannel.getInstance().init(channelToken);
+	this.BrowserChannel_ = IPAD || IPHONE ? null :
+	    brkn.model.BrowserChannel.getInstance().init(channelToken);
 	
 	/**
 	 * @type {brkn.Controller}
@@ -370,9 +371,7 @@ brkn.Main.getSessionAndInit = function(response) {
           brkn.Main.init(response, data['token'], data['channels'], data['programs'],
               data['current_user'], data['viewer_sessions']);
           
-          var isIpad = !!navigator.userAgent.match(/iPad/i);
-          var isIphone = !!navigator.userAgent.match(/iPhone/i);
-          if (isIpad || isIphone) {
+          if (IPAD || IPHONE) {
             reveal();
           }
         } else if (e.target.getStatus() == 500) {

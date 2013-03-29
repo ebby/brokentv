@@ -60,6 +60,10 @@
        -o-transition: @arguments;
       -ms-transition: @arguments;
           transition: @arguments;
+          
+  .transform(e('translateZ(0)'));
+  -webkit-backface-visibility: hidden;
+  -webkit-perspective: 1000;
 }
 
 .transform (...) {
