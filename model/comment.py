@@ -39,9 +39,9 @@ class Comment(db.Model):
 
   def toJson(self):
     json = {}
-    json['id'] = self.key().id()
+    json['id'] = str(self.key().id())
     json['media'] = self.media.toJson()
-    json['parent_id'] = self.parent_comment.key().id() if self.parent_comment else None
+    json['parent_id'] = str(self.parent_comment.key().id()) if self.parent_comment else None
     json['user'] = self.user.toJson()
     json['text'] = self.text
     json['time'] = self.time.isoformat()

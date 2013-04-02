@@ -255,7 +255,7 @@ brkn.sidebar.Stream.prototype.addActivity_ = function(opt_activity, opt_digest, 
         });
       }
       activityEl = soy.renderAsElement(brkn.sidebar.commentActivity, {
-        comments: comments.reverse(),
+        comments: comments.reverse().slice(0, 3),
         users: users,
         media: medias[0]
       });

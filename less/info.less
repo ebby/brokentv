@@ -17,15 +17,48 @@ div#sidebar div.info {
       width: 100%;
       height: auto;
       position: absolute;
-      opacity: .5;
       top: 50%;
       left: 50%;
       margin-top: -20px;
       pointer-events: none;
+      opacity: 0;
+      visibility: hidden;
+      .transition(opacity, .3s, ease);
       &.fix-height {
         height: 150%;
         width: auto;
       }
+      &.show {
+        opacity: .5;
+        visibility: visible;
+      }
+    }
+    div.play {
+      width: 45px;
+      height: 45px;
+      padding: 0;
+      border-radius: 23px;
+      border: 2px solid rgba(0, 0, 0, .7);
+      background: rgba(0, 0, 0, .5);
+      position: absolute;
+      left: 115px;
+      top: 80px;
+      opacity: 0;
+      visibility: hidden;
+      .transition(opacity, .3s, ease);
+      .icon {
+        .icon-play();
+        font-size: 28px;
+        margin-top: 7px;
+        margin-left: 4px;
+      }
+    }
+    &:hover div.play {
+      visibility: visible;
+      opacity: .9;
+    }
+    &.scrolled div.play {
+      display: none;
     }
     div.publisher {
       left: 9px;
@@ -33,7 +66,7 @@ div#sidebar div.info {
       background: rgba(0, 0, 0, .6);
       display: inline-block;
       .border-radius(3px);
-      position: absolute;
+      position: relative;
       cursor: pointer;
       img {
         width: 22px;
@@ -60,9 +93,9 @@ div#sidebar div.info {
       background: #555;
     }
     div.links {
-      position: absolute;
-      top: 4px;
-      right: -50px;
+      position: relative;
+      top: 12px;
+      left: 15px;
       text-shadow: 1px 1px 1px #181818;
       display: inline-block;
       .border-radius(3px);
@@ -79,16 +112,7 @@ div#sidebar div.info {
         .icon-link();
         margin: 0 4px;
         color: #f5f5f5;
-        input {
-          display: none;
-          cursor: pointer;
-          background: rgba(0, 0, 0, .5);
-          border: 1px solid #181818;
-          .border-radius(3px);
-          color: #f5f5f5;
-          margin-left: 5px;
-          padding: 1px 3px 3px 3px;
-        }
+        cursor: pointer;
       }
       div.host {
         .icon-link-ext();
@@ -96,10 +120,22 @@ div#sidebar div.info {
         color: #f5f5f5;
       }
     }
+    div.link-select {
+      position: relative;
+      top: 12px;
+      left: 8px;
+      input {
+        cursor: pointer;
+        background: rgba(0, 0, 0, .5);
+        border: 1px solid #181818;
+        .border-radius(3px);
+        color: #f5f5f5;
+        padding: 1px 3px 3px 3px;
+      }
+    }
   }
   img.thumb {
     height: 70px;
-    .border-radius(6px);
     position: absolute;
     .box-shadow(e('0 0 3px 0 rgba(0, 0, 0, 0.5), 0 0 1px 1px rgba(255, 255, 255, .9)'));
     border: 0px solid whiteSmoke;
@@ -116,6 +152,10 @@ div#sidebar div.info {
     a {
       cursor: pointer;
     }
+    a.prev-link {
+      position: absolute;
+      right: 10px;
+    }
   }
   div.scrollable {
     height: 200px;
@@ -124,9 +164,9 @@ div#sidebar div.info {
     margin-right: -14px;
   }
   div.title {
-    position: absolute;
+    position: relative;
     left: 9px;
-    top: 40px;
+    top: 10px;
     padding-right: 10px;
     color: white;
     text-shadow: 1px 1px 1px black;
@@ -149,7 +189,7 @@ div#sidebar div.info {
       font-family: MuseoSans700;
     }
     position: relative;
-    width: 260px;
+    width: 250px;
     margin-top: 181px;
     font-size: 12px;
     margin-left: 10px;
@@ -195,8 +235,8 @@ div#sidebar div.info {
       .border-radius(0);
       .box-shadow(e('inset 0 0 1px 1px rgba(140, 140, 140, 0.70), 0 0 1px #5e5e5e'));
       margin-top: -1px;
-      width: 40px;
-      height: 33px;
+      width: 48px;
+      height: 43px;
       position: relative;
       &:active, &.goog-custom-button-active, &.goog-custom-button-disabled,
       &.goog-custom-button-checked {
@@ -208,12 +248,6 @@ div#sidebar div.info {
       opacity: .8;
       top: 50%;
       left: 50%
-    }
-    div.play .icon {
-      .icon-play();
-      font-size: 17px;
-      margin-top: -10px;
-      margin-left: -5px;
     }
     div.plus .icon {
       .icon-plus();
@@ -303,6 +337,32 @@ div#sidebar div.info {
       vertical-align: middle;
       margin: 0 10px;
       white-space: normal;
+    }
+  }
+  div.overlay {
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, .6);
+    position: absolute;
+    left: 0;
+    top: 0;
+    div.leaving {
+      width: 300px;
+      height: 50px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      margin-left: -150px;
+      margin-top: -25px;
+      font-size: 14px;
+      font-family: MuseoSans500;
+      color: #f5f5f5;
+      text-shadow: 1px 1px 1px #181818;
+      text-align: center;
+    }
+    div.button {
+      margin: 10px 5px;
+      background: rgba(0, 0, 0, .5);
     }
   }
 }

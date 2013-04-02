@@ -143,7 +143,7 @@ brkn.Player.prototype.enterDocument = function() {
       .listen(this.getElement(), goog.events.EventType.MOUSEMOVE, goog.bind(function(e) {
         var xPer = e.offsetX/this.height_;
         var yPer = e.offsetY/this.width_;
-        if (xPer > .7 && xPer < .9 && yPer > .7 && yPer < .9 &&
+        if (xPer > .7 && xPer < 1 && yPer > .7 && yPer < 1 &&
             (this.playerState_ == YT.PlayerState.PLAYING ||
              this.playerState_ == YT.PlayerState.PAUSED)) {
           // Pass click through to flash to kill possible advertisement

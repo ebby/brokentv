@@ -60,8 +60,10 @@
        -o-transition: @arguments;
       -ms-transition: @arguments;
           transition: @arguments;
-          
-  .transform(e('translateZ(0)'));
+}
+
+.ios-accel () {
+  -webkit-transform: translate3d(0,0,0);
   -webkit-backface-visibility: hidden;
   -webkit-perspective: 1000;
 }
@@ -72,6 +74,16 @@
   -moz-transform:@arguments;
   -webkit-transform:@arguments;
   -o-transform:@arguments;
+  
+  -webkit-backface-visibility: hidden;
+  -webkit-perspective: 1000;
+}
+
+.transition-duration (...) {
+  transition-duration:@arguments;
+  -moz-transition-duration:@arguments; /* Firefox 4 */
+  -webkit-transition-duration:@arguments; /* Safari and Chrome */
+  -o-transition-duration:@arguments; /* Opera */
 }
 
 .alternate () {

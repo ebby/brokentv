@@ -46,6 +46,11 @@ brkn.model.Media = function(media) {
 	this.duration = media['duration'];
 	
 	/**
+   * @type {boolean}
+   */
+  this.fetched = false;
+	
+	/**
    * @type {string}
    */
   this.description = media['description'];
@@ -89,7 +94,7 @@ brkn.model.Media = function(media) {
 	 * @type {goog.math.Size}
 	 */
 	this.thumbSize = new goog.math.Size(480, 360);
-	
+
 	/**
    * @type {number}
    */
@@ -101,6 +106,11 @@ brkn.model.Media = function(media) {
   this.comments = [];
 
   /**
+   * @type {Array.<brkn.model.Tweet>}
+   */
+  this.tweets = [];
+
+  /**
    * @type {number}
    */
   this.commentCount = media['comment_count'] || 0;
@@ -110,6 +120,11 @@ brkn.model.Media = function(media) {
    */
   this.starCount = media['star_count'] || 0;
 
+  /**
+   * @type {Array.<brkn.model.User>}
+   */
+  this.seen = [];
+  
   /**
    * @type {Array.<brkn.model.User>}
    */
@@ -158,7 +173,7 @@ brkn.model.Media.prototype.addComment = function(comment) {
   if (comment.user.id != brkn.model.Users.getInstance().currentUser.id) {
     brkn.model.Notify.getInstance().publish(brkn.model.Notify.Actions.SHOW,
         'commented on ' + this.name, comment.text, comment.user, comment.user.picture,
-        '#media:' + this.id);
+        '#info:' + this.id);
   }
 };
 

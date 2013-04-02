@@ -257,7 +257,9 @@ brkn.Controller.prototype.enterDocument = function() {
             if (brkn.model.Player.getInstance().getCurrentProgram()) {
               var elapsed = brkn.model.Player.getInstance().getCurrentTime() /
                   brkn.model.Player.getInstance().getCurrentProgram().media.duration;
-              if (elapsed > .988) {
+              var remaining = brkn.model.Player.getInstance().getCurrentProgram().media.duration -
+                  brkn.model.Player.getInstance().getCurrentTime();
+              if (remaining < 3) {
                 brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.BEFORE_END);
               }
               if (brkn.model.Channels.getInstance().currentChannel.myChannel &&
@@ -323,6 +325,7 @@ brkn.Controller.prototype.enterDocument = function() {
   brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_SIDEBAR,
       function(show) {
         this.sidebarToggle_.setChecked(show);
+        goog.dom.classes.enable(this.getElement(), 'sidebar-toggled', show);
         this.resize();
       }, this);
   brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.PLAY,
@@ -392,8 +395,8 @@ brkn.Controller.prototype.toggleGuide_ = function(show) {
  * Resize
  */
 brkn.Controller.prototype.resize = function() {
-  goog.style.setWidth(this.getElement(), goog.dom.getViewportSize().width -
-      (this.sidebarToggle_.isChecked() ? 320 : 0));
+//  goog.style.setWidth(this.getElement(), goog.dom.getViewportSize().width -
+//      (this.sidebarToggle_.isChecked() ? 320 : 0));
   if (!brkn.model.Channels.getInstance().currentChannel.myChannel) {
     goog.style.showElement(this.progressEl_, false);
     

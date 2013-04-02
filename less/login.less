@@ -28,6 +28,8 @@ div#login {
     }
     div#static-content {
       .transition(height, .6s, ease-in);
+      -webkit-backface-visibility: hidden;
+      -webkit-perspective: 1000;
       height: 0;
       div#footer {
         display: none;
@@ -86,6 +88,9 @@ div#login {
   .bold {
     font-family: MuseoSans700;
   }
+  audio {
+    display: none;
+  }
   div#homepage {
     width: 100%;
     height: 100%;
@@ -105,6 +110,37 @@ div#login {
       opacity: 1;
       .transition(e('opacity .5s ease-in, top .3s ease'));
     }
+    div.chord {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 90px;
+      cursor: pointer;
+      &:active, &.strike {
+        background: url(/static/img/strike.png) no-repeat;
+        background-position: center;
+      }
+    }
+    div#chord-1 {
+      height: 292px;
+      margin-top: -150px;
+      margin-left: -224px;
+    }
+    div#chord-2 {
+      height: 247px;
+      margin-top: -105px;
+      margin-left: -104px;
+    }
+    div#chord-3 {
+      height: 202px;
+      margin-top: -60px;
+      margin-left: 16px;
+    }
+    div#chord-4 {
+      height: 153px;
+      margin-top: -10px;
+      margin-left: 136px;
+    }
   }
   div#static-scrollable {
     width: 100%;
@@ -112,6 +148,10 @@ div#login {
     position: absolute;
     top: 0;
     left: 0;
+    display: none;
+  }
+  &.expanded div#static-scrollable {
+    display: block;
   }
   div#static-content {
     width: 100%;
@@ -191,9 +231,17 @@ div#login {
         }
         &.error {
           background-color: #B7432E;
+          div.bg {
+            color: #dedede;
+            text-shadow: 1px 1px 1px #7d7d7d;
+          }
         }
         &.wait {
           background-color: #B49B4B;
+          div.bg {
+            color: #dedede;
+            text-shadow: 1px 1px 1px #7d7d7d;
+          }
         }
       }
       &.spin div.power div.bg {

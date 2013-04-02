@@ -25,8 +25,8 @@ class BaseHandler(SessionRequest):
             # Either used just logged in or just saw the first page
             # We'll see here 
             cookie = facebook.get_user_from_cookie(self.request.cookies,
-                                                   constants.FACEBOOK_APP_ID,
-                                                   constants.FACEBOOK_APP_SECRET)
+                                                   constants.facebook_app(self.request.host_url)['FACEBOOK_APP_ID'],
+                                                   constants.facebook_app(self.request.host_url)['FACEBOOK_APP_SECRET'])
             if cookie:
                 # Okay so user logged in 
                 # Now, check to see if existing user
@@ -45,7 +45,7 @@ class BaseHandler(SessionRequest):
                         access_token=cookie["access_token"],
                         location=profile['location']['name'] \
                             if 'location' in profile else None)
-                    user_number = Stat.add_user(user.gender)
+                    user_number = Stat.add_user(user.gender) + 500
                     waitlist_email = emailer.Email(emailer.Message.WAITLIST,
                                                    {'name' : user.first_name, 'waitlist' : user_number})
                     waitlist_email.send(user)

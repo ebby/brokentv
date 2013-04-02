@@ -78,7 +78,7 @@ class MainHandler(BaseHandler):
       self.session['channel_id'] = channel_id
       self.session['media_id'] = media_id
   
-      template_data['facebook_app_id'] = constants.FACEBOOK_APP_ID;
+      template_data['facebook_app_id'] = constants.facebook_app(self.request.host_url)['FACEBOOK_APP_ID'];
       path = os.path.join(os.path.dirname(__file__), 'templates/home.html')
       self.response.out.write(template.render(path, template_data))
 

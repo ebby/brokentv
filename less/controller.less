@@ -9,7 +9,14 @@ div.controller {
 	border-top: 1px solid #ccc;
 	pointer-events: none;
 	.box-shadow(e('inset 0 -3px 7px -3px rgba(0,0,0,0.2), 0 0 5px 0 rgba(0, 0, 0, .5)'));
-	.transition(width, .5s, ease);
+	/*.transition(width, .5s, ease);*/
+  
+  &.sidebar-toggled {
+    div.right {
+      .transform(e('translate3d(-320px,0,0)'));
+    }
+  }
+  
   &.window {
     div.background {
       opacity: 0;
@@ -59,7 +66,9 @@ div.controller {
     width: 100px;
     height: 100%;
     pointer-events: all;
-    .transition(width, .5s, ease);
+    /*.transition(width, .5s, ease);*/
+    .transition-duration(500ms);
+    .transform(e('translate3d(0,0,0)'));
     div.border {
       display: none;
       width: 6px;
@@ -187,8 +196,9 @@ div.controller {
     width: 35px;
     height: 25px;
     .icon {
-      .sprite-info();
-      margin: 3px 0 0 8px;
+      .icon-info();
+      margin: 5px 0 0 1px;
+      font-size: 15px;
     }
   }
   div.button.admin-toggle {

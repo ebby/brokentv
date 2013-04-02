@@ -18,7 +18,8 @@ def broadcastViewerChange(user, last_channel_id, channel_id, session_id, time):
   response['session_id'] = session_id
   channels = memcache.get('web_channels') or {}
   for client in channels.iterkeys():
-    webchannel.send_message(client, simplejson.dumps(response))
+    if client in user.friends:
+      webchannel.send_message(client, simplejson.dumps(response))
     
 def broadcastNewComment(comment, tweet):
   response = {}

@@ -58,9 +58,12 @@ brkn.Notify.prototype.show_ = function(flash, action, content, opt_user, opt_img
   var image = goog.dom.getElementByClass('image', noteEl);
   var close = goog.dom.getElementByClass('close', noteEl);
   this.getHandler()
-      .listen(noteEl, goog.events.EventType.CLICK, function(e) {
+      .listen(goog.dom.getElementByClass('close', noteEl), goog.events.EventType.CLICK, function(e) {
         e.preventDefault()
         e.stopPropagation()
+        goog.dom.removeNode(noteEl);
+      })
+      .listen(noteEl, goog.events.EventType.CLICK, function(e) {
         goog.dom.removeNode(noteEl);
       })
       .listen(image,

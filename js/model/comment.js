@@ -10,7 +10,7 @@ goog.require('brkn.model.Users');
  */
 brkn.model.Comment = function(comment) {
   /**
-   * @type {number}
+   * @type {string}
    * @private
    */
   this.id = comment['id'];
@@ -38,7 +38,7 @@ brkn.model.Comment = function(comment) {
   this.relativeTime = goog.date.relative.format(this.time.getTime());
 
   /**
-   * @type {number}
+   * @type {string}
    */
   this.parentId = comment['parent_id'];
 

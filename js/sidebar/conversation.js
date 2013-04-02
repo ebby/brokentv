@@ -179,20 +179,23 @@ brkn.sidebar.Conversation.prototype.onAddComment_ = function(e) {
       '/_comment',
       e.callback,
       'POST',
-      'media_id=' + this.media_.id + '&text=' + e.text + '&tweet=' + e.twitter);
-  
-  if (e.facebook) {
+      'media_id=' + this.media_.id + '&text=' + e.text +
+      '&tweet=' + e.twitter + '&facebook=' + e.facebook +
+      (e.parentId ? '&parent_id=' + e.parentId : ''));
+
+  if (e.facebook && !e.parentId) {
     FB.api('/me/feed', 'POST', {
       'message': e.text,
       'name': this.media_.name,
-      'link': 'http://www.broken.tv',
+      'link': this.media_.link,
       'picture': this.media_.thumbnail,
-      'caption': 'on Broken.TV',
+      'caption': 'on XYLO',
       'description': this.media_.description
     }, function(response) {});
+
+    // Disable facebook posting after first post
+    this.commentInput_.setFacebook(false);
   }
-  
-  brkn.model.Analytics.getInstance().comment(this.media_.id, e.facebook, e.twitter);
 };
 
 

@@ -128,6 +128,9 @@ class Programming():
 
       all_medias = backup_medias if not len(all_medias) else all_medias
 
+      # Don't repeat already programmed 
+      all_medias = Programming.no_reprogram(next_programs, all_medias)
+
       # StorySort algorithm
       all_medias = Programming.story_sort(all_medias)
 
@@ -152,7 +155,9 @@ class Programming():
                                       max_time=(datetime.datetime.now() + datetime.timedelta(seconds=duration)))
         logging.info(program)
         if program:
-          programming.get(channel_id, []).append(program.toJson(fetch_channel=False, fetch_media=True, media_desc=False, pub_desc=False))
+          if not programming.get(channel_id, None):
+            programming[channel_id] = []
+          programming.get(channel_id).append(program.toJson(fetch_channel=False, fetch_media=True, media_desc=False, pub_desc=False))
           programs.append(program)
           logging.info('ADDING: ' + media.name + ' at: ' + program.time.isoformat())
           if len(pickle.dumps(programming)) > 1000000:
@@ -163,9 +168,14 @@ class Programming():
       memcache.set('programming', programming)
 
       channels = memcache.get('channels') or []
+      updated = False
       for i,c in enumerate(channels):
         if c['id'] == channel_id:
           channels[i] = channel.toJson(get_programming=False)
+          updated = True
+      if not updated:
+        channels.append(channel.toJson(get_programming=False))
+
       memcache.set('channels', channels)
 
     # Schedule our next programming selection
@@ -316,6 +326,19 @@ class Programming():
       span -= medias[cutoff_index].duration
       cutoff_index += 1
     return medias[:cutoff_index]
+  
+  
+  @classmethod
+  def no_reprogram(cls, programs, medias):
+    programmed_medias = {}
+    for program in programs:
+      programmed_medias[program['media']['id']] = True
+    filtered_medias = []
+    for media in medias:
+      if not programmed_medias.get(media.id):
+        filtered_medias.append(media)
+    return filtered_medias
+  
   
   @classmethod
   def fetch_related_tweets(cls, medias):

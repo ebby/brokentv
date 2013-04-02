@@ -254,6 +254,77 @@ brkn.Main.staticInit = function() {
   goog.events.listen(window, goog.events.EventType.RESIZE, goog.partial(brkn.Main.resizeStatic, expand));
   
   brkn.model.Analytics.getInstance().init();
+  
+  var chord1 = goog.dom.getElement('chord-1');
+  var chord2 = goog.dom.getElement('chord-2');
+  var chord3 = goog.dom.getElement('chord-3');
+  var chord4 = goog.dom.getElement('chord-4');
+  var mp31 = goog.dom.getElement('mp3-1');
+  var mp32 = goog.dom.getElement('mp3-2');
+  var mp33 = goog.dom.getElement('mp3-3');
+  var mp34 = goog.dom.getElement('mp3-4');
+  mp31.volume = .5;
+  mp32.volume = .5;
+  mp33.volume = .5;
+  mp34.volume = .5;
+  
+  goog.events.listen(chord1, goog.events.EventType.CLICK, function(e) {
+    mp31.load();
+    mp31.play();
+  });
+  goog.events.listen(chord2, goog.events.EventType.CLICK, function(e) {
+    mp32.load();
+    mp32.play();
+  });
+  goog.events.listen(chord3, goog.events.EventType.CLICK, function(e) {
+    mp33.load();
+    mp33.play();
+  });
+  goog.events.listen(chord4, goog.events.EventType.CLICK, function(e) {
+    mp34.load();
+    mp34.play();
+  });
+  
+  goog.Timer.callOnce(function() {
+    goog.dom.classes.add(chord1, 'strike');
+    mp31.play();
+  }, 500);
+  goog.Timer.callOnce(function() {
+    goog.dom.classes.remove(chord1, 'strike');
+    goog.dom.classes.add(chord2, 'strike');
+    mp32.play();
+  }, 800);
+  goog.Timer.callOnce(function() {
+    goog.dom.classes.remove(chord2, 'strike');
+    goog.dom.classes.add(chord3, 'strike');
+    mp33.play();
+  }, 1100);
+  goog.Timer.callOnce(function() {
+    goog.dom.classes.remove(chord3, 'strike');
+    goog.dom.classes.add(chord4, 'strike');
+    mp34.play();
+  }, 1400);
+  goog.Timer.callOnce(function() {
+    goog.dom.classes.remove(chord4, 'strike');
+    goog.dom.classes.add(chord3, 'strike');
+    mp33.load();
+    mp33.play();
+  }, 1700);
+  goog.Timer.callOnce(function() {
+    goog.dom.classes.remove(chord3, 'strike');
+    goog.dom.classes.add(chord2, 'strike');
+    mp32.load();
+    mp32.play();
+  }, 2000);
+  goog.Timer.callOnce(function() {
+    goog.dom.classes.remove(chord2, 'strike');
+    goog.dom.classes.add(chord1, 'strike');
+    mp31.load();
+    mp31.play();
+  }, 2300);
+  goog.Timer.callOnce(function() {
+    goog.dom.classes.remove(chord1, 'strike');
+  }, 2600);
 };
 
 
@@ -366,14 +437,14 @@ brkn.Main.getSessionAndInit = function(response) {
               }, 600);
             }, 600);
           };
-          brkn.model.Player.getInstance().subscribeOnce(brkn.model.Player.Actions.NO_MEDIA, reveal);
-          brkn.model.Player.getInstance().subscribeOnce(brkn.model.Player.Actions.PLAYING, reveal);
+          //brkn.model.Player.getInstance().subscribeOnce(brkn.model.Player.Actions.NO_MEDIA, reveal);
+          //brkn.model.Player.getInstance().subscribeOnce(brkn.model.Player.Actions.PLAYING, reveal);
           brkn.Main.init(response, data['token'], data['channels'], data['programs'],
               data['current_user'], data['viewer_sessions']);
           
-          if (IPAD || IPHONE) {
-            reveal();
-          }
+          //if (IPAD || IPHONE) {
+          reveal();
+          //}
         } else if (e.target.getStatus() == 500) {
           brkn.Main.noLogin('error', 'Opps, check back later');
         } else {

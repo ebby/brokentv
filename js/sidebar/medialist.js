@@ -169,7 +169,7 @@ brkn.sidebar.MediaList.prototype.decorateInternal = function(el) {
 
   if (goog.dom.classes.has(this.getElement(), 'starred')) {
     this.noActivitiesEl_ = goog.dom.createDom('div', 'no-comments',
-        'Stories you love will be here.');
+        'Favorities will appear here.');
     goog.dom.appendChild(this.getElement(), this.noActivitiesEl_);
   }
 

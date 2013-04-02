@@ -277,6 +277,8 @@ brkn.Guide.prototype.enterDocument = function() {
   this.addTimeSlots(this.timeslots_, this.minTime_);
 
   goog.style.setWidth(this.getElement(), this.width_);
+//  goog.style.setWidth(this.headerEl_, this.width_);
+//  goog.style.setWidth(this.channelsEl_, this.width_);
   var viewOffset = brkn.Guide.HISTORY_SLOTS/this.timeslots_ * this.width_;
   
   this.pixelsPerSecond_ = (this.width_ - brkn.Guide.NAME_WIDTH)/this.timeline;
@@ -616,6 +618,8 @@ brkn.Guide.prototype.expand_ = function() {
   this.addTimeSlots(1, this.maxTime_);
   this.width_ += this.timeslotWidth_;
   goog.style.setWidth(this.getElement(), this.width_);
+//  goog.style.setWidth(this.headerEl_, this.width_);
+//  goog.style.setWidth(this.channelsEl_, this.width_);
   this.timeslots_++;
   this.maxTime_.add(new goog.date.Interval(0, 0, 0, 0, this.interval_ * newSlots));
   this.timeline = this.timeslots_ * this.interval_ * 60;

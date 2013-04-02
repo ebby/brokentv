@@ -67,6 +67,12 @@ brkn.sidebar.CommentInput = function() {
   this.addCommentButton_ = new goog.ui.CustomButton('add');
 
   /**
+   * @type {?brkn.model.User}
+   * @private
+   */
+  this.replyUser = null;
+  
+  /**
    * @type {?Element}
    * @private
    */
@@ -183,7 +189,7 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
           goog.bind(this.onAddComment_, this));
   
   brkn.model.Sidebar.getInstance().subscribe(brkn.model.Sidebar.Actions.REPLY_COMMENT,
-      this.reply_, this);
+      this.reply, this);
   brkn.model.Users.getInstance().currentUser.subscribe(brkn.model.User.Actions.TWITTER_AUTH, function() {
     this.tweetToggle_.setChecked(true);
   }, this);
@@ -191,15 +197,16 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
 
 
 /**
- * @param {brkn.model.Comment} comment Parent comment
+ * @param {brkn.model.Comment|string} comment Parent comment or id
  * @param {brkn.model.User} user But in reply to this user
  * @private
  */
-brkn.sidebar.CommentInput.prototype.reply_ = function(comment, user) {
+brkn.sidebar.CommentInput.prototype.reply = function(comment, user) {
   if (this.token_) {
     this.removeReply_();
   }
-  this.parentComment = comment.id.toString();
+  this.replyUser = user;
+  this.parentComment = comment.id ? comment.id : comment.toString();
   this.token_ = goog.dom.createDom('div', 'token', '@' + user.firstName());
   goog.dom.appendChild(this.inputHolder_, this.token_);
   this.setFocused(true);
@@ -211,6 +218,7 @@ brkn.sidebar.CommentInput.prototype.reply_ = function(comment, user) {
  * @private
  */
 brkn.sidebar.CommentInput.prototype.removeReply_ = function() {
+  this.replyUser = null;
   this.parentComment = null;
   goog.dom.removeNode(this.token_);
   this.token_ = null;
@@ -223,8 +231,15 @@ brkn.sidebar.CommentInput.prototype.removeReply_ = function() {
  */
 brkn.sidebar.CommentInput.prototype.getValue = function() {
   return this.commentInput_.getValue();
-}
+};
 
+
+/**
+ * @param {string} text
+ */
+brkn.sidebar.CommentInput.prototype.setValue = function(text) {
+  return this.commentInput_.setValue(text);
+};
 
 
 /**
@@ -245,8 +260,24 @@ brkn.sidebar.CommentInput.prototype.collapse = function() {
 /**
  * @return {boolean}
  */
+brkn.sidebar.CommentInput.prototype.hasReply = function() {
+  return !!this.token_;
+};
+
+
+/**
+ * @return {boolean}
+ */
 brkn.sidebar.CommentInput.prototype.isFocused = function() {
   return goog.dom.classes.has(this.getElement(), 'focused');
+};
+
+
+/**
+ * @param {boolean} enabled
+ */
+brkn.sidebar.CommentInput.prototype.setFacebook = function(enabled) {
+  this.fbToggle_.setChecked(enabled);
 };
 
 

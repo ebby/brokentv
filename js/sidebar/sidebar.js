@@ -106,6 +106,13 @@ brkn.Sidebar.prototype.currentTab_;
  * @type {Element}
  * @private
  */
+brkn.Sidebar.prototype.arrowEl_;
+
+
+/**
+ * @type {Element}
+ * @private
+ */
 brkn.Sidebar.prototype.contentEl_;
 
 
@@ -134,6 +141,7 @@ brkn.Sidebar.prototype.conversationEl_;
 brkn.Sidebar.prototype.enterDocument = function() {
   goog.base(this, 'enterDocument');
 
+  this.arrowEl_ = goog.dom.getElementByClass('arrow', this.toolbar_);
   this.contentEl_ = goog.dom.getElement('sidebar-content');
   this.mediaListEl_ = goog.dom.getElement('media-list');
   this.profileEl_ = goog.dom.getElement('profile');
@@ -153,14 +161,26 @@ brkn.Sidebar.prototype.enterDocument = function() {
   
   this.starred_ = new brkn.sidebar.Profile(brkn.model.Users.getInstance().currentUser);
   this.starred_.decorate(goog.dom.getElement('my-profile'));
-
+  
   if (this.info_) {
-    this.currentScreen_ = this.info_.getElement();
+    this.currentScreen_ = goog.dom.getElement('info');
     this.currentTab_ = 'info';
+    this.tabNav_('info', 'info');
   } else {
     this.currentScreen_ = goog.dom.getElement('stream');
     this.currentTab_ = 'stream';
+    this.tabNav_('info', 'stream');
   }
+  var direction = 'left';
+  goog.array.forEach(this.tabNames_, function(name) {
+    var tab = goog.dom.getElementByClass(name, this.contentEl_);
+    if (name == this.currentTab_) {
+      direction = 'right';
+      return;
+    }
+    goog.dom.classes.add(tab, direction);
+  }, this);
+  
   this.screens_ = [this.currentScreen_, '']
   goog.dom.classes.add(this.currentScreen_, 'current');
   
@@ -192,8 +212,9 @@ brkn.Sidebar.prototype.enterDocument = function() {
             var tabName = goog.dom.classes.get(tab)[0];   
             this.tabNav_(this.currentTab_, tabName); 
             goog.dom.classes.add(tab, 'selected');
-            goog.style.setPosition(goog.dom.getElementByClass('arrow', this.toolbar_),
-                goog.style.getSize(tab).width/2 + goog.style.getPosition(tab).x);
+//            goog.style.setPosition(goog.dom.getElementByClass('arrow', this.toolbar_),
+//                goog.style.getSize(tab).width/2 + goog.style.getPosition(tab).x);
+            this.updateArrow_();
             if (lastTab != this.currentTab_) {
               e.stopPropagation();
             }
@@ -276,9 +297,12 @@ brkn.Sidebar.prototype.onNextProgram_ = function(opt_program) {
   var program = opt_program || brkn.model.Channels.getInstance().currentChannel.getCurrentProgram();
   if (program) {
     this.currentMedia_ = program.media;
+    
     if (!this.info_ || this.currentMedia_.id != this.info_.getModel().id) {
+      var input = this.info_ && this.info_.getInput() ? this.info_.getInput() : null;
+      var lastMedia = this.info_ ? this.info_.getMedia() : null;
       goog.dispose(this.info_);
-      this.info_ = new brkn.sidebar.Info(this.currentMedia_);
+      this.info_ = new brkn.sidebar.Info(this.currentMedia_, false, lastMedia, input);
       this.info_.decorate(goog.dom.getElement('info'));
     }
   }
@@ -311,27 +335,33 @@ brkn.Sidebar.prototype.tabNav_ = function(from, to) {
   var toScreen = goog.dom.getElementByClass(to, this.contentEl_);
   var fromIndex = goog.array.indexOf(this.tabNames_, from);
   var toIndex = goog.array.indexOf(this.tabNames_, to);
-  var right = goog.array.indexOf(this.tabNames_, from) < toIndex;
+  var right = fromIndex < toIndex;
   var i = right ? 0 : this.tabNames_.length - 1;
   var condition = right ? i < this.tabNames_.length : i >= 0;
   for (i; condition; i += right ? 1 : -1) {
     var name = this.tabNames_[i];
     var tab = goog.dom.getElementByClass(name, this.contentEl_);
     if ((right && i > toIndex) || (!right && i < toIndex)) {
-      goog.style.setStyle(tab, {
-        'left': '',
-        'right': ''
-      });
+      goog.dom.classes.add(tab, 'right');
+      goog.dom.classes.remove(tab, 'left');
+//      goog.style.setStyle(tab, {
+//        'left': '',
+//        'right': ''
+//      });
     } else if ((right && i < toIndex) || (!right && i > toIndex)) {
-      goog.style.setStyle(tab, {
-        'left': right ? '-300px' : '',
-        'right': ''
-      });
+      goog.dom.classes.enable(tab, 'left', right);
+      goog.dom.classes.add(tab, 'right');
+//      goog.style.setStyle(tab, {
+//        'left': right ? '-300px' : '',
+//        'right': ''
+//      });
     } else if (i == toIndex) {
-      goog.style.setStyle(tab, {
-        'right': right ? 0 : '',
-        'left': ''
-      });
+      goog.dom.classes.remove(tab, 'right');
+      goog.dom.classes.remove(tab, 'left');
+//      goog.style.setStyle(tab, {
+//        'right': right ? 0 : '',
+//        'left': ''
+//      });
       break;
     }
   }
@@ -357,27 +387,36 @@ brkn.Sidebar.prototype.navigate = function(to, opt_back, opt_title) {
   
   var isScreen = goog.dom.classes.has(this.currentScreen_, 'screen');
   if (opt_back) {
-    goog.style.setStyle(this.currentScreen_, {
-      'left': '',
-      'right': 0
-    });
-    goog.style.setStyle(to, {
-      'right': '',
-      'left': 0,
-      'width': ''
-    });
+    goog.dom.classes.remove(this.currentScreen_, 'on');
+//    goog.dom.classes.add(this.currentScreen_, 'right');
+//    goog.dom.classes.remove(this.currentScreen_, 'left');
+//    goog.dom.classes.add(to, 'left');
+//    goog.dom.classes.remove(to, 'right');
+//    goog.style.setStyle(this.currentScreen_, {
+//      'left': '',
+//      'right': 0
+//    });
+//    goog.style.setStyle(to, {
+//      'right': '',
+//      'left': 0,
+//      'width': ''
+//    });
     goog.dom.classes.remove(this.currentScreen_, 'current');
     goog.dom.classes.add(to, 'current');
     this.currentScreen_ = to;
   } else {
-    goog.style.setStyle(this.currentScreen_, {
-      'left': isScreen ? 0 : '',
-      'right': ''
-    });
-    goog.style.setStyle(to, {
-      'right': 0,
-      'left': ''
-    });
+//    goog.dom.classes.remove(this.currentScreen_, 'right');
+    goog.dom.classes.enable(this.currentScreen_, 'on', !isScreen);
+//    goog.dom.classes.add(to, 'right');
+//    goog.dom.classes.remove(to, 'left');
+//    goog.style.setStyle(this.currentScreen_, {
+//      'left': isScreen ? 0 : '',
+//      'right': ''
+//    });
+//    goog.style.setStyle(to, {
+//      'right': 0,
+//      'left': ''
+//    });
     goog.array.insertAt(this.screens_, [this.currentScreen_,
         goog.dom.getTextContent(goog.dom.getElementByClass('back-title', this.toolbar_))], 0);
     goog.dom.classes.remove(this.currentScreen_, 'current');
@@ -427,8 +466,11 @@ brkn.Sidebar.prototype.showMediaList = function(name, opt_medias, opt_url, opt_t
 
 /**
  * @param {brkn.model.Media} media
+ * @param {?boolean=} opt_noFetch
+ * @param {?brkn.model.Media=} opt_lastMedia
+ * @param {?string=} opt_lastInput
  */
-brkn.Sidebar.prototype.showMediaInfo = function(media) {
+brkn.Sidebar.prototype.showMediaInfo = function(media, opt_noFetch, opt_lastMedia, opt_lastInput) {
   if (this.info_ && media.id == this.info_.getModel().id) {
     goog.dom.classes.remove(this.toolbar_, 'back');
     var lastScreen = this.screens_[0][0];
@@ -438,7 +480,7 @@ brkn.Sidebar.prototype.showMediaInfo = function(media) {
     this.tabNav_(this.currentTab_, 'info');
   } else {
     var mediaInfoEl = goog.dom.getElement('media-info');
-    var mediaInfo = new brkn.sidebar.Info(media);
+    var mediaInfo = new brkn.sidebar.Info(media, opt_noFetch, opt_lastMedia, opt_lastInput);
     mediaInfo.decorate(mediaInfoEl);
     brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NAVIGATE,
         mediaInfoEl, false, media.name);
@@ -467,7 +509,11 @@ brkn.Sidebar.prototype.showProfile = function(user) {
  * @private
  */
 brkn.Sidebar.prototype.updateArrow_ = function() {
-  goog.style.setPosition(goog.dom.getElementByClass('arrow', this.toolbar_),
-      goog.style.getSize(this.tabs_[this.currentTab_]).width/2 +
-          goog.style.getPosition(this.tabs_[this.currentTab_]).x);
+  var pos = Math.round(goog.style.getSize(this.tabs_[this.currentTab_]).width/2 +
+      goog.style.getPosition(this.tabs_[this.currentTab_]).x);
+  this.arrowEl_.style.transform = 'translate3d(' + pos + 'px, 0,0)';
+  this.arrowEl_.style.msTransform = 'translate3d(' + pos + 'px, 0,0)';
+  this.arrowEl_.style.WebkitTransform = 'translate3d(' + pos + 'px, 0,0)';
+  this.arrowEl_.style.MozTransform = 'translate3d(' + pos + 'px, 0,0)';
+  this.arrowEl_.style.OTransform = 'translate3d(' + pos + 'px, 0,0)';
 };

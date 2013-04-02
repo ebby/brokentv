@@ -208,8 +208,8 @@ class InfoHandler(BaseHandler):
     if media:
       response = {}
       response['description'] = media.description
-      response['seen'] = media.seen_by()
-      response['comments'] = [c.toJson() for c in Comment.get_by_media(media)]
+      response['seen'] = media.seen_by(self.current_user)
+      response['comments'] = [c.toJson() for c in Comment.get_by_media(media, uid=self.current_user.id)]
       response['tweets'] = [t.to_json() for t in media.get_tweets()]
       self.response.out.write(simplejson.dumps(response))
         
@@ -297,7 +297,7 @@ class SeenHandler(BaseHandler):
   @BaseHandler.logged_in
   def get(self, id):
     media = Media.get_by_key_name(id)
-    self.response.out.write(simplejson.dumps(media.seen_by()))
+    self.response.out.write(simplejson.dumps(media.seen_by(self.current_user)))
     
   @BaseHandler.logged_in
   def post(self):
@@ -307,7 +307,7 @@ class SeenHandler(BaseHandler):
     if session and media:
       session.add_media(media)
     if media:
-      media.seen_by(self.current_user)
+      media.set_seen_by(self.current_user)
     if async:
       channel = Channel.get_by_key_name(self.current_user.id)
       channel.current_media = None

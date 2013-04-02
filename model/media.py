@@ -162,13 +162,14 @@ class Media(db.Model):
     from tweet import Tweet
     return Tweet.all().filter('media =', self).order('-time').fetch(limit, offset=offset)
 
-  def seen_by(self, user=None):
+  def set_seen_by(self, user=None):
     if user and not user.id in self.seen:
       self.seen.append(user.id)
       self.put()
       return None
-    else:
-      return [User.get_by_key_name(uid).toJson() for uid in self.seen]
+
+  def seen_by(self, user):
+    return [User.get_by_key_name(uid).toJson() for uid in self.seen if uid in user.friends]
     
   @classmethod
   @db.transactional

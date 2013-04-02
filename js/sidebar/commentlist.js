@@ -34,7 +34,7 @@ brkn.sidebar.CommentList = function(media, opt_comments, opt_twitter, opt_tweets
   this.comments_ = opt_comments || [];
 
   /**
-   * @type {Object.<number, brkn.model.Comment>}
+   * @type {Object.<string, brkn.model.Comment>}
    * @private
    */
   this.commentsMap_ = {};
@@ -206,7 +206,7 @@ brkn.sidebar.CommentList.prototype.commentClick_ = function(e) {
   var targetEl = /** @type {Element} */ e.target;
   var commentEl = goog.dom.getAncestorByClass(targetEl, 'comment');
   if (commentEl) {
-    var commentId = parseInt(commentEl.id.split('-')[1], 10);
+    var commentId = commentEl.id.split('-')[1];
     var comment = this.commentsMap_[commentId];
     if (goog.dom.classes.has(targetEl, 'reply')) {
       brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.REPLY_COMMENT,

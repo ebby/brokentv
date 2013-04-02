@@ -48,23 +48,36 @@ PROD_SIMPLE_JS = '/static/js/brkn-simple-min.js'
 ADV_JS = '//localhost:9810/compile?id=brokentv&mode=advanced&pretty-print=true'
 SIMPLE_JS = '//localhost:9810/compile?id=brokentv&mode=simple&pretty-print=true'
 
+def facebook_app(hostname=None):
+  if DEVELOPMENT:
+    return {
+            'FACEBOOK_APP_ID': "164212930331128",
+            'FACEBOOK_APP_SECRET': "fd15a6f75af1cc786177f2c9e74f7424"
+           }
+  elif hostname and 'broken' in hostname:
+    return {
+            'FACEBOOK_APP_ID': "238486862959443",
+            'FACEBOOK_APP_SECRET': "6c43ede6e4268e331ead0f0fc79ad95a"
+           }
+  else:
+    return {
+            'FACEBOOK_APP_ID': "131936020298013",
+            'FACEBOOK_APP_SECRET': "d69567a45ca1a5313c06c5b615555227"
+           }
+
 if DEVELOPMENT:
-  FACEBOOK_APP_ID = "164212930331128"
-  FACEBOOK_APP_SECRET = "fd15a6f75af1cc786177f2c9e74f7424"
   JS_SOURCE = SIMPLE_JS
   GDATA_CLIENT = '882797508644-e6cmb7g9pta07sbn0sajcrb7600hgd6n.apps.googleusercontent.com'
   CLIENT_SECRETS_FILE = "client_secrets_dev.json"
   STATS_JS_SOURCE = SIMPLE_JS
   ADMIN_JS_SOURCE = '//localhost:9810/compile?id=admin&mode=simple&pretty-print=true'
-  
+
   TWITTER_CONSUMER_KEY = 'o2RPbUJUFDtltq7LmKVD1A'
   TWITTER_CONSUMER_SECRET = 'E88eAbv1Wag6XMCUjuDpBQuQr7KKwVujxsE1z3eoO8'
   TWITTER_ACCESS_TOKEN = '423216326-eDLmanwsrUcZewQ9IwKlmYJJaRq3MbG6OMNh6cjk'
   TWITTER_TOKEN_SECRET = 'kP7AKjHN2KYl5F0QLKI19Rh7maNDKCOJd9gXCeUEJg'
   TWITTER_CALLBACK = 'http://local.broken.tv:8011/_twitter/callback'
 else :
-  FACEBOOK_APP_ID = "131936020298013"
-  FACEBOOK_APP_SECRET = "d69567a45ca1a5313c06c5b615555227"
   JS_SOURCE = PROD_JS
   SIMPLE_JS = PROD_SIMPLE_JS
   GDATA_CLIENT = '882797508644-8pm4lrn1h8dq0sfaabac3m6b6uismfav.apps.googleusercontent.com'
