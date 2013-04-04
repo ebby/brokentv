@@ -65,7 +65,7 @@ class TopicCollectionMedia(db.Model):
   topic = db.ReferenceProperty(Topic, collection_name='collection_medias')
   collection = db.ReferenceProperty(Collection, collection_name='topic_medias')
   media = db.ReferenceProperty(Media)
-  collection_media = db.ReferenceProperty(CollectionMedia, 'topic_collection_medias')
+  collection_media = db.ReferenceProperty(CollectionMedia)
   approved = db.IntegerProperty(default=Approval.PENDING)
   
   @classmethod

@@ -13,7 +13,7 @@
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
   @font-face {
     font-family: 'icons';
-    src: url('static/webfonts/icons.svg?88235317#icons') format('svg');
+    src: url('/static/webfonts/icons.svg?88235317#icons') format('svg');
   }
 }
 .button {
@@ -341,7 +341,7 @@ div.controller div.button.info-toggle .icon {
 
   /* 'ℹ' */
 
-  margin: 5px 0 0 1px;
+  margin: 4px 0 0 0;
   font-size: 15px;
 }
 div.controller div.button.info-toggle .icon:before {
@@ -579,6 +579,13 @@ div#guide.animate div.channels div.channel div.name {
   -ms-transition: left 1s linear;
   transition: left 1s linear;
 }
+div#guide.animate div.ticker {
+  -webkit-transition: left 1s linear;
+  -moz-transition: left 1s linear;
+  -o-transition: left 1s linear;
+  -ms-transition: left 1s linear;
+  transition: left 1s linear;
+}
 div#guide.tick-along.animate.toggled div.channels div.channel div.programs div.program.playing div.title {
   -webkit-transition: left 1s linear;
   -moz-transition: left 1s linear;
@@ -661,11 +668,6 @@ div#guide div.my-ticker {
   height: 45px;
   z-index: 110;
   cursor: pointer !important;
-  -webkit-transition: left 1s linear;
-  -moz-transition: left 1s linear;
-  -o-transition: left 1s linear;
-  -ms-transition: left 1s linear;
-  transition: left 1s linear;
 }
 div#guide div.ticker.go-live div.go-live,
 div#guide div.my-ticker.go-live div.go-live,
@@ -932,9 +934,9 @@ div.header div.browse.now span {
   border-left: 1px solid #2d3446;
   padding-right: 10px;
   margin-top: -1px;
-  -webkit-box-shadow: inset -1px 0 1px -1px #F1F1F1, 0 0 1px #DEDEDE;
-  -moz-box-shadow: inset -1px 0 1px -1px #F1F1F1, 0 0 1px #DEDEDE;
-  box-shadow: inset -1px 0 1px -1px #F1F1F1, 0 0 1px #DEDEDE;
+  -webkit-box-shadow: inset 0 0 1px -1px #F1F1F1, 0 0 1px #DEDEDE;
+  -moz-box-shadow: inset 0 0 1px -1px #F1F1F1, 0 0 1px #DEDEDE;
+  box-shadow: inset 0 0 1px -1px #F1F1F1, 0 0 1px #DEDEDE;
   background: #3d3d3d url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAoCAIAAACw1AcgAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyRpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoTWFjaW50b3NoKSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDpCN0QxODVCQTUzREUxMUUyQUU0NkZEMEE1QkIwMzk4RCIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDpCN0QxODVCQjUzREUxMUUyQUU0NkZEMEE1QkIwMzk4RCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkI3RDE4NUI4NTNERTExRTJBRTQ2RkQwQTVCQjAzOThEIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOkI3RDE4NUI5NTNERTExRTJBRTQ2RkQwQTVCQjAzOThEIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+2i3rwAAAADRJREFUeNpi6OvrY/r//z8K/vfvHxMDAwMYg9ggDBOHycHYyPLIagiJIYuj2w8yH8oGCDAAI7RqXUjJdmoAAAAASUVORK5CYII=);
 }
 .collapsed div.channels div.channel div.programs div.program:last-child {
@@ -2641,20 +2643,11 @@ div#sidebar div.list-media div.media {
   border-top-right-radius: 3px;
   position: relative;
 }
-div#sidebar div.list-media div.media:hover div.preview {
-  background: white;
-  background-size: auto 100%;
-}
 div#sidebar div.list-media div.media:hover div.preview div.thumb {
-  -webkit-transition: opacity 0.3s ease;
-  -moz-transition: opacity 0.3s ease;
-  -o-transition: opacity 0.3s ease;
-  -ms-transition: opacity 0.3s ease;
-  transition: opacity 0.3s ease;
   opacity: .7;
 }
 div#sidebar div.list-media div.media:hover div.preview div.list-play {
-  display: block;
+  visibility: visible;
   opacity: .95;
 }
 div#sidebar div.list-media div.media:hover div.preview div.title,
@@ -2687,20 +2680,60 @@ div#sidebar div.list-media div.media div.preview div.thumb {
   width: 100%;
   height: 100%;
   opacity: .2;
+  -webkit-transition: opacity 0.3s ease;
+  -moz-transition: opacity 0.3s ease;
+  -o-transition: opacity 0.3s ease;
+  -ms-transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease;
   background-size: 150% auto;
   background-position: center;
   border-top-left-radius: 3px;
   border-top-right-radius: 3px;
 }
 div#sidebar div.list-media div.media div.preview div.list-play {
-  background: url(/static/img/sprite/list-play.png);
-  width: 20px;
-  height: 20px;
   top: 50%;
-  margin-top: -10px;
+  margin-top: -12px;
   right: 8px;
   position: absolute;
   opacity: .6;
+  width: 20px;
+  height: 20px;
+  -webkit-border-radius: 12px;
+  -moz-border-radius: 12px;
+  border-radius: 12px;
+  border: 2px solid rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  visibility: hidden;
+  -webkit-transition: opacity 0.3s ease;
+  -moz-transition: opacity 0.3s ease;
+  -o-transition: opacity 0.3s ease;
+  -ms-transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease;
+}
+div#sidebar div.list-media div.media div.preview div.list-play .icon {
+  font-family: 'icons';
+  font-style: normal;
+  font-weight: normal;
+  speak: none;
+  text-decoration: inherit;
+  /* opacity .8 */
+
+  font-variant: normal;
+  /* Uncomment for 3D effect */
+
+  /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+
+  /* '▶' */
+
+  font-size: 14px;
+  margin-top: 3px;
+  margin-left: 7px;
+  text-shadow: none;
+  color: #f5f5f5;
+}
+div#sidebar div.list-media div.media div.preview div.list-play .icon:before {
+  content: '\25b6';
 }
 div#sidebar div.list-media div.media div.preview div.title {
   left: 5px;
@@ -3250,6 +3283,7 @@ div#login .bold {
 }
 div#login audio {
   display: none;
+  height: 0;
 }
 div#login div#homepage {
   width: 100%;
@@ -3421,11 +3455,12 @@ div#login div#static-content div.fb-login div.power div.bg {
   font-size: 41px;
   font-size: 35px;
   color: #7d7d7d;
-  width: 32px;
-  height: 36px;
-  left: 19px;
-  top: 19px;
+  width: 38px;
+  height: 39px;
+  left: 16px;
+  top: 16px;
   position: relative;
+  text-align: center;
 }
 div#login div#static-content div.fb-login div.power div.bg:before {
   content: '\e78e';
@@ -3665,6 +3700,9 @@ div#login div#static-content div.footer div.home-twitter:before {
   position: relative;
   top: 1px;
 }
+div#login div#static-content div.footer div.copyright {
+  display: inline-block;
+}
 #uvTab {
   display: none !important;
   opacity: .8;
@@ -3842,7 +3880,7 @@ div#sidebar div.info div.picture div.play {
   width: 45px;
   height: 45px;
   padding: 0;
-  border-radius: 23px;
+  border-radius: 24px;
   border: 2px solid rgba(0, 0, 0, 0.7);
   background: rgba(0, 0, 0, 0.5);
   position: absolute;
@@ -3895,6 +3933,7 @@ div#sidebar div.info div.picture div.publisher {
   border-radius: 3px;
   position: relative;
   cursor: pointer;
+  z-index: 1;
 }
 div#sidebar div.info div.picture div.publisher img {
   width: 22px;
@@ -3930,6 +3969,7 @@ div#sidebar div.info div.picture div.links {
   -moz-border-radius: 3px;
   border-radius: 3px;
   height: 25px;
+  z-index: 1;
 }
 div#sidebar div.info div.picture div.links > div,
 div#sidebar div.info div.picture div.links > a {
@@ -3999,6 +4039,9 @@ div#sidebar div.info div.picture div.link-select input {
   color: #f5f5f5;
   padding: 1px 3px 3px 3px;
 }
+div#sidebar div.info div.picture.scrolled div.link-select {
+  display: none;
+}
 div#sidebar div.info img.thumb {
   height: 70px;
   position: absolute;
@@ -4030,6 +4073,9 @@ div#sidebar div.info div.scrollable {
   overflow-y: scroll !important;
   padding-right: 14px;
   margin-right: -14px;
+  position: absolute;
+  top: 0;
+  z-index: 0;
 }
 div#sidebar div.info div.title {
   position: relative;
@@ -5131,4 +5177,95 @@ a {
 }
 .ios-scroll {
   -webkit-overflow-scrolling: touch;
+}
+@media handheld, only screen and (max-width: 480px), only screen and (max-device-width: 480px) {
+  body.iphone.login {
+    position: static;
+  }
+  div.main {
+    min-height: 505px;
+  }
+  div.main .iphone div#sidebar {
+    min-height: 505px;
+  }
+  div#login {
+    min-height: 505px;
+  }
+  div#login.expanded div#homepage {
+    top: -40px;
+    background-position: top center;
+  }
+  div#login div#homepage {
+    background-size: 800px;
+    background-position-y: 10%;
+  }
+  div#login div#homepage div.chord {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 51px;
+    cursor: pointer;
+  }
+  div#login div#homepage div.chord:active,
+  div#login div#homepage div.chord.strike {
+    background: url(/static/img/strike.png) no-repeat;
+    background-position: center;
+  }
+  div#login div#homepage div#chord-1 {
+    height: 190px;
+    margin-top: -194px;
+    margin-left: -128px;
+  }
+  div#login div#homepage div#chord-2 {
+    height: 164px;
+    margin-top: -166px;
+    margin-left: -59px;
+  }
+  div#login div#homepage div#chord-3 {
+    height: 138px;
+    margin-top: -138px;
+    margin-left: 9px;
+  }
+  div#login div#homepage div#chord-4 {
+    height: 112px;
+    margin-top: -103px;
+    margin-left: 78px;
+  }
+  div#login div#static-content div.header {
+    width: 100%;
+  }
+  div#login div#static-content div.title {
+    left: 50%;
+    width: 320px;
+    margin-left: -160px;
+    text-align: center;
+    font-size: 23px;
+    top: 25px;
+    padding: 0;
+    border-right: none;
+  }
+  div#login div#static-content div.subtitle {
+    display: none;
+  }
+  div#login div#static-content div.fb-login {
+    left: 50%;
+    margin-left: -115px;
+    top: 70px;
+  }
+  div#login div#static-content div#pages {
+    width: 90%;
+  }
+  div#login div#static-content div#pages div.page-content {
+    width: 100%;
+    font-size: 13px;
+    line-height: 13px;
+  }
+  div#login div#static-content div.footer {
+    width: 100%;
+    left: 0;
+    margin-left: 0;
+  }
+  div#login div#static-content div.footer div.copyright {
+    display: none;
+  }
 }

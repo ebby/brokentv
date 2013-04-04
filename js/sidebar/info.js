@@ -230,6 +230,7 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
   var scrollable = goog.dom.getElementByClass('scrollable', this.getElement());
   var publisherEl = goog.dom.getElementByClass('publisher', this.getElement());
   var titleEl = goog.dom.getElementByClass('title', this.getElement());
+  var linksEl = goog.dom.getElementByClass('links', this.getElement());
   this.spinner_ = goog.dom.getElementByClass('loading', this.getElement())
   var img = /** @type {Element} */ picEl.firstChild;
   this.tweetHolderEl_ = goog.dom.getElementByClass('tweet-holder', this.getElement());
@@ -299,7 +300,7 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
           }, this))
       .listen(this.commentInput_,
           'add',
-          goog.bind(this.onAddComment_, this, true))
+          goog.bind(this.onAddComment_, this))
       .listen(this.noCommentsEl_,
           goog.events.EventType.CLICK,
           goog.bind(function(e) {
@@ -387,6 +388,7 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
                 var opacity = (120-scrollable.scrollTop)/100;
                 goog.style.setOpacity(publisherEl, Math.min(1, Math.max(opacity, 0)));
                 goog.style.setOpacity(titleEl, Math.min(1, Math.max(opacity, 0)));
+                goog.style.setOpacity(linksEl, Math.min(1, Math.max(opacity, 0)));
                 goog.style.setOpacity(img, Math.min(.5, Math.max(opacity, .1)));
                 goog.dom.classes.enable(picEl, 'scrolled', scrollable.scrollTop > 10);
               }, this))
@@ -426,7 +428,9 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
   this.media_.subscribe(brkn.model.Media.Actions.ADD_TWEET, function(tweet) {
     this.addTweet_(tweet, true);
   }, this);
-  this.media_.subscribe(brkn.model.Media.Actions.WATCHING, this.addViewer_, this);
+  this.media_.subscribe(brkn.model.Media.Actions.WATCHING, function(user, channel, offline) {
+    this.addViewer_(user, offline);
+  }, this);
 };
 
 
@@ -451,6 +455,8 @@ brkn.sidebar.Info.prototype.renderInfo = function(fetched, description, seen, tw
     this.media_.description = description;
     goog.dom.getElementByClass('description', this.getElement()).innerHTML =
         goog.string.linkify.linkifyPlainText(description);
+    goog.style.showElement(goog.dom.getElementByClass('scrollable', this.getElement()),
+        true);
   } else {
     goog.style.showElement(goog.dom.getElementByClass('desc-link', this.getElement()),
         false);
@@ -476,7 +482,7 @@ brkn.sidebar.Info.prototype.renderInfo = function(fetched, description, seen, tw
     return user;
   }, this);
 
-  goog.array.forEach(this.media_.onlineViewers, function(viewer) {
+  goog.object.forEach(this.media_.onlineViewers, function(viewer) {
     this.addViewer_(viewer);
   }, this);
   
@@ -678,8 +684,7 @@ brkn.sidebar.Info.prototype.addComment_ = function(comment, opt_last) {
     this.addComment_(reply, opt_last);
   }, this);
   
-  if (opt_last &&
-      goog.array.find(this.media_.onlineViewers, function(u) {return u.id == comment.user.id})) {
+  if (opt_last && this.media_.onlineViewers[comment.user.id]) {
     this.commentInput_.reply((comment.parentId || comment.id), comment.user);
   }
 };
@@ -693,6 +698,7 @@ brkn.sidebar.Info.prototype.addComment_ = function(comment, opt_last) {
 brkn.sidebar.Info.prototype.addViewer_ = function(user, opt_offline) {
   if (opt_offline && this.viewerEls_[user.id]) {
     goog.dom.classes.remove(this.viewerEls_[user.id], 'online');
+    return;
   }
   if (user.id != brkn.model.Users.getInstance().currentUser.id || goog.DEBUG) {
     if (!this.viewerEls_[user.id]) {

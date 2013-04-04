@@ -62,8 +62,12 @@ class MainHandler(BaseHandler):
       else:
         template_data['js_location'] = constants.SIMPLE_JS
 
+      template_data['html5'] = self.request.get('html5') == 'true'
       if not constants.DEVELOPMENT or self.request.get('css') or self.request.get('prod'):
         template_data['css_location'] = constants.CSS_SOURCE
+
+      # SINGLE CHANNEL
+      self.session['single_channel_id'] = self.request.get('sc')
 
       # LINKS
       channel_id = self.request.get('c')

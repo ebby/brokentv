@@ -127,11 +127,9 @@ brkn.model.Channels.prototype.setCurrentChannel = function(currentChannelId) {
  * @param {Object} viewerSessions Viewers json object.
  */
 brkn.model.Channels.prototype.loadViewersFromJson = function(viewerSessions) {
-	var users = brkn.model.Users.getInstance();
 	goog.array.forEach((/** @type {Array.<Object>} */ viewerSessions),
 			goog.bind(function(session) {
 				var u = brkn.model.Users.getInstance().get_or_add(session['user']);
-				users.add(u);
 				brkn.model.Users.getInstance().addOnline(u);
 				var channel = this.channelMap[session['channel_id']];
 				var tuneIn = goog.date.fromIsoString(session['tune_in'] + 'Z');
@@ -141,6 +139,7 @@ brkn.model.Channels.prototype.loadViewersFromJson = function(viewerSessions) {
 				u.currentSession = newSession;
 				if (channel) {
 				  channel.viewerSessions.push(newSession);
+				  channel.publish(brkn.model.Channel.Action.ADD_VIEWER, newSession);
 				  var program = channel.getCurrentProgram();
 	        program && program.media.publish(brkn.model.Media.Actions.WATCHING, u, channel);
 				}	
@@ -159,7 +158,7 @@ brkn.model.Channels.prototype.changeChannel = function(channel, opt_forced) {
     this.currentChannel = channel;
     this.updateOnlineUsers(channel.getCurrentProgram());
     var program = channel.getCurrentProgram();
-    var withFriends = program && !!program.media.onlineViewers.length;
+    var withFriends = program && !goog.object.isEmpty(program.media.onlineViewers);
     goog.net.XhrIo.send('/_changechannel', goog.functions.NULL(), 'POST',
         'channel=' + channel.id + '&friends=' + withFriends + (opt_forced ? '&forced=true' : ''));
     brkn.model.Analytics.getInstance().changeChannel(channel, this.lastChannel);
@@ -175,16 +174,18 @@ brkn.model.Channels.prototype.updateOnlineUsers = function(program) {
     if (this.currentProgram_) {
       // If previous program, remove channel viewers.
       goog.array.forEach(this.currentChannel.viewerSessions, function(s) {
-        goog.array.removeIf(this.currentProgram_.media.onlineViewers,
-            function(v) {return v.id == s.user.id});
+        goog.object.remove(this.currentProgram_.media.onlineViewers, s.user.id);
       }, this);
     }
     
     if (program) {
       // If next program, add channel viewers.
       this.currentProgram_ = program;
-      var viewers = goog.array.map(this.currentChannel.viewerSessions, function(s) {return s.user});
-      program.media.onlineViewers = goog.array.concat(program.media.onlineViewers, viewers);
+      var viewers = goog.array.forEach(this.currentChannel.viewerSessions, function(s) {
+        if (!s.tuneOut) {
+          program.media.onlineViewers[s.user.id] = s.user;
+        }
+      });
     }
   }
 };
@@ -212,5 +213,6 @@ brkn.model.Channels.prototype.getMyChannel = function() {
 brkn.model.Channels.Actions = {
 	CHANGE_CHANNEL: 'change-channel',
 	NEXT_PROGRAM: 'next-program',
-	PLAY_ASYNC: 'play-async'
+	PLAY_ASYNC: 'play-async',
+	RESIZE: 'resize'
 };

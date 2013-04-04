@@ -294,6 +294,7 @@ class ClearHandler(BaseHandler):
         for channel in channels:
           channel.next_time = None
           channel.put()
+        memcache.delete('programming')
       elif cid:
         channel = Channel.get_by_key_name(cid)
         programming.Programming.clear_channel(channel)
@@ -405,21 +406,28 @@ class RemovePublisher(BaseHandler):
 class RemoveProgramHandler(BaseHandler):
     @BaseHandler.admin
     def post(self):
-      program = Program.get_by_id(long(self.request.get('program')))
-      logging.info('REMOVING ' + program.media.name)
-      if program:
-        channel = program.channel;
-        effected = program.remove()
-        logging.info(effected)
-        broadcast.broadcastProgramChanges(channel, effected)
-      
+      if constants.SAVE_PROGRAMS:
+        program = Program.get_by_id(long(self.request.get('program')))
+        if program:
+          channel = program.channel;
+          effected = program.remove()
+          logging.info(effected)
+          broadcast.broadcastProgramChanges(channel.id, programs=effected)
+      else:
+        channel_id = self.request.get('channel_id')
+        media = Media.get_by_key_name(self.request.get('media_id'))
+        if channel_id and media:
+          new_schedule = programming.Programming.remove_program(channel_id, media)
+          broadcast.broadcastProgramChanges(channel_id, cached_programs=new_schedule)
+
 class RescheduleProgramHandler(BaseHandler):
     @BaseHandler.admin
     def post(self):
-      program = Program.get_by_id(int(self.request.get('program')))
-      new_time = datetime.datetime.fromtimestamp(float(self.request.get('time')))
-      channel = program.channel;
-      effected = program.reschedule(new_time)
-      # Update memcache
-      Program.get_current_programs([channel])
-      #broadcastProgramChanges(channel, effected)
+      if constants.SAVE_PROGRAMS:
+        program = Program.get_by_id(int(self.request.get('program')))
+        new_time = datetime.datetime.fromtimestamp(float(self.request.get('time')))
+        channel = program.channel;
+        effected = program.reschedule(new_time)
+        # Update memcache
+        Program.get_current_programs([channel])
+        #broadcastProgramChanges(channel, effected)

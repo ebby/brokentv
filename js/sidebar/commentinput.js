@@ -300,6 +300,7 @@ brkn.sidebar.CommentInput.prototype.setFocused = function(focus) {
  */
 brkn.sidebar.CommentInput.prototype.onAddComment_ = function(e) {
   if (this.commentInput_.getValue()) {
+    window.console.log(this.commentInput_.getValue())
     this.dispatchEvent({
       type: 'add',
       callback: goog.bind(function(e) {

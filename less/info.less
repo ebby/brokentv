@@ -37,7 +37,7 @@ div#sidebar div.info {
       width: 45px;
       height: 45px;
       padding: 0;
-      border-radius: 23px;
+      border-radius: 24px;
       border: 2px solid rgba(0, 0, 0, .7);
       background: rgba(0, 0, 0, .5);
       position: absolute;
@@ -68,6 +68,7 @@ div#sidebar div.info {
       .border-radius(3px);
       position: relative;
       cursor: pointer;
+      z-index: 1;
       img {
         width: 22px;
         height: 22px;
@@ -100,6 +101,7 @@ div#sidebar div.info {
       display: inline-block;
       .border-radius(3px);
       height: 25px;
+      z-index: 1;
       >div, >a {
         display: inline-block;
         vertical-align: top;
@@ -133,6 +135,9 @@ div#sidebar div.info {
         padding: 1px 3px 3px 3px;
       }
     }
+    &.scrolled div.link-select {
+      display: none;
+    }
   }
   img.thumb {
     height: 70px;
@@ -162,6 +167,9 @@ div#sidebar div.info {
     .scroll-y();
     padding-right: 14px;
     margin-right: -14px;
+    position: absolute;
+    top: 0;
+    z-index: 0;
   }
   div.title {
     position: relative;

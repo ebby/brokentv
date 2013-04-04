@@ -126,9 +126,9 @@ brkn.model.Media = function(media) {
   this.seen = [];
   
   /**
-   * @type {Array.<brkn.model.User>}
+   * @type {Object.<string, brkn.model.User>}
    */
-  this.onlineViewers = [];
+  this.onlineViewers = {};
 
   /**
    * @type {string}
@@ -195,10 +195,12 @@ brkn.model.Media.prototype.removeComment = function(commentId) {
  */
 brkn.model.Media.prototype.addViewer = function(user, channel, opt_offline) {
   if (opt_offline) {
-    goog.array.removeIf(this.onlineViewers, function(u) {return u.id == user.id});
+    goog.object.remove(this.onlineViewers, user.id);
+    user.currentMedia = null;
     return;
   }
-  this.onlineViewers.push(user);
+  this.onlineViewers[user.id] = user;
+  user.currentMedia = this;
   if (user.id != brkn.model.Users.getInstance().currentUser.id) {
     brkn.model.Notify.getInstance().publish(brkn.model.Notify.Actions.FLASH,
         'is watching ' + channel.name, this.name, user, this.thumbnail1, '#info:' + this.id);

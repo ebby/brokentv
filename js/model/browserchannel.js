@@ -61,18 +61,20 @@ brkn.model.BrowserChannel.prototype.onMessage_ = function(rawMessage) {
 	switch(message.type) {
 	  case 'viewer_change':
 	    var user = brkn.model.Users.getInstance().get_or_add(message['user']);
-	    var channel = brkn.model.Channels.getInstance().get(message['channel_id']);
+
 	    var time = goog.date.fromIsoString(message['time'] + 'Z');
 	    if (user.currentSession) {
 	      user.currentSession.end(time); 
 	    }
+
 	    if (message['last_channel_id']) {
   	    var lastChannel = brkn.model.Channels.getInstance().get(message['last_channel_id']);
   	    lastChannel.publish(brkn.model.Channel.Action.REMOVE_VIEWER, user);
-  	    var lastProgram = lastChannel.getCurrentProgram();
-  	    lastProgram && lastProgram.media.publish(brkn.model.Media.Actions.WATCHING, user,
+  	    user.currentMedia && user.currentMedia.publish(brkn.model.Media.Actions.WATCHING, user,
   	        lastChannel, true);
 	    }
+
+	    var channel = message['channel_id'] && brkn.model.Channels.getInstance().get(message['channel_id']);
 	    if (channel) { /* Might be a private channel */
 	      var session = new brkn.model.Session(message['session_id'], user, channel, time);
 	      user.currentSession = session;
@@ -119,10 +121,6 @@ brkn.model.BrowserChannel.prototype.onMessage_ = function(rawMessage) {
   	            brkn.model.Channels.getInstance().publish(
   	                brkn.model.Channels.Actions.NEXT_PROGRAM, p);
   	          }
-//  	          if (currentProgram && p.id == currentProgram.id) {
-//  	            // If this program is now on, play it.
-//  	            brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.NEXT_PROGRAM, p);
-//  	          }
 	          }
 	        }, this));
       break;

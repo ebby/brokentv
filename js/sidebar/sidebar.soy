@@ -29,7 +29,7 @@
       <div class="title">
         <div class="text">{$media.name}</div>
       </div>
-      <div class="scrollable ios-scroll">
+      <div class="scrollable ios-scroll" {if not $description}style="display:none"{/if}>
         <div class="desc-link">
           <a href="#">DESCRIPTION</a>
           <div class="published">{$published}</div>
@@ -488,7 +488,7 @@
       <div class="preview">
         <div class="thumb" style="background-image:url({$media.thumbnail});
             background-position: 50% {$media.thumbPos}%"></div>
-        <div class="list-play"></div>
+        <div class="list-play"><div class="icon"></div></div>
         <div class="title">{$media.name}</div>
       </div>
     </div>

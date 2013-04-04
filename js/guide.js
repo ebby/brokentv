@@ -105,6 +105,13 @@ goog.inherits(brkn.Guide, goog.ui.Component);
 
 
 /**
+ * @type {boolean}
+ * @constant
+ */
+brkn.Guide.MY_TICKER = false;
+
+
+/**
  * @type {number}
  * @constant
  */
@@ -243,7 +250,7 @@ brkn.Guide.prototype.enterDocument = function() {
   this.headerEl_ = goog.dom.getElement('header');
   this.channelsEl_ = goog.dom.getElement('channels');
   this.horizon_ = 1;
-  this.width_ = goog.dom.getViewportSize().width * this.horizon_;
+  this.width_ = Math.max(1280, goog.dom.getViewportSize().width) * this.horizon_;
   this.controllerHeight_ = goog.style.getSize(goog.dom.getElement('controller')).height;
 
   brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_GUIDE,
@@ -392,6 +399,8 @@ brkn.Guide.prototype.enterDocument = function() {
           this.updateNowButtons_();
         }, this));
 
+  brkn.model.Channels.getInstance().subscribe(brkn.model.Channels.Actions.RESIZE,
+      this.resize_, this);
   brkn.model.Channels.getInstance().subscribe(brkn.model.Channels.Actions.CHANGE_CHANNEL,
       this.changeChannel, this);
   brkn.model.Channels.getInstance().subscribe(brkn.model.Channels.Actions.NEXT_PROGRAM,
@@ -647,17 +656,17 @@ brkn.Guide.prototype.tick_ = function() {
     this.updateNowButtons_();
     
     goog.style.setPosition(this.tickerEl_, elapsed);
-    goog.style.setPosition(this.myTickerEl_, myElapsed);
-    // goog.style.showElement(this.tickerEl_, !!currentProgram);
-    goog.style.showElement(this.myTickerEl_, !!myCurrentProgram);
     goog.dom.classes.enable(this.tickerEl_, 'go-live', !isMyChannel && !!currentProgram &&
         !!myCurrentProgram && currentProgram.id != myCurrentProgram.id && 
         Math.abs(myElapsed - elapsed) > 45);
-    // goog.dom.classes.enable(this.tickerEl_, 'can-go-live', !isMyChannel &&
-    //     Math.abs(myElapsed - elapsed) > 15);
-    goog.dom.classes.enable(this.myTickerEl_, 'show', !Math.abs(myElapsed - elapsed) > 15);
-    goog.dom.classes.enable(this.myTickerEl_, 'show-me', !isMyChannel &&
-        Math.abs(myElapsed - elapsed) > 15);
+    
+    if (brkn.Guide.MY_TICKER) {
+      goog.style.setPosition(this.myTickerEl_, myElapsed);
+      goog.style.showElement(this.myTickerEl_, !!myCurrentProgram);
+      goog.dom.classes.enable(this.myTickerEl_, 'show', !Math.abs(myElapsed - elapsed) > 15);
+      goog.dom.classes.enable(this.myTickerEl_, 'show-me', !isMyChannel &&
+          Math.abs(myElapsed - elapsed) > 15); 
+    }
 
     if (this.firstAlign_) {
       this.firstAlign_ = false;

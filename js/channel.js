@@ -489,14 +489,14 @@ brkn.Channel.prototype.onRemoveProgram_ = function(program, programEl) {
     '/admin/_removeprogram',
     undefined,
     'POST',
-    'program=' + program.id);
-//  goog.net.XhrIo.send(
-//      'admin/_media/collection',
-//      goog.bind(function() {
-//        alert('Disallowed on all channels.');
-//      }, this),
-//      'POST',
-//      '&media=' + program.media.id + '&approve=' + false);
+    'program=' + program.id + '&media_id=' + program.media.id + '&channel_id=' + this.getModel().id);
+  goog.net.XhrIo.send(
+      'admin/_media/collection',
+      goog.bind(function() {
+        alert('Disallowed on all channels.');
+      }, this),
+      'POST',
+      '&media=' + program.media.id + '&approve=false');
 };
 
 
@@ -526,8 +526,7 @@ brkn.Channel.prototype.addViewer = function(session) {
       this.viewers_[session.user.id] = userEl;
     }
 
-    if (this.getModel().getCurrentProgram() &&
-        (!session.tuneOut || session.tuneOut.getTime() > this.minTime_.getTime())) {
+    if (!session.tuneOut || session.tuneOut.getTime() > this.minTime_.getTime()) {
       var lineEl = soy.renderAsElement(brkn.channel.line, {
         user: session.user
       });
@@ -554,6 +553,7 @@ brkn.Channel.prototype.removeViewer = function(user) {
   if (this.viewers_[user.id]) {
     goog.dom.removeNode(this.viewers_[user.id])
   	goog.object.remove(this.viewers_, user.id);
+    brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.RESIZE);
   } 
 };
 

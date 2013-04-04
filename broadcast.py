@@ -40,11 +40,14 @@ def broadcastNewActivity(activity):
     if client in activity.acl or client == activity.user.id:
       webchannel.send_message(client, simplejson.dumps(response))
     
-def broadcastProgramChanges(channel, programs):
+def broadcastProgramChanges(channel_id, programs=None, cached_programs=None):
   response = {}
   response['type'] = 'update_programs'
-  response['channel_id'] = channel.id
-  response['programs'] = [p.toJson(False) for p in programs]
+  response['channel_id'] = channel_id
+  if programs:
+    response['programs'] = [p.toJson(False) for p in programs]
+  elif cached_programs:
+    response['programs'] = cached_programs
   channels = memcache.get('web_channels') or {}
   for client in channels.iterkeys():
     webchannel.send_message(client, simplejson.dumps(response))

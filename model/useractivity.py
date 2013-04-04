@@ -43,10 +43,10 @@ class UserActivity(db.Model):
     return u_a
 
   @classmethod
-  def get_stream(cls, user, offset=0):
+  def get_stream(cls, user, limit=20, offset=0):
     u_a = UserActivity.all()
     u_a = u_a.filter('acl =', user.id)
-    u_a = u_a.order('-time').fetch(30, offset)
+    u_a = u_a.order('-time').fetch(limit, offset)
     return u_a
 
   @classmethod

@@ -395,8 +395,6 @@ brkn.Controller.prototype.toggleGuide_ = function(show) {
  * Resize
  */
 brkn.Controller.prototype.resize = function() {
-//  goog.style.setWidth(this.getElement(), goog.dom.getViewportSize().width -
-//      (this.sidebarToggle_.isChecked() ? 320 : 0));
   if (!brkn.model.Channels.getInstance().currentChannel.myChannel) {
     goog.style.showElement(this.progressEl_, false);
     

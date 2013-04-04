@@ -338,8 +338,31 @@ class Programming():
       if not programmed_medias.get(media.id):
         filtered_medias.append(media)
     return filtered_medias
-  
-  
+
+
+  @classmethod
+  def remove_program(cls, channel_id, media):
+    cached_programming = memcache.get('programming') or {}
+    new_schedule = []
+    sched = 0
+    if cached_programming.get(channel_id):
+      for program in cached_programming[channel_id]:
+        time = iso8601.parse_date(program['time']).replace(tzinfo=None)
+        if program['media']['id'] == media.id:
+          sched += 1
+          continue
+        if sched:
+          new_time = time - datetime.timedelta(seconds=(sched * media.duration))
+          program['time'] = new_time.isoformat()
+        new_schedule.append(program)
+    channel = Channel.get_by_key_name(channel_id)
+    channel.next_time = channel.next_time - datetime.timedelta(seconds=(sched * media.duration)) 
+    channel.put()
+    cached_programming[channel_id] = new_schedule
+    memcache.set('programming', cached_programming)
+    return new_schedule
+
+
   @classmethod
   def fetch_related_tweets(cls, medias):
     api = tweepy.API()

@@ -168,8 +168,8 @@ class Collection(db.Model):
       cc.delete()
     for cc in collection.channels.fetch(None):
       cc.delete()
-    for tcm in collection.topic_medias.fetch(None):
-      tcm.delete()
+#    for tcm in collection.topic_medias.fetch(None):
+#      tcm.delete()
     collection.delete()
   
   def toJson(self):
@@ -228,9 +228,10 @@ class CollectionMedia(db.Model):
   def approve(self, approved):
     self.approved = Approval.APPROVED if approved else Approval.REJECTED
     self.put()
-    for tcm in self.topic_collection_medias.fetch(None):
-      tcm.approved = Approval.APPROVED if approved else Approval.REJECTED
-      tcm.put()
+    for tcm in self.collection.topic_medias.fetch(None):
+      if tcm.media.id == self.media.id:
+        tcm.approved = Approval.APPROVED if approved else Approval.REJECTED
+        tcm.put()
     Collection.incr_pending(self.collection.key(), -1)
 
 class CollectionPlaylist(db.Model):

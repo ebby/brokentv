@@ -45,7 +45,12 @@ brkn.model.User = function(user) {
    */
   this.demo = user['demo'];
 
-	/**
+  /**
+   * @type {brkn.model.Media}
+   */
+  this.currentMedia;
+  
+  /**
    * @type {brkn.model.Session}
    */
   this.currentSession;

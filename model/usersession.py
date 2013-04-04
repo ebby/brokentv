@@ -45,7 +45,7 @@ class UserSession(db.Model):
 
   def toJson(self, get_media=False):
     json = {}
-    json['id'] = self.key().id()
+    json['id'] = self.id
     json['user'] = self.user.toJson()
     json['tune_in'] = self.tune_in.isoformat()
     json['tune_out'] = self.tune_out.isoformat() if self.tune_out else None

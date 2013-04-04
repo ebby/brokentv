@@ -20,6 +20,9 @@ div#guide {
         .transition(left, 1s, linear);
       }
     }
+    div.ticker {
+      .transition(left, 1s, linear);
+    }
   }
   
   &.tick-along.animate.toggled div.channels div.channel div.programs div.program.playing div.title {
@@ -80,7 +83,6 @@ div#guide {
     height: 45px;
     z-index: 110;
     cursor: pointer !important;
-    .transition(left, 1s, linear);
     &.go-live div.go-live, &.can-go-live:hover div.go-live {
       opacity: 1;
       visibility: visible;
@@ -293,7 +295,7 @@ div#guide {
           border-left: 1px solid #2d3446;
           padding-right: 10px;
           margin-top: -1px;
-          .box-shadow(e('inset -1px 0 1px -1px #F1F1F1, 0 0 1px #DEDEDE'));
+          .box-shadow(e('inset 0 0 1px -1px #F1F1F1, 0 0 1px #DEDEDE'));
           background: #3d3d3d @grad;
           &:last-child {
             .box-shadow(none);

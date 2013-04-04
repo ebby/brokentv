@@ -16,7 +16,7 @@ class WebChannelDisconnectedHandler(BaseHandler):
   def post(self):
     client_id = self.request.get('from')
     def remove_client(clients, client_id):
-      if client_id in clients:
+      if clients.get(client_id):
         del clients[client_id]
       return clients
     web_channels = memcache_cas('web_channels', remove_client, client_id)
@@ -33,8 +33,7 @@ class WebChannelDisconnectedHandler(BaseHandler):
         last_session = user_sessions[0]
         last_session.end_session()
 
-      if last_session and current_viewers[client_id]['id'] != last_session.id:
-        web_channels = memcache_cas('current_viewers', remove_client, client_id)
+      web_channels = memcache_cas('current_viewers', remove_client, client_id)
 
       if channel_viewers.get(user_sessions[0].channel.id) and \
           client_id in channel_viewers[user_sessions[0].channel.id]:
@@ -48,3 +47,7 @@ class WebChannelDisconnectedHandler(BaseHandler):
             break
         if not set:
           memcache.set('channel_viewers', channel_viewers)
+
+      if last_session:    
+        broadcast.broadcastViewerChange(user, last_session.channel.id, None, last_session.id,
+                                        datetime.datetime.now().isoformat())

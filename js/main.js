@@ -255,6 +255,19 @@ brkn.Main.staticInit = function() {
   
   brkn.model.Analytics.getInstance().init();
   
+  if (IPHONE) {
+    goog.dom.classes.add(document.body, 'iphone');
+    goog.dom.classes.add(document.body, 'login');
+    window.onload = function() {
+      goog.Timer.callOnce(function() {
+        window.scrollTo(0, 1);
+      }, 1000);
+    }
+  } 
+};
+
+
+brkn.Main.makeMusic = function() {
   var chord1 = goog.dom.getElement('chord-1');
   var chord2 = goog.dom.getElement('chord-2');
   var chord3 = goog.dom.getElement('chord-3');
@@ -437,14 +450,13 @@ brkn.Main.getSessionAndInit = function(response) {
               }, 600);
             }, 600);
           };
-          //brkn.model.Player.getInstance().subscribeOnce(brkn.model.Player.Actions.NO_MEDIA, reveal);
-          //brkn.model.Player.getInstance().subscribeOnce(brkn.model.Player.Actions.PLAYING, reveal);
+          
+          goog.dom.classes.remove(document.body, 'login');
+          
           brkn.Main.init(response, data['token'], data['channels'], data['programs'],
               data['current_user'], data['viewer_sessions']);
-          
-          //if (IPAD || IPHONE) {
-          reveal();
-          //}
+
+          goog.Timer.callOnce(reveal, 300);
         } else if (e.target.getStatus() == 500) {
           brkn.Main.noLogin('error', 'Opps, check back later');
         } else {

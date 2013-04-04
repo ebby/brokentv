@@ -10,6 +10,13 @@ class Program(db.Model):
   time = db.DateTimeProperty()
   async = db.BooleanProperty(default=False)
   seek = db.IntegerProperty(default=0)
+  
+  @property
+  def id(self):
+    if constants.SAVE_PROGRAMS:
+      return str(self.key().id())
+    return str(uuid.uuid1())
+    
 
   @classmethod
   def get_current_programs(cls, channels, limit=5):    
@@ -27,7 +34,7 @@ class Program(db.Model):
     return programming
 
   @classmethod
-  @db.transactional(xg=True)
+  #@db.transactional(xg=True)
   def atomic_add(cls, media, channel, time=None, min_time=None, max_time=None, async=False):
     program = None
     if not time:
@@ -37,7 +44,8 @@ class Program(db.Model):
       program = Program(media=media, channel=channel,
                         time=time,
                         async=async)
-      program.put()
+      if constants.SAVE_PROGRAMS:
+        program.put()
       channel.next_time = time + datetime.timedelta(seconds=program.media.duration)
       if async:
         channel.current_program = program.key().id()
@@ -53,8 +61,9 @@ class Program(db.Model):
     program = Program.atomic_add(media=media, channel=channel, time=time, min_time=min_time,
                                  max_time=max_time, async=async)
     if program:
-      channelProgram = ChannelProgram(channel=channel, program=program, time=program.time)
-      channelProgram.put()
+      if constants.SAVE_PROGRAMS:
+        channelProgram = ChannelProgram(channel=channel, program=program, time=program.time)
+        channelProgram.put()
 
       media.last_programmed = program.time
       media.programmed_count += 1
@@ -63,16 +72,17 @@ class Program(db.Model):
     return program
 
   def remove(self):
-    effected = Program.all().filter('channel =', self.channel).filter('time >', self.time) \
-        .order('time').fetch(None)
-    
-    for program in effected:
-      program.time = program.time - datetime.timedelta(seconds=self.media.duration)
-      program.put()
-    c_p = self.channelPrograms.get()
-    c_p.delete()
-    self.delete()
-    return effected
+    if constants.SAVE_PROGRAMS:
+      effected = Program.all().filter('channel =', self.channel).filter('time >', self.time) \
+          .order('time').fetch(None)
+      
+      for program in effected:
+        program.time = program.time - datetime.timedelta(seconds=self.media.duration)
+        program.put()
+      c_p = self.channelPrograms.get()
+      c_p.delete()
+      self.delete()
+      return effected
   
   def reschedule(self, new_time):
     effected = Program.all().filter('channel =', self.channel).filter('time >=', min(self.time, new_time)) \
@@ -92,7 +102,7 @@ class Program(db.Model):
   
   def toJson(self, fetch_channel=True, fetch_media=True, media_desc=True, pub_desc=True):
     json = {}
-    json['id'] = str(self.key().id()) # Send as string, JS integers have 32 bit limit
+    json['id'] = self.id
     json['media'] = self.media.toJson(get_desc=media_desc, pub_desc=pub_desc) if fetch_media else self.media.key().name()
     json['time'] = self.time.isoformat() if self.time else None
     json['channel'] = self.channel.toJson() if fetch_channel else {'id': self.channel.id}

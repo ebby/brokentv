@@ -20,6 +20,7 @@
       var HOST_URL = '{{ host_url }}';
       var IPAD = !!navigator.userAgent.match(/iPad/i);
       var IPHONE = !!navigator.userAgent.match(/iPhone/i);
+      var HTML5 = '{{ html5 }}' == 'True';
 
 			// Re-namespace to avoid closure conflict.
 			var appengine = goog.appengine; 
@@ -33,19 +34,19 @@
 		</script>
   </head>
   <body>
-    <audio id="mp3-1">
+    <audio id="mp3-1" style="display:none; height:0">
       <source src="/static/audio/xylo-a.mp3" type='audio/mpeg; codecs="mp3"'>
       <source src="/static/audio/xylo-a.wav" type="audio/wav">
     </audio>
-    <audio id="mp3-2">
+    <audio id="mp3-2" style="display:none; height:0">
       <source src="/static/audio/xylo-s.mp3" type='audio/mpeg; codecs="mp3"'>
       <source src="/static/audio/xylo-s.wav" type="audio/wav">
     </audio>
-    <audio id="mp3-3">
+    <audio id="mp3-3" style="display:none; height:0">
       <source src="/static/audio/xylo-d.mp3" type='audio/mpeg; codecs="mp3"'>
       <source src="/static/audio/xylo-d.wav" type="audio/wav">
     </audio>
-    <audio id="mp3-4">
+    <audio id="mp3-4" style="display:none; height:0">
       <source src="/static/audio/xylo-f.mp3" type='audio/mpeg; codecs="mp3"'>
       <source src="/static/audio/xylo-f.wav" type="audio/wav">
     </audio>
@@ -109,20 +110,20 @@
                   <li>Contribute to marketing and company operations.</li>
                 </ul>
                 <br/>
-                <span class="bold">Software Engineer (aka. Renaissance Coder)</span><br/><br/>
+                <span class="bold">Software Engineer</span><br/><br/>
                 Background:<br/>
                 <ul>
                   <li>Full-stack web developer with proven experience building products.</li>
-                  <li>Expertise in Python web services required.</li>
+                  <li>Expertise with Python web services required.</li>
                   <li>Basic knowledge of machine learning and data science helpful.</li>
-                  <li>Javascript, HTML5, CSS3, and UI design skills are pluses.</li>
+                  <li>Javascript, HTML5, CSS3, and UI design are pluses.</li>
                   <li>Ideal candiate strives to impact culture & society, chooses to do so through code.</li>
                 </ul>
                 Responsibilites:<br/>
                 <ul>
                   <li>Maintain and scale our backend system.</li>
                   <li>Add robustness to algorithms and services.</li>
-                  <li>Make creative contributions to the product and feature-set.</li>
+                  <li>Make creative contributions to the product and platform.</li>
                   <li>Potentially manage an engineering team.</li>
                 </ul>
               </div>
@@ -178,7 +179,7 @@
 		          <a class="section" id="privacy" href='#'>PRIVACY POLICY</a> &middot;
 		         -->
 		        <a href='http://blog.xylovision.com' target="_blank">BLOG</a> &middot;
-		        COPYRIGHT &copy; 2013 XYLO INC. ALL RIGHTS RESERVED. &middot;
+		        <div class="copyright">COPYRIGHT &copy; 2013 XYLO INC. ALL RIGHTS RESERVED. &middot;</div>
 		        <a href='http://facebook.com/xyloinc' class="icon" target="_blank"><div class="home-facebook"></div></a> &middot;
             <a href='http://twitter.com/xyloinc'  class="icon" target="_blank"><div class="home-twitter"></div></a>
 		      </div>

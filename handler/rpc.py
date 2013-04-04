@@ -1,6 +1,7 @@
 from common import *
 
-def get_session(current_user, media_id=None, channel_id=None, set_programming=True):
+def get_session(current_user, media_id=None, channel_id=None, single_channel_id=None,
+                set_programming=True):
   data = {}
 
   # RETREIVE CHANNELS AND PROGRAMMING
@@ -12,22 +13,25 @@ def get_session(current_user, media_id=None, channel_id=None, set_programming=Tr
     cached_channels = [c.toJson() for c in channels]
     memcache.set('channels', cached_channels)
 
+  if single_channel_id:
+    single_channel = filter(lambda c: c['id'] == single_channel_id, cached_channels)
+    if len(single_channel):
+      channels = single_channel
+
   cached_programming = memcache.get('programming') or {}
-  new_programming = False
-  for channel in cached_channels:
-    next_time = iso8601.parse_date(channel['next_time']).replace(tzinfo=None) \
-        if channel['next_time'] else None
-    if set_programming and (not next_time or next_time < datetime.datetime.now()):
-      # Kick our programming backend off. It shuts down when users leave.
-      #programming.Programming.set_programming(channel['id'], queue='programming', kickoff=True)
-      #new_programming = True
-      deferred.defer(programming.Programming.set_programming, channel['id'],
-                     _name=channel['name'].replace(' ', '') + '-' + str(uuid.uuid1()),
-                     _queue='programming', fetch_twitter=(not constants.DEVELOPMENT))
-  if not len(cached_programming) or new_programming:
-    # No cached programming, attempt to fetch
-    channels = channels or Channel.get_public()
-    cached_programming = Program.get_current_programs(channels)
+
+  if not len(cached_programming):
+    if constants.SAVE_PROGRAMS:
+      # No cached programming, attempt to fetch
+      channels = channels or Channel.get_public()
+      cached_programming = Program.get_current_programs(channels)
+    else:
+      # Generate programming to memcache
+      for channel in cached_channels:
+        deferred.defer(programming.Programming.set_programming, channel['id'],
+                       _name=channel['name'].replace(' ', '') + '-' + str(uuid.uuid1()),
+                       _queue='programming', fetch_twitter=(not constants.DEVELOPMENT))
+  
 
   # Tack on the user's private channel if it exists, and programming
   user_channel = current_user.channel.get()
@@ -44,7 +48,7 @@ def get_session(current_user, media_id=None, channel_id=None, set_programming=Tr
       cached_channels.append(user_channel.toJson())
       cached_programming = dict(cached_programming.items() + user_programs.items())
 
-  data['channels'] = cached_channels
+  data['channels'] = channels or cached_channels
   data['programs'] = cached_programming
  
   # CREATE BROWSER CHANNEL
@@ -85,28 +89,23 @@ def get_session(current_user, media_id=None, channel_id=None, set_programming=Tr
     session.put()
   else:
     session = UserSession.new(current_user, current_channel, with_friends=with_friends)
-    
+
   # TRACK ALL USERS
-  def add_viewer(current_viewers, uid, session):
+  def add_current_viewer(current_viewers, uid, session):
     current_viewers[uid] = session
     return current_viewers
-  current_viewers = memcache_cas('current_viewers', add_viewer, current_user.id, session.toJson())
+  current_viewers = memcache_cas('current_viewers', add_current_viewer, current_user.id, session.toJson())
   
   # Track current viewers by channel, useful for audience tailoring
   channel_viewers = memcache.get('channel_viewers') or {}
-  set = False
   if not channel_viewers.get(current_channel.id) or \
       current_user.id not in channel_viewers[current_channel.id]:
-    client = memcache.Client()
-    for i in range(3): # Retry loop
-      channel_viewers = client.gets('channel_viewers') or {}
-      channel_viewers[current_channel.id] = \
-          channel_viewers.get(current_channel.id, []) + [current_user.id]
-      set = client.cas('channel_viewers', channel_viewers)
-      if set:
-         break
-    if not set:
-      memcache.set('channel_viewers', channel_viewers)
+    
+    def add_channel_viewer(channel_viewers, cid, uid):
+      channel_viewers[cid] = \
+          channel_viewers.get(cid, []) + [uid]
+      return channel_viewers
+    channel_viewers = memcache_cas('channel_viewers', add_channel_viewer, current_channel.id, current_user.id)
 
   # Grab sessions for current_users (that we care about)
   # TODO cache last session for each user
@@ -128,6 +127,7 @@ def get_session(current_user, media_id=None, channel_id=None, set_programming=Tr
 
   broadcast.broadcastViewerChange(current_user, None, current_channel.id,
                                   session.key().id(), session.tune_in.isoformat());
+
   return data
 
 class SessionHandler(BaseHandler):
@@ -148,9 +148,11 @@ class SessionHandler(BaseHandler):
 
       media_id = self.session.get('media_id', None)
       channel_id = self.session.get('channel_id', None)
+      single_channel_id = self.session.get('single_channel_id', None)
 
       if not data.get('error'):
-        data = get_session(self.current_user, media_id=media_id, channel_id=channel_id)
+        data = get_session(self.current_user, media_id=media_id, channel_id=channel_id,
+                           single_channel_id=single_channel_id)
       self.response.out.write(simplejson.dumps(data))
 
 class SettingsHandler(BaseHandler):
@@ -371,18 +373,13 @@ class ChangeChannelHandler(BaseHandler):
           Media.add_opt_out(last_program.media.key().name(), self.current_user.id)
     else:
       session = UserSession.new(self.current_user, channel, with_friends=with_friends)
-      
+
     # Track current viewers by channel, useful for audience catering
-    client = memcache.Client()
-    for i in range(3):
-      channel_viewers = client.gets('channel_viewers') or {}
-      if remove_user and self.current_user.id in channel_viewers.get(last_channel_id, []):
-        # Remove user from channel
-        channel_viewers[last_channel_id].remove(self.current_user.id)
-      channel_viewers[channel_id] = channel_viewers.get(channel_id, []) + [self.current_user.id]
-      set = client.cas('channel_viewers', channel_viewers)
-    if not set:
-      memcache.set('channel_viewers', channel_viewers)
+    def add_viewer(channel_viewers, cid, uid):
+      channel_viewers[cid] = \
+          channel_viewers.get(cid, []) + [uid]
+      return channel_viewers
+    channel_viewers = memcache_cas('channel_viewers', add_viewer, channel_id, self.current_user.id)
     
     # Track the media opt-in behavior
     current_program = channel.get_current_program()

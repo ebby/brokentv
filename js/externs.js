@@ -4,6 +4,8 @@ var IPHONE;
 
 var IPAD;
 
+var HTML5;
+
 var appengine = {};
 
 /** 

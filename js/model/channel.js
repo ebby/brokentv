@@ -115,7 +115,7 @@ brkn.model.Channel.prototype.addProgram = function(program) {
  * @param {goog.date.DateTime} time The last programmed time on this channel
  */
 brkn.model.Channel.prototype.maybeFetchProgramming = function(time) {
-  if (this.lastTime_ <= time) {
+  if (this.lastTime_ <= time && !this.myChannel) {
     this.fetchCurrentProgramming();
   }
 };
