@@ -2,7 +2,7 @@ goog.provide('brkn.Sidebar');
 
 goog.require('soy');
 goog.require('brkn.model.Channels');
-goog.require('brkn.model.Controller');
+DESKTOP && goog.require('brkn.model.Controller');
 goog.require('brkn.model.Sidebar');
 goog.require('brkn.sidebar');
 goog.require('brkn.sidebar.Admin');
@@ -238,13 +238,15 @@ brkn.Sidebar.prototype.enterDocument = function() {
             }
           }, this));
   
-  brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_SIDEBAR,
-      function(show) {
-        goog.dom.classes.enable(this.getElement(), 'toggled', show);
-        goog.Timer.callOnce(goog.bind(function() {
-          goog.dom.classes.enable(this.getElement(), 'collapsed', !show);
-        }, this), !show ? 500 : 0);
-      }, this);
+  if (DESKTOP) {
+    brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_SIDEBAR,
+        function(show) {
+          goog.dom.classes.enable(this.getElement(), 'toggled', show);
+          goog.Timer.callOnce(goog.bind(function() {
+            goog.dom.classes.enable(this.getElement(), 'collapsed', !show);
+          }, this), !show ? 500 : 0);
+        }, this);
+  }
   
   brkn.model.Sidebar.getInstance().subscribe(brkn.model.Sidebar.Actions.NAVIGATE,
       this.navigate, this);
@@ -262,17 +264,20 @@ brkn.Sidebar.prototype.enterDocument = function() {
       this.onNextProgram_, this);
   brkn.model.Channels.getInstance().subscribe(brkn.model.Channels.Actions.CHANGE_CHANNEL,
       this.onChangeChannel_, this);
-  brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_ADMIN,
-      function(show) {
-        goog.dom.classes.enable(this.getElement(), 'admin', show);
-        if (show) {
-          brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.TOGGLE_SIDEBAR,
-              true);
-          this.tabNav_(this.currentTab_, 'admin');
-        } else if (this.currentTab_ == 'admin') {
-          this.tabNav_('admin', 'info');
-        }
-      }, this);
+  
+  if (DESKTOP) {
+    brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_ADMIN,
+        function(show) {
+          goog.dom.classes.enable(this.getElement(), 'admin', show);
+          if (show) {
+            brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.TOGGLE_SIDEBAR,
+                true);
+            this.tabNav_(this.currentTab_, 'admin');
+          } else if (this.currentTab_ == 'admin') {
+            this.tabNav_('admin', 'info');
+          }
+        }, this);
+  }
 };
 
 
@@ -485,7 +490,7 @@ brkn.Sidebar.prototype.showMediaInfo = function(media, opt_noFetch, opt_lastMedi
     brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NAVIGATE,
         mediaInfoEl, false, media.name);
   }
-  brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.TOGGLE_SIDEBAR, true);
+  DESKTOP && brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.TOGGLE_SIDEBAR, true);
 };
 
 
@@ -501,7 +506,7 @@ brkn.Sidebar.prototype.showProfile = function(user) {
   this.profile_.decorate(this.profileEl_);
   brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NAVIGATE,
       this.profileEl_, false, user.name);
-  brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.TOGGLE_SIDEBAR, true);
+  DESKTOP && brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.TOGGLE_SIDEBAR, true);
 };
 
 

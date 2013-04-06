@@ -44,7 +44,7 @@ class Program(db.Model):
       program = Program(media=media, channel=channel,
                         time=time,
                         async=async)
-      if constants.SAVE_PROGRAMS:
+      if constants.SAVE_PROGRAMS or async:
         program.put()
       channel.next_time = time + datetime.timedelta(seconds=program.media.duration)
       if async:

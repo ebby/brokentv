@@ -320,6 +320,8 @@ brkn.Controller.prototype.enterDocument = function() {
       function() {
         this.resize();
       }, this);
+  brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.MUTE,
+      this.mute_, this);
   brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_GUIDE,
       this.toggleGuide_, this);
   brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_SIDEBAR,
@@ -355,6 +357,14 @@ brkn.Controller.prototype.setAsync_ = function(program, opt_restart) {
       goog.dom.classes.add(this.elapsedEl_, 'animate');
     }, this), 1000);
   }
+};
+
+
+/**
+ * @private 
+ */
+brkn.Controller.prototype.mute_ = function(mute) {
+  this.volumeButton_.setChecked(mute);
 };
 
 

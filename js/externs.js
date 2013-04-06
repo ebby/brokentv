@@ -4,6 +4,8 @@ var IPHONE;
 
 var IPAD;
 
+var DESKTOP;
+
 var HTML5;
 
 var appengine = {};
@@ -51,6 +53,7 @@ YT.Player.prototype.pauseVideo;
 YT.Player.prototype.seekTo;
 YT.Player.prototype.mute;
 YT.Player.prototype.unMute;
+YT.Player.prototype.isMuted;
 
 /** 
  * enum {string} 

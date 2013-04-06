@@ -108,7 +108,9 @@ brkn.Player.prototype.enterDocument = function() {
   this.updateStagecover_();
 
   if (this.currentProgram_) {
-    this.playProgram(this.currentProgram_);
+    if (DESKTOP) {
+      this.playProgram(this.currentProgram_);
+    }
   } else  {
     brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.NO_MEDIA);
   }
@@ -160,7 +162,7 @@ brkn.Player.prototype.enterDocument = function() {
           
           return; 
         }
-        if (this.player_ && this.player_.getPlayerState) {
+        if (this.player_ && this.player_.getPlayerState && DESKTOP) {
           switch (this.player_.getPlayerState()) {
             case YT.PlayerState.PLAYING:
               brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.PLAY, false);
@@ -189,31 +191,34 @@ brkn.Player.prototype.enterDocument = function() {
         // TODO: fade in
         this.updateStagecover_(undefined, true);
       }, this);
-  brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_SIDEBAR,
-      function(show) {
-        this.resize(show);
-      }, this);
-  brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_GUIDE,
-      function(show) {
-        goog.Timer.callOnce(goog.bind(this.resize, this));
-      }, this);
-  brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.PLAY,
-      function(play) {
-        play ? this.player_.playVideo() : this.player_.pauseVideo();
-        var el = goog.dom.getElementByClass(play ? 'play' : 'pause', this.getElement());
-        var queue = new goog.fx.AnimationSerialQueue();
-        queue.add(new goog.fx.dom.FadeInAndShow(el, 250, goog.fx.easing.easeOut));
-        queue.add(new goog.fx.dom.FadeOutAndHide(el, 250, goog.fx.easing.easeIn));
-        queue.play();
-      }, this);
-  brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.MUTE,
-      function(mute) {
-        this.player_ && (mute ? this.player_.mute() : this.player_.unMute());
-      }, this);
-  brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.RESTART,
-      function() {
-        this.player_.seekTo(0);
-      }, this);
+  
+  if (DESKTOP) {
+    brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_SIDEBAR,
+        function(show) {
+          this.resize(show);
+        }, this);
+    brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_GUIDE,
+        function(show) {
+          goog.Timer.callOnce(goog.bind(this.resize, this));
+        }, this);
+    brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.PLAY,
+        function(play) {
+          play ? this.player_.playVideo() : this.player_.pauseVideo();
+          var el = goog.dom.getElementByClass(play ? 'play' : 'pause', this.getElement());
+          var queue = new goog.fx.AnimationSerialQueue();
+          queue.add(new goog.fx.dom.FadeInAndShow(el, 250, goog.fx.easing.easeOut));
+          queue.add(new goog.fx.dom.FadeOutAndHide(el, 250, goog.fx.easing.easeIn));
+          queue.play();
+        }, this);
+    brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.MUTE,
+        function(mute) {
+          this.player_ && (mute ? this.player_.mute() : this.player_.unMute());
+        }, this);
+    brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.RESTART,
+        function() {
+          this.player_.seekTo(0);
+        }, this);
+  }
   
   this.resize();
 };
@@ -252,8 +257,10 @@ brkn.Player.prototype.toggleExpand_ = function(e) {
   e.preventDefault();
   e.stopPropagation();
   var show = !brkn.model.Sidebar.getInstance().toggled();
-  brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.TOGGLE_SIDEBAR, show);
-  brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.TOGGLE_GUIDE, show);
+  if (DESKTOP) {
+    brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.TOGGLE_SIDEBAR, show);
+    brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.TOGGLE_GUIDE, show);
+  }
 };
 
 
@@ -424,6 +431,10 @@ brkn.Player.prototype.onPlayerReady_ = function(event) {
           (goog.now() - this.currentProgram_.time.getTime())/1000;
       this.player_.seekTo(seek);
       this.player_.playVideo();
+      if (DESKTOP) {
+        brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.MUTE,
+            this.player_.isMuted());
+      }
     }
   }, this), 1000);
 };

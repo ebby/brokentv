@@ -45,10 +45,11 @@ CSS_SOURCE =  '/static/css/main.css'
 STATS_CSS_SOURCE =  '/static/css/stats.css'
 ADMIN_CSS_SOURCE =  '/static/css/admin.css'
 
-PROD_JS = '/static/js/brkn-min.js'
+PROD_JS = '/static/js/main-min.js'
 PROD_SIMPLE_JS = '/static/js/brkn-simple-min.js'
-ADV_JS = '//localhost:9810/compile?id=brokentv&mode=advanced&pretty-print=true'
-SIMPLE_JS = '//localhost:9810/compile?id=brokentv&mode=simple&pretty-print=true'
+MOBILE_PROD_JS = '/static/js/mobile-min.js'
+ADV_JS = '//localhost:9810/compile?id=main&mode=advanced&pretty-print=true'
+SIMPLE_JS = '//localhost:9810/compile?id=main&mode=simple&pretty-print=true'
 
 def facebook_app(hostname=None):
   if DEVELOPMENT:
@@ -73,6 +74,7 @@ if DEVELOPMENT:
   CLIENT_SECRETS_FILE = "client_secrets_dev.json"
   STATS_JS_SOURCE = SIMPLE_JS
   ADMIN_JS_SOURCE = '//localhost:9810/compile?id=admin&mode=simple&pretty-print=true'
+  MOBILE_JS_SOURCE = '//localhost:9810/compile?id=mobile&mode=simple&pretty-print=true'
 
   TWITTER_CONSUMER_KEY = 'o2RPbUJUFDtltq7LmKVD1A'
   TWITTER_CONSUMER_SECRET = 'E88eAbv1Wag6XMCUjuDpBQuQr7KKwVujxsE1z3eoO8'
@@ -86,6 +88,7 @@ else :
   CLIENT_SECRETS_FILE = "client_secrets_prod.json"
   STATS_JS_SOURCE = '/static/js/stats-min.js'
   ADMIN_JS_SOURCE = '/static/js/admin-min.js'
+  MOBILE_JS_SOURCE = '/static/js/mobile-min.js'
   
   TWITTER_CONSUMER_KEY = 'jd3rN8a2Z3nYSFLdJRZg'
   TWITTER_CONSUMER_SECRET = 'xfqxhXlYcyVKJ446CWu6Rwjn4tEgTV48ry40uySxgE'

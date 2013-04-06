@@ -1,5 +1,6 @@
 goog.provide('brkn.model.BrowserChannel');
 
+goog.require('brkn.model.Controller');
 goog.require('brkn.model.Channels');
 goog.require('brkn.model.Comment');
 goog.require('brkn.model.Medias');
@@ -140,10 +141,12 @@ brkn.model.BrowserChannel.prototype.onClose_ = function() {
     var myChannel = brkn.model.Channels.getInstance().currentChannel.myChannel;
     var currentMedia = myChannel && brkn.model.Channels.getInstance().currentChannel.currentMedia;
     var seek = currentMedia && Math.floor(brkn.model.Player.getInstance().getCurrentTime())
-    goog.net.XhrIo.send('/_settings', goog.functions.NULL(), 'POST',
-        'show_guide=' + brkn.model.Controller.getInstance().guideToggled +
-        '&show_sidebar=' + brkn.model.Controller.getInstance().sidebarToggled +
-        (seek ? '&current_seek=' + seek : ''));
+    if (DESKTOP) {
+      goog.net.XhrIo.send('/_settings', goog.functions.NULL(), 'POST',
+          'show_guide=' + brkn.model.Controller.getInstance().guideToggled +
+          '&show_sidebar=' + brkn.model.Controller.getInstance().sidebarToggled +
+          (seek ? '&current_seek=' + seek : ''));
+    }
     this.loggedOff_ = true;
   }
 };

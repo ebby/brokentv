@@ -51,16 +51,17 @@ jinja_environment = jinja2.Environment(
 class MainHandler(BaseHandler):
     def get(self, path=None):
       self.session['user'] = None
+
+      mobile = self.request.host_url.startswith('http://m.') or self.request.get('mobile')
       
       template_data = {}
       template_data['host_url'] = self.request.host_url
       if self.request.get('prod') or not constants.DEVELOPMENT:
-        template_data['js_location'] = constants.PROD_SIMPLE_JS if self.request.get('simple') \
-            else constants.PROD_JS
+        template_data['js_location'] = constants.MOBILE_PROD_JS if mobile else constants.PROD_JS
       elif self.request.get('adv'): 
         template_data['js_location'] = constants.ADV_JS
       else:
-        template_data['js_location'] = constants.SIMPLE_JS
+        template_data['js_location'] = constants.MOBILE_JS_SOURCE if mobile else constants.SIMPLE_JS
 
       template_data['html5'] = self.request.get('html5') == 'true'
       if not constants.DEVELOPMENT or self.request.get('css') or self.request.get('prod'):
@@ -82,9 +83,14 @@ class MainHandler(BaseHandler):
       self.session['channel_id'] = channel_id
       self.session['media_id'] = media_id
   
-      template_data['facebook_app_id'] = constants.facebook_app(self.request.host_url)['FACEBOOK_APP_ID'];
-      path = os.path.join(os.path.dirname(__file__), 'templates/home.html')
-      self.response.out.write(template.render(path, template_data))
+      template_data['facebook_app_id'] = constants.facebook_app(self.request.host_url)['FACEBOOK_APP_ID']
+      
+      if mobile:
+        path = os.path.join(os.path.dirname(__file__), 'templates/mobile.html')
+        self.response.out.write(template.render(path, template_data))
+      else:
+        path = os.path.join(os.path.dirname(__file__), 'templates/home.html')
+        self.response.out.write(template.render(path, template_data))
 
 class AdminHandler(BaseHandler):
     @BaseHandler.super_admin
@@ -133,6 +139,15 @@ class ImagesHandler(webapp2.RequestHandler):
         if publisher:
           self.response.headers['Content-Type'] = 'image/jpeg'
           self.response.out.write(publisher.picture)
+          
+class PitchHandler(BaseHandler):
+    def get(self):
+      allowed = self.request.get('xyz') == '123'
+      if allowed:
+        path = os.path.join(os.path.dirname(__file__), 'templates/deck.html')
+        self.response.out.write(template.render(path, {}))
+      else:
+        self.redirect('/')
 
 #--------------------------------------
 # APPLICATION INIT
@@ -220,6 +235,7 @@ def create_handlers_map():
     ('/', MainHandler),
     ('/admin', AdminHandler),
     ('/stats', StatsHandler),
+    ('/deck', PitchHandler),
     ('/namestorm', NameStormHandler),
     ('/namestorm/(syl)', NameStormHandler),
     ('/namestorm/(sug)', NameStormHandler),

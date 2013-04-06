@@ -1,0 +1,72 @@
+{namespace brkn.mobile}
+
+/**
+ * Tucked away here for security 
+ * @param admin
+ * @param sidebar
+ */
+{template .main}
+<div class="main">
+  <div id="stage" class="stage">
+    <div id="ytplayer"></div>
+    <div id="stagecover">
+      <div class="message">
+        <span></span>
+        <div class="spinner" style="display:none"></div>
+      </div>
+      <div class="fullscreen"></div>
+      <div class="expand"></div>
+      <div class="play" style="display: none"><div></div></div>
+      <div class="pause" style="display: none"><div></div></div>
+    </div>
+    <div id="logo"></div>
+  </div>
+  <div id="sidebar" class="{if $sidebar}toggled{else}collapsed{/if}">
+    <div id="toolbar">
+      <div class="back">
+        <div class="back-button"><div>BACK</div></div>
+        <div class="back-title"></div>
+      </div>
+      <ul class="tabs">
+        <li class="info tab selected">
+          <div class="label">NOW</div>
+        </li>
+        <li class="stream tab">
+          <div class="label">STREAM</div>
+        </li>
+        <li class="profile tab">
+          <div class="label">ME</div>
+        </li>
+      </ul>
+      <div class="radial-grad"></div>
+      <div class="arrow"></div>
+    </div>
+    <div id="sidebar-content">
+      <div id="info" class="screen info">
+        <div class="no-info">Pick a channel or play a story.</div>
+      </div>
+      <div id="stream" class="screen stream">
+        <div class="loading loading-activity"><div class="loading-spinner"></div></div>
+      </div>
+      <div id="my-profile" class="screen profile"></div>
+      <div id="admin" class="screen admin"></div>
+      <div id="media-list" class="slide media-list"></div>
+      <div id="conversation" class="slide"></div>
+      {if $admin}
+        <div id="admin-col-list" class="slide admin"></div>
+        <div id="admin-list" class="slide admin-list"></div>
+      {/if}
+      <div id="media-info" class="slide info"></div>
+      <div id="profile" class="slide profile"></div>
+    </div>
+  </div>
+  <div id="notify" class="notify"></div>
+  <div id="welcome" class="welcome" style="display:none">
+    <div class="thanks"></div>
+    <div class="guide"></div>
+    <div class="friends"></div>
+    <div class="sidebar"></div>
+    <div class="close"></div>
+  </div>
+</div>
+{/template}

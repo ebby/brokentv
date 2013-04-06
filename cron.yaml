@@ -6,5 +6,5 @@ cron:
   
 - description: set programming
   url: /cron/program
-  schedule: every 1 minutes
+  schedule: every 2 minutes
   target: programming

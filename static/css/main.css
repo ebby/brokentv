@@ -2200,7 +2200,7 @@ div#sidebar div#sidebar-content div.screen.left {
 div#sidebar div#sidebar-content div.slide {
   position: absolute;
   opacity: 0;
-  visibility: 0;
+  visibility: hidden;
   height: 100%;
   width: 320px;
   top: 43px;
@@ -5231,6 +5231,9 @@ a {
     margin-top: -103px;
     margin-left: 78px;
   }
+  div#login div#static-scrollable {
+    -webkit-overflow-scrolling: touch;
+  }
   div#login div#static-content div.header {
     width: 100%;
   }
@@ -5267,5 +5270,8 @@ a {
   }
   div#login div#static-content div.footer div.copyright {
     display: none;
+  }
+  div#login div#static-content div.footer a:hover {
+    text-decoration: none;
   }
 }
