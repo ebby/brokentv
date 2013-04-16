@@ -40,8 +40,9 @@ div#logo {
       left: 50%;
       margin-left: -100px;
       bottom: -150px;
-      background: @spinner no-repeat center;
-      background-size: 80px;
+      background: @spinner2 no-repeat center;
+      background-position: 50% 60%;
+      background-size: 70px;
       width: 200px;
       height: 220px;
     }
@@ -56,13 +57,13 @@ div#logo {
     .transition(opacity, .1s, ease);
   }
   div.fullscreen {
-    .sprite-fullscreen();
+    .icon-fullscreen();
     width: 20px;
     height: 20px;
     right: 40px;
     top: 10px;
     &.full {
-      .sprite-closescreen();
+      .icon-closescreen();
       width: 20px;
       height: 20px;
     }
@@ -99,7 +100,7 @@ div#logo {
       left: 50%;
       margin-top: -10px;
       margin-left: -5px;
-      .sprite-player-play();
+      .icon-play();
     }
   }
   div.pause {
@@ -109,7 +110,7 @@ div#logo {
       left: 50%;
       margin-top: -10px;
       margin-left: -7px;
-      .sprite-player-pause();
+      .icon-pause();
     }
   }
 }

@@ -44,8 +44,23 @@ brkn.model.Media = function(media) {
 	 * @type {number}
 	 */
 	this.duration = media['duration'];
-	
+
 	/**
+   * @type {boolean}
+   */
+  this.live = !!media['live'];
+
+  /**
+   * @type {Array.<brkn.model.Channel>}
+   */
+  this.onChannels = [];
+
+  /**
+   * @type {?brkn.model.Channel}
+   */
+  this.playingOnChannel = null;
+
+  /**
    * @type {boolean}
    */
   this.fetched = false;
@@ -98,7 +113,7 @@ brkn.model.Media = function(media) {
 	/**
    * @type {number}
    */
-  this.thumbPos = (/** @type {number} */ media['thumb_pos']) || 37;
+  this.thumbPos = 37;
 
 	/**
    * @type {Array.<brkn.model.Comment>}
@@ -165,6 +180,37 @@ brkn.model.Media.Actions = {
 
 
 /**
+ * @param {brkn.model.Channel} channel
+ */
+brkn.model.Media.prototype.addChannel = function(channel) {
+  if (!goog.array.find(this.onChannels, function(c) {return channel.id == c.id})) {
+    this.onChannels.push(channel);
+  }
+};
+
+
+/**
+ * Updates the media's status based on channels it could be playing on.
+ */
+brkn.model.Media.prototype.updateChannels = function() {
+  goog.array.forEach(this.onChannels, function(channel) {
+    var currentProgram = channel.getCurrentProgram();
+    if (currentProgram && currentProgram.media.id == this.id) {
+      this.playingOnChannel = channel;
+
+      goog.array.forEach(channel.viewerSessions, function(s) {
+        if (!s.tuneOut) {
+         this.onlineViewers[s.user.id] = s.user;
+        }
+      });
+    } else {
+      this.onlineViewers = {};   
+    }
+  }, this);
+};
+
+
+/**
  * @param {brkn.model.Comment} comment
  */
 brkn.model.Media.prototype.addComment = function(comment) {
@@ -190,10 +236,10 @@ brkn.model.Media.prototype.removeComment = function(commentId) {
 
 /**
  * @param {brkn.model.User} user
- * @param {brkn.model.Channel} channel
+ * @param {?brkn.model.Channel=} opt_channel
  * @param {?boolean=} opt_offline
  */
-brkn.model.Media.prototype.addViewer = function(user, channel, opt_offline) {
+brkn.model.Media.prototype.addViewer = function(user, opt_channel, opt_offline) {
   if (opt_offline) {
     goog.object.remove(this.onlineViewers, user.id);
     user.currentMedia = null;
@@ -203,6 +249,7 @@ brkn.model.Media.prototype.addViewer = function(user, channel, opt_offline) {
   user.currentMedia = this;
   if (user.id != brkn.model.Users.getInstance().currentUser.id) {
     brkn.model.Notify.getInstance().publish(brkn.model.Notify.Actions.FLASH,
-        'is watching ' + channel.name, this.name, user, this.thumbnail1, '#info:' + this.id);
+        'is watching ' + (opt_channel ? opt_channel.name : ''), this.name, user,
+        this.thumbnail1, '#info:' + this.id);
   }
 };

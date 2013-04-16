@@ -29,6 +29,7 @@ goog.require('goog.ui.Textarea.EventType');
 brkn.sidebar.Info = function(media, opt_noFetch, opt_lastMedia, opt_lastInput) {
   goog.base(this);
 
+  media.updateChannels();
   this.setModel(media);
 
   /**
@@ -91,6 +92,12 @@ brkn.sidebar.Info = function(media, opt_noFetch, opt_lastMedia, opt_lastInput) {
    * @private
    */
   this.tweets_ = [];
+  
+  /**
+   * @type {Object.<string, brkn.model.Tweet>}
+   * @private
+   */
+  this.tweetsMap_ = {};
 
   /**
    * @type {brkn.sidebar.CommentInput}
@@ -167,6 +174,13 @@ brkn.sidebar.Info.prototype.currentDotEl_;
  * @type {Element}
  * @private
  */
+brkn.sidebar.Info.prototype.contentsEl_;
+
+
+/**
+ * @type {Element}
+ * @private
+ */
 brkn.sidebar.Info.prototype.commentsEl_;
 
 
@@ -233,6 +247,7 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
   var linksEl = goog.dom.getElementByClass('links', this.getElement());
   this.spinner_ = goog.dom.getElementByClass('loading', this.getElement())
   var img = /** @type {Element} */ picEl.firstChild;
+  this.contentsEl_ = goog.dom.getElementByClass('info-contents', this.getElement());
   this.tweetHolderEl_ = goog.dom.getElementByClass('tweet-holder', this.getElement());
   this.tweetsEl_ = goog.dom.getElementByClass('tweets', this.getElement());
   this.dotNavEl_ = goog.dom.getElementByClass('dot-nav', this.getElement());
@@ -348,7 +363,9 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
           goog.bind(function() {
             var dotEl = this.currentDotEl_ && goog.dom.getNextElementSibling(this.currentDotEl_) ||
                 goog.dom.getElementByClass('dot', this.getElement());
-            this.toDot_(dotEl);
+            goog.Timer.callOnce(goog.bind(function() {
+              this.toDot_(dotEl);
+            }, this));
           }, this))
       .listen(window,
           goog.events.EventType.CLICK,
@@ -398,6 +415,9 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
       .listen(this.commentsEl_,
               goog.events.EventType.CLICK,
               goog.bind(this.commentClick_, this))
+      .listen(this.tweetsEl_,
+              goog.events.EventType.CLICK,
+              goog.bind(this.tweetClick_, this))
       .listen(goog.dom.getElementByClass('desc-link', this.getElement()),
           goog.events.EventType.CLICK,
           goog.bind(function() {
@@ -620,6 +640,8 @@ brkn.sidebar.Info.prototype.onAddComment_ = function(e) {
  * @private
  */
 brkn.sidebar.Info.prototype.addTweet_ = function(tweet, opt_first) {
+  this.tweetsMap_[tweet.id] = tweet;
+  
   var linkedText = goog.string.linkify.linkifyPlainText(tweet.text);
   linkedText = linkedText.replace(/#(\S+)/g, function(hashtag, query) {
     return '<a target="_blank" href="http://twitter.com/search?q=%23' + query + '">' + hashtag + '</a>';
@@ -630,7 +652,8 @@ brkn.sidebar.Info.prototype.addTweet_ = function(tweet, opt_first) {
   var tweetEl = soy.renderAsElement(brkn.sidebar.tweet, {
     tweet: tweet,
     text: linkedText,
-    timestamp: goog.date.relative.format(tweet.time.getTime())
+    timestamp: goog.date.relative.format(tweet.time.getTime()),
+    prefix: 'infotweet'
   });
   var dotEl = goog.dom.createDom('div', 'dot');
   brkn.model.Clock.getInstance().addTimestamp(tweet.time,
@@ -712,9 +735,25 @@ brkn.sidebar.Info.prototype.addViewer_ = function(user, opt_offline) {
       });
     }
     goog.style.showElement(this.viewersEl_, true);
-    goog.dom.setTextContent((/** @type {Element} */ this.viewersEl_.firstChild),
+    goog.dom.setTextContent(goog.dom.getElementByClass('status', this.viewersEl_),
         'WATCHING' + (this.hasSeen_ ? ' + SEEN' : ''));
     goog.dom.classes.add(this.viewerEls_[user.id], 'online');
+  }
+};
+
+/**
+ * @param {Event} e
+ * @private
+ */
+brkn.sidebar.Info.prototype.tweetClick_ = function(e) {
+  var targetEl = /** @type {Element} */ e.target;
+  var tweetEl = goog.dom.getAncestorByClass(targetEl, 'tweet');
+  if (tweetEl) {
+    var tweetId = tweetEl.id.split('-')[1];
+    var tweet = this.tweetsMap_[tweetId];
+    if (goog.dom.classes.has(targetEl, 'reply')) {
+      brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.REPLY_TWEET, tweet);
+    }
   }
 };
 
@@ -762,11 +801,12 @@ brkn.sidebar.Info.prototype.scrollGrad_ = function() {
   goog.dom.classes.enable(this.commentsEl_.parentElement, 'top-grad',
       !!this.commentsEl_.scrollTop);
   var maxHeight = this.commentsEl_.style.maxHeight;
+  var viewHeight = goog.dom.getViewportSize().height;
   maxHeight = maxHeight.substring(0, maxHeight.length-2);
   var height = goog.style.getSize(this.commentsEl_).height;
   goog.dom.classes.enable(this.commentsEl_.parentElement, 'bottom-grad',
       this.commentsEl_.scrollTop < this.commentsEl_.scrollHeight - maxHeight - 5 &&
-      height >= maxHeight);
+      height >= maxHeight && viewHeight > 640);
 };
 
 
@@ -776,9 +816,14 @@ brkn.sidebar.Info.prototype.scrollGrad_ = function() {
  */
 brkn.sidebar.Info.prototype.resize = function(opt_extra, opt_scrollComments) {
   this.resizeExtra_ = opt_extra != undefined ? opt_extra : this.resizeExtra_;
-  if (this.commentsEl_ && this.commentsEl_.parentElement) {
-    goog.style.setStyle(this.commentsEl_, 'max-height', goog.dom.getViewportSize().height -
-        goog.style.getPosition(this.commentsEl_.parentElement).y - 110 - this.resizeExtra_ + 'px');
+  var viewHeight = goog.dom.getViewportSize().height;
+  goog.style.setHeight(this.contentsEl_, viewHeight - 283);
+  if (viewHeight > 640 && this.commentsEl_ && this.commentsEl_.parentElement) {
+    goog.style.setStyle(this.commentsEl_, 'max-height', viewHeight -
+        goog.style.getPosition(this.commentsEl_.parentElement).y - 313 - this.resizeExtra_ + 'px'); 
+    this.scrollGrad_();
+  } else if (viewHeight < 640) {
+    goog.style.setStyle(this.commentsEl_, 'max-height', '');
     this.scrollGrad_();
   }
   

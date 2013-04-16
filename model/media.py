@@ -23,6 +23,7 @@ class Media(db.Model):
   last_twitter_fetch = db.DateTimeProperty()
   thumb_pos = db.IntegerProperty(default=50) # Percent to center of thumbnail
   path = db.StringProperty()
+  live = db.BooleanProperty(default=False)
   
   # Statistics
   started = db.StringListProperty(default=[]) # Users who let the program play
@@ -56,7 +57,17 @@ class Media(db.Model):
           media = Media.add_from_json(simplejson.loads(response.content))
           break
     return media
-  
+
+  @classmethod
+  def add_live(cls, id, start_time, end_time):
+    yt_service = get_youtube_service()
+    entry = yt_service.GetYouTubeVideoEntry(video_id=id)
+    live_media = Media.add_from_entry([entry])[0]
+    live_media.duration = float((end_time - start_time).seconds)
+    live_media.live = True
+    live_media.put()
+    return live_media
+
   @classmethod
   def add_from_url(cls, url):
     yt_service = get_youtube_service()
@@ -209,4 +220,7 @@ class Media(db.Model):
     json['link'] = self.link
     json['thumb_pos'] = self.thumb_pos
     json['star_count'] = self.star_count
+    json['comment_count'] = self.comment_count
+    if self.live:
+      json['live'] = self.live
     return json

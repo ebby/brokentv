@@ -190,6 +190,8 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
   
   brkn.model.Sidebar.getInstance().subscribe(brkn.model.Sidebar.Actions.REPLY_COMMENT,
       this.reply, this);
+  brkn.model.Sidebar.getInstance().subscribe(brkn.model.Sidebar.Actions.REPLY_TWEET,
+      this.replyTweet, this);
   brkn.model.Users.getInstance().currentUser.subscribe(brkn.model.User.Actions.TWITTER_AUTH, function() {
     this.tweetToggle_.setChecked(true);
   }, this);
@@ -211,7 +213,24 @@ brkn.sidebar.CommentInput.prototype.reply = function(comment, user) {
   goog.dom.appendChild(this.inputHolder_, this.token_);
   this.setFocused(true);
   this.commentInput_.getElement().style.paddingLeft = goog.style.getSize(this.token_).width + 5 + 'px';
-}
+};
+
+
+/**
+ * @param {brkn.model.Tweet} tweet
+ * @private
+ */
+brkn.sidebar.CommentInput.prototype.replyTweet = function(tweet) {
+  if (this.token_) {
+    this.removeReply_();
+  }
+  this.parentTweet = tweet.id;
+  this.setValue((this.getValue() ? this.getValue() + ' ' : '') + '@' + tweet.handle + ' ');
+  this.setFocused(true);
+  this.tweetToggle_.setEnabled(true);
+  this.setFocused(true);
+  this.setCaretToPos(this.getValue().length);
+};
 
 
 /**
@@ -223,6 +242,33 @@ brkn.sidebar.CommentInput.prototype.removeReply_ = function() {
   goog.dom.removeNode(this.token_);
   this.token_ = null;
   this.commentInput_.getElement().style.paddingLeft = '';
+};
+
+
+/**
+ * @param {number} selectionStart 
+ * @param {number} selectionEnd
+ */
+brkn.sidebar.CommentInput.prototype.setSelectionRange = function(selectionStart, selectionEnd) {
+  if (this.commentInput_.getElement().setSelectionRange) {
+    this.commentInput_.getElement().focus();
+    this.commentInput_.getElement().setSelectionRange(selectionStart, selectionEnd);
+  }
+  else if (this.commentInput_.getElement().createTextRange) {
+    var range = this.commentInput_.getElement().createTextRange();
+    range.collapse(true);
+    range.moveEnd('character', selectionEnd);
+    range.moveStart('character', selectionStart);
+    range.select();
+  }
+};
+
+
+/**
+ * @param {number} pos
+ */
+brkn.sidebar.CommentInput.prototype.setCaretToPos = function(pos) {
+  this.setSelectionRange(pos, pos);
 };
 
 
@@ -300,7 +346,6 @@ brkn.sidebar.CommentInput.prototype.setFocused = function(focus) {
  */
 brkn.sidebar.CommentInput.prototype.onAddComment_ = function(e) {
   if (this.commentInput_.getValue()) {
-    window.console.log(this.commentInput_.getValue())
     this.dispatchEvent({
       type: 'add',
       callback: goog.bind(function(e) {

@@ -34,6 +34,7 @@
 
 /**
  * @param program
+ * @param media
  * @param repeat
  * @param admin
  */
@@ -43,6 +44,10 @@
       background-position: 50% {$program.media.thumbPos}%"></div>
 	  <div class="progress"></div>
 	  <div class="title">{$program.media.name}</div>
+	  <div class="stats">
+      <div class="comment-count"><div class="icon"></div>{$media.commentCount}</div>
+      <div class="star-count"><div class="icon"></div>{$media.starCount}</div>
+    </div>
 	  {if $admin}
 	    <div class="remove"></div>
 	    <div class="repos"></div>
@@ -52,11 +57,13 @@
 
 /**
  * @param user
+ * @param firstName
  */
 {template .line}
   <div class="line">
     <div class="pic">
 	    <img src="{$user.picture}">
+	    <div class="watch-with">JOIN {$firstName}</div>
 	  </div>
   </div>
 {/template}

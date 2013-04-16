@@ -63,8 +63,7 @@ brkn.Mobile.prototype.decorateInternal = function(element) {
   goog.base(this, 'decorateInternal', element);
 
   var mainEl = soy.renderAsElement(brkn.mobile.main, {
-    admin: brkn.model.Users.getInstance().currentUser.isAdmin(),
-    sidebar: brkn.model.Users.getInstance().currentUser.showSidebar
+    admin: brkn.model.Users.getInstance().currentUser.isAdmin()
   });
   goog.dom.insertChildAt(element, mainEl, 0);
 };
@@ -77,6 +76,9 @@ brkn.Mobile.prototype.enterDocument = function() {
   this.sidebar_.decorate(goog.dom.getElement('sidebar'));
   this.player_.decorate(goog.dom.getElement('stage'));
   this.notify_.decorate(goog.dom.getElement('notify'));
+  
+  // Hide notification until we have a mobile UI for it
+  goog.style.showElement(this.notify_.getElement(), false);
 
   if (!brkn.model.Users.getInstance().currentUser.welcomed) {
     this.welcome_(brkn.model.Users.getInstance().currentUser);
@@ -341,7 +343,7 @@ brkn.Mobile.getSessionAndInit = function(response) {
           brkn.Mobile.init(response, data['token'], data['channels'], data['programs'],
               data['current_user'], data['viewer_sessions']);
 
-          goog.Timer.callOnce(reveal, 300);
+          goog.Timer.callOnce(reveal);
         } else if (e.target.getStatus() == 500) {
           brkn.Mobile.noLogin('error', 'Opps, check back later');
         } else {

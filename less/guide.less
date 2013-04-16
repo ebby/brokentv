@@ -76,9 +76,12 @@ div#guide {
     display: none;
     position: absolute;
     top: 0;
-    .sprite-ticker();
+    .icon-ticker();
+    font-size: 33px;
+    color: #f5f5f5;
+    text-shadow: 0 0 4px rgba(0, 0, 0, .5);
+    text-align: center;
     margin-left: @name-width - 20;
-    margin-top: -7px;
     width: 30px;
     height: 45px;
     z-index: 110;
@@ -172,7 +175,7 @@ div#guide {
     opacity: 0;
     visibility: hidden;
     .transition(opacity, .3s, ease);
-    .sprite-my-ticker();
+    .icon-ticker();
     &.show, &.show-me div.me {
       opacity: 1;
       visibility: visible;
@@ -265,7 +268,7 @@ div#guide {
     }
   }
   &.toggled div.channels {
-    div.channel div.programs div.program.playing div.title {
+    div.channel div.programs div.program.playing {
       color: #f5f5f5;
       text-shadow: 1px 1px 1px rgba(0, 0, 0, .6), -1px -1px 1px rgba(0, 0, 0, .6),
           -1px 1px 1px rgba(0, 0, 0, .6), 1px -1px 1px rgba(0, 0, 0, .6);
@@ -314,6 +317,9 @@ div#guide {
           div.remove, div.repos {
             display: none;
           }
+          div.stats {
+            display: none;
+          }
           &:active {
             background: #111;
             .box-shadow(inset, -1px, 0, 1px, #000);
@@ -338,7 +344,7 @@ div#guide {
     overflow-y: scroll;
     font-size: 12px;
     div.channel {
-      border-bottom: 1px solid #444;
+      border-bottom: 1px solid rgba(0, 0, 0, .8);
       position: relative;
       background: #525252 url(/static/img/content-texture.png);
       overflow: hidden;
@@ -393,14 +399,11 @@ div#guide {
       div.programs {
         display: inline-block;
         width: 100%;
-        height: 50px;
+        height: 80px;
         white-space: nowrap;
         min-width: 540px;
-        position: relative;
         vertical-align: top;
         margin-bottom: 4px;
-        margin-left: @name-width;
-        margin-top: 10px;
         div.program {
           display: inline-block;
           position: absolute;
@@ -408,22 +411,30 @@ div#guide {
 					overflow: hidden;
 					vertical-align: middle;
 					height: 100%;
-					color: #f5f5f5;
+					color: rgba(255, 255, 255, 0.7);
 					text-shadow: 1px 1px 1px #181818;
-					background: #555;
+					background: #444;
 					z-index: 0;
-					.border-radius(5px);
-          border: 1px solid #343434;
+          border-left: 1px solid rgba(0, 0, 0, .8);
+          border-right: 1px solid rgba(0, 0, 0, .8);
           cursor: pointer !important;
 					.transition(width, .3s, ease);
+					margin-left: @name-width;
 					&.selected {
 					  border: 1px solid rgba(0, 0, 255, 0.5);
 					}
-          &:hover div.title {
-            display: block !important;
+          &:hover {
             color: #f5f5f5;
             text-shadow: 1px 1px 1px rgba(0, 0, 0, .6), -1px -1px 1px rgba(0, 0, 0, .6),
-                -1px 1px 1px rgba(0, 0, 0, .6), 1px -1px 1px rgba(0, 0, 0, .6);
+                  -1px 1px 1px rgba(0, 0, 0, .6), 1px -1px 1px rgba(0, 0, 0, .6);
+            div.title {
+              display: block !important;
+            }
+          }
+          &:active {
+            div.thumb {
+              .box-shadow(e('inset 0 0 0 1px rgba(0, 0, 0,.7)'));
+            }
           }
 					div.info {
 					  display: inline-block;
@@ -439,6 +450,12 @@ div#guide {
             -webkit-filter: none !important;
             opacity: .9;
           }
+          &.clipped div.stats {
+            display: none;
+          }
+          &.clipped:hover div.stats {
+            display: block;
+          }
           &.clipped:hover div.thumb, &.playing div.thumb {
             .transition(background-position, 4s, ease-out);
           }
@@ -448,7 +465,7 @@ div#guide {
 					  opacity: .2;
 					  background-size: 110% auto;
 					  background-position: 50% 37%;
-					  .border-radius(3px);
+					  .box-shadow(e('inset 0 0 0 1px rgba(255,255,255,.2)'));
 					  &.fix-height {
               background-size: auto 100%;
             }
@@ -469,15 +486,50 @@ div#guide {
 					  left: 5px;
 						top: 5px;
 						height: 40px;
-						color: rgba(255, 255, 255, 0.7);
 						font-size: 11px;
 						position: absolute;
 						overflow: hidden;
-						padding-right: 25px;
+						padding-right: 70px;
 						&.marquee {
 						  .transition(e('margin-left 10s linear, left 1s linear'));
 						}
 					}
+					div.stats {
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            div.comment-count {
+              div.icon {
+                .icon-comment();
+                font-size: 15px;
+                margin-top: -2px;
+                position: absolute;
+                top: 0;
+                left: 0;
+              }
+              min-width: 15px;
+              height: 15px;
+              padding-left: 17px;
+              font-size: 10px;
+              float: right;
+              position: relative;
+            }
+            div.star-count {
+              div.icon {
+                .icon-heart();
+                font-size: 12px;
+                position: absolute;
+                top: 0;
+                left: 0;
+              }
+              min-width: 15px;
+              height: 15px;
+              padding-left: 15px;
+              font-size: 10px;
+              float: right;
+              position: relative;
+            }
+          }
 	        &.current {
 	          background: rgba(255, 255, 255, .3);
 	          border-color: white;
@@ -615,6 +667,56 @@ div#guide {
               }
 		        }
 	        }
+	        div.watch-with {
+            display: none;
+            opacity: 0;
+            visibility: hidden;
+            text-align: center;
+            .transition(opacity, .3s, ease);
+            position: absolute;
+            bottom: 37px;
+            padding: 5px;
+            white-space: nowrap;
+            margin-left: -14px;
+            .border-radius(3px);
+            background: #dedede;
+            .box-shadow(e('0 0 4px 1px rgba(0, 0, 0, .4), 0px 1px 0 0px rgba(0, 0, 0,.4)'));
+            font-size: 11px;
+            font-family: MuseoSans700;
+            color: #181818;
+            text-shadow: 1px 1px 1px white;
+            border: 1px solid rgba(0, 0, 0, .6);
+            pointer-events: all;
+            cursor: pointer;
+            &:after, &:before {
+              top: 100%;
+              border: solid transparent;
+              content: " ";
+              height: 0;
+              width: 0;
+              position: absolute;
+              pointer-events: none;
+            }
+            &:after {
+              border-color: rgba(222, 222, 222, 0);
+              border-top-color: #dedede;
+              border-width: 5px;
+              left: 50%;
+              margin-left: -5px;
+            }
+            &:before {
+              border-color: rgba(204, 204, 204, 0);
+              border-top-color: rgba(0, 0, 0, .6);
+              border-width: 6px;
+              left: 50%;
+              margin-left: -6px;
+            }
+          }
+          &:hover div.watch-with, div.watch-with:hover {
+            display: block;
+            opacity: 1;
+            visibility: visible;
+          }
 	        div.username {
 	          position: absolute;
 	          left: 10px;
@@ -637,10 +739,13 @@ div#guide {
       div.spinner {
         margin: 0 10px;
         font-size: 80px;
-        line-height: 15px;
+        line-height: 0;
         position: absolute;
         .transition(margin, .3s, ease);
         pointer-events: none;
+        top: 50%;
+        margin-top: -27px;
+        height: 80px;
       }
       &.show div.spinner {
         margin: 0 50px;
@@ -679,7 +784,7 @@ div#guide {
         line-height: 20px;
         .border-radius(4px, 4px, 0, 0);
         div.close {
-          .sprite-close-light();
+          .icon-close();
           cursor: pointer;
           position: absolute;
           right: 5px;

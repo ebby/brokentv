@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link rel="apple-touch-icon-precomposed" href="/static/img/apple-touch-icon-precomposed.png"/>
     <title>XYLO</title>
 
     {% if css_location %}
@@ -26,7 +27,7 @@
       var IPAD = !!navigator.userAgent.match(/iPad/i);
       var IPHONE = !!navigator.userAgent.match(/iPhone/i);
       var HTML5 = '{{ html5 }}' == 'True';
-      var DESKTOP = !IPAD && !IPHONE;
+      var DESKTOP = true;
 
 			// Re-namespace to avoid closure conflict.
 			var appengine = goog.appengine; 

@@ -8,7 +8,7 @@ from google.appengine.api import memcache
 # CHANNEL HELPERS
 #--------------------------------------
 
-def broadcastViewerChange(user, last_channel_id, channel_id, session_id, time):
+def broadcastViewerChange(user, last_channel_id, channel_id, session_id, time, media=None):
   response = {}
   response['type'] = 'viewer_change'
   response['user'] = user.toJson()
@@ -16,6 +16,7 @@ def broadcastViewerChange(user, last_channel_id, channel_id, session_id, time):
   response['channel_id'] = channel_id
   response['time'] = time
   response['session_id'] = session_id
+  response['media'] = media.toJson(get_desc=False, pub_desc=False) if media else None
   channels = memcache.get('web_channels') or {}
   for client in channels.iterkeys():
     if client in user.friends:

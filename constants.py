@@ -7,7 +7,7 @@ DEVELOPMENT = os.environ.get('SERVER_SOFTWARE', '').startswith('Development')
 
 SAVE_PROGRAMS = False
 
-SUPER_ADMINS = ['1240963', '100003192433087']
+SUPER_ADMINS = ['1240963', '100003192433087', '100005453982771']
 
 SHARE_URL = 'xylocast.com/'
 
@@ -28,7 +28,8 @@ TWITTER_USER_BLACKLIST = [
   'whonewz',
   'usabusinessnews',
   'newsheadlinesco',
-  'businessnewsvid'                   
+  'businessnewsvid',
+  'ivantrajkovic1'                   
 ]
 
 TWITTER_PHRASE_BLACKLIST = [

@@ -121,7 +121,7 @@ brkn.Channel.YOUTUBE_DATA = 'https://gdata.youtube.com/feeds/api/videos/%s?v=2&a
  * @type {number}
  * @constant
  */
-brkn.Channel.PROGRAM_PADDING = 12;
+brkn.Channel.PROGRAM_PADDING = 1;
 
 
 /**
@@ -244,7 +244,10 @@ brkn.Channel.prototype.enterDocument = function() {
   
   var programs = this.getModel().programming;
   for (var i = 0; i < programs.length; i++) {
-  	if ((programs[i].time.getTime() < this.startTime_.getTime()) &&
+    if (programs[i].media.live) {
+      window.console.log('LIVE');
+      this.addProgram(programs[i]);
+    } else if ((programs[i].time.getTime() < this.startTime_.getTime()) &&
   			(programs[i].time.getTime() + programs[i].media.duration * 1000 > (this.startTime_.getTime() - this.timeline_*1000))) {
   		// This program is in progress
   		this.addProgram(programs[i]);
@@ -370,6 +373,7 @@ brkn.Channel.prototype.addProgram = function(program) {
 	    (program.time.getTime() + program.media.duration*1000) > goog.now();
 	soy.renderElement(programEl, brkn.channel.program, {
 		program: program,
+		media: program.media,
 		repeat: width > 600,
 		admin: showAdmin
 	});
@@ -394,9 +398,17 @@ brkn.Channel.prototype.addProgram = function(program) {
     }
     goog.dom.classes.enable(programEl, 'stretched', program.media.thumbSize.height > 360);
   });
+	
+	 var offset = (program.time.getTime() - this.minTime_.getTime())/1000 * this.pixelsPerSecond_;
 
+	if (program.media.live) {
+	  var diff = (goog.now() - program.time.getTime())/1000
+	  var cutoff = diff * this.pixelsPerSecond_ - 100;
+	  width -= cutoff;
+	  offset += cutoff;
+	}
+	
 	goog.style.setWidth(programEl, width - brkn.Channel.PROGRAM_PADDING);
-	var offset = (program.time.getTime() - this.minTime_.getTime())/1000 * this.pixelsPerSecond_;
 	goog.style.setPosition(programEl, offset);
 	goog.style.setPosition(this.suggestEl_, offset + width);
 	goog.dom.appendChild(this.programsEl_, programEl);
@@ -528,9 +540,11 @@ brkn.Channel.prototype.addViewer = function(session) {
 
     if (!session.tuneOut || session.tuneOut.getTime() > this.minTime_.getTime()) {
       var lineEl = soy.renderAsElement(brkn.channel.line, {
-        user: session.user
+        user: session.user,
+        firstName: session.user.firstName().toUpperCase()
       });
       goog.dom.appendChild(userEl, lineEl);
+      var watchWith = goog.dom.getElementByClass('watch-with', lineEl);
       var tuneInTime = Math.max(session.tuneIn.getTime(), this.minTime_.getTime());
       var offset = (tuneInTime - this.minTime_.getTime()) / 1000 *
           this.pixelsPerSecond_ + brkn.Guide.NAME_WIDTH;
@@ -538,6 +552,7 @@ brkn.Channel.prototype.addViewer = function(session) {
       goog.style.setWidth(lineEl, elapsed);
       goog.style.setPosition(lineEl, offset);
       goog.style.setStyle(lineEl, 'background', session.user.color);
+      goog.style.setStyle(watchWith, 'margin-left', -goog.style.getSize(watchWith).width/2 + 14 + 'px');
       this.getHandler().listen(lineEl, goog.events.EventType.CLICK, function() {
         brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.PROFILE, session.user)
       })

@@ -74,11 +74,12 @@ brkn.Main.prototype.popup_;
 /** @inheritDoc */
 brkn.Main.prototype.decorateInternal = function(element) {
   goog.base(this, 'decorateInternal', element);
-
+  
   var mainEl = soy.renderAsElement(brkn.main.main, {
     user: brkn.model.Users.getInstance().currentUser,
     admin: brkn.model.Users.getInstance().currentUser.isAdmin(),
-    guide: brkn.model.Users.getInstance().currentUser.showGuide,
+    guide: brkn.model.Users.getInstance().currentUser.showGuide &&
+        !brkn.model.Channels.getInstance().currentChannel.myChannel,
     sidebar: brkn.model.Users.getInstance().currentUser.showSidebar
   });
   goog.dom.insertChildAt(element, mainEl, 0);
@@ -213,7 +214,6 @@ brkn.Main.staticInit = function() {
   goog.events.listen(img, goog.events.EventType.LOAD, function() {
     goog.dom.classes.remove(homepage, 'hide');
     goog.dom.classes.add(homepage, 'show');
-    brkn.Main.makeMusic();
   });
   
   goog.Timer.callOnce(function() {
@@ -422,6 +422,7 @@ brkn.Main.login = function() {
         // not_authorized
         //brkn.Main.notAuthorized();
         goog.dom.classes.remove(fbLogin, 'disabled');
+        brkn.Main.makeMusic();
       }
     }, {scope: 'email'});
   });

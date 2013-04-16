@@ -33,7 +33,7 @@ brkn.Guide = function() {
    * @type {number}
    * @private
    */
-  this.interval_ = 10;
+  this.interval_ = 5;
 
   /**
    * @type {number}

@@ -326,6 +326,7 @@ brkn.Sidebar.prototype.onChangeChannel_ = function(opt_channel) {
       goog.dispose(this.info_);
       this.info_ = new brkn.sidebar.Info(this.currentMedia_);
       this.info_.decorate(goog.dom.getElement('info'));
+      this.showMediaInfo(this.currentMedia_);
     }
   }
 };

@@ -71,5 +71,7 @@ brkn.model.Session.prototype.seen = function(media) {
 brkn.model.Session.prototype.end = function(time) {
   this.tuneOut = time;
   var seconds = (this.tuneOut.getTime() - this.tuneIn.getTime()) / 1000;
-  brkn.model.Analytics.getInstance().endSession(this.channel, seconds, this.medias.length);
+  if (this.user.id == brkn.model.Users.getInstance().currentUser.id && this.channel) {
+    brkn.model.Analytics.getInstance().endSession(this.channel, seconds, this.medias.length); 
+  }
 };

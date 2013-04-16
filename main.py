@@ -53,12 +53,12 @@ class MainHandler(BaseHandler):
       self.session['user'] = None
 
       mobile = self.request.host_url.startswith('http://m.') or self.request.get('mobile')
-      
+
       template_data = {}
       template_data['host_url'] = self.request.host_url
       if self.request.get('prod') or not constants.DEVELOPMENT:
         template_data['js_location'] = constants.MOBILE_PROD_JS if mobile else constants.PROD_JS
-      elif self.request.get('adv'): 
+      elif self.request.get('adv'):
         template_data['js_location'] = constants.ADV_JS
       else:
         template_data['js_location'] = constants.MOBILE_JS_SOURCE if mobile else constants.SIMPLE_JS
@@ -73,6 +73,7 @@ class MainHandler(BaseHandler):
       # LINKS
       channel_id = self.request.get('c')
       media_id = self.request.get('m')
+
       if path:
         link = Link.get_by_path(path)
         if link:
@@ -219,6 +220,7 @@ def create_handlers_map():
     ('/admin/init', admin.InitProgrammingHandler),
     ('/admin/storysort', admin.StorySortHandler),
     ('/admin/setprogramming', admin.SetProgrammingHandler),
+    ('/admin/live', admin.LiveHandler),
     
     # Resources
     ('/images/(.*)/(.*)', ImagesHandler),

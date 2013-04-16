@@ -63,26 +63,33 @@ brkn.model.BrowserChannel.prototype.onMessage_ = function(rawMessage) {
 	  case 'viewer_change':
 	    var user = brkn.model.Users.getInstance().get_or_add(message['user']);
 
-	    var time = goog.date.fromIsoString(message['time'] + 'Z');
-	    if (user.currentSession) {
+	    var time = message['time'] && goog.date.fromIsoString(message['time'] + 'Z'); 
+	    if (user.currentSession && time) {
 	      user.currentSession.end(time); 
-	    }
+	    } 
 
-	    if (message['last_channel_id']) {
-  	    var lastChannel = brkn.model.Channels.getInstance().get(message['last_channel_id']);
+	    var lastChannel = message['last_channel_id'] && brkn.model.Channels.getInstance().get(message['last_channel_id']);
+	    if (lastChannel) {
   	    lastChannel.publish(brkn.model.Channel.Action.REMOVE_VIEWER, user);
   	    user.currentMedia && user.currentMedia.publish(brkn.model.Media.Actions.WATCHING, user,
   	        lastChannel, true);
 	    }
 
 	    var channel = message['channel_id'] && brkn.model.Channels.getInstance().get(message['channel_id']);
+	    var media = message['media'] && brkn.model.Medias.getInstance().getOrAdd(message['media']);
 	    if (channel) { /* Might be a private channel */
+	      time = time || new goog.date.DateTime();
 	      var session = new brkn.model.Session(message['session_id'], user, channel, time);
 	      user.currentSession = session;
 	      channel.publish(brkn.model.Channel.Action.ADD_VIEWER, session);
 	      var program = channel.getCurrentProgram();
-	      program && program.media.publish(brkn.model.Media.Actions.WATCHING, user, channel);
+	      media = program ? program.media : media;
 	    }
+
+	    if (media) {
+	      media.publish(brkn.model.Media.Actions.WATCHING, user, channel);
+	    }
+
 	    break;
 	  case 'new_comment':
 	    var comment = new brkn.model.Comment(message['comment']);

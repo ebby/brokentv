@@ -14,6 +14,9 @@ class WebChannelConnectedHandler(BaseHandler):
 
 class WebChannelDisconnectedHandler(BaseHandler):
   def post(self):
+    if self.session.get('user'):
+      del self.session['user']
+
     client_id = self.request.get('from')
     def remove_client(clients, client_id):
       if clients.get(client_id):
@@ -33,20 +36,16 @@ class WebChannelDisconnectedHandler(BaseHandler):
         last_session = user_sessions[0]
         last_session.end_session()
 
-      web_channels = memcache_cas('current_viewers', remove_client, client_id)
+      web_channels = memcache_cas('current_viewers', remove_client, channel_id)
 
       if channel_viewers.get(user_sessions[0].channel.id) and \
           client_id in channel_viewers[user_sessions[0].channel.id]:
-        client = memcache.Client()
-        for i in range(3):
-          channel_viewers = client.gets('channel_viewers')
-          if client_id in channel_viewers[user_sessions[0].channel.id]:
-            channel_viewers[user_sessions[0].channel.id].remove(client_id)
-          set = client.cas('channel_viewers', channel_viewers)
-          if set:
-            break
-        if not set:
-          memcache.set('channel_viewers', channel_viewers)
+        def remove_channel_viewer(channel_viewers, client_id, channel_id):
+          if client_id in channel_viewers[channel_id]:
+            channel_viewers[channel_id].remove(client_id)
+          return channel_viewers
+        channel_viewers = memcache_cas('channel_viewers', remove_channel_viewe, client_id,
+                                       user_sessions[0].channel.id)
 
       if last_session:    
         broadcast.broadcastViewerChange(user, last_session.channel.id, None, last_session.id,

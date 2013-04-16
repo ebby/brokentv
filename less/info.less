@@ -138,6 +138,15 @@ div#sidebar div.info {
     &.scrolled div.link-select {
       display: none;
     }
+    div.scrollable {
+      height: 200px;
+      .scroll-y();
+      padding-right: 14px;
+      margin-right: -14px;
+      position: absolute;
+      top: 0;
+      z-index: 0;
+    }
   }
   img.thumb {
     height: 70px;
@@ -159,17 +168,21 @@ div#sidebar div.info {
     }
     a.prev-link {
       position: absolute;
-      right: 10px;
+      right: -8px;
     }
-  }
-  div.scrollable {
-    height: 200px;
-    .scroll-y();
-    padding-right: 14px;
-    margin-right: -14px;
-    position: absolute;
-    top: 0;
-    z-index: 0;
+    div.globe-icon {
+      .icon-globe();
+      display: inline-block;
+      margin-right: 5px;
+    }
+    div.friends-icon {
+      .icon-users();
+      display: inline-block;
+      margin-right: 5px;
+    }
+    div.status {
+      display: inline-block;
+    }
   }
   div.title {
     position: relative;
@@ -200,12 +213,12 @@ div#sidebar div.info {
     width: 250px;
     margin-top: 181px;
     font-size: 12px;
-    margin-left: 10px;
+    margin-left: 9px;
     padding-bottom: 5px;
     border-bottom: 1px solid #dedede;
   }
   div.description {
-    width: 260px;
+    width: 250px;
     min-height: 150px;
     position: relative;
     margin-right: 5px;
@@ -286,6 +299,10 @@ div#sidebar div.info {
       margin-top: -6px;
       margin-left: -6px;
     }
+  }
+  div.info-contents {
+    position: relative;
+    overflow: hidden;
   }
   div.viewers {
     position: relative;

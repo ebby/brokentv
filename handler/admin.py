@@ -431,3 +431,20 @@ class RescheduleProgramHandler(BaseHandler):
         # Update memcache
         Program.get_current_programs([channel])
         #broadcastProgramChanges(channel, effected)
+        
+class LiveHandler(BaseHandler):
+    @BaseHandler.admin
+    def post(self):
+      id = self.request.get('id')
+      channel_id = self.request.get('channel_id')
+      start_time = self.request.get('start_time')
+      end_time = self.request.get('end_time')
+
+      start_time = iso8601.parse_date(start_time).replace(tzinfo=None)
+      end_time = iso8601.parse_date(end_time).replace(tzinfo=None)
+
+      live_media = Media.add_live(id, start_time, end_time)
+      channel = Channel.get_by_key_name(channel_id)
+      programming.Programming.add_program(channel, live_media, start_time)
+      
+      

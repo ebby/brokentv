@@ -21,6 +21,5 @@ class SetProgrammingHandler(webapp2.RequestHandler):
     channels = Channel.get_public()
     for c in channels:
       programming.Programming.set_programming(c.key().name(), queue='programming',
-                                              fetch_twitter=(not constants.DEVELOPMENT),
                                               schedule_next=False)
     

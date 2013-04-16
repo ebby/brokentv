@@ -87,7 +87,7 @@ div#sidebar {
         }
         div.back-button {
           width: 64px;
-          opacity: .85;
+          opacity: 1;
         }
       }
     }
@@ -117,11 +117,11 @@ div#sidebar {
         top: 5px;
         cursor: pointer;
         .transition(e('opacity .3s ease, width, .3s, ease'));
-        background: white;
-        .sprite-backbutton();
+        background: white @back-button;
         width: 0;
+        height: 30px;
         &:active {
-          .sprite-backbutton-active();
+          background-image: @back-button-active;
           div {
             color: #8d8d8d;
           }
@@ -232,10 +232,6 @@ div#sidebar {
         opacity: 1;
         visibility: visible;
         .transition-duration(500ms);
-        div.media-list {
-          padding-right: 14px;
-          margin-right: -14px;
-        }
       }
       &.right {
         .transform(e('translate3d(320px,0,0)'));
@@ -274,6 +270,10 @@ div#sidebar {
     }
     div.media-list {
       .scroll-y();
+      &.current {
+        padding-right: 14px;
+        margin-right: -14px;
+      }
       div.list-info {
         margin: 10px;
         display: table;
@@ -315,7 +315,7 @@ div#sidebar {
         }
       }
       div.medias {
-        margin: 10px;
+        margin: 9px;
         padding-bottom: 5px;
       }
     }
@@ -546,8 +546,7 @@ div#sidebar {
     background: rgba(0, 0, 0, .6);
     .border-radius(6px);
     div.loading-spinner {
-      background: @spinner no-repeat center;
-      background-size: 50px;
+      background: @spinner3 no-repeat center;
       width: 90px;
       height: 90px;
     }
@@ -846,6 +845,40 @@ div#sidebar {
         bottom: 3px;
         right: 5px;
         font-size: 10px;
+      }
+      div.tweet-options {
+        position: absolute;
+        height: 9px;
+        top: 5px;
+        right: 5px;
+        visibility: hidden;
+        opacity: 0;
+        color: #f5f5f5;
+        text-shadow: 1px 1px 1px #181818;
+        .transition(opacity, .2s, ease);
+        background: rgba(0, 0, 0, .5);
+        padding: 5px;
+        .border-radius(3px);
+        border: 1px solid #888;
+        div.remove {
+          .icon-close();
+          cursor: pointer;
+          margin-left: 6px;
+          float: right;
+          margin-top: -1px;
+          font-size: 12px;
+        }
+        div.reply {
+          .icon-reply();
+          cursor: pointer;
+          float: right;
+          margin-top: -2px;
+          font-size: 12px;
+        }
+      }
+      &:hover div.tweet-options {
+        visibility: visible;
+        opacity: .7;
       }
     }
     div.dot-nav {

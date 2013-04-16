@@ -97,6 +97,16 @@ class Programming():
     
     logging.info('GAP: ' + str(gap))
 
+    if programming.get(channel_id) and len(programming[channel_id]) and \
+        programming[channel_id][0]['media'].get('live') == True:
+      logging.info('live tweets')
+      # Update tweets for live events
+      media = Media.get_by_key_name(programming[channel_id][0]['media']['id'])
+      deferred.defer(Programming.fetch_related_tweets, [],
+                     _name='twitter-' + channel_id + '-' + str(uuid.uuid1()),
+                     _queue='twitter',
+                     _countdown=30)
+
     programs = []
     if not programming.get(channel_id) or gap > 60:
       channel = Channel.get_by_key_name(channel_id)
@@ -198,6 +208,19 @@ class Programming():
                      _countdown=next_gen,
                      _queue=queue)
     return programs
+  
+  @classmethod
+  def add_program(self, channel, media, time):
+    programming = memcache.get('programming') or {}
+    program = Program.add_program(channel, media, time=time, min_time=time, max_time=(time + datetime.timedelta(media.duration + 50)))
+    logging.info(program)
+    if program:
+      if not programming.get(channel.id, None):
+        programming[channel.id] = []
+      programming.get(channel.id).append(program.toJson(fetch_channel=False, fetch_media=True, media_desc=False, pub_desc=False))
+      logging.info('ADDING LIVE: ' + media.name + ' at: ' + program.time.isoformat())
+
+    memcache.set('programming', programming)
   
   '''
     Our secret sauce sorting algorithm

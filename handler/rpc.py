@@ -36,6 +36,7 @@ def get_session(current_user, media_id=None, channel_id=None, single_channel_id=
   # Tack on the user's private channel if it exists, and programming
   user_channel = current_user.channel.get()
   
+  media = None
   if media_id:
     media = Media.get_by_key_name(media_id)
     if media:
@@ -91,10 +92,10 @@ def get_session(current_user, media_id=None, channel_id=None, single_channel_id=
     session = UserSession.new(current_user, current_channel, with_friends=with_friends)
 
   # TRACK ALL USERS
-  def add_current_viewer(current_viewers, uid, session):
-    current_viewers[uid] = session
+  def add_current_viewer(current_viewers, uid, sid):
+    current_viewers[uid] = sid
     return current_viewers
-  current_viewers = memcache_cas('current_viewers', add_current_viewer, current_user.id, session.toJson())
+  current_viewers = memcache_cas('current_viewers', add_current_viewer, current_user.id, session.id)
   
   # Track current viewers by channel, useful for audience tailoring
   channel_viewers = memcache.get('channel_viewers') or {}
@@ -110,10 +111,11 @@ def get_session(current_user, media_id=None, channel_id=None, single_channel_id=
   # Grab sessions for current_users (that we care about)
   # TODO cache last session for each user
   viewer_sessions = [session.toJson()]
-  for uid,sess in [tuple for tuple in current_viewers.iteritems() if \
+  for uid,sess_id in [tuple for tuple in current_viewers.iteritems() if \
                    (tuple[0] in current_user.friends or \
                     (current_user.demo and tuple[0] in SUPER_ADMINS))]:
-    viewer_sessions.append(sess)
+    sess = UserSession.get_by_id(int(sess_id))
+    viewer_sessions.append(sess.toJson())
   data['viewer_sessions'] = viewer_sessions
 
   # ME
@@ -126,7 +128,7 @@ def get_session(current_user, media_id=None, channel_id=None, single_channel_id=
   current_user.put()
 
   broadcast.broadcastViewerChange(current_user, None, current_channel.id,
-                                  session.key().id(), session.tune_in.isoformat());
+                                  session.key().id(), session.tune_in.isoformat(), media);
 
   return data
 
@@ -149,6 +151,7 @@ class SessionHandler(BaseHandler):
       media_id = self.session.get('media_id', None)
       channel_id = self.session.get('channel_id', None)
       single_channel_id = self.session.get('single_channel_id', None)
+      self.session['channel_id'] = None
 
       if not data.get('error'):
         data = get_session(self.current_user, media_id=media_id, channel_id=channel_id,
@@ -201,6 +204,8 @@ class ProgramHandler(BaseHandler):
       program = Program.add_program(channel, media,
                                     time=(datetime.datetime.now() if now else None), 
                                     async=True)
+      broadcast.broadcastViewerChange(self.current_user, None, channel.id,
+                                    None, None, media);
       self.response.out.write(simplejson.dumps(program.toJson(False)))
       
 class InfoHandler(BaseHandler):
@@ -387,7 +392,8 @@ class ChangeChannelHandler(BaseHandler):
       Media.add_opt_in(current_program.media.key().name(), self.current_user.id)
 
     broadcast.broadcastViewerChange(self.current_user, last_channel_id, channel_id,
-                                    session.key().id(), session.tune_in.isoformat());
+                                    session.key().id(), session.tune_in.isoformat(),
+                                    (current_program.media if current_program else None));
 
 class CollectionsMediaHandler(BaseHandler):
   @BaseHandler.logged_in

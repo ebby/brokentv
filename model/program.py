@@ -39,7 +39,8 @@ class Program(db.Model):
     program = None
     if not time:
       time = channel.next_time or datetime.datetime.now()
-    time = max(time, datetime.datetime.now())
+    if not media.live:
+      time = max(time, datetime.datetime.now())
     if async or min_time.replace(microsecond=0) <= time.replace(microsecond=0) <= max_time.replace(microsecond=0):
       program = Program(media=media, channel=channel,
                         time=time,
@@ -61,7 +62,7 @@ class Program(db.Model):
     program = Program.atomic_add(media=media, channel=channel, time=time, min_time=min_time,
                                  max_time=max_time, async=async)
     if program:
-      if constants.SAVE_PROGRAMS:
+      if constants.SAVE_PROGRAMS or async:
         channelProgram = ChannelProgram(channel=channel, program=program, time=program.time)
         channelProgram.put()
 

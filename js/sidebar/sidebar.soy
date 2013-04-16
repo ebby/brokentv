@@ -44,25 +44,33 @@
         <div class="button plus"><div class="icon"></div></div>
       </div>
     </div>
-    <div class="viewers" style="display: none">
-      <div class="label">SEEN</div>
-    </div>
-    <div class="tweet-holder" style="display:none">
-      <div class="label"><a class="tweets-link">LATEST TWEETS</a></div>
-      <div class="tweets"></div>
-      <div class="dot-nav"></div>
-    </div>
-    <div class="comments-holder ios-scroll" style="display:none">
-      <div class="label">
-        <a class="conv-link">CONVERSATION</a>
-        {if $lastMediaId}
-          <a class="prev-link">&#10218; LAST PROGRAM</a>
-        {/if}
+    <div class="info-contents">
+      <div class="scrollable ios-scroll">
+        <div class="tweet-holder" style="display:none">
+          <div class="label"><div class="globe-icon"></div><a class="tweets-link">LATEST TWEETS</a></div>
+          <div class="tweets"></div>
+          <div class="dot-nav"></div>
+        </div>
+        <div class="viewers" style="display: none">
+          <div class="label">
+            <div class="friends-icon"></div>
+            <div class="status">SEEN</div>
+          </div>
+        </div>
+        <div class="comments-holder ios-scroll" style="display:none">
+          <div class="label">
+            <div class="friends-icon"></div>
+            <a class="conv-link">CONVERSATION</a>
+            {if $lastMediaId}
+              <a class="prev-link">&#10218; LAST PROGRAM</a>
+            {/if}
+          </div>
+          <div class="no-comments" style="display:none">Start the conversation with friends.</div>
+          <div class="comments"></div>
+          <div class="top-grad"></div>
+          <div class="bottom-grad"></div>
+        </div>
       </div>
-      <div class="no-comments" style="display:none">Start the conversation.</div>
-      <div class="comments"></div>
-      <div class="top-grad"></div>
-      <div class="bottom-grad"></div>
     </div>
     <div class="loading loading-activity"><div class="loading-spinner"></div></div>
     <div class="overlay" style="display: none">
@@ -90,9 +98,10 @@
  * @param tweet
  * @param text
  * @param timestamp
+ * @param prefix
  */
 {template .tweet}
-  <div class="tweet">
+  <div class="tweet" id="{$prefix}-{$tweet.id}">
     {if $tweet.user}
       <a href="#user:{$tweet.user.id}"><img src="{$tweet.picture}"/></a>
     {else}
@@ -105,6 +114,9 @@
       {$text|noAutoescape}
     </div>
     <div class="timestamp">{$timestamp}</div>
+    <div class="tweet-options">
+      <div class="reply"></div>
+    </div>
   </div>
 {/template}
 

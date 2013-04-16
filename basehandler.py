@@ -51,12 +51,12 @@ class BaseHandler(SessionRequest):
                     waitlist_email.send(user)
                 elif user.access_token != cookie["access_token"]:
                     user.access_token = cookie["access_token"]
-                
+
                 # Update friends graph
                 friends = graph.get_connections("me", "friends")['data']
                 user.friends = [f['id'] for f in friends]
                 user.put()
-                
+
                 # User is now logged in
                 self.session["user"] = user.to_session()
                 return user

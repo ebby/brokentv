@@ -7,9 +7,52 @@
     .iphone div#sidebar {
       min-height: 505px;
     }
+    div#sidebar {
+      
+      div.list-media {
+        div.media {
+          div.preview {
+            div.thumb {
+              opacity: .7;
+            }
+            div.list-play {
+              visibility: visible;
+              opacity: .95;
+            }
+            div.title, div.published {
+              color: #f7f7f7;
+              text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5), -1px -1px rgba(0, 0, 0, 0.5),
+                  1px -1px 1px rgba(0, 0, 0, 0.5), -1px 1px rgba(0, 0, 0, 0.5);
+            }
+            div.approve, div.remove, div.repos, div.play {
+              filter: invert(100%);
+              -webkit-filter: invert(100%);
+              -moz-filter: invert(100%);
+              -o-filter: invert(100%);
+              -ms-filter: invert(100%);
+            }
+          }
+        }
+      }
+      div.info {
+        div.picture {
+          div.play {
+            opacity: 1;
+            visibility: visible;
+          }
+        }
+      }
+    }
   }
   div#login {
     min-height: 505px;
+    &.hide {
+      div#homepage {
+        &.show {
+          .transition(none);
+        }
+      }
+    }
     &.expanded {
       div#homepage {
         top: -40px;
@@ -93,6 +136,31 @@
         }
         a:hover {
           text-decoration: none;
+        }
+      }
+    }
+  }
+}
+
+@media handheld, only screen and (max-height: 640px), only screen and (max-device-height: 640px) {
+  div#sidebar {
+    div.info {
+      div.info-contents{
+        -webkit-overflow-scrolling: touch;
+        width: 100%;
+        height: 100%;
+        div.scrollable {
+          .scroll-y();
+          padding-right: 29px;
+          margin-right: -29px;
+          position: absolute;
+          top: 0;
+          z-index: 0;
+          height: 100%;
+          width: 300px;
+        }
+        div.comments-holder {
+          padding-bottom: 5px;
         }
       }
     }
