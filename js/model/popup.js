@@ -23,5 +23,6 @@ goog.addSingletonGetter(brkn.model.Popup);
 brkn.model.Popup.Action = {
 	ON_HIDE: 'on-hide',
 	SELECT_PROGRAM: 'select-program',
-  SHARE: 'share'
+  SHARE: 'share',
+  HIDE: 'hide'
 };

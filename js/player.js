@@ -72,6 +72,13 @@ brkn.Player.prototype.spinner_;
 
 
 /**
+ * @type {Element}
+ * @private
+ */
+brkn.Player.prototype.restart_;
+
+
+/**
  * @type {number}
  * @private
  */
@@ -104,6 +111,7 @@ brkn.Player.prototype.enterDocument = function() {
   this.stagecover_ = goog.dom.getElement('stagecover');
   this.message_ = goog.dom.getElementByClass('message', this.stagecover_);
   this.spinner_ = goog.dom.getElementByClass('spinner', this.stagecover_);
+  this.restart_ = goog.dom.getElementByClass('restart', this.stagecover_);
   
   this.updateStagecover_();
 
@@ -141,6 +149,13 @@ brkn.Player.prototype.enterDocument = function() {
         e.preventDefault();
       }, this))
       .listen(this.getElement(), goog.events.EventType.DBLCLICK, goog.bind(this.toggleExpand_, this))
+      .listen(this.restart_, goog.events.EventType.CLICK, goog.bind(function(e) {
+        e.preventDefault();
+        e.stopPropagation()
+        if (this.currentProgram_) {
+          this.playProgram(this.currentProgram_);
+        }
+      }, this))
       .listen(expandEl, goog.events.EventType.CLICK, goog.bind(this.toggleExpand_, this))
       .listen(this.getElement(), goog.events.EventType.MOUSEMOVE, goog.bind(function(e) {
         var xPer = e.offsetX/this.height_;
@@ -315,6 +330,8 @@ brkn.Player.prototype.play = function(media, opt_tries) {
       var tries = opt_tries || 0;
       if (!this.player_.getPlayerState() && tries < 4) {
         this.play(media, ++tries);
+      } else if (tries >= 4) {
+        this.updateStagecover_(undefined, undefined, true);
       }
     }, this), retry);
   }
@@ -328,8 +345,10 @@ brkn.Player.prototype.resize = function() {
   var playerEl = goog.dom.getElement('ytplayer');
   var stagecover = goog.dom.getElement('stagecover');
   var message = goog.dom.getElementByClass('message', stagecover)
-  var guideHeight = 40;
-  var sidebarWidth = goog.dom.classes.has(goog.dom.getElement('sidebar'), 'toggled')  ? 320 : 0;
+  var guideHeight = goog.dom.getElement('guide').style.height;
+  guideHeight = guideHeight.substring(0, guideHeight.length - 2);
+  guideHeight = brkn.model.Controller.getInstance().guideToggled ? guideHeight : 40;
+  var sidebarWidth = brkn.model.Controller.getInstance().sidebarToggled ? 320 : 0;
   this.width_ = goog.dom.getViewportSize().height - guideHeight;
   this.height_ = goog.dom.getViewportSize().width - sidebarWidth;
   goog.style.setHeight(playerEl, goog.dom.getViewportSize().height - guideHeight);
@@ -446,32 +465,45 @@ brkn.Player.prototype.onPlayerReady_ = function(event) {
 brkn.Player.prototype.onPlayerError_ = function(event) {
   goog.DEBUG && window.console.log(event);
   brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.NO_MEDIA);
+  this.updateStagecover_(undefined, undefined, true);
 };
 
 
 /**
  * @param {?string=} opt_message
  * @param {?boolean=} opt_beforeEnd
+ * @param {?boolean=} opt_restart
  * @private
  */
-brkn.Player.prototype.updateStagecover_ = function(opt_message, opt_beforeEnd) {
+brkn.Player.prototype.updateStagecover_ = function(opt_message, opt_beforeEnd, opt_restart) {
   var stagecover = goog.dom.getElement('stagecover');
 //  var seek = this.currentProgram_ ? (goog.now() - this.currentProgram_.time.getTime())/1000 : 0;
   var seek = this.currentProgram_ ? brkn.model.Player.getInstance().getCurrentTime() : 0;
+  
+  if (opt_restart) {
+    goog.style.showElement(this.spinner_, false);
+    goog.style.showElement(this.restart_, true);
+    goog.dom.classes.add(stagecover, 'covered');
+    return;
+  }
+  
   if (!this.currentProgram_ || (this.currentProgram_ && seek > this.currentProgram_.media.duration)) {
     brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.NO_MEDIA);
     goog.dom.setTextContent((/** @type {Element} */ this.message_.firstChild),
         brkn.Player.Messages.OFFLINE);
     goog.style.showElement(this.spinner_, false);
+    goog.style.showElement(this.restart_, false);
     goog.dom.classes.add(stagecover, 'covered');
   } else if ((this.playerState_ != YT.PlayerState.PLAYING &&
       this.playerState_ != YT.PlayerState.PAUSED) || opt_beforeEnd) {
     goog.dom.setTextContent((/** @type {Element} */ this.message_.firstChild),
         brkn.Player.Messages.LOADING);
     goog.style.showElement(this.spinner_, true);
+    goog.style.showElement(this.restart_, false);
     goog.dom.classes.add(stagecover, 'covered');
   } else {
     goog.style.showElement(this.spinner_, false);
+    goog.style.showElement(this.restart_, false);
     goog.dom.classes.remove(stagecover, 'covered');
   }
   goog.style.setOpacity(stagecover, this.playerState_ == YT.PlayerState.BUFFERING ? .9 : 1);

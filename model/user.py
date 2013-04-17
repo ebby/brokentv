@@ -25,6 +25,7 @@ class User(db.Model):
     post_twitter = db.BooleanProperty(default=False)
     demo = db.BooleanProperty(default=False)
     welcomed = db.BooleanProperty(default=False)
+    email_reply = db.BooleanProperty(default=True)
     
     # Stats
     session_count = db.IntegerProperty(default=0)

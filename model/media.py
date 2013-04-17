@@ -45,6 +45,10 @@ class Media(db.Model):
       self.put()
     return constants.SHARE_URL + self.path
 
+  @property
+  def thumb(self): 
+    return 'http://i.ytimg.com/vi/%s/0.jpg' % self.host_id
+
   @classmethod
   def get(cls, id):
     media = Media.get_by_id(id)

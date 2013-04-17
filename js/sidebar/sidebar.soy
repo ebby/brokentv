@@ -86,9 +86,10 @@
 
 /**
  * @param user
+ * @param firstName
  */
 {template .viewer}
-  <div class="viewer">
+  <div class="viewer" name="{$firstName}">
     <img src="{$user.picture}">
   </div>
 {/template}

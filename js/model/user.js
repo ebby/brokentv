@@ -114,6 +114,10 @@ brkn.model.User = function(user) {
    * @type {boolean}
    */
   this.postTwitter = user['post_twitter'] != undefined ? user['post_twitter'] : true;
+  
+  this.subscribe(brkn.model.User.Actions.TWITTER_AUTH, function() {
+    this.postTwitter = true;
+  }, this);
 };
 goog.inherits(brkn.model.User, goog.pubsub.PubSub);
 

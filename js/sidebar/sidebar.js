@@ -212,8 +212,6 @@ brkn.Sidebar.prototype.enterDocument = function() {
             var tabName = goog.dom.classes.get(tab)[0];   
             this.tabNav_(this.currentTab_, tabName); 
             goog.dom.classes.add(tab, 'selected');
-//            goog.style.setPosition(goog.dom.getElementByClass('arrow', this.toolbar_),
-//                goog.style.getSize(tab).width/2 + goog.style.getPosition(tab).x);
             this.updateArrow_();
             if (lastTab != this.currentTab_) {
               e.stopPropagation();
@@ -350,24 +348,12 @@ brkn.Sidebar.prototype.tabNav_ = function(from, to) {
     if ((right && i > toIndex) || (!right && i < toIndex)) {
       goog.dom.classes.add(tab, 'right');
       goog.dom.classes.remove(tab, 'left');
-//      goog.style.setStyle(tab, {
-//        'left': '',
-//        'right': ''
-//      });
     } else if ((right && i < toIndex) || (!right && i > toIndex)) {
       goog.dom.classes.enable(tab, 'left', right);
       goog.dom.classes.add(tab, 'right');
-//      goog.style.setStyle(tab, {
-//        'left': right ? '-300px' : '',
-//        'right': ''
-//      });
     } else if (i == toIndex) {
       goog.dom.classes.remove(tab, 'right');
       goog.dom.classes.remove(tab, 'left');
-//      goog.style.setStyle(tab, {
-//        'right': right ? 0 : '',
-//        'left': ''
-//      });
       break;
     }
   }
@@ -388,41 +374,20 @@ brkn.Sidebar.prototype.tabNav_ = function(from, to) {
  */
 brkn.Sidebar.prototype.navigate = function(to, opt_back, opt_title) {
   if (to == this.currentScreen_) {
+    if (opt_title) {
+      goog.dom.setTextContent(goog.dom.getElementByClass('back-title', this.toolbar_), opt_title);
+    }
     return;
   }
   
   var isScreen = goog.dom.classes.has(this.currentScreen_, 'screen');
   if (opt_back) {
     goog.dom.classes.remove(this.currentScreen_, 'on');
-//    goog.dom.classes.add(this.currentScreen_, 'right');
-//    goog.dom.classes.remove(this.currentScreen_, 'left');
-//    goog.dom.classes.add(to, 'left');
-//    goog.dom.classes.remove(to, 'right');
-//    goog.style.setStyle(this.currentScreen_, {
-//      'left': '',
-//      'right': 0
-//    });
-//    goog.style.setStyle(to, {
-//      'right': '',
-//      'left': 0,
-//      'width': ''
-//    });
     goog.dom.classes.remove(this.currentScreen_, 'current');
     goog.dom.classes.add(to, 'current');
     this.currentScreen_ = to;
   } else {
-//    goog.dom.classes.remove(this.currentScreen_, 'right');
     goog.dom.classes.enable(this.currentScreen_, 'on', !isScreen);
-//    goog.dom.classes.add(to, 'right');
-//    goog.dom.classes.remove(to, 'left');
-//    goog.style.setStyle(this.currentScreen_, {
-//      'left': isScreen ? 0 : '',
-//      'right': ''
-//    });
-//    goog.style.setStyle(to, {
-//      'right': 0,
-//      'left': ''
-//    });
     goog.array.insertAt(this.screens_, [this.currentScreen_,
         goog.dom.getTextContent(goog.dom.getElementByClass('back-title', this.toolbar_))], 0);
     goog.dom.classes.remove(this.currentScreen_, 'current');

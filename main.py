@@ -67,6 +67,11 @@ class MainHandler(BaseHandler):
       if not constants.DEVELOPMENT or self.request.get('css') or self.request.get('prod'):
         template_data['css_location'] = constants.CSS_SOURCE
 
+      self.session['message'] = None
+      # MAIL UNSUB
+      if self.request.get('unsub') == '1':
+        self.session['message'] = 'You are unsubscribed'
+
       # SINGLE CHANNEL
       self.session['single_channel_id'] = self.request.get('sc')
 
@@ -116,6 +121,16 @@ class StatsHandler(BaseHandler):
       template_data['js_location'] = constants.STATS_JS_SOURCE
       path = os.path.join(os.path.dirname(__file__), 'templates/stats.html')
       self.response.out.write(template.render(path, template_data))
+      
+class UnsubscribeHandler(BaseHandler):
+  @BaseHandler.logged_in
+  def get(self):
+    type = self.request.get('type')
+    if type == 'reply':
+      current_user = self.current_user
+      current_user.email_reply = False
+      current_user.put()
+    self.redirect('/?unsub=1')
 
 class NameStormHandler(BaseHandler):
     @BaseHandler.super_admin
@@ -235,6 +250,7 @@ def create_handlers_map():
     
     # Pages
     ('/', MainHandler),
+    ('/unsubscribe', UnsubscribeHandler),
     ('/admin', AdminHandler),
     ('/stats', StatsHandler),
     ('/deck', PitchHandler),

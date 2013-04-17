@@ -1,6 +1,5 @@
 @import "functions.less";
 @import "images.less";
-@import "sprite.less";
 @import "icons.less";
 @import "buttons.less";
 @import "controller.less";
@@ -79,6 +78,49 @@ div, li, a {
 
 .ios-scroll {
   -webkit-overflow-scrolling: touch;
+}
+
+div#hovercard {
+  text-align: center;
+  .transition(opacity, .3s, ease);
+  position: absolute;
+  padding: 5px;
+  white-space: nowrap;
+  margin-left: -14px;
+  .border-radius(3px);
+  background: #dedede;
+  .box-shadow(e('0 0 4px 1px rgba(0, 0, 0, .4), 0px 1px 0 0px rgba(0, 0, 0,.4)'));
+  font-size: 11px;
+  font-family: MuseoSans700;
+  color: #181818;
+  text-shadow: 1px 1px 1px white;
+  border: 1px solid rgba(0, 0, 0, .6);
+  pointer-events: all;
+  cursor: pointer;
+  z-index: 999999;
+  &:after, &:before {
+    top: 100%;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+  }
+  &:after {
+    border-color: rgba(222, 222, 222, 0);
+    border-top-color: #dedede;
+    border-width: 5px;
+    left: 50%;
+    margin-left: -5px;
+  }
+  &:before {
+    border-color: rgba(204, 204, 204, 0);
+    border-top-color: rgba(0, 0, 0, .6);
+    border-width: 6px;
+    left: 50%;
+    margin-left: -6px;
+  }
 }
 
 @import "mobile.less";

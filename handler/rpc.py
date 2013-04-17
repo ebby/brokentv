@@ -156,6 +156,8 @@ class SessionHandler(BaseHandler):
       if not data.get('error'):
         data = get_session(self.current_user, media_id=media_id, channel_id=channel_id,
                            single_channel_id=single_channel_id)
+      if self.session.get('message'):
+        data['message'] = self.session['message']
       self.response.out.write(simplejson.dumps(data))
 
 class SettingsHandler(BaseHandler):
@@ -250,8 +252,13 @@ class CommentHandler(BaseHandler):
     tweet = self.request.get('tweet') == 'true'
     facebook = self.request.get('facebook') == 'true'
     parent_id = self.request.get('parent_id')
+    to_user_id = self.request.get('to_user_id')
+    to_user = None
 
     if media and text:
+      if to_user_id and to_user_id != self.current_user.id:
+        to_user = User.get_by_key_name(to_user_id)
+      
       acl = self.current_user.friends + [self.current_user.id]
       if self.current_user.demo:
         acl += SUPER_ADMINS
@@ -263,6 +270,8 @@ class CommentHandler(BaseHandler):
         client = oauth.TwitterClient(constants.TWITTER_CONSUMER_KEY,
                                      constants.TWITTER_CONSUMER_SECRET,
                                      self.request.host_url + '/_twitter/callback')
+        if to_user and to_user.twitter_handle:
+          text = '@' + to_user.twitter_handle + ' ' + text
         text += ' ' + media.link
         response = client.update_status(text, self.current_user.twitter_token,
                                         self.current_user.twitter_secret)
@@ -278,7 +287,7 @@ class CommentHandler(BaseHandler):
       current_user.put()
       
       Stat.add_comment(self.current_user, facebook, tweet)
-      broadcast.broadcastNewComment(c, new_tweet);
+      broadcast.broadcastNewComment(c, new_tweet, to_user, self.request.host_url);
 
       response = {
                   'comment': c.toJson(),
@@ -474,7 +483,7 @@ class TwitterCallbackHandler(BaseHandler):
     self.current_user.set_twitter_info(user_info)
     broadcast.broadcastTwitterAuth(self.current_user)
     self.response.out.write('<script>window.close()</script>')
-    
+
 class WelcomedHandler(BaseHandler):
   @BaseHandler.logged_in
   def post(self):

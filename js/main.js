@@ -95,6 +95,7 @@ brkn.Main.prototype.enterDocument = function() {
   this.sidebar_.decorate(goog.dom.getElement('sidebar'));
   this.player_.decorate(goog.dom.getElement('stage'));
   this.notify_.decorate(goog.dom.getElement('notify'));
+  this.popup_ = new brkn.Popup();
 
   if (!brkn.model.Users.getInstance().currentUser.welcomed) {
     this.welcome_(brkn.model.Users.getInstance().currentUser);
@@ -444,6 +445,11 @@ brkn.Main.getSessionAndInit = function(response) {
             var error = goog.dom.getElement('error');
             goog.dom.setTextContent(error, data['error']);
             brkn.Main.noLogin('error', 'Yikes...');
+            return;
+          } 
+          if (data['message']) {
+            var message = goog.dom.getElement('message');
+            goog.dom.setTextContent(message, data['message']);
             return;
           }
           var reveal = function() {

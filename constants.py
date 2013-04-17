@@ -56,7 +56,8 @@ def facebook_app(hostname=None):
   if DEVELOPMENT:
     return {
             'FACEBOOK_APP_ID': "164212930331128",
-            'FACEBOOK_APP_SECRET': "fd15a6f75af1cc786177f2c9e74f7424"
+            'FACEBOOK_APP_SECRET': "fd15a6f75af1cc786177f2c9e74f7424",
+            'APP_ACCESS_TOKEN': '164212930331128|nvTVKKFgSzcEzyivherB91YmRc8'
            }
   elif hostname and 'broken' in hostname:
     return {
@@ -66,7 +67,8 @@ def facebook_app(hostname=None):
   else:
     return {
             'FACEBOOK_APP_ID': "131936020298013",
-            'FACEBOOK_APP_SECRET': "d69567a45ca1a5313c06c5b615555227"
+            'FACEBOOK_APP_SECRET': "d69567a45ca1a5313c06c5b615555227",
+            'APP_ACCESS_TOKEN': '131936020298013|bGlXMsPD20Lxncmd_bIFzRWOXVo'
            }
 
 if DEVELOPMENT:

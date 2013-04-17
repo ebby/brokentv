@@ -118,6 +118,13 @@ brkn.Channel.YOUTUBE_DATA = 'https://gdata.youtube.com/feeds/api/videos/%s?v=2&a
 
 
 /**
+ * @type {boolean}
+ * @constant
+ */
+brkn.Channel.VIEWER_LINES = true;
+
+  
+/**
  * @type {number}
  * @constant
  */
@@ -399,7 +406,7 @@ brkn.Channel.prototype.addProgram = function(program) {
     goog.dom.classes.enable(programEl, 'stretched', program.media.thumbSize.height > 360);
   });
 	
-	 var offset = (program.time.getTime() - this.minTime_.getTime())/1000 * this.pixelsPerSecond_;
+	var offset = (program.time.getTime() - this.minTime_.getTime())/1000 * this.pixelsPerSecond_;
 
 	if (program.media.live) {
 	  var diff = (goog.now() - program.time.getTime())/1000
@@ -408,8 +415,8 @@ brkn.Channel.prototype.addProgram = function(program) {
 	  offset += cutoff;
 	}
 	
-	goog.style.setWidth(programEl, width - brkn.Channel.PROGRAM_PADDING);
-	goog.style.setPosition(programEl, offset);
+	goog.style.setWidth(programEl, Math.ceil(width - brkn.Channel.PROGRAM_PADDING));
+	goog.style.setPosition(programEl, Math.floor(offset));
 	goog.style.setPosition(this.suggestEl_, offset + width);
 	goog.dom.appendChild(this.programsEl_, programEl);
 	var clipped = width < 120;
@@ -541,7 +548,8 @@ brkn.Channel.prototype.addViewer = function(session) {
     if (!session.tuneOut || session.tuneOut.getTime() > this.minTime_.getTime()) {
       var lineEl = soy.renderAsElement(brkn.channel.line, {
         user: session.user,
-        firstName: session.user.firstName().toUpperCase()
+        firstName: session.user.firstName().toUpperCase(),
+        channelId: session.channel.id
       });
       goog.dom.appendChild(userEl, lineEl);
       var watchWith = goog.dom.getElementByClass('watch-with', lineEl);
@@ -553,9 +561,11 @@ brkn.Channel.prototype.addViewer = function(session) {
       goog.style.setPosition(lineEl, offset);
       goog.style.setStyle(lineEl, 'background', session.user.color);
       goog.style.setStyle(watchWith, 'margin-left', -goog.style.getSize(watchWith).width/2 + 14 + 'px');
-      this.getHandler().listen(lineEl, goog.events.EventType.CLICK, function() {
-        brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.PROFILE, session.user)
-      })
+      this.getHandler().listen(lineEl, goog.events.EventType.CLICK, function(e) {
+        if (!goog.dom.getAncestorByClass(e.target, 'watch-with')) {
+          brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.PROFILE, session.user)
+        }
+      });
     }
   }
 };
@@ -682,12 +692,6 @@ brkn.Channel.prototype.update = function() {
     // Update path
     this.constructPath();
   }
-  
-//  var delta = goog.style.getPosition(currentProgram).x + goog.style.getPosition(goog.dom.getElement('guide')).x;
-//  goog.object.forEach(this.programs_, function(p) {
-//    var title = goog.dom.getElementByClass('title', p);
-//    goog.style.setPosition(title, delta < 5 ? -delta + 10 : 5);
-//  });
  
   // Potentially move title for current program
   if (this.currentProgram_ && this.changeTime_ > 0) {
@@ -695,7 +699,7 @@ brkn.Channel.prototype.update = function() {
     var delta = goog.style.getPosition(currentProgram).x +
         goog.style.getPosition(goog.dom.getElement('guide')).x;
     var title = goog.dom.getElementByClass('title', currentProgram);
-    goog.style.setPosition(title, delta < 5 ? -delta + 10 : 5);
+    goog.style.setPosition(title, delta < 200 ? -delta + 200 + 10 : 5);
   } else {
     this.changeTime_++;
   }

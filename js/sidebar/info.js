@@ -139,6 +139,7 @@ brkn.sidebar.Info = function(media, opt_noFetch, opt_lastMedia, opt_lastInput) {
    * @private
    */
   this.resizeExtra_ = 0;
+
 };
 goog.inherits(brkn.sidebar.Info, goog.ui.Component);
 
@@ -260,6 +261,7 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
   this.playButton_.decorate(goog.dom.getElementByClass('play', this.getElement()));
   this.plusButton_.decorate(goog.dom.getElementByClass('plus', this.getElement()));
   this.tweetTimer_ = new goog.Timer(5000);
+  this.watchWith_ = goog.dom.getElementByClass('watch-with', this.getElement());
 
   if (!this.fetch_ || this.media_.fetched) {
     this.renderInfo(false, this.media_.description, this.media_.seen, this.media_.tweets,
@@ -491,7 +493,8 @@ brkn.sidebar.Info.prototype.renderInfo = function(fetched, description, seen, tw
       goog.style.showElement(this.viewersEl_, true);
       this.hasSeen_ = true;
       var viewerEl = soy.renderAsElement(brkn.sidebar.viewer, {
-        user: user
+        user: user,
+        firstName: user.firstName
       });
       goog.dom.appendChild(this.viewersEl_, viewerEl);
       this.viewerEls_[viewer.id] = viewerEl;
@@ -614,7 +617,8 @@ brkn.sidebar.Info.prototype.onAddComment_ = function(e) {
       'POST',
       'media_id=' + this.media_.id + '&text=' + e.text +
       '&tweet=' + e.twitter + '&facebook=' + e.facebook +
-      (e.parentId ? '&parent_id=' + e.parentId : ''));
+      (e.parentId ? '&parent_id=' + e.parentId : '') +
+      (e.toUserId ? '&to_user_id=' + e.toUserId : ''));
 
   if (e.facebook && !e.parentId) {
     FB.api('/me/feed', 'POST', {
@@ -730,9 +734,25 @@ brkn.sidebar.Info.prototype.addViewer_ = function(user, opt_offline) {
       });
       this.viewerEls_[user.id] = viewerEl;
       goog.dom.insertChildAt(this.viewersEl_, viewerEl, 1);
-      this.getHandler().listen(viewerEl, goog.events.EventType.CLICK, function() {
-        brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.PROFILE, user);
-      });
+      this.getHandler()
+          .listen(viewerEl, goog.events.EventType.CLICK, function() {
+            brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.PROFILE, user);
+          })
+          .listen(viewerEl, goog.events.EventType.MOUSEOVER, function() {
+            var pos = goog.style.getPosition(viewerEl);
+            var containerPos = goog.style.getPosition(this.viewersEl_);
+            var hovercard = goog.dom.getElement('hovercard');
+            goog.dom.setTextContent(hovercard, user.firstName() +
+                (goog.dom.classes.has(viewerEl, 'online') ? ' is watching' : ' saw this'));
+            var cardSize = goog.style.getSize(hovercard);
+            hovercard.style.right = 320 - containerPos.x - pos.x - cardSize.width/2 - 12 + 'px';
+            hovercard.style.top = containerPos.y + pos.y + 210 + 'px';
+            goog.style.showElement(hovercard, true);
+          })
+          .listen(viewerEl, goog.events.EventType.MOUSEOUT, function(e) {
+            var hovercard = goog.dom.getElement('hovercard');
+            goog.style.showElement(hovercard, false);
+          });
     }
     goog.style.showElement(this.viewersEl_, true);
     goog.dom.setTextContent(goog.dom.getElementByClass('status', this.viewersEl_),
@@ -740,6 +760,7 @@ brkn.sidebar.Info.prototype.addViewer_ = function(user, opt_offline) {
     goog.dom.classes.add(this.viewerEls_[user.id], 'online');
   }
 };
+
 
 /**
  * @param {Event} e

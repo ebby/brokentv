@@ -40,10 +40,10 @@ brkn.Popup = function() {
    * @private
    */
   this.model_ = brkn.model.Popup.getInstance();
-  this.model_.subscribe(brkn.model.Popup.Action.SHARE,
-      this.showForShare_, this);
   this.model_.subscribe(brkn.model.Popup.Action.SELECT_PROGRAM,
       this.showForSelectProgram_, this);
+  this.model_.subscribe(brkn.model.Popup.Action.HIDE,
+      this.hide_, this);
 };
 goog.inherits(brkn.Popup, goog.ui.Popup);
 goog.addSingletonGetter(brkn.Popup);
@@ -198,89 +198,6 @@ brkn.Popup.prototype.onAddProgram_ = function(channel, video) {
 		'channel=' + channel.id +'&youtube_id=' + video.getVideoId());
 };
 
-
-/**
- * Show popup for a like object.
- * @param {Element} anchor The like element.
- * @private
- */
-brkn.Popup.prototype.showForShare_ = function(anchor) {
-  this.setVisible(false);
-  this.positionAtAnchor(anchor);
-
-  soy.renderElement(this.getContentElement(), brkn.popup.shareRecord, {
-    id: 1
-  });
-  FB.XFBML.parse(document.getElementById('fblike'));
-
-//  if (!like.hasData()) {
-//    // The category wasn't populated. Fetch the facebook data and fill in.
-//    like.fetchData(goog.bind(function() {
-//      var categoryEl = goog.dom.getElementByClass('category',
-//          this.getContentElement());
-//      goog.dom.setTextContent(categoryEl, like.getCategory());
-//    }, this));
-//  }
-//
-//  var likeEl = /** @type {Element} */ this.getContentElement().firstChild;
-//  goog.dom.classes.enable(likeEl, 'liked', isLiked);
-//
-//  var findLink = goog.dom.getElementByClass('find-link', likeEl);
-//
-//  var addButton = new goog.ui.CustomButton('ADD');
-//  addButton.addClassName('add-button');
-//  addButton.addClassName('blue');
-//  addButton.render(likeEl);
-//  addButton.setVisible(!isShared || isLiked);
-//
-//  var removeButton = new goog.ui.CustomButton('REMOVE');
-//  removeButton.addClassName('add-button');
-//  removeButton.addClassName('red');
-//  removeButton.render(likeEl);
-//
-//  var image = /** @type {Element} */ goog.dom.getElementByClass('picture',
-//      likeEl).firstChild;
-//
-//  this.handler_.
-//      listen(addButton,
-//          goog.ui.Component.EventType.ACTION,
-//          function() {
-//            this.addLike_(like);
-//            if (goog.dom.classes.has(likeEl, 'unliked')) {
-//              // Adding your own just removed like
-//              goog.dom.classes.remove(likeEl, 'unliked');
-//              goog.dom.classes.add(likeEl, 'liked');
-//            } else {
-//              // Adding a like from your partner
-//              addButton.setEnabled(false);
-//            }
-//          }).
-//      listen(removeButton,
-//          goog.ui.Component.EventType.ACTION,
-//          function() {
-//            this.likeToRemove_ = like.id;
-//            goog.dom.classes.remove(likeEl, 'liked');
-//            goog.dom.classes.add(likeEl, 'unliked');
-//          }).
-//      listen(findLink,
-//          goog.events.EventType.CLICK,
-//          goog.bind(this.onFindLink_, this, like)).
-//      listen(image,
-//          goog.events.EventType.LOAD,
-//          function() {
-//            goog.style.showElement(image, true);
-//            goog.Timer.callOnce(function() {
-//              if (image.clientHeight < 80) {
-//                goog.dom.classes.add(image, 'fix-height');
-//              }
-//              // Center the cropped picture.
-//              image.style.marginLeft = -1 * image.clientWidth / 2 + 'px';
-//              image.style.marginTop = -1 * image.clientHeight / 2 + 'px';
-//            });
-//          });
-
-  this.setVisible(true);
-};
 
 
 

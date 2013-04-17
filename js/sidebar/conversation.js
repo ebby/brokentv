@@ -181,7 +181,8 @@ brkn.sidebar.Conversation.prototype.onAddComment_ = function(e) {
       'POST',
       'media_id=' + this.media_.id + '&text=' + e.text +
       '&tweet=' + e.twitter + '&facebook=' + e.facebook +
-      (e.parentId ? '&parent_id=' + e.parentId : ''));
+      (e.parentId ? '&parent_id=' + e.parentId : '') +
+      (e.toUserId ? '&to_user_id=' + e.toUserId : ''));
 
   if (e.facebook && !e.parentId) {
     FB.api('/me/feed', 'POST', {

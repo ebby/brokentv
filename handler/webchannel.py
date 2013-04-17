@@ -36,7 +36,7 @@ class WebChannelDisconnectedHandler(BaseHandler):
         last_session = user_sessions[0]
         last_session.end_session()
 
-      web_channels = memcache_cas('current_viewers', remove_client, channel_id)
+      web_channels = memcache_cas('current_viewers', remove_client, client_id)
 
       if channel_viewers.get(user_sessions[0].channel.id) and \
           client_id in channel_viewers[user_sessions[0].channel.id]:
@@ -44,7 +44,7 @@ class WebChannelDisconnectedHandler(BaseHandler):
           if client_id in channel_viewers[channel_id]:
             channel_viewers[channel_id].remove(client_id)
           return channel_viewers
-        channel_viewers = memcache_cas('channel_viewers', remove_channel_viewe, client_id,
+        channel_viewers = memcache_cas('channel_viewers', remove_channel_viewer, client_id,
                                        user_sessions[0].channel.id)
 
       if last_session:    

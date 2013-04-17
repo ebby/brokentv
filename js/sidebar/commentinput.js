@@ -361,7 +361,8 @@ brkn.sidebar.CommentInput.prototype.onAddComment_ = function(e) {
       facebook: this.fbToggle_.isChecked(),
       twitter: this.tweetToggle_.isChecked(),
       text: this.commentInput_.getValue(),
-      parentId: this.parentComment
+      parentId: this.parentComment,
+      toUserId: this.replyUser && this.replyUser.id
     });
     this.commentInput_.setValue('');
     this.removeReply_();

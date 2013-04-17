@@ -327,6 +327,11 @@ brkn.Mobile.getSessionAndInit = function(response) {
             brkn.Mobile.noLogin('error', 'Yikes...');
             return;
           }
+          if (data['message']) {
+            var message = goog.dom.getElement('message');
+            goog.dom.setTextContent(message, data['message']);
+            return;
+          }
           var reveal = function() {
             goog.Timer.callOnce(function() {
               goog.dom.classes.add(login, 'hide');

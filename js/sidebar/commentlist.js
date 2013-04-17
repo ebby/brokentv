@@ -52,6 +52,12 @@ brkn.sidebar.CommentList = function(media, opt_comments, opt_twitter, opt_tweets
   this.tweets_ = opt_tweets || [];
 
   /**
+   * @type {Object.<string, brkn.model.Tweet>}
+   * @private
+   */
+  this.tweetsMap_ = {};
+
+  /**
    * @type {number}
    * @private
    */
@@ -173,6 +179,7 @@ brkn.sidebar.CommentList.prototype.decorateInternal = function(el) {
  * @private
  */
 brkn.sidebar.CommentList.prototype.addTweet_ = function(tweet, opt_first) {
+  this.tweetsMap_[tweet.id] = tweet;
   goog.style.showElement(this.noCommentsEl_, false);
   var linkedText = goog.string.linkify.linkifyPlainText(tweet.text);
   linkedText = linkedText.replace(/#(\S+)/g, function(hashtag, query) {
@@ -204,16 +211,27 @@ brkn.sidebar.CommentList.prototype.addTweet_ = function(tweet, opt_first) {
  */
 brkn.sidebar.CommentList.prototype.commentClick_ = function(e) {
   var targetEl = /** @type {Element} */ e.target;
-  var commentEl = goog.dom.getAncestorByClass(targetEl, 'comment');
-  if (commentEl) {
-    var commentId = commentEl.id.split('-')[1];
-    var comment = this.commentsMap_[commentId];
-    if (goog.dom.classes.has(targetEl, 'reply')) {
-      brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.REPLY_COMMENT,
-          comment.parentId ? this.commentsMap_[comment.parentId] : comment, comment.user);
-    } else if (goog.dom.classes.has(targetEl, 'remove')) {
-      this.media_.publish(brkn.model.Media.Actions.REMOVE_COMMENT, commentId);
+  if (this.twitter_) {
+    var tweetEl = goog.dom.getAncestorByClass(targetEl, 'tweet');
+    if (tweetEl) {
+      var tweetId = tweetEl.id.split('-')[1];
+      var tweet = this.tweetsMap_[tweetId];
+      if (goog.dom.classes.has(targetEl, 'reply')) {
+        brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.REPLY_TWEET, tweet);
+      }
     }
+  } else {
+    var commentEl = goog.dom.getAncestorByClass(targetEl, 'comment');
+    if (commentEl) {
+      var commentId = commentEl.id.split('-')[1];
+      var comment = this.commentsMap_[commentId];
+      if (goog.dom.classes.has(targetEl, 'reply')) {
+        brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.REPLY_COMMENT,
+            comment.parentId ? this.commentsMap_[comment.parentId] : comment, comment.user);
+      } else if (goog.dom.classes.has(targetEl, 'remove')) {
+        this.media_.publish(brkn.model.Media.Actions.REMOVE_COMMENT, commentId);
+      }
+    } 
   }
 };
 

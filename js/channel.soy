@@ -48,6 +48,7 @@
       <div class="comment-count"><div class="icon"></div>{$media.commentCount}</div>
       <div class="star-count"><div class="icon"></div>{$media.starCount}</div>
     </div>
+    <div class="viewers"></div>
 	  {if $admin}
 	    <div class="remove"></div>
 	    <div class="repos"></div>
@@ -55,16 +56,28 @@
   </div>
 {/template}
 
+
 /**
  * @param user
  * @param firstName
+ * @param channelId
  */
 {template .line}
   <div class="line">
     <div class="pic">
 	    <img src="{$user.picture}">
-	    <div class="watch-with">JOIN {$firstName}</div>
+	    <a href="#channel:{$channelId}"><div class="watch-with"><div>JOIN {$firstName}</div></div></a>
 	  </div>
+  </div>
+{/template}
+
+
+/**
+ * @param user
+ */
+{template .viewer}
+  <div class="viewer">
+    <img src="{$user.picture}">
   </div>
 {/template}
 
