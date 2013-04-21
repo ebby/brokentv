@@ -211,7 +211,7 @@ brkn.sidebar.MediaList.prototype.addMedia = function(media) {
   var mediaEl = soy.renderAsElement(brkn.sidebar.listMedia, {
     media: media
   });
-  var previewEl = goog.dom.getElementByClass('preview', mediaEl);
+  var previewEl = goog.dom.getElementByClass('list-play', mediaEl);
   goog.dom.appendChild(this.mediasEl_, mediaEl);
   if (this.isAdmin_) {
     this.dragDropGroup_.addItem(mediaEl);

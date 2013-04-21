@@ -53,8 +53,12 @@ def broadcastNewComment(comment, tweet, to_user, host_url):
                                      'image': comment.media.thumb
                                     })
       comment_email.send(to_user)
+      
+  logging.info('shoudl broadcast reply')
+      
   for client in channels.iterkeys():
-    if client in comment.acl:
+    if (comment.parent_comment and client in comment.user.friends) or (client in comment.acl) or \
+        (to_user and client == to_user.id):
       webchannel.send_message(client, simplejson.dumps(response))
     
 def broadcastNewActivity(activity):

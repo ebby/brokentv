@@ -264,6 +264,8 @@ brkn.Guide.prototype.enterDocument = function() {
         this.align_(false, undefined, true);
         this.updateNowButtons_();
       }, this);
+  
+  this.toggleGuide_(goog.dom.classes.has(this.getElement(), 'toggled'));
 
   // Set start time
   this.startTime_ = new goog.date.DateTime();
@@ -282,6 +284,8 @@ brkn.Guide.prototype.enterDocument = function() {
   this.addTimeSlots(this.timeslots_, this.minTime_);
 
   goog.style.setWidth(this.getElement(), this.width_);
+//  goog.style.setWidth(this.headerEl_, this.width_);
+//  goog.style.setWidth(this.channelsEl_, this.width_);
   var viewOffset = brkn.Guide.HISTORY_SLOTS/this.timeslots_ * this.width_;
   
   this.pixelsPerSecond_ = (this.width_ - brkn.Guide.NAME_WIDTH)/this.timeline;
@@ -294,7 +298,7 @@ brkn.Guide.prototype.enterDocument = function() {
   this.channelNameStyle_.innerHTML = 'div#guide div.channels div.channel div.name' +
     '{left:0 !important}';
   
-  this.maxLastProgram_ = 0;
+  var maxLastProgram = 0;
   goog.array.forEach(brkn.model.Channels.getInstance().channels, goog.bind(function(c) {
     if (!(c.myChannel && !brkn.Exp.MY_CHANNEL)) {
       var channel = new brkn.Channel(c, this.timeline, this.startTime_, 0, this.minTime_);
@@ -309,7 +313,7 @@ brkn.Guide.prototype.enterDocument = function() {
       var programs = goog.dom.getElementsByClass('program', channel.getElement());
       var lastProgram = /** @type {Element} */ goog.array.peek(programs);
       if (lastProgram) {
-        this.maxLastProgram_ = Math.max(this.maxLastProgram_, goog.style.getPosition(lastProgram).x +
+        maxLastProgram = Math.max(maxLastProgram, goog.style.getPosition(lastProgram).x +
             goog.style.getSize(lastProgram).width + 170 /* for suggestion box */);
       }
     }
@@ -412,8 +416,10 @@ brkn.Guide.prototype.enterDocument = function() {
   brkn.model.Player.getInstance().subscribe(brkn.model.Player.Actions.PLAY_ASYNC,
       this.playAsync_, this);
 
+  while (goog.style.getSize(this.getElement()).width < maxLastProgram) {
+    this.expand_();
+  }
   this.resize_();
-  this.toggleGuide_(goog.dom.classes.has(this.getElement(), 'toggled'));
 
   if (this.isAdmin_) {
     // Don't drag when shift key is pressed...we're rescheduling a show.
@@ -444,18 +450,14 @@ brkn.Guide.prototype.forceScroll_ = function(el, scrollTo) {
 
 
 /**
- * @param {Element} element
- * @param {number} x
- * @param {number} y
- * @param {?boolean=} opt_none
  * @private
  */
-brkn.Guide.prototype.transform_ = function(element, x, y, opt_none) {
-  element.style.transform = opt_none ? '' : 'translate3d(' + x + 'px, ' + y + 'px,0)';
-  element.style.msTransform = opt_none ? '' : 'translate3d(' + x + 'px, ' + y + 'px,0)';
-  element.style.WebkitTransform = opt_none ? '' : 'translate3d(' + x + 'px, ' + y + 'px,0)';
-  element.style.MozTransform = opt_none ? '' : 'translate3d(' + x + 'px, ' + y + 'px,0)';
-  element.style.OTransform = opt_none ? '' : 'translate3d(' + x + 'px, ' + y + 'px,0)';
+brkn.Guide.prototype.transform_ = function(element, x, y) {
+  element.style.transform = 'translate3d(' + x + 'px, ' + y + 'px,0)';
+  element.style.msTransform = 'translate3d(' + x + 'px, ' + y + 'px,0)';
+  element.style.WebkitTransform = 'translate3d(' + x + 'px, ' + y + 'px,0)';
+  element.style.MozTransform = 'translate3d(' + x + 'px, ' + y + 'px,0)';
+  element.style.OTransform = 'translate3d(' + x + 'px, ' + y + 'px,0)';
 };
 
 
@@ -467,18 +469,13 @@ brkn.Guide.prototype.toggleGuide_ = function(show) {
   // Align before we see guide
   goog.dom.classes.remove(this.getElement(), 'animate');
   this.align_(true, undefined, false);
+  goog.dom.classes.add(this.getElement(), 'animate');
 
   var height = Math.min(this.channelsEl_.scrollHeight, brkn.Guide.GUIDE_HEIGHT);
   goog.dom.classes.enable(this.getElement(), 'toggled', show);
-  
-  goog.dom.classes.add(this.getElement(), 'transition');
-  this.transform_(this.getElement(), 0, show ? 0 : height + 20, show);
-  goog.Timer.callOnce(goog.bind(function() {
-    goog.dom.classes.remove(this.getElement(), 'transition');
-    goog.dom.classes.add(this.getElement(), 'animate');
-  }, this), 500);
-  //goog.style.setHeight(this.getElement(), show ? height + this.controllerHeight_ + 19 :
-  //    this.controllerHeight_);
+
+  goog.style.setHeight(this.getElement(), show ? height + this.controllerHeight_ + 19 :
+      this.controllerHeight_);
   if (this.currentChannel_) {
     // In case we're async playing.
     this.channelsEl_.scrollTop = goog.style.getPosition(this.currentChannel_.getElement()).y;
@@ -644,6 +641,8 @@ brkn.Guide.prototype.expand_ = function() {
   this.addTimeSlots(1, this.maxTime_);
   this.width_ += this.timeslotWidth_;
   goog.style.setWidth(this.getElement(), this.width_);
+//  goog.style.setWidth(this.headerEl_, this.width_);
+//  goog.style.setWidth(this.channelsEl_, this.width_);
   this.timeslots_++;
   this.maxTime_.add(new goog.date.Interval(0, 0, 0, 0, this.interval_ * newSlots));
   this.timeline = this.timeslots_ * this.interval_ * 60;
@@ -687,9 +686,6 @@ brkn.Guide.prototype.tick_ = function() {
       this.firstAlign_ = false;
       this.align_(true, undefined, false);
       goog.dom.classes.add(this.getElement(), 'animate');
-//      while (goog.style.getSize(this.getElement()).width < this.maxLastProgram_) {
-//        this.expand_();
-//      }
     } else if (!this.dragging_) {
       this.align_();
     }
@@ -799,5 +795,6 @@ brkn.Guide.prototype.resize_ = function() {
   var channelsHeight = Math.min(this.channelsEl_.scrollHeight, brkn.Guide.GUIDE_HEIGHT);
   goog.style.setHeight(this.channelsEl_, goog.dom.classes.has(this.getElement(), 'toggled')
       ? channelsHeight : this.controllerHeight_);
-  goog.style.setHeight(this.getElement(), channelsHeight + this.controllerHeight_ + 19);
+  goog.style.setHeight(this.getElement(), goog.dom.classes.has(this.getElement(), 'collapsed') ?
+      this.controllerHeight_ : channelsHeight + this.controllerHeight_ + 19);
 };

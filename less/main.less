@@ -3,6 +3,7 @@
 @import "icons.less";
 @import "buttons.less";
 @import "controller.less";
+@import "search.less";
 @import "guide.less";
 @import "player.less";
 @import "popup.less";
@@ -16,6 +17,7 @@
 @import "profile.less";
 @import "conversation.less";
 @import "welcome.less";
+@import "queue.less";
 
 @font-face {
   font-family: 'MuseoSans100';
@@ -120,6 +122,255 @@ div#hovercard {
     border-width: 6px;
     left: 50%;
     margin-left: -6px;
+  }
+}
+
+div.list-media {
+  width: 298px; 
+  margin-bottom: 10px;
+  .border-radius(3px); 
+  position: relative;
+  background: #EBEBEB;
+  border: 1px solid white;
+  .box-shadow(0, 0, 2px, 1px, rgba(0, 0, 0, 0.3));
+  cursor: pointer;
+  color: #f5f5f5;
+  text-shadow: 1px 1px 1px #181818;
+  opacity: 0;
+  .transition(opacity, .3s, ease-in);
+  &.show {
+    opacity: 1;
+  }
+  &.remove {
+    opacity: 0;
+  }
+  &:active {
+    .box-shadow(0, 0, 0, 1px, rgba(0, 0, 0, 0.1));
+  }
+  &:last-child:active {
+    div.publisher {
+      margin-bottom: 4px;
+    }
+  }
+  &:hover div.media {
+    div.preview {
+      div.thumb {
+        opacity: .7;
+      }
+      div.list-play {
+        visibility: visible;
+        opacity: .95;
+      }
+      div.title, div.published {
+        color: #f7f7f7;
+        text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5), -1px -1px rgba(0, 0, 0, 0.5),
+            1px -1px 1px rgba(0, 0, 0, 0.5), -1px 1px rgba(0, 0, 0, 0.5);
+      }
+      div.approve, div.remove, div.repos, div.play {
+        filter: invert(100%);
+        -webkit-filter: invert(100%);
+        -moz-filter: invert(100%);
+        -o-filter: invert(100%);
+        -ms-filter: invert(100%);
+      }
+    }
+  }
+  div.media {
+    white-space: normal;
+    overflow: hidden;
+    vertical-align: middle;
+    height: 48px;
+    color: #999;
+    text-shadow: 1px 1px 1px white;
+    margin-top: -1px;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    position: relative;
+    div.preview {
+      display: inline-block;
+      width: 100%;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+      background: #535353;
+      border-top-left-radius: 3px;
+      border-top-right-radius: 3px;
+      margin-top: 1px;
+      div.thumb {
+        width: 100%;
+        height: 100%;
+        opacity: .2;
+        .transition(opacity, .3s, ease);
+        background-size: 150% auto;
+        background-position: center;
+        border-top-left-radius: 3px;
+        border-top-right-radius: 3px;
+      }
+      div.list-play {
+        top: 50%;
+        margin-top: -12px;
+        right: 8px;
+        position: absolute;
+        opacity: .6;         
+        width: 20px;
+        height: 20px;
+        .border-radius(12px);
+        border: 2px solid rgba(0, 0, 0, .7);
+        background: rgba(0, 0, 0, .5);
+        opacity: 0;
+        visibility: hidden;
+        .transition(opacity, .3s, ease);
+        .icon {
+          .icon-play();
+          font-size: 14px;
+          margin-top: 3px;
+          margin-left: 7px;
+          text-shadow: none;
+          color: #f5f5f5;
+        }
+      }
+      div.title {
+        left: 5px;
+        top: 5px;
+        color: #dedede;
+        text-shadow: 1px 1px 1px #181818;
+        height: 100%;
+        font-size: 13px;
+        line-height: 20px;
+        position: absolute;
+        overflow: hidden;
+        margin-right: 30px;
+        font-family: MuseoSans300;
+        &.marquee {
+          .transition(margin-left, 10s, linear);
+        }
+      }
+      div.published {
+        position: absolute;
+        bottom: 3px;
+        font-size: 10px;
+        color: #181818;
+        left: 5px;
+      }
+      div.approve {
+        position: absolute;
+        right: 25px;
+        top: 3px;
+        width: 20px;
+        height: 20px;
+        background-image: url(/static/img/circle-check.png);
+        background-repeat: no-repeat;
+        background-position: center;
+      }
+      div.remove {
+        position: absolute;
+        right: 5px;
+        top: 3px;
+        width: 20px;
+        height: 20px;
+        background-image: url(/static/img/circle-x.png);
+        background-repeat: no-repeat;
+        background-position: center;
+        filter: invert(100%);
+      }
+      div.repos {
+        position: absolute;
+        right: 5px;
+        bottom: 3px;
+        width: 20px;
+        height: 20px;
+        background-image: url(/static/img/circle-repos.png);
+        background-repeat: no-repeat;
+        background-position: center;
+      }
+      div.play {
+        position: absolute;
+        right: 45px;
+        top: 3px;
+        width: 20px;
+        height: 20px;
+        background-image: url(/static/img/circle-play.png);
+        background-repeat: no-repeat;
+        background-position: center;
+      }
+    }
+    &:hover div.title {
+      color: #f5f5f5;
+      text-shadow: 0px 0px 4px black;
+    }
+  }
+  div.publisher {
+    position: relative;
+    top: 3px;
+    left: 0px;
+    margin-bottom: 4px;
+    width: 272px;
+    padding: 3px;
+    color: #181818;
+    text-shadow: 1px 1px 1px white;
+    font-family: MuseoSans500;
+    img {
+      width: 22px;
+      height: 22px;
+      .border-radius(6px);
+      vertical-align: top;
+      border: 1px solid transparent;
+    }
+    div.name {
+      font-size: 11px;
+      line-height: 3px;
+      margin: 0 5px;
+      display: inline-block;
+    }
+    div.duration {
+      position: absolute;
+      right: 3px;
+      top: 3px;
+    }
+  }
+  div.stats {
+    position: absolute;
+    right: 3px;
+    bottom: 7px;
+    color: #181818;
+    text-shadow: 1px 1px 1px white;
+    div.comment-count {
+      div.icon {
+        .icon-comment();
+        font-size: 15px;
+        margin-top: -2px;
+        color: #666;
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+      min-width: 15px;
+      height: 15px;
+      padding-left: 17px;
+      font-size: 10px;
+      float: right;
+      position: relative;
+    }
+    div.like-count {
+      div.icon {
+        .icon-like();
+        font-size: 12px;
+        color: #666;
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+      min-width: 15px;
+      height: 15px;
+      padding-left: 15px;
+      font-size: 10px;
+      float: right;
+      position: relative;
+    }
+  }
+  div.description, div.duration {
+    font-size: 11px;
+    margin: 5px;
   }
 }
 

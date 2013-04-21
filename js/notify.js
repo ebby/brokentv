@@ -80,17 +80,19 @@ brkn.Notify.prototype.show_ = function(flash, action, content, opt_user, opt_img
   
   var dispEl = goog.dom.getElementByClass('note', noteEl);
   goog.Timer.callOnce(function() {
-    goog.dom.classes.add(dispEl, 'show');
-    if (flash) {
-      goog.Timer.callOnce(function() {
-        goog.dom.classes.remove(dispEl, 'show');
-        goog.dom.classes.add(dispEl, 'fade-out');
+    if (dispEl) {
+      goog.dom.classes.add(dispEl, 'show');
+      if (flash) {
         goog.Timer.callOnce(function() {
-          goog.dom.removeNode(noteEl);
-        }, 5100);
-      }, 3000);
-    } else {
-      goog.dom.classes.add(dispEl, 'dim'); 
+          goog.dom.classes.remove(dispEl, 'show');
+          goog.dom.classes.add(dispEl, 'fade-out');
+          goog.Timer.callOnce(function() {
+            goog.dom.removeNode(noteEl);
+          }, 5100);
+        }, 3000);
+      } else {
+        goog.dom.classes.add(dispEl, 'dim'); 
+      }
     }
   });
 };

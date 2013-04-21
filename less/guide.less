@@ -8,13 +8,10 @@ div#guide {
   background: #f7f7f7;
   width: 100%;
   color: #ccc;
+  .transition(e('height .5s ease, opacity .5s ease'));
   .grab();
   &:hover {
     opacity: 1;
-  }
-  &.transition {
-    .transition-duration(500ms);
-    .transform(e('translate3d(0,0,0)'));
   }
   &.animate {
     .transition(e('height .5s ease, opacity .5s ease, left 1s linear'));
@@ -371,6 +368,9 @@ div#guide {
         -webkit-perspective: 1000;
         cursor: pointer;
         z-index: 1;
+        &:hover {
+          opacity: 1;
+        }
         div.text {
           position: relative;
           top: 50%;
@@ -523,9 +523,9 @@ div#guide {
               float: right;
               position: relative;
             }
-            div.star-count {
+            div.like-count {
               div.icon {
-                .icon-heart();
+                .icon-like();
                 font-size: 12px;
                 position: absolute;
                 top: 0;

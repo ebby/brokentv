@@ -1,5 +1,5 @@
 from common import *
-
+from media import *
 
 class Stat(db.Model):
   date = db.DateProperty(auto_now_add=True)
@@ -28,6 +28,8 @@ class Stat(db.Model):
   tweet_count = db.IntegerProperty(default=0)
   facebook_count = db.IntegerProperty(default=0)
   star_count = db.IntegerProperty(default=0)
+  like_count = db.IntegerProperty(default=0)
+  dislike_count = db.IntegerProperty(default=0)
   
   @classmethod
   def to_json(cls, end_date=datetime.date.today(), horizon=30):
@@ -52,6 +54,8 @@ class Stat(db.Model):
       json.setdefault('tweet_count', []).append({'x': timestamp, 'y': stat.tweet_count})
       json.setdefault('facebook_count', []).append({'x': timestamp, 'y': stat.facebook_count})
       json.setdefault('star_count', []).append({'x': timestamp, 'y': stat.star_count})
+      json.setdefault('like_count', []).append({'x': timestamp, 'y': stat.like_count})
+      json.setdefault('dislike_count', []).append({'x': timestamp, 'y': stat.dislike_count})
     return json
 
   
@@ -193,4 +197,28 @@ class Stat(db.Model):
   def add_star_trans(cls, today_key):
     today = db.get(today_key)
     today.star_count += 1
+    today.put()
+    
+  @classmethod
+  def add_like(cls, media):
+    Media.add_like(media.id)
+    Stat.add_like_trans(Stat.get_today().key())
+
+  @classmethod
+  @db.transactional
+  def add_like_trans(cls, today_key):
+    today = db.get(today_key)
+    today.like_count += 1
+    today.put()
+
+  @classmethod
+  def add_dislike(cls, media):
+    Media.add_dislike(media.id)
+    Stat.add_like_trans(Stat.get_today().key())
+
+  @classmethod
+  @db.transactional
+  def add_dislike_trans(cls, today_key):
+    today = db.get(today_key)
+    today.dislike_count += 1
     today.put()

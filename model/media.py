@@ -32,6 +32,8 @@ class Media(db.Model):
   host_views = db.IntegerProperty(default=0)
   comment_count = db.IntegerProperty(default=0)
   star_count = db.IntegerProperty(default=0)
+  like_count = db.IntegerProperty(default=0)
+  dislike_count = db.IntegerProperty(default=0)
   programmed_count = db.IntegerProperty(default=0)
 
   @property
@@ -50,16 +52,14 @@ class Media(db.Model):
     return 'http://i.ytimg.com/vi/%s/0.jpg' % self.host_id
 
   @classmethod
-  def get(cls, id):
-    media = Media.get_by_id(id)
+  def get(cls, id, fetch_publisher=False):
+    media = Media.get_by_key_name(id)
     if not media:
-      tries = 0
-      while (tries < 4):
-        response = urlfetch.fetch(Media.YOUTUBE_DATA % id)
-        tries += 1
-        if response.status_code == 200:
-          media = Media.add_from_json(simplejson.loads(response.content))
-          break
+      host_id = id[7:] if 'youtube' in id else id
+      yt_service = get_youtube_service()
+      entry = yt_service.GetYouTubeVideoEntry(video_id=host_id)
+      medias = Media.add_from_entry([entry], fetch_publisher=fetch_publisher)
+      media = medias[0] if len(medias) else None
     return media
 
   @classmethod
@@ -126,10 +126,10 @@ class Media(db.Model):
         
   
   @classmethod
-  def add_from_entry(cls, entries):
+  def add_from_entry(cls, entries, fetch_publisher=False):
     from publisher import Publisher
     from publisher import PublisherMedia
-    
+
     medias = []
     for entry in [e for e in entries if e.media.player and not e.noembed]:
       content_url = urlparse.urlparse(entry.media.player.url)
@@ -150,9 +150,9 @@ class Media(db.Model):
                     description=desc,
                     host_views=int(entry.statistics.view_count) if entry.statistics else 0,
                     category=category)
-        
+
         publisher_name = entry.author[0].name.text.lower()
-        publisher = Publisher.add(MediaHost.YOUTUBE, publisher_name)
+        publisher = Publisher.add(MediaHost.YOUTUBE, publisher_name, fetch_details=fetch_publisher)
         PublisherMedia.add(publisher, media)
         media.put()
       medias.append(media)
@@ -185,12 +185,26 @@ class Media(db.Model):
 
   def seen_by(self, user):
     return [User.get_by_key_name(uid).toJson() for uid in self.seen if uid in user.friends]
+
+  @classmethod
+  @db.transactional
+  def add_like(cls, key_name):
+    obj = Media.get_by_key_name(key_name)
+    if obj:
+      obj.like_count += 1
     
+  @classmethod
+  @db.transactional
+  def add_dislike(cls, key_name):
+    obj = Media.get_by_key_name(key_name)
+    if obj:
+      obj.dislike_count -= 1
+
   @classmethod
   @db.transactional
   def add_started(cls, key_name, uid):
     obj = Media.get_by_key_name(key_name)
-    if uid not in obj.started:
+    if obj and uid not in obj.started:
       obj.started.append(uid)
       obj.put()
   
@@ -198,7 +212,7 @@ class Media(db.Model):
   @db.transactional
   def add_opt_in(cls, key_name, uid):
     obj = Media.get_by_key_name(key_name)
-    if uid not in obj.opt_in:
+    if obj and uid not in obj.opt_in:
       obj.opt_in.append(uid)
       obj.put()
 
@@ -206,7 +220,7 @@ class Media(db.Model):
   @db.transactional
   def add_opt_out(cls, key_name, uid):
     obj = Media.get_by_key_name(key_name)
-    if uid not in obj.opt_out:
+    if obj and uid not in obj.opt_out:
       obj.opt_out.append(uid)
       obj.put()
 
@@ -224,6 +238,8 @@ class Media(db.Model):
     json['link'] = self.link
     json['thumb_pos'] = self.thumb_pos
     json['star_count'] = self.star_count
+    json['like_count'] = self.like_count
+    json['dislike_count'] = self.dislike_count
     json['comment_count'] = self.comment_count
     if self.live:
       json['live'] = self.live

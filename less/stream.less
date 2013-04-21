@@ -21,7 +21,7 @@ div#sidebar div.stream {
   }
   div.activity {
     position: relative;
-    font-size: 13px;
+    font-size: 11px;
     margin-bottom: 15px;
     width: 320px;
     opacity: 0;
@@ -30,14 +30,14 @@ div#sidebar div.stream {
       opacity: 1;
     }
     &.digest {
-      &.comment div.text {
-        margin-bottom: 8px;
+      &.comment div.template {
         padding-bottom: 0px;
       }
-      div.text {
+      div.template {
         left: 10px;
         margin-bottom: 5px;
         padding-bottom: 8px;
+        width: 300px;
         span {
           font-family: MuseoSans700;
         }
@@ -53,11 +53,10 @@ div#sidebar div.stream {
       }
       div.comment {
         margin-bottom: 3px;
-        div.text {
+        div.template {
           left: 50px;
           margin-bottom: 10px;
-          padding-bottom: 15px;
-          width: 240px;
+          width: 260px;
         }
       }
       div.medias {
@@ -69,6 +68,7 @@ div#sidebar div.stream {
       background: #ccc;
       width: 34px;
       height: 34px;
+      margin-top: 5px;
       .border-radius(18px);
       .box-shadow(inset, 0px, 0px, 2px, 1px, rgba(0, 0, 0, 0.6));
       display: inline-block;
@@ -87,22 +87,32 @@ div#sidebar div.stream {
         }
       }
     }
-    div.text {
+    div.template {
       position: relative;
       left: 50px;
       top: 0px;
       min-height: 20px;
       width: 260px;
-      padding-bottom: 13px;
       font-family: MuseoSans500;
       a {
         color: #181818;
+        font-family: MuseoSans700;
+      }
+      div.text {
+        background: rgba(0, 0, 0, .1);
+        margin-top: 4px;
+        padding: 5px;
+        font-family: MuseoSans700;
+        font-size: 13px;
+        .border-radius(3px);
+        .box-shadow(inset, 0, 0, 1px, 1px, rgba(0, 0, 0, 0.2));
       }
       div.timestamp {
-        font-size: 11px;
+        font-size: 10px;
         font-family: MuseoSans300;
         position: absolute;
-        bottom: 0;
+        top: 0;
+        right: 0;
       }
     }
   }

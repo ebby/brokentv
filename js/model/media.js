@@ -78,12 +78,12 @@ brkn.model.Media = function(media) {
   /**
    * @type {brkn.model.Publisher}
    */
-  this.publisher = new brkn.model.Publisher(media['publisher']);
+  this.publisher = media['publisher'] && new brkn.model.Publisher(media['publisher']);
   
   /**
    * @type {goog.date.DateTime}
    */
-  this.published = goog.date.fromIsoString(media['published'] + 'Z');
+  this.published = media['published'] && goog.date.fromIsoString(media['published'] + 'Z');
 
 	/**
 	 * @type {string}
@@ -134,6 +134,16 @@ brkn.model.Media = function(media) {
    * @type {number}
    */
   this.starCount = media['star_count'] || 0;
+  
+  /**
+   * @type {number}
+   */
+  this.likeCount = media['like_count'] || 0;
+  
+  /**
+   * @type {number}
+   */
+  this.dislikeCount = media['dislike_count'] || 0;
 
   /**
    * @type {Array.<brkn.model.User>}
@@ -252,4 +262,25 @@ brkn.model.Media.prototype.addViewer = function(user, opt_channel, opt_offline) 
         'is watching ' + (opt_channel ? opt_channel.name : ''), this.name, user,
         this.thumbnail1, '#info:' + this.id);
   }
+};
+
+
+/**
+ * @param {Object} entry
+ */
+brkn.model.Media.fromEntry = function(entry) {
+  var media = new brkn.model.Media({
+    'id': 'youtube' + entry['media$group']['yt$videoid']['$t'],
+    'name': entry['title']['$t'],
+    'host_id': entry['media$group']['yt$videoid']['$t'],
+    'description': entry['media$group']['media$description']['$t'],
+    'duration': entry['media$group']['yt$duration']['seconds'],
+    'publisher': {
+                    'name': entry['author'][0]['name']['$t'],
+                    'id': 'youtube' + entry['author'][0]['name']['$t'],
+                    'picture': 'https://i4.ytimg.com/i/' + entry['author'][0]['yt$userId']['$t'] + '/1.jpg'
+                  }
+  });
+  media.published = goog.date.fromIsoString(entry['published']['$t']);
+  return media;
 };

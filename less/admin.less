@@ -102,8 +102,26 @@ div#content {
   >div {
     display: none;
   }
-  &.users div.users, &.stats div.stats, &.channels div.channels {
+  &.users div.users, &.launch div.launch, &.stats div.stats, &.channels div.channels {
     display: block;
+  }
+  div#launch {
+    margin: 10px auto;
+    margin-top: 50px;
+    width: 1000px;
+    height: 300px;
+    div.button {
+      width: 100px;
+      margin-left: -4px;
+      &:first-child {
+        margin-left: 0;
+      }
+    }
+    .label {
+      margin: 10px 0;
+      font-size: 12px;
+      font-family: MuseoSans700;  
+    }
   }
   div#stats {
     margin: auto;
@@ -239,6 +257,7 @@ div#content {
       border-bottom-left-radius: 3px;
       -webkit-border-top-left-radius: 3px;
       -webkit-border-bottom-left-radius: 3px;
+      margin-left: 0;
     }
   }
 }

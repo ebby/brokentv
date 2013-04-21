@@ -256,6 +256,7 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
   this.noCommentsEl_ = goog.dom.getElementByClass('no-comments', this.getElement());
   this.commentInput_.render(this.getElement());
   this.starToggle_.decorate(goog.dom.getElementByClass('star', this.getElement()));
+  this.starToggle_.setChecked(brkn.model.Users.getInstance().currentUser.isStarred(this.media_));
   this.fbButton_.decorate(goog.dom.getElementByClass('facebook', this.getElement()));
   this.twitterButton_.decorate(goog.dom.getElementByClass('twitter', this.getElement()));
   this.playButton_.decorate(goog.dom.getElementByClass('play', this.getElement()));
@@ -453,6 +454,14 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
   this.media_.subscribe(brkn.model.Media.Actions.WATCHING, function(user, channel, offline) {
     this.addViewer_(user, offline);
   }, this);
+  brkn.model.Users.getInstance().currentUser.subscribe(
+      brkn.model.User.Actions.SET_STARRED, function() {
+        this.starToggle_.setChecked(brkn.model.Users.getInstance().currentUser.isStarred(this.media_));
+      }, this);
+  brkn.model.Channels.getInstance().getMyChannel().subscribe(brkn.model.Channel.Action.ADD_QUEUE,
+      function(media, add) {
+        this.plusButton_.setChecked(add);
+      }, this); 
 };
 
 
@@ -698,7 +707,6 @@ brkn.sidebar.Info.prototype.addComment_ = function(comment, opt_last) {
   });
   brkn.model.Clock.getInstance().addTimestamp(comment.time,
       goog.dom.getElementByClass('timestamp', commentEl));
-
   if (comment.parentId) {
     goog.dom.insertSiblingAfter(commentEl, this.lastCommentEl_[comment.parentId]);
   } else {
@@ -925,16 +933,16 @@ brkn.sidebar.Info.prototype.onPlusMouseDown_ = function() {
  * @private
  */
 brkn.sidebar.Info.prototype.onPlusButton_ = function() {
-  if (!(brkn.model.Player.getInstance().getCurrentProgram() &&
-      brkn.model.Player.getInstance().getCurrentProgram().async)) {
-    var program = brkn.model.Program.async((/** @type {brkn.model.Media} */ this.getModel()));
-    brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.PLAY_ASYNC, program);
-    this.playButton_.setActive(false);
-    this.plusButton_.setChecked(false);
-  } else {
+//  if (!(brkn.model.Player.getInstance().getCurrentProgram() &&
+//      brkn.model.Player.getInstance().getCurrentProgram().async)) {
+//    var program = brkn.model.Program.async((/** @type {brkn.model.Media} */ this.getModel()));
+//    brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.PLAY_ASYNC, program);
+//    this.playButton_.setActive(false);
+//    this.plusButton_.setChecked(false);
+//  } else {
     brkn.model.Channels.getInstance().getMyChannel().publish(brkn.model.Channel.Action.ADD_QUEUE,
         (/** @type {brkn.model.Media} */ this.getModel()), this.plusButton_.isChecked()); 
     brkn.model.Notify.getInstance().publish(brkn.model.Notify.Actions.FLASH,
         'Added to queue', this.media_.name, undefined, this.media_.thumbnail);
-  }
+//  }
 };

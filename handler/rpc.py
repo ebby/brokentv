@@ -123,6 +123,12 @@ def get_session(current_user, media_id=None, channel_id=None, single_channel_id=
   user_obj['current_channel'] = current_channel.id
   data['current_user'] = user_obj
 
+  # Potentially send friend invites
+  if not current_user.last_login:
+    deferred.defer(User.update_waitlist, current_user.id, current_channel.id,
+                   _name='update_waitlist' + '-' + str(uuid.uuid1()),
+                   _queue='programming')
+
   # Update login
   current_user.last_login = datetime.datetime.now()
   current_user.put()
@@ -134,6 +140,10 @@ def get_session(current_user, media_id=None, channel_id=None, single_channel_id=
 
 class SessionHandler(BaseHandler):
   def post(self):
+    if self.current_user.access_level < AccessLevel.USER and \
+        constants.INVITE_POLICY() == constants.InvitePolicy.ANYBODY:
+      self.current_user.grant_access()
+
     if self.current_user.access_level < AccessLevel.USER:
       self.error(401)
     else:
@@ -202,7 +212,7 @@ class ProgramHandler(BaseHandler):
       self.response.out.write(simplejson.dumps({}))
     if channel and media_id and channel.id == self.current_user.id:
       # Add to my personal channel
-      media = Media.get_by_key_name(media_id)
+      media = Media.get(media_id)
       program = Program.add_program(channel, media,
                                     time=(datetime.datetime.now() if now else None), 
                                     async=True)
@@ -213,7 +223,7 @@ class ProgramHandler(BaseHandler):
 class InfoHandler(BaseHandler):
   @BaseHandler.logged_in
   def get(self, id):
-    media = Media.get_by_key_name(id)
+    media = Media.get(id, fetch_publisher=True)
     if media:
       response = {}
       response['description'] = media.description
@@ -445,6 +455,76 @@ class StarHandler(BaseHandler):
     else:
       collection.add_media(media, True)
       Stat.add_star(media)
+      
+class LikeHandler(BaseHandler):
+  @BaseHandler.logged_in
+  def get(self, media_id=None):
+    media = Media.get_by_key_name(media_id)
+    likes = Collection.get_by_key_name(self.current_user.id + '-liked')
+    dislikes = Collection.get_by_key_name(self.current_user.id + '-disliked')
+    liked = likes.collectionMedias.filter('media =', media).get() if likes else False
+    disliked = dislikes.collectionMedias.filter('media =', media).get() if dislikes else False
+    self.response.out.write(simplejson.dumps({
+                                              'media_id': media_id,
+                                              'liked': 1 if liked else 0,
+                                              'disliked': 1 if disliked else 0
+                                              }))
+
+  @BaseHandler.logged_in
+  def post(self):
+    media = Media.get_by_key_name(self.request.get('media_id'))
+    collection = Collection.get_or_insert(self.current_user.id + '-liked',
+                                          user=self.current_user,
+                                          name='Liked')
+    
+    if self.request.get('flip'):
+      dislikes = Collection.get_by_key_name(self.current_user.id + '-disliked')
+      if dislikes:
+        dislikes.remove_media(media)
+    
+    if self.request.get('delete'):
+      collection.remove_media(media)
+    else:
+      collection.add_media(media, True)
+      Stat.add_like(media)
+      broadcast.broadcastNewActivity(UserActivity.add_starred(self.current_user, media))
+      
+class DislikeHandler(BaseHandler):
+  @BaseHandler.logged_in
+  def post(self):
+    media = Media.get_by_key_name(self.request.get('media_id'))
+    collection = Collection.get_or_insert(self.current_user.id + '-disliked',
+                                          user=self.current_user,
+                                          name='Disliked')
+
+    if self.request.get('flip'):
+      likes = Collection.get_by_key_name(self.current_user.id + '-liked')
+      if likes:
+        likes.remove_media(media)
+
+    if self.request.get('delete'):
+      collection.remove_media(media)
+    else:
+      collection.add_media(media, True)
+      Stat.add_like(media)
+
+class QueueHandler(BaseHandler):
+  @BaseHandler.logged_in
+  def get(self):
+    uid = self.current_user.id
+    col = Collection.get_by_key_name(uid + '-queue')
+    self.response.out.write(simplejson.dumps([m.toJson() for m in col.get_medias(20)] if col else []))
+
+  @BaseHandler.logged_in
+  def post(self):
+    media = Media.get_by_key_name(self.request.get('media_id'))
+    collection = Collection.get_or_insert(self.current_user.id + '-queue',
+                                          user=self.current_user,
+                                          name='Queue')
+    if self.request.get('delete'):
+      collection.remove_media(media)
+    else:
+      collection.add_media(media, True)
       broadcast.broadcastNewActivity(UserActivity.add_starred(self.current_user, media))
 
 class TweetHandler(BaseHandler):

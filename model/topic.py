@@ -39,8 +39,9 @@ class Topic(db.Model):
     if True:
       topic = Topic(key_name=id)
       topic.put()
-      deferred.defer(Topic.fetch_details, topic.id,
-                     _name='freebase-' + str(uuid.uuid1()), _queue='youtube')
+      if constants.FETCH_FREEBASE:
+        deferred.defer(Topic.fetch_details, topic.id,
+                       _name='freebase-' + str(uuid.uuid1()), _queue='youtube')
     return topic
 
 

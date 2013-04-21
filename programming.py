@@ -243,6 +243,7 @@ class Programming():
       f = 10
       g = 1
       h = .1
+      i = 1
       score = a * float(media.host_views)/max_views \
             + b * len(media.seen) \
             + c * len(media.opt_in) \
@@ -250,7 +251,8 @@ class Programming():
             + e * media.comment_count \
             + f * (0 if media.last_programmed else 1)/max_views \
             - g * (media.programmed_count or 0) \
-            - h * (datetime.datetime.now() - media.published).days
+            - h * (datetime.datetime.now() - media.published).days \
+            + i * (media.like_count + media.dislike_count)
       score *= max_views
       return int(score)
 

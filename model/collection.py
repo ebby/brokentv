@@ -55,9 +55,7 @@ class Collection(db.Model):
                                                 feed_category)
     else:
       uri = Collection.YOUTUBE_FEED % ((collection.region or 'US'), collection.feed_id)
-    logging.info(uri)
     response = urlfetch.fetch(uri)
-    logging.info(response.status_code)
     if response.status_code == 200:
       data = simplejson.loads(response.content) or {}
       entries = data['feed']['entry'] if data.get('feed') else []

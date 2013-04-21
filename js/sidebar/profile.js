@@ -69,6 +69,7 @@ brkn.sidebar.Profile.prototype.enterDocument = function() {
         medias = goog.array.map(medias, function(m) {
           return new brkn.model.Media(m);
         });
+        brkn.model.Users.getInstance().currentUser.setStarred(medias);
         this.starred_ = new brkn.sidebar.MediaList(medias);
         this.starred_.decorate(goog.dom.getElementByClass('starred-content', this.getElement()));
       }, this));

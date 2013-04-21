@@ -1,9 +1,13 @@
 import os
 
+from google.appengine.api import memcache
+
 CONFIG = {}
 CONFIG['webapp2_extras.sessions'] = dict(secret_key='JHG234K5HG34JH5B3K4J53N4KJ5')
 
 DEVELOPMENT = os.environ.get('SERVER_SOFTWARE', '').startswith('Development')
+
+FETCH_FREEBASE = False
 
 SAVE_PROGRAMS = False
 
@@ -121,11 +125,27 @@ class MediaType:
 
 class MediaHost:
   YOUTUBE = 'youtube'
-  
+
 class MediaHostUrl:
   YOUTUBE = 'http://www.youtube.com/watch?v=%s'
-  
+
 class Approval:
   APPROVED = 0
   REJECTED = 1
   PENDING = 2
+
+class InvitePolicy:
+  NIGHTCLUB = 0
+  HAS_FRIEND = 1
+  ANYBODY = 2
+  NOBODY = 3
+
+def INVITE_POLICY():
+  if memcache.get('invite_policy', None) is None:
+    memcache.set('invite_policy', InvitePolicy.NOBODY)
+  return memcache.get('invite_policy')
+
+def INVITE_LIMIT():
+  if memcache.get('invite_limit', None) is None:
+    memcache.set('invite_limit', 1000)
+  return memcache.get('invite_limit')

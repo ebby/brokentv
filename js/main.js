@@ -5,7 +5,9 @@ goog.require('brkn.Controller');
 goog.require('brkn.Notify');
 goog.require('brkn.Player');
 goog.require('brkn.Popup');
+goog.require('brkn.Search');
 goog.require('brkn.Sidebar');
+goog.require('brkn.Queue');
 goog.require('brkn.main');
 goog.require('brkn.model.Analytics');
 goog.require('brkn.model.BrowserChannel');
@@ -60,6 +62,16 @@ brkn.Main = function(channelToken) {
    * @type {brkn.Notify}
    */
   this.notify_ = new brkn.Notify();
+  
+  /**
+   * @type {brkn.Queue}
+   */
+  this.queue_ = new brkn.Queue();
+  
+  /**
+   * @type {brkn.Search}
+   */
+  this.search_ = new brkn.Search();
 };
 goog.inherits(brkn.Main, goog.ui.Component);
 
@@ -95,6 +107,8 @@ brkn.Main.prototype.enterDocument = function() {
   this.sidebar_.decorate(goog.dom.getElement('sidebar'));
   this.player_.decorate(goog.dom.getElement('stage'));
   this.notify_.decorate(goog.dom.getElement('notify'));
+  this.queue_.decorate(goog.dom.getElement('queue'));
+  this.search_.decorate(goog.dom.getElement('search'));
   this.popup_ = new brkn.Popup();
 
   if (!brkn.model.Users.getInstance().currentUser.welcomed) {
@@ -464,11 +478,11 @@ brkn.Main.getSessionAndInit = function(response) {
           };
           
           goog.dom.classes.remove(document.body, 'login');
-          
+          goog.Timer.callOnce(reveal, 300);
           brkn.Main.init(response, data['token'], data['channels'], data['programs'],
               data['current_user'], data['viewer_sessions']);
 
-          goog.Timer.callOnce(reveal, 300);
+          
         } else if (e.target.getStatus() == 500) {
           brkn.Main.noLogin('error', 'Opps, check back later');
         } else {

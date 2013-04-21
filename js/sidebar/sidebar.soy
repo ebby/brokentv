@@ -171,7 +171,7 @@
 {template .sessionActivity}
   <div class="activity{if $users.length > 1}{sp}digest{/if}">
     {if $users.length > 1}
-      <div class="text">
+      <div class="template">
         <span>{$users.length} friends{sp}</span>
         {if $tunedOut}watched{else}are watching{/if}
         {if $channel}{sp}<a href="#channel:{$channel.id}">{$channel.name}</a>{/if}
@@ -193,7 +193,7 @@
           <img src="{$users[0].picture}"/>
         </div>
       </a>
-      <div class="text">
+      <div class="template">
         <a class="user" href="#user:{$users[0].id}">{$users[0].name}</a>{sp}
         {if $tunedOut}watched{else}is watching{/if}
         {if $channel}{sp}<a href="#channel:{$channel.id}">{$channel.name}</a>{/if}
@@ -213,7 +213,7 @@
 {template .commentActivity}
   <div class="comment activity{if $comments.length > 1}{sp}digest{/if}">
     {if $comments.length > 1}
-      <div class="text">
+      <div class="template">
         {if $users.length == 1}
           <a class="user" href="#user:{$users[0].id}">{$users[0].name}{sp}</a>{sp}discussed{sp}
           <a class="title" href="#info:{$media.id}">{$media.name}</a>.
@@ -230,9 +230,9 @@
             <img src="{$comment.user.picture}"/>
           </div>
         </a>
-        <div class="text">
+        <div class="template">
           <a class="user" href="#user:{$comment.user.id}">{$comment.user.name}</a>{sp}{sp}
-          "{$comment.text}"
+          <div class="text">{$comment.text}</div>
           <div class="timestamp">{$comment.relativeTime}</div>
         </div>
       </div>
@@ -505,13 +505,16 @@
         <div class="title">{$media.name}</div>
       </div>
     </div>
+    
     <div class="publisher">
+      {if $media.publisher}
       <img src="{$media.publisher.picture}">
       <div class="name">{$media.publisher.name}</div>
+      {/if}
     </div>
     <div class="stats">
       <div class="comment-count"><div class="icon"></div>{$media.commentCount}</div>
-      <div class="star-count"><div class="icon"></div>{$media.starCount}</div>
+      <div class="like-count"><div class="icon"></div>{$media.likeCount}</div>
     </div>
   </div>
 {/template}

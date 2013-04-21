@@ -32,12 +32,15 @@ class BaseHandler(SessionRequest):
                 # Now, check to see if existing user
                 graph = facebook.GraphAPI(cookie["access_token"])
                 user = User.get_by_key_name(cookie["uid"])
+                new_user = False
+                user_number = 0
                 if not user:
+                    new_user = True
                     # Not an existing user so get user info
                     profile = graph.get_object("me")
                     user = User(key_name=str(profile["id"]),
                         id=str(profile["id"]),
-                        access_level=(AccessLevel.ADMIN if constants.DEVELOPMENT else AccessLevel.WAITLIST),
+                        access_level=AccessLevel.WAITLIST,
                         name=profile["name"],
                         gender=profile.get("gender"),
                         email=profile.get("email"),
@@ -45,17 +48,33 @@ class BaseHandler(SessionRequest):
                         access_token=cookie["access_token"],
                         location=profile['location']['name'] \
                             if 'location' in profile else None)
-                    user_number = Stat.add_user(user.gender) + 500
-                    waitlist_email = emailer.Email(emailer.Message.WAITLIST,
-                                                   {'name' : user.first_name, 'waitlist' : user_number})
-                    waitlist_email.send(user)
+                    user_number = Stat.add_user(user.gender)
                 elif user.access_token != cookie["access_token"]:
                     user.access_token = cookie["access_token"]
 
                 # Update friends graph
                 friends = graph.get_connections("me", "friends")['data']
                 user.friends = [f['id'] for f in friends]
+                
+                # Determine access level
+                if new_user and user_number < constants.INVITE_LIMIT():
+                  if constants.INVITE_POLICY() == constants.InvitePolicy.NIGHTCLUB:
+                    if (user.gender == 'female' and user.has_friend()) or \
+                        (user.gender == 'male' and user.has_female_friend()):
+                      user.access_level = AccessLevel.USER
+                  if constants.INVITE_POLICY() == constants.InvitePolicy.HAS_FRIEND:
+                    if user.has_friend():
+                      user.access_level = AccessLevel.USER
+                  if constants.INVITE_POLICY() == constants.InvitePolicy.ANYBODY:
+                    user.access_level = AccessLevel.USER
+
                 user.put()
+
+                if new_user:
+                  if user.access_level == AccessLevel.USER:
+                    user.send_invite()
+                  else:
+                    user.send_waitlist_email(user_number + 500)
 
                 # User is now logged in
                 self.session["user"] = user.to_session()

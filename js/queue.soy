@@ -1,0 +1,15 @@
+{namespace brkn.queue}
+
+/**
+ * @param media
+ */
+{template .media}
+  <div class="queue-media">
+    <div class="pic">
+      <img src="{$media.publisher.picture}">
+    </div>
+    <div class="title">{$media.name}</div>
+    <div class="play"></div>
+    <div class="remove"></div>
+  </div>
+{/template}

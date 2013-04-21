@@ -235,22 +235,28 @@ h4,.h4 {
 								<div mc:edit="std_content00">
 								<h1 class="h1">Welcome to XYLO!</h1>
 								<br />
-
+								<a href="{{ link }}">
+                <table border="0" cellpadding="10" cellspacing="0" width="100%" style="background: #dedede">
+                  <tr>
+                    <td width="140px"><img width="140px" src="{{ image }}"/></td>
+                    <td valign="center" style="font-size: 22px; font-weight: bold">{{ friend_name }}
+                    <div style="font-size: 16px; margin-top: 10px">is watching right now!</div></td>
+                  </tr>
+                </table>
+                </a>
+                <br/>
 								{{ name }},<br />
-								<br />
-								I'd like to invite you to XYLO, your vision into the web!
-								<br /><br />
-								Catch the latest news, talk shows, music videos, and sports highlights.
-								Interested in a story? Discuss live with friend,
-								read the related Twitter discussion, and respond right from XYLO. 
+                <br />
+                I'd like to invite you to XYLO, your never-ending content fix!
                 <br /><br />
-                We are currently in beta and need your feedback to make this product great. Please
-                reply to this email with any thoughts you have.<br />
-								<br />
-
-								Thanks,<br />
-								Ebby Amir, Founder<br />
-								ebby@xylocast.com <br />
+                Catch the latest news, talk shows, music videos, and sports highlights.
+                Interested in a story? Discuss live with friend,
+                read the related Twitter discussion, and respond right from XYLO. 
+                <br /><br />
+                Thanks,<br />
+                Ebby Amir, Founder<br />
+                ebby@xylocast.com <br />
+                <br />
 								<br />
 								</div>
 								</td>
@@ -265,7 +271,7 @@ h4,.h4 {
 										<div mc:edit="std_content01"><a
 											href="http://www.xylocast.com" target="_blank"
 											style="color: #FFFFFF; font-family: Arial; font-size: 15px; font-weight: bold; letter-spacing: -.5px; line-height: 100%; text-align: center; text-decoration: none;">WATCH
-										NOW</a></div>
+										WITH {{ friend_first_name }}</a></div>
 										</td>
 									</tr>
 								</table>

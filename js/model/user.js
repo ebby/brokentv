@@ -49,7 +49,12 @@ brkn.model.User = function(user) {
    * @type {brkn.model.Media}
    */
   this.currentMedia;
-  
+
+  /**
+   * @type {Array.<brkn.model.Media>}
+   */
+  this.starred = [];
+
   /**
    * @type {brkn.model.Session}
    */
@@ -153,6 +158,25 @@ brkn.model.User.prototype.getActivities = function() {
 
 
 /**
+ * @param {Array.<brkn.model.Media>} medias
+ */
+brkn.model.User.prototype.setStarred = function(medias) {
+  this.starred = medias;
+  this.publish(brkn.model.User.Actions.SET_STARRED);
+};
+
+
+/**
+ * @param {brkn.model.Media} media
+ */
+brkn.model.User.prototype.isStarred = function(media) {
+  return goog.array.find(this.starred, function(m) {
+    return m.id == media.id;
+  })
+};
+
+
+/**
  * @param {?boolean=} opt_time Show the time 
  * @return {string} Last login date as a readable string
  */
@@ -170,7 +194,8 @@ brkn.model.User.prototype.getLastLogin = function (opt_time) {
  * @enum {string}
  */
 brkn.model.User.Actions = {
-  TWITTER_AUTH: 'twitter-auth'
+  TWITTER_AUTH: 'twitter-auth',
+  SET_STARRED: 'set-starred'
 };
 
 

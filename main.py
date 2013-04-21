@@ -106,6 +106,9 @@ class AdminHandler(BaseHandler):
         template_data['css_location'] = constants.ADMIN_CSS_SOURCE
       template_data['js_location'] = constants.ADMIN_JS_SOURCE
       template_data['stats'] = simplejson.dumps(Stat.to_json())
+      logging.info(constants.INVITE_POLICY())
+      template_data['invite_policy'] = constants.INVITE_POLICY()
+      template_data['invite_limit'] = constants.INVITE_LIMIT()
       path = os.path.join(os.path.dirname(__file__), 'templates/admin.html')
       self.response.out.write(template.render(path, template_data))
 
@@ -187,11 +190,16 @@ def create_handlers_map():
     ('/_changechannel', rpc.ChangeChannelHandler),
     ('/_comment', rpc.CommentHandler),
     ('/_comment/(.*)', rpc.CommentHandler),
+    ('/_dislike', rpc.DislikeHandler),
+    ('/_dislike/(.*)', rpc.DislikeHandler),
     ('/_info/(.*)', rpc.InfoHandler),
+    ('/_like', rpc.LikeHandler),
+    ('/_like/(.*)', rpc.LikeHandler),
     ('/_link', rpc.LinkHandler),
     ('/_optin', rpc.OptInHandler),
     ('/_programming/(.*)', rpc.ProgramHandler),
     ('/_publisher/(.*)', rpc.PublisherHandler),
+    ('/_queue', rpc.QueueHandler),
     ('/_started', rpc.StartedHandler),
     ('/_seen', rpc.SeenHandler),
     ('/_seen/(.*)', rpc.SeenHandler),
@@ -221,6 +229,7 @@ def create_handlers_map():
     ('/admin/_demo', admin.DemoHandler),
     ('/admin/_fetch', admin.FetchHandler),
     ('/admin/_program', admin.ProgramHandler),
+    ('/admin/_launchsettings', admin.LaunchSettingsHandler),
     ('/admin/_media/collection', admin.CollectionMediaHandler),
     ('/admin/_media/collection/(.*)', admin.CollectionMediaHandler),
     ('/admin/_media/publisher/(.*)', rpc.PublisherMediaHandler),

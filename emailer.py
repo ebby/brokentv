@@ -55,3 +55,10 @@ class Message():
             'template': 'comment.html'
            }
   
+  @staticmethod
+  def WELCOME_FRIEND(name):
+    return {
+            'subject' : 'Watch XYLO with ' + name + ' right now!',
+            'template': 'comment.html'
+           }
+  

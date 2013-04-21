@@ -1,7 +1,7 @@
 cron:
 - description: publisher fetch
   url: /cron/fetch
-  schedule: every 30 minutes
+  schedule: every 1 hours
   target: youtube
   
 - description: set programming

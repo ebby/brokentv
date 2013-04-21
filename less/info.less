@@ -43,8 +43,7 @@ div#sidebar div.info {
       position: absolute;
       left: 115px;
       top: 80px;
-      opacity: 0;
-      visibility: hidden;
+      opacity: .9;
       .transition(opacity, .3s, ease);
       .icon {
         .icon-play();
@@ -52,10 +51,6 @@ div#sidebar div.info {
         margin-top: 7px;
         margin-left: 4px;
       }
-    }
-    &:hover div.play {
-      visibility: visible;
-      opacity: .9;
     }
     &.scrolled div.play {
       display: none;
@@ -163,12 +158,14 @@ div#sidebar div.info {
     margin-left: 10px;
     text-shadow: 1px 1px 1px white;
     font-family: MuseoSans700;
+    position: relative;
+    width: 300px;
     a {
       cursor: pointer;
     }
     a.prev-link {
       position: absolute;
-      right: -8px;
+      right: 0;
     }
     div.globe-icon {
       .icon-globe();
@@ -277,17 +274,14 @@ div#sidebar div.info {
       margin-left: -6px;
     }
     div.star .icon {
-      .icon-heart();
-      font-size: 11px;
-      margin-top: -5px;
-      margin-left: -5px;
+      .icon-bookmark();
+      font-size: 16px;
+      margin-top: -9px;
+      margin-left: -2px;
     }
     div.star.goog-custom-button-checked .icon {
-      .icon-heart();
-      font-size: 11px;
-      color: red;
-      margin-top: -5px;
-      margin-left: -5px;
+      .icon-bookmark();
+      color: yellow;
     }
     div.facebook .icon {
       .icon-facebook();

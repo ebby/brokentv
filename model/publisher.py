@@ -43,11 +43,15 @@ class Publisher(db.Model):
       return publisher
 
   @classmethod
-  def add(self, host, host_id, name=None, channel_id=None):
+  def add(self, host, host_id, name=None, channel_id=None, fetch_details=False):
     publisher = Publisher.get_or_insert(key_name=host+host_id,
                                         host_id=host_id,
                                         name=name,
                                         channel_id=channel_id)
+    if fetch_details:
+      deferred.defer(Publisher.fetch_details, publisher.id,
+                     _name='publisher-details' + '-' + str(uuid.uuid1()),
+                     _queue='youtube')
     return publisher
   
   @classmethod
@@ -63,7 +67,7 @@ class Publisher(db.Model):
           return
         desc = user_entry.content.text
         desc = desc.decode('utf-8').replace("\n", r" ") if desc else None
-        
+
         picture = urlfetch.fetch(user_entry.thumbnail.url)
         publisher.name = user_entry.title.text.decode('utf-8')
         publisher.picture = db.Blob(picture.content)

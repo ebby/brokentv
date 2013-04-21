@@ -26,6 +26,22 @@
   </head>
   <body>
     <div id="content" class="users">
+      <div class="launch" id="launch">
+        <div class="policy">
+          <div class="label">INVITE POLICY</div>
+          <div id="policies" class="controls">
+			      <div class="button dark 0{% if invite_policy == 0 %} selected{% endif %}">NIGHTCLUB</div>
+			      <div class="button dark 1{% if invite_policy == 1 %} selected{% endif %}">HAS FRIEND</div>
+			      <div class="button dark 2{% if invite_policy == 2 %} selected{% endif %}">ANYBODY</div>
+			      <div class="button dark 3{% if invite_policy == 3 %} selected{% endif %}">NOBODY</div>
+			    </div>
+        </div>
+        <div class="limit">
+          <div class="label">INVITE LIMIT</div>
+          <input type="text" id="invite-limit" value="{{ invite_limit }}"/>
+          <div class="button" id="update-limit">Update</div>
+        </div>
+      </div>
       <div class="users" id="users"></div>
       <div class="stats" id="stats">
       
@@ -116,6 +132,7 @@
       <div class="logo">XYLO <span>admin</span></div>
       <div id="sections" class="sections">
         <div class="section users selected">USERS</div>
+        <div class="section launch">LAUNCH</div>
         <div class="section stats">STATS</div>
         <div class="section stats">CHANNELS</div>
         <div class="section stats">CONTENT</div>

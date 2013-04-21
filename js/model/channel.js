@@ -112,6 +112,20 @@ brkn.model.Channel.prototype.addProgram = function(program) {
 
 
 /**
+ * @param {?Function=} opt_callback
+ */
+brkn.model.Channel.prototype.fetchQueue = function(opt_callback) {
+  goog.net.XhrIo.send('/_queue', function(e) {
+    var response = e.target.getResponseJson();
+    this.queue_ = goog.array.map((/** @type {Array.<Object>} */ response), function(m) {
+      return brkn.model.Medias.getInstance().getOrAdd(m);
+    }, this);
+    opt_callback && opt_callback(this.queue_);
+  });
+};
+
+
+/**
  * @param {goog.date.DateTime} time The last programmed time on this channel
  */
 brkn.model.Channel.prototype.maybeFetchProgramming = function(time) {
@@ -134,10 +148,15 @@ brkn.model.Channel.prototype.addQueue = function(media, add) {
         '#info:' + media.id);
     
     brkn.model.Analytics.getInstance().playAsync(media);
+    
+    goog.net.XhrIo.send('/_queue', goog.functions.NULL(), 'POST',
+        'media_id=' + media.id);
   } else {
     goog.array.removeIf(this.queue, function(m) {
       return m.id == media.id;
     }, this);
+    goog.net.XhrIo.send('/_queue', goog.functions.NULL(), 'POST',
+        'media_id=' + media.id + '&delete=1');
   }
 };
 

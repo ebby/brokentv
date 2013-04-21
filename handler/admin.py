@@ -73,12 +73,23 @@ class AccessLevelHandler(BaseHandler):
       user = User.get_by_key_name(self.request.get('uid'))
       access_level = int(self.request.get('level'))
       if user.access_level == 0 and access_level == 1:
-        welcome_email = emailer.Email(emailer.Message.WELCOME, {'name' : user.first_name})
-        welcome_email.send(user)
+        user.send_invite()
       user.access_level = access_level
       user.put()
       self.response.out.write('')
-      
+ 
+class LaunchSettingsHandler(BaseHandler):
+    @BaseHandler.super_admin
+    def post(self):
+      invite_policy = self.request.get('invite_policy')
+      invite_limit = self.request.get('invite_limit')
+      if invite_policy:
+        logging.info(invite_policy)
+        memcache.set('invite_policy', int(invite_policy))
+      if invite_limit:
+        memcache.set('invite_limit', int(invite_limit))
+      self.response.out.write('')
+
 class DemoHandler(BaseHandler):
     @BaseHandler.super_admin
     def post(self):
