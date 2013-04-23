@@ -22,7 +22,7 @@ class Publisher(db.Model):
   def get_medias(self, limit, offset=0):
     # add .order('-published')
     pub_medias = PublisherMedia.all().filter('publisher =', self) \
-        .fetch(limit=limit, offset=offset)
+        .order('-published').fetch(limit=limit, offset=offset)
     return [p_m.media for p_m in pub_medias]
   
   def toJson(self, get_desc=True):

@@ -40,7 +40,13 @@ indexes:
   - name: is_parent
   - name: media
   - name: time
-  
+
+- kind: PublisherMedia
+  properties:
+  - name: publisher
+  - name: published
+    direction: desc
+
 - kind: Tweet
   properties:
   - name: media

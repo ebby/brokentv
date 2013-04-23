@@ -71,6 +71,12 @@ brkn.Sidebar = function() {
    * @private
    */
   this.screens_ = [];
+  
+  /**
+   * @type {number}
+   * @private
+   */
+  this.activitiesCount_ = 0;
 };
 goog.inherits(brkn.Sidebar, goog.ui.Component);
 
@@ -137,6 +143,13 @@ brkn.Sidebar.prototype.profileEl_;
 brkn.Sidebar.prototype.conversationEl_;
 
 
+/**
+ * @type {Element}
+ * @private
+ */
+brkn.Sidebar.prototype.activitiesCountEl_;
+
+
 /** @inheritDoc */
 brkn.Sidebar.prototype.enterDocument = function() {
   goog.base(this, 'enterDocument');
@@ -148,6 +161,7 @@ brkn.Sidebar.prototype.enterDocument = function() {
   this.conversationEl_ = goog.dom.getElement('conversation');
   this.toolbar_ = goog.dom.getElement('toolbar');
   this.tabsEl_ = goog.dom.getElementByClass('tabs', this.getElement());
+  this.activitiesCountEl_ = goog.dom.getElementByClass('activities-count', this.getElement());
   var keyHandler = new goog.events.KeyHandler(document);
 
   goog.array.forEach(goog.dom.getChildren(this.tabsEl_), function(tab) {
@@ -216,6 +230,9 @@ brkn.Sidebar.prototype.enterDocument = function() {
             if (lastTab != this.currentTab_) {
               e.stopPropagation();
             }
+            if (tabName == 'stream') {
+              this.newActivities_(0, true);
+            }
           }, this))
       .listen(this.toolbar_,
           goog.events.EventType.CLICK,
@@ -248,6 +265,8 @@ brkn.Sidebar.prototype.enterDocument = function() {
   
   brkn.model.Sidebar.getInstance().subscribe(brkn.model.Sidebar.Actions.NAVIGATE,
       this.navigate, this);
+  brkn.model.Sidebar.getInstance().subscribe(brkn.model.Sidebar.Actions.NEW_ACTIVITIES,
+      this.newActivities_, this);
   brkn.model.Sidebar.getInstance().subscribe(brkn.model.Sidebar.Actions.CONVERSATION,
       this.showConversation, this);
   brkn.model.Sidebar.getInstance().subscribe(brkn.model.Sidebar.Actions.MEDIA_LIST,
@@ -286,10 +305,29 @@ brkn.Sidebar.prototype.fetchAndRenderStream_ = function() {
   goog.net.XhrIo.send(
       '/_activity',
       goog.bind(function(e) {
-        var activities = /** @type {Array.<Object>} */ e.target.getResponseJson();
+        var response = e.target.getResponseJson();
+        var activities = /** @type {Array.<Object>} */ response['activities'];
         this.stream_ = new brkn.sidebar.Stream(activities);
         this.stream_.decorate(goog.dom.getElement('stream'));
+        brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NEW_ACTIVITIES,
+            parseInt(response['new_count'], 10));
       }, this));
+};
+
+
+/**
+ * @param {number} count
+ * @param {?number=} opt_reset
+ * @private
+ */
+brkn.Sidebar.prototype.newActivities_ = function(count, opt_reset) {
+  if (opt_reset) {
+    this.activitiesCount_ = 0;
+    goog.style.showElement(this.activitiesCountEl_, false);
+  }
+  this.activitiesCount_ += count;
+  goog.dom.setTextContent(this.activitiesCountEl_, this.activitiesCount_.toString());
+  goog.style.showElement(this.activitiesCountEl_, !!this.activitiesCount_);
 };
 
 

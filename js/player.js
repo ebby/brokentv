@@ -207,7 +207,6 @@ brkn.Player.prototype.enterDocument = function() {
             }
           }, this))
       .listen(this.getElement(), goog.events.EventType.CLICK, goog.bind(function(e) {
-        window.console.log(e.target);
         if (goog.dom.classes.has(goog.dom.getElement('queue'), 'show') ||
             goog.dom.classes.has(goog.dom.getElement('search'), 'show') ||
             goog.dom.getAncestorByClass(e.target, 'queue') ||

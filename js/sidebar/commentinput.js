@@ -163,6 +163,7 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
       .listen(keyHandler,
           goog.events.KeyHandler.EventType.KEY,
           goog.bind(function(e) {
+            e.stopPropagation();
             this.addCommentButton_.setEnabled(this.commentInput_.getValue());
             if (e.keyCode == '13') {
               e.preventDefault();

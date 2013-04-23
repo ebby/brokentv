@@ -24,7 +24,7 @@ class Media(db.Model):
   thumb_pos = db.IntegerProperty(default=50) # Percent to center of thumbnail
   path = db.StringProperty()
   live = db.BooleanProperty(default=False)
-  
+
   # Statistics
   started = db.StringListProperty(default=[]) # Users who let the program play
   opt_in = db.StringListProperty(default=[]) # Users who tune-in or async play
@@ -175,7 +175,42 @@ class Media(db.Model):
 
   def get_tweets(self, limit=10, offset=0):
     from tweet import Tweet
-    return Tweet.all().filter('media =', self).order('-time').fetch(limit, offset=offset)
+    
+    new_tweets = []
+
+    cached_media = memcache.get(self.id) or {}
+    cached_tweets_json = cached_media.get('tweets') or []
+    if not cached_tweets_json or limit + offset > len(cached_tweets_json):
+      tweets = Tweet.all().filter('media =', self)
+      if len(cached_tweets_json) and offset < len(cached_tweets_json):
+        latest_time = iso8601.parse_date(cached_tweets_json[0]['time']).replace(tzinfo=None)
+        tweets = tweets.filter('time >', latest_time)
+      tweets = tweets.order('-time').fetch(limit, offset=offset)
+
+      if tweets and len(tweets):
+        new_time = tweets[0].time
+        inserted = False
+        # Insert by timestamp
+        for i in range(len(cached_tweets_json)):
+          time = iso8601.parse_date(cached_tweets_json[i]['time']).replace(tzinfo=None)
+          if new_time > time:
+            for t in tweets:
+              if t.id == cached_tweets_json[i]['id']:
+                break
+              new_tweets.append(t.to_json())
+            inserted = True
+          if inserted:
+            new_tweets += cached_tweets_json[i:]
+            break
+          new_tweets.append(cached_tweets_json[i])
+
+        if not cached_tweets_json or not inserted:
+          new_tweets = cached_tweets_json + [t.to_json() for t in tweets]
+      cached_tweets_json = new_tweets if len(new_tweets) else cached_tweets_json
+      cached_media['tweets'] = cached_tweets_json
+      memcache.set(self.id, cached_media)
+
+    return cached_tweets_json[offset:offset+limit]
 
   def set_seen_by(self, user=None):
     if user and not user.id in self.seen:

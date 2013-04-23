@@ -126,6 +126,8 @@ brkn.Queue.prototype.addMedia_ = function(media, add) {
         .listen(playEl, goog.events.EventType.CLICK, goog.bind(function(e) {
           e.preventDefault();
           e.stopPropagation();
+          goog.dom.classes.remove(this.getElement(), 'show');
+          this.toggle_.setChecked(false);
           var program = brkn.model.Program.async(media);
           brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.PLAY_ASYNC, program);
           brkn.model.Channels.getInstance().getMyChannel().publish(brkn.model.Channel.Action.ADD_QUEUE,

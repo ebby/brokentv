@@ -37,6 +37,7 @@ def get_session(current_user, media_id=None, channel_id=None, single_channel_id=
   user_channel = current_user.channel.get()
   
   media = None
+  current_channel = None
   if media_id:
     media = Media.get_by_key_name(media_id)
     if media:
@@ -51,76 +52,15 @@ def get_session(current_user, media_id=None, channel_id=None, single_channel_id=
 
   data['channels'] = channels or cached_channels
   data['programs'] = cached_programming
- 
-  # CREATE BROWSER CHANNEL
-  token = browserchannel.create_channel(current_user.id)
-  data['token'] = token
     
   # MAKE SURE WE HAVE CHANNELS
   channels = channels or Channel.get_public()
   assert len(channels) > 0, 'NO CHANNELS IN DATABASE'
-  
-  current_viewers = memcache.get('current_viewers') or {}
-  current_friends = [tuple for tuple in current_viewers.iteritems() \
-                      if tuple[0] in current_user.friends \
-                      or (current_user.demo and tuple[0] in SUPER_ADMINS)]
-  with_friends = len(current_friends) > 0
-
-  user_sessions = UserSession.get_by_user(current_user)
-  current_channel = None
-  if media_id:
-    current_channel = user_channel or Channel.get_my_channel(current_user)
-  elif channel_id:
-    current_channel = Channel.get_by_key_name(channel_id)
-  elif len(user_sessions):
-    current_channel = Channel.get_by_key_name(user_sessions[0].channel.key().name())
-
-  if not current_channel:
-    current_channel = channels[0] if len(channels) else None
-
-  if len(user_sessions) and not user_sessions[0].tune_out:
-    # Kill it, create new
-    user_sessions[0].delete()
-    session = UserSession.new(current_user, current_channel, with_friends=with_friends)
-  elif len(user_sessions) and user_sessions[0].tune_out and \
-      (datetime.datetime.now() - user_sessions[0].tune_out).seconds < 180:
-    # Re-purpose last session (typically if the user refreshed)
-    session = user_sessions[0]
-    session.tune_out = None
-    session.put()
-  else:
-    session = UserSession.new(current_user, current_channel, with_friends=with_friends)
-
-  # TRACK ALL USERS
-  def add_current_viewer(current_viewers, uid, sid):
-    current_viewers[uid] = sid
-    return current_viewers
-  current_viewers = memcache_cas('current_viewers', add_current_viewer, current_user.id, session.id)
-  
-  # Track current viewers by channel, useful for audience tailoring
-  channel_viewers = memcache.get('channel_viewers') or {}
-  if not channel_viewers.get(current_channel.id) or \
-      current_user.id not in channel_viewers[current_channel.id]:
-    
-    def add_channel_viewer(channel_viewers, cid, uid):
-      channel_viewers[cid] = \
-          channel_viewers.get(cid, []) + [uid]
-      return channel_viewers
-    channel_viewers = memcache_cas('channel_viewers', add_channel_viewer, current_channel.id, current_user.id)
-
-  # Grab sessions for current_users (that we care about)
-  # TODO cache last session for each user
-  viewer_sessions = [session.toJson()]
-  for uid,sess_id in [tuple for tuple in current_viewers.iteritems() if \
-                   (tuple[0] in current_user.friends or \
-                    (current_user.demo and tuple[0] in SUPER_ADMINS))]:
-    sess = UserSession.get_by_id(int(sess_id))
-    viewer_sessions.append(sess.toJson())
-  data['viewer_sessions'] = viewer_sessions
 
   # ME
   user_obj = current_user.toJson(configs=True)
-  user_obj['current_channel'] = current_channel.id
+  user_obj['current_channel'] = current_channel.id if current_channel else current_user.current_channel_id \
+      if current_user.current_channel_id else channels[0].id
   data['current_user'] = user_obj
 
   # Potentially send friend invites
@@ -132,9 +72,6 @@ def get_session(current_user, media_id=None, channel_id=None, single_channel_id=
   # Update login
   current_user.last_login = datetime.datetime.now()
   current_user.put()
-
-  broadcast.broadcastViewerChange(current_user, None, current_channel.id,
-                                  session.key().id(), session.tune_in.isoformat(), media);
 
   return data
 
@@ -148,7 +85,7 @@ class SessionHandler(BaseHandler):
       self.error(401)
     else:
       data = {}
-      
+
       user_agent = self.request.headers.get('user_agent')
       if self.current_user.id not in constants.SUPER_ADMINS:
         if 'Mobile' in user_agent:
@@ -161,7 +98,6 @@ class SessionHandler(BaseHandler):
       media_id = self.session.get('media_id', None)
       channel_id = self.session.get('channel_id', None)
       single_channel_id = self.session.get('single_channel_id', None)
-      self.session['channel_id'] = None
 
       if not data.get('error'):
         data = get_session(self.current_user, media_id=media_id, channel_id=channel_id,
@@ -169,6 +105,74 @@ class SessionHandler(BaseHandler):
       if self.session.get('message'):
         data['message'] = self.session['message']
       self.response.out.write(simplejson.dumps(data))
+
+class PresenceHandler(BaseHandler):
+  @BaseHandler.logged_in
+  def get(self):
+    current_user = self.current_user
+    data = {}
+    
+    # CREATE BROWSER CHANNEL
+    token = browserchannel.create_channel(current_user.id)
+    data['token'] = token
+    
+    current_viewers = memcache.get('current_viewers') or {}
+    current_friends = [tuple for tuple in current_viewers.iteritems() \
+                        if tuple[0] in current_user.friends \
+                        or (current_user.demo and tuple[0] in SUPER_ADMINS)]
+    with_friends = len(current_friends) > 0
+    
+    last_session_json = UserSession.get_last_session(current_user.id)
+    current_channel_id = current_user.current_channel_id if current_user.current_channel_id \
+        else Channel.get_public()[0].id
+    current_channel = Channel.get_by_key_name(current_channel_id)
+    last_session_tune_out = iso8601.parse_date(last_session_json['tune_out']).replace(tzinfo=None) \
+        if last_session_json and last_session_json.get('tune_out') else None
+    if last_session_json and not last_session_json['tune_out']:
+      # Kill it, create new
+      # Maybe kill it on this line?
+      session_json = UserSession.new(current_user, current_channel, with_friends=with_friends).toJson()
+    elif last_session_tune_out and (datetime.datetime.now() - last_session_tune_out).seconds < 180:
+      # Re-purpose last session (typically if the user refreshed)
+      session_json = UserSession.reset_last_session(current_user)
+    else:
+      session_json = UserSession.new(current_user, current_channel, with_friends=with_friends).toJson()
+    
+    # TRACK ALL USERS
+    def add_current_viewer(current_viewers, uid, sid):
+      current_viewers[uid] = sid
+      return current_viewers
+    current_viewers = memcache_cas('current_viewers', add_current_viewer, current_user.id, session_json['id'])
+    
+    # Track current viewers by channel, useful for audience tailoring
+    channel_viewers = memcache.get('channel_viewers') or {}
+    if not channel_viewers.get(current_channel_id) or \
+        current_user.id not in channel_viewers[current_channel_id]:
+      
+      def add_channel_viewer(channel_viewers, cid, uid):
+        channel_viewers[cid] = \
+            channel_viewers.get(cid, []) + [uid]
+        return channel_viewers
+      channel_viewers = memcache_cas('channel_viewers', add_channel_viewer, current_channel_id, current_user.id)
+  
+    # Grab sessions for current_users (that we care about)
+    viewer_sessions = [session_json]
+    for uid,sess_id in [tuple for tuple in current_viewers.iteritems() if \
+                     (tuple[0] in current_user.friends or \
+                      (current_user.demo and tuple[0] in SUPER_ADMINS))]:
+      sess_json = UserSession.get_last_session(uid)
+      viewer_sessions.append(sess_json)
+    data['viewer_sessions'] = viewer_sessions
+
+    media = None
+    media_id = self.session.get('media_id', None)
+    if media_id:
+      media = Media.get_by_key_name(media_id)
+    
+    broadcast.broadcastViewerChange(current_user, None, current_channel.id,
+                                    session_json['id'], session_json['tune_in'], media);
+
+    self.response.out.write(simplejson.dumps(data))
 
 class SettingsHandler(BaseHandler):
   @BaseHandler.logged_in
@@ -229,7 +233,7 @@ class InfoHandler(BaseHandler):
       response['description'] = media.description
       response['seen'] = media.seen_by(self.current_user)
       response['comments'] = [c.toJson() for c in Comment.get_by_media(media, uid=self.current_user.id)]
-      response['tweets'] = [t.to_json() for t in media.get_tweets()]
+      response['tweets'] = media.get_tweets()
       self.response.out.write(simplejson.dumps(response))
         
 class PublisherHandler(BaseHandler):
@@ -352,7 +356,7 @@ class ActivityHandler(BaseHandler):
       activities = UserActivity.get_for_user(user, offset=int(offset)) if user else []
     else:
       activities = UserActivity.get_stream(self.current_user, offset=int(offset))
-    self.response.out.write(simplejson.dumps([a.toJson() for a in activities if a.user]))
+    self.response.out.write(simplejson.dumps(activities))
       
 class ChangeChannelHandler(BaseHandler):
   @BaseHandler.logged_in
@@ -410,6 +414,10 @@ class ChangeChannelHandler(BaseHandler):
     if current_program:
       Media.add_opt_in(current_program.media.key().name(), self.current_user.id)
 
+    current_user = self.current_user
+    current_user.current_channel_id = channel_id
+    current_user.put()
+
     broadcast.broadcastViewerChange(self.current_user, last_channel_id, channel_id,
                                     session.key().id(), session.tune_in.isoformat(),
                                     (current_program.media if current_program else None));
@@ -460,15 +468,16 @@ class LikeHandler(BaseHandler):
   @BaseHandler.logged_in
   def get(self, media_id=None):
     media = Media.get_by_key_name(media_id)
-    likes = Collection.get_by_key_name(self.current_user.id + '-liked')
-    dislikes = Collection.get_by_key_name(self.current_user.id + '-disliked')
-    liked = likes.collectionMedias.filter('media =', media).get() if likes else False
-    disliked = dislikes.collectionMedias.filter('media =', media).get() if dislikes else False
-    self.response.out.write(simplejson.dumps({
-                                              'media_id': media_id,
-                                              'liked': 1 if liked else 0,
-                                              'disliked': 1 if disliked else 0
-                                              }))
+    if media:
+      likes = Collection.get_by_key_name(self.current_user.id + '-liked')
+      dislikes = Collection.get_by_key_name(self.current_user.id + '-disliked')
+      liked = likes.collectionMedias.filter('media =', media).get() if likes else False
+      disliked = dislikes.collectionMedias.filter('media =', media).get() if dislikes else False
+      self.response.out.write(simplejson.dumps({
+                                                'media_id': media_id,
+                                                'liked': 1 if liked else 0,
+                                                'disliked': 1 if disliked else 0
+                                                }))
 
   @BaseHandler.logged_in
   def post(self):
@@ -487,8 +496,8 @@ class LikeHandler(BaseHandler):
     else:
       collection.add_media(media, True)
       Stat.add_like(media)
-      broadcast.broadcastNewActivity(UserActivity.add_starred(self.current_user, media))
-      
+      broadcast.broadcastNewActivity(UserActivity.add_like(self.current_user, media))
+
 class DislikeHandler(BaseHandler):
   @BaseHandler.logged_in
   def post(self):
@@ -525,7 +534,6 @@ class QueueHandler(BaseHandler):
       collection.remove_media(media)
     else:
       collection.add_media(media, True)
-      broadcast.broadcastNewActivity(UserActivity.add_starred(self.current_user, media))
 
 class TweetHandler(BaseHandler):
   @BaseHandler.logged_in
@@ -533,8 +541,8 @@ class TweetHandler(BaseHandler):
     offset = self.request.get('offset') or 0
     media = Media.get_by_key_name(media_key)
     if media:
-      tweets = media.get_tweets(offset=int(offset))
-      self.response.out.write(simplejson.dumps([t.to_json() for t in tweets]))
+      tweets_json = media.get_tweets(offset=int(offset))
+      self.response.out.write(simplejson.dumps(tweets_json))
 
 class TwitterHandler(BaseHandler):
   @BaseHandler.logged_in

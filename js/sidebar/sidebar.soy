@@ -243,6 +243,46 @@
 
 
 /**
+ * @param users
+ * @param time
+ * @param media_count
+ */
+{template .likeActivity}
+  <div class="like activity{if $users.length > 1}{sp}digest{/if}">
+    {if $users.length > 1}
+      <div class="template">
+        <span>{$users.length} friends{sp}</span>
+        liked
+        <div class="timestamp">{$time}</div>
+      </div>
+      <div class="users">
+        {foreach $user in $users}
+          <a href="#user:{$user.id}">
+            <div class="picture" style="background:{$user.color}">
+              <img src="{$user.picture}"/>
+            </div>
+          </a>
+        {/foreach}
+      </div>
+    {/if}
+    {if $users.length == 1}
+      <a href="#user:{$users[0].id}">
+        <div class="picture" style="background:{$users[0].color}">
+          <img src="{$users[0].picture}"/>
+        </div>
+      </a>
+      <div class="template" style="top:10px;margin-bottom:30px">
+        <a class="user" href="#user:{$users[0].id}">{$users[0].name}</a>{sp}
+        liked{sp}{if $media_count > 1}{$media_count} stories{/if}
+        <div class="timestamp">{$time}</div>
+      </div>
+    {/if}
+    <div class="medias"></div>
+  </div>
+{/template}
+
+
+/**
  * @param thumbnail
  * @param description
  * @param link
@@ -501,20 +541,21 @@
       <div class="preview">
         <div class="thumb" style="background-image:url({$media.thumbnail});
             background-position: 50% {$media.thumbPos}%"></div>
-        <div class="list-play"><div class="icon"></div></div>
         <div class="title">{$media.name}</div>
+        <div class="stats">
+          <div class="comment-count"><div class="icon"></div>{$media.commentCount}</div>
+          <div class="like-count"><div class="icon"></div>{$media.likeCount}</div>
+        </div>
       </div>
     </div>
     
     <div class="publisher">
       {if $media.publisher}
-      <img src="{$media.publisher.picture}">
-      <div class="name">{$media.publisher.name}</div>
+        <img src="{$media.publisher.picture}">
+        <div class="name">{$media.publisher.name}</div>
       {/if}
-    </div>
-    <div class="stats">
-      <div class="comment-count"><div class="icon"></div>{$media.commentCount}</div>
-      <div class="like-count"><div class="icon"></div>{$media.likeCount}</div>
+      <div class="list-play"><div class="icon"></div></div>
+      <div class="list-plus"><div class="icon"></div></div>
     </div>
   </div>
 {/template}

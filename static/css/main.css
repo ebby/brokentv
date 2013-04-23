@@ -1268,7 +1268,9 @@ div.header div.browse.now span {
 .collapsed div.channels div.channel div.programs div.program div.repos {
   display: none;
 }
-.collapsed div.channels div.channel div.programs div.program div.stats {
+.collapsed div.channels div.channel div.programs div.program div.stats,
+.collapsed div.channels div.channel div.programs div.program div.program-play,
+.collapsed div.channels div.channel div.programs div.program div.program-plus {
   display: none;
 }
 .collapsed div.channels div.channel div.programs div.program:active {
@@ -1404,6 +1406,10 @@ div.channels div.channel div.programs div.program:hover div.thumb {
   -webkit-box-shadow: inset 0 0 0 1px rgba(255,255,255,.2);
   -moz-box-shadow: inset 0 0 0 1px rgba(255,255,255,.2);
   box-shadow: inset 0 0 0 1px rgba(255,255,255,.2);
+}
+div.channels div.channel div.programs div.program:hover div.program-play,
+div.channels div.channel div.programs div.program:hover div.program-plus {
+  display: block;
 }
 div.channels div.channel div.programs div.program:active div.thumb {
   -webkit-box-shadow: inset 0 0 0 1px rgba(0, 0, 0,.7);
@@ -1547,6 +1553,79 @@ div.channels div.channel div.programs div.program div.stats div.like-count div.i
 }
 div.channels div.channel div.programs div.program div.stats div.like-count div.icon:before {
   content: '👍';
+}
+div.channels div.channel div.programs div.program div.program-play,
+div.channels div.channel div.programs div.program div.program-plus {
+  display: none;
+  bottom: 6px;
+  position: absolute;
+  opacity: .6;
+  width: 20px;
+  height: 20px;
+  -webkit-border-radius: 12px;
+  -moz-border-radius: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.5);
+}
+div.channels div.channel div.programs div.program div.program-play:active,
+div.channels div.channel div.programs div.program div.program-plus:active {
+  background: rgba(0, 0, 0, 0.7);
+  border-color: rgba(0, 0, 0, 0.9);
+}
+div.channels div.channel div.programs div.program div.program-play {
+  left: 6px;
+}
+div.channels div.channel div.programs div.program div.program-play .icon {
+  font-family: 'icons';
+  font-style: normal;
+  font-weight: normal;
+  speak: none;
+  text-decoration: inherit;
+  /* opacity .8 */
+
+  font-variant: normal;
+  /* Uncomment for 3D effect */
+
+  /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+
+  /* '▶' */
+
+  font-size: 14px;
+  margin-top: 3px;
+  margin-left: 7px;
+  text-shadow: none;
+  color: #f5f5f5;
+}
+div.channels div.channel div.programs div.program div.program-play .icon:before {
+  content: '\25b6';
+}
+div.channels div.channel div.programs div.program div.program-plus {
+  left: 32px;
+}
+div.channels div.channel div.programs div.program div.program-plus .icon {
+  font-family: 'icons';
+  font-style: normal;
+  font-weight: normal;
+  speak: none;
+  text-decoration: inherit;
+  /* opacity .8 */
+
+  font-variant: normal;
+  /* Uncomment for 3D effect */
+
+  /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+
+  /* '+' */
+
+  font-size: 14px;
+  margin-top: 3px;
+  margin-left: 6px;
+  text-shadow: none;
+  color: #f5f5f5;
+}
+div.channels div.channel div.programs div.program div.program-plus .icon:before {
+  content: '\2b';
 }
 div.channels div.channel div.programs div.program.current {
   background: rgba(255, 255, 255, 0.3);
@@ -2806,6 +2885,7 @@ div#sidebar div#toolbar ul.tabs li.tab {
   display: table-cell;
   vertical-align: middle;
   cursor: pointer;
+  position: relative;
 }
 div#sidebar div#toolbar ul.tabs li.tab.admin {
   display: none;
@@ -2819,6 +2899,20 @@ div#sidebar div#toolbar ul.tabs li.tab div.label {
   font-size: 11px;
   color: #8d8d8d;
   text-shadow: 1px 1px 0 white;
+}
+div#sidebar div#toolbar ul.tabs li.tab div.activities-count {
+  position: absolute;
+  height: 10px;
+  background: #ff5555;
+  padding: 1px 4px;
+  border-radius: 3px;
+  color: #fefefe;
+  text-shadow: none;
+  border: 1px solid #B7432E;
+  font-size: 9px;
+  top: 4px;
+  display: inline-block;
+  right: 4px;
 }
 div#sidebar div#toolbar div.arrow {
   position: absolute;
@@ -5094,12 +5188,9 @@ div#sidebar div.stream div.activity {
 div#sidebar div.stream div.activity.show {
   opacity: 1;
 }
-div#sidebar div.stream div.activity.digest.comment div.template {
-  padding-bottom: 0px;
-}
 div#sidebar div.stream div.activity.digest div.template {
   left: 10px;
-  margin-bottom: 5px;
+  margin-bottom: 0;
   padding-bottom: 8px;
   width: 300px;
 }
@@ -5124,14 +5215,13 @@ div#sidebar div.stream div.activity.digest div.comment div.template {
   width: 260px;
 }
 div#sidebar div.stream div.activity.digest div.medias {
-  margin-top: 13px;
+  margin-top: 5px;
 }
 div#sidebar div.stream div.activity div.picture {
   position: absolute;
   background: #ccc;
   width: 34px;
   height: 34px;
-  margin-top: 5px;
   -webkit-border-radius: 18px;
   -moz-border-radius: 18px;
   border-radius: 18px;
@@ -5158,11 +5248,17 @@ div#sidebar div.stream div.activity div.picture:active img {
   -moz-box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.1);
   box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.1);
 }
+div#sidebar div.stream div.activity div.comment div.template {
+  margin-bottom: 0;
+}
+div#sidebar div.stream div.activity div.comment div.picture {
+  margin-top: 5px;
+}
 div#sidebar div.stream div.activity div.template {
   position: relative;
   left: 50px;
-  top: 0px;
-  min-height: 20px;
+  top: 0;
+  margin-bottom: 25px;
   width: 260px;
   font-family: MuseoSans500;
 }
@@ -6056,10 +6152,6 @@ div.list-media:last-child:active div.publisher {
 div.list-media:hover div.media div.preview div.thumb {
   opacity: .7;
 }
-div.list-media:hover div.media div.preview div.list-play {
-  visibility: visible;
-  opacity: .95;
-}
 div.list-media:hover div.media div.preview div.title,
 div.list-media:hover div.media div.preview div.published {
   color: #f7f7f7;
@@ -6111,51 +6203,6 @@ div.list-media div.media div.preview div.thumb {
   background-position: center;
   border-top-left-radius: 3px;
   border-top-right-radius: 3px;
-}
-div.list-media div.media div.preview div.list-play {
-  top: 50%;
-  margin-top: -12px;
-  right: 8px;
-  position: absolute;
-  opacity: .6;
-  width: 20px;
-  height: 20px;
-  -webkit-border-radius: 12px;
-  -moz-border-radius: 12px;
-  border-radius: 12px;
-  border: 2px solid rgba(0, 0, 0, 0.7);
-  background: rgba(0, 0, 0, 0.5);
-  opacity: 0;
-  visibility: hidden;
-  -webkit-transition: opacity 0.3s ease;
-  -moz-transition: opacity 0.3s ease;
-  -o-transition: opacity 0.3s ease;
-  -ms-transition: opacity 0.3s ease;
-  transition: opacity 0.3s ease;
-}
-div.list-media div.media div.preview div.list-play .icon {
-  font-family: 'icons';
-  font-style: normal;
-  font-weight: normal;
-  speak: none;
-  text-decoration: inherit;
-  /* opacity .8 */
-
-  font-variant: normal;
-  /* Uncomment for 3D effect */
-
-  /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
-
-  /* '▶' */
-
-  font-size: 14px;
-  margin-top: 3px;
-  margin-left: 7px;
-  text-shadow: none;
-  color: #f5f5f5;
-}
-div.list-media div.media div.preview div.list-play .icon:before {
-  content: '\25b6';
 }
 div.list-media div.media div.preview div.title {
   left: 5px;
@@ -6234,7 +6281,7 @@ div.list-media div.publisher {
   top: 3px;
   left: 0px;
   margin-bottom: 4px;
-  width: 272px;
+  width: 290px;
   padding: 3px;
   color: #181818;
   text-shadow: 1px 1px 1px white;
@@ -6252,7 +6299,7 @@ div.list-media div.publisher img {
 div.list-media div.publisher div.name {
   font-size: 11px;
   line-height: 3px;
-  margin: 0 5px;
+  margin: 2px 0px -2px 5px;
   display: inline-block;
 }
 div.list-media div.publisher div.duration {
@@ -6260,12 +6307,85 @@ div.list-media div.publisher div.duration {
   right: 3px;
   top: 3px;
 }
+div.list-media div.list-play,
+div.list-media div.list-plus {
+  top: 50%;
+  margin-top: -12px;
+  position: absolute;
+  opacity: .6;
+  width: 20px;
+  height: 20px;
+  -webkit-border-radius: 12px;
+  -moz-border-radius: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.4);
+}
+div.list-media div.list-play:active,
+div.list-media div.list-plus:active {
+  background: rgba(0, 0, 0, 0.7);
+  border-color: rgba(0, 0, 0, 0.9);
+}
+div.list-media div.list-play {
+  right: 6px;
+}
+div.list-media div.list-play .icon {
+  font-family: 'icons';
+  font-style: normal;
+  font-weight: normal;
+  speak: none;
+  text-decoration: inherit;
+  /* opacity .8 */
+
+  font-variant: normal;
+  /* Uncomment for 3D effect */
+
+  /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+
+  /* '▶' */
+
+  font-size: 14px;
+  margin-top: 3px;
+  margin-left: 7px;
+  text-shadow: none;
+  color: #f5f5f5;
+}
+div.list-media div.list-play .icon:before {
+  content: '\25b6';
+}
+div.list-media div.list-plus {
+  right: 32px;
+}
+div.list-media div.list-plus .icon {
+  font-family: 'icons';
+  font-style: normal;
+  font-weight: normal;
+  speak: none;
+  text-decoration: inherit;
+  /* opacity .8 */
+
+  font-variant: normal;
+  /* Uncomment for 3D effect */
+
+  /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+
+  /* '+' */
+
+  font-size: 14px;
+  margin-top: 3px;
+  margin-left: 6px;
+  text-shadow: none;
+  color: #f5f5f5;
+}
+div.list-media div.list-plus .icon:before {
+  content: '\2b';
+}
 div.list-media div.stats {
   position: absolute;
   right: 3px;
   bottom: 7px;
-  color: #181818;
-  text-shadow: 1px 1px 1px white;
+  color: #f5f5f5;
+  text-shadow: 1px 1px 1px #181818;
 }
 div.list-media div.stats div.comment-count {
   min-width: 15px;
@@ -6292,7 +6412,6 @@ div.list-media div.stats div.comment-count div.icon {
 
   font-size: 15px;
   margin-top: -2px;
-  color: #666;
   position: absolute;
   top: 0;
   left: 0;
@@ -6324,7 +6443,6 @@ div.list-media div.stats div.like-count div.icon {
   /* '\1f44d' */
 
   font-size: 12px;
-  color: #666;
   position: absolute;
   top: 0;
   left: 0;

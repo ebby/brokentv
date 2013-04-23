@@ -252,7 +252,6 @@ brkn.Channel.prototype.enterDocument = function() {
   var programs = this.getModel().programming;
   for (var i = 0; i < programs.length; i++) {
     if (programs[i].media.live) {
-      window.console.log('LIVE');
       this.addProgram(programs[i]);
     } else if ((programs[i].time.getTime() < this.startTime_.getTime()) &&
   			(programs[i].time.getTime() + programs[i].media.duration * 1000 > (this.startTime_.getTime() - this.timeline_*1000))) {
@@ -430,6 +429,8 @@ brkn.Channel.prototype.addProgram = function(program) {
 	    goog.style.getSize(programEl).width;
 
 	var titleEl = goog.dom.getElementByClass('title', programEl);
+	var playEl = goog.dom.getElementByClass('program-play', programEl);
+	var plusEl = goog.dom.getElementByClass('program-plus', programEl);
 	var titleWidth = goog.style.getSize(titleEl).width;
 	// Marquee text and pan
 	this.getHandler()
@@ -437,11 +438,6 @@ brkn.Channel.prototype.addProgram = function(program) {
 	      if (!brkn.model.Controller.getInstance().guideToggled) {
 	        return;
 	      }
-//    	  var titleOffset = titleWidth + goog.style.getPosition(titleEl).x;
-//    	  if (titleOffset > programWidth) {
-//    	    goog.style.setStyle(titleEl, 'margin-left', -(titleOffset - programWidth - 10) + 'px');
-//    	    goog.dom.classes.add(titleEl, 'marquee');
-//    	  }
     	  if (!this.adminMode_) {
     	    goog.style.setStyle(img, 'background-position-y', program.media.thumbPos +
     	        10 * Math.max(program.media.thumbSize.width/programWidth, 1) + '%');
@@ -451,11 +447,21 @@ brkn.Channel.prototype.addProgram = function(program) {
     	  if (!brkn.model.Controller.getInstance().guideToggled) {
           return;
         }
-//        goog.style.setStyle(titleEl, 'margin-left', '');
-//        goog.dom.classes.remove(titleEl, 'marquee');
         if (!this.adminMode_) {
           goog.style.setStyle(img, 'background-position-y', program.media.thumbPos + '%');
         }
+      })
+      .listen(playEl, goog.events.EventType.CLICK, function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var asyncProgram = brkn.model.Program.async(program.media);
+        brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.PLAY_ASYNC, asyncProgram);
+      })
+      .listen(plusEl, goog.events.EventType.CLICK, function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        brkn.model.Channels.getInstance().getMyChannel().publish(brkn.model.Channel.Action.ADD_QUEUE,
+            program.media, true);
       });
 	
 	// Admin features

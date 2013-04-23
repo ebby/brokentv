@@ -29,6 +29,7 @@ brkn.model.Sidebar.prototype.toggled = function() {
  */
 brkn.model.Sidebar.Actions = {
   NAVIGATE: 'navigate',
+  NEW_ACTIVITIES: 'new-activites',
   MEDIA_INFO: 'media-info',
   MEDIA_LIST: 'media-list',
   REPLY_COMMENT: 'reply-comment',

@@ -307,8 +307,6 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
           goog.bind(this.onPlayButton_, this))
       .listen(this.plusButton_, goog.ui.Component.EventType.ACTION,
           goog.bind(this.onPlusButton_, this))
-      .listen(this.plusButton_.getElement(), goog.events.EventType.MOUSEDOWN,
-          goog.bind(this.onPlusMouseDown_, this))
       .listen(goog.dom.getElementByClass('local', this.getElement()),
           goog.events.EventType.CLICK,
           goog.bind(function(e) {
@@ -917,32 +915,7 @@ brkn.sidebar.Info.prototype.onPlayButton_ = function() {
 /**
  * @private
  */
-brkn.sidebar.Info.prototype.onPlusMouseDown_ = function() {
-  if (!(brkn.model.Player.getInstance().getCurrentProgram() &&
-      brkn.model.Player.getInstance().getCurrentProgram().async)) {
-    this.playButton_.setActive(true); 
-    goog.Timer.callOnce(goog.bind(function() {
-      // Just in case we don't complete click.
-      this.playButton_.setActive(false); 
-    }, this), 2000)
-  }
-};
-
-
-/**
- * @private
- */
 brkn.sidebar.Info.prototype.onPlusButton_ = function() {
-//  if (!(brkn.model.Player.getInstance().getCurrentProgram() &&
-//      brkn.model.Player.getInstance().getCurrentProgram().async)) {
-//    var program = brkn.model.Program.async((/** @type {brkn.model.Media} */ this.getModel()));
-//    brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.PLAY_ASYNC, program);
-//    this.playButton_.setActive(false);
-//    this.plusButton_.setChecked(false);
-//  } else {
-    brkn.model.Channels.getInstance().getMyChannel().publish(brkn.model.Channel.Action.ADD_QUEUE,
-        (/** @type {brkn.model.Media} */ this.getModel()), this.plusButton_.isChecked()); 
-    brkn.model.Notify.getInstance().publish(brkn.model.Notify.Actions.FLASH,
-        'Added to queue', this.media_.name, undefined, this.media_.thumbnail);
-//  }
+  brkn.model.Channels.getInstance().getMyChannel().publish(brkn.model.Channel.Action.ADD_QUEUE,
+      (/** @type {brkn.model.Media} */ this.getModel()), this.plusButton_.isChecked());
 };

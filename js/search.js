@@ -154,7 +154,7 @@ brkn.Search.prototype.addMedia_ = function(media) {
   });
 
   var playEl = goog.dom.getElementByClass('list-play', mediaEl); 
-//  var plusEl = goog.dom.getElementByClass('plus', mediaEl); 
+  var plusEl = goog.dom.getElementByClass('list-plus', mediaEl); 
 
   goog.dom.appendChild(this.resultMedias_, mediaEl); 
   
@@ -167,11 +167,14 @@ brkn.Search.prototype.addMedia_ = function(media) {
       .listen(playEl, goog.events.EventType.CLICK, goog.bind(function(e) {
         e.preventDefault();
         e.stopPropagation();
+        goog.dom.classes.remove(this.getElement(), 'show');
         var program = brkn.model.Program.async(media);
         brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.PLAY_ASYNC, program);
-      }, this));
-
-//  goog.dom.classes.enable(this.mediasEl_, 'no-medias', !this.mediasCount_);
-//  goog.dom.setTextContent((/** @type {Element} */ this.toggle_.getElement().firstChild),
-//      this.mediasCount_ > 0 ? this.mediasCount_.toString() : '');
+      }, this))
+      .listen(plusEl, goog.events.EventType.CLICK, function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        brkn.model.Channels.getInstance().getMyChannel().publish(brkn.model.Channel.Action.ADD_QUEUE,
+            media, true);
+      });
 };

@@ -24,19 +24,11 @@ goog.require('goog.ui.media.YoutubeModel');
 
 
 /**
- * @param {string} channelToken
  * @constructor
  * @extends {goog.ui.Component}
  */
-brkn.Main = function(channelToken) {
+brkn.Main = function() {
 	goog.base(this);
-
-	/**
-	 * @type {brkn.model.BrowserChannel}
-	 * @private
-	 */
-	this.BrowserChannel_ = IPAD || IPHONE ? null :
-	    brkn.model.BrowserChannel.getInstance().init(channelToken);
 	
 	/**
 	 * @type {brkn.Controller}
@@ -77,10 +69,73 @@ goog.inherits(brkn.Main, goog.ui.Component);
 
 
 /**
+ * @type {Element}
+ * @private
+ */
+brkn.Main.mp31_;
+
+
+/**
+ * @type {Element}
+ * @private
+ */
+brkn.Main.mp32_;
+
+
+/**
+ * @type {Element}
+ * @private
+ */
+brkn.Main.mp33_;
+
+
+/**
+ * @type {Element}
+ * @private
+ */
+brkn.Main.mp34_;
+
+
+/**
+ * @type {Element}
+ * @private
+ */
+brkn.Main.chord1_;
+
+
+/**
+ * @type {Element}
+ * @private
+ */
+brkn.Main.chord2_;
+
+
+/**
+ * @type {Element}
+ * @private
+ */
+brkn.Main.chord3_;
+
+
+/**
+ * @type {Element}
+ * @private
+ */
+brkn.Main.chord4_;
+
+
+/**
  * @type {brkn.Popup}
  * @private
  */
 brkn.Main.prototype.popup_;
+
+
+/**
+ * @type {brkn.model.BrowserChannel}
+ * @private
+ */
+brkn.Main.prototype.browserChannel_;
 
 
 /** @inheritDoc */
@@ -123,32 +178,43 @@ brkn.Main.prototype.enterDocument = function() {
     }
   });
   
-  this.getHandler().listen(window, goog.events.EventType.CLICK, function(e) {
-    var a = goog.dom.getAncestorByTagNameAndClass(e.target, 'a')
-    var href = a ? a.href : null;
-    if (href) {
-      var matches = href.match('#(.*):(.*)');
-      if (matches && matches.length) {
-        e.preventDefault();
-        e.stopPropagation();
-        switch(matches[1]) {
-          case 'user':
-            var user = brkn.model.Users.getInstance().get(matches[2]);
-            brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.PROFILE, user);
-            break;
-          case 'channel':
-            var channel = brkn.model.Channels.getInstance().get(matches[2]);
-            brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.CHANGE_CHANNEL,
-                channel);
-            break;
-          case 'info':
-            var media = brkn.model.Medias.getInstance().get(matches[2]);
-            brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.MEDIA_INFO, media);
-            break;
+  this.getHandler()
+      .listen(window, goog.events.EventType.CLICK, function(e) {
+        var a = goog.dom.getAncestorByTagNameAndClass(e.target, 'a')
+        var href = a ? a.href : null;
+        if (href) {
+          var matches = href.match('#(.*):(.*)');
+          if (matches && matches.length) {
+            e.preventDefault();
+            e.stopPropagation();
+            switch(matches[1]) {
+              case 'user':
+                var user = brkn.model.Users.getInstance().get(matches[2]);
+                brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.PROFILE, user);
+                break;
+              case 'channel':
+                var channel = brkn.model.Channels.getInstance().get(matches[2]);
+                brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.CHANGE_CHANNEL,
+                    channel);
+                break;
+              case 'info':
+                var media = brkn.model.Medias.getInstance().get(matches[2]);
+                brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.MEDIA_INFO, media);
+                break;
+            }
+          }
         }
-      }
-    }
-  });
+      });
+  
+  window.onbeforeunload = function(e) {
+    return 'Leaving so soon?'
+  }
+  
+  goog.net.XhrIo.send('/_presence', goog.bind(function(e) {
+    var data = e.target.getResponseJson();
+    this.browserChannel_ = brkn.model.BrowserChannel.getInstance().init(data['token']);
+    brkn.model.Channels.getInstance().loadViewersFromJson(data['viewer_sessions']);
+  }, this));
   
   brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_INFO, function() {
     var login = goog.dom.getElement('login');
@@ -179,14 +245,11 @@ brkn.Main.prototype.welcome_ = function(user) {
 
 /**
  * @param {Object} response Facebook response data.
- * @param {string} channelToken Channel token.
  * @param {Object} channels Channels json object.
  * @param {Object} programs Programs json object.
  * @param {Object} currentUser The curernt user json object.
- * @param {Object} viewerSessions Viewers json object.
  */
-brkn.Main.init = function(response, channelToken, channels, programs,
-		currentUser, viewerSessions) {
+brkn.Main.init = function(response, channels, programs, currentUser) {
 
 	if (!goog.object.isEmpty(currentUser)) {
 	  brkn.model.Users.getInstance().setCurrentUser(currentUser);
@@ -194,11 +257,10 @@ brkn.Main.init = function(response, channelToken, channels, programs,
 
 	brkn.model.Channels.getInstance().loadFromJson(channels);
 	brkn.model.Programs.getInstance().loadFromJson(programs);
-	brkn.model.Channels.getInstance().loadViewersFromJson(viewerSessions);
 	brkn.model.Channels.getInstance().setCurrentChannel(currentUser['current_channel']);
 	brkn.model.Clock.getInstance().init();
 	
-	var main = new brkn.Main(channelToken);
+	var main = new brkn.Main();
 	main.decorate(document.body);
 	
 	brkn.model.Analytics.getInstance().login();
@@ -280,83 +342,88 @@ brkn.Main.staticInit = function() {
       }, 1000);
     }
   }
+  
+  brkn.Main.makeMusic();
 };
 
 
 brkn.Main.makeMusic = function() {
-  var chord1 = goog.dom.getElement('chord-1');
-  var chord2 = goog.dom.getElement('chord-2');
-  var chord3 = goog.dom.getElement('chord-3');
-  var chord4 = goog.dom.getElement('chord-4');
-  var mp31 = goog.dom.getElement('mp3-1');
-  var mp32 = goog.dom.getElement('mp3-2');
-  var mp33 = goog.dom.getElement('mp3-3');
-  var mp34 = goog.dom.getElement('mp3-4');
-  mp31.volume = .5;
-  mp32.volume = .5;
-  mp33.volume = .5;
-  mp34.volume = .5;
-  mp31.load();
-  mp32.load();
-  mp33.load();
-  mp34.load();
+  brkn.Main.chord1_ = goog.dom.getElement('chord-1');
+  brkn.Main.chord2_ = goog.dom.getElement('chord-2');
+  brkn.Main.chord3_ = goog.dom.getElement('chord-3');
+  brkn.Main.chord4_ = goog.dom.getElement('chord-4');
+  brkn.Main.mp31_ = goog.dom.getElement('mp3-1');
+  brkn.Main.mp32_ = goog.dom.getElement('mp3-2');
+  brkn.Main.mp33_ = goog.dom.getElement('mp3-3');
+  brkn.Main.mp34_ = goog.dom.getElement('mp3-4');
+  brkn.Main.mp31_.volume = .5;
+  brkn.Main.mp32_.volume = .5;
+  brkn.Main.mp33_.volume = .5;
+  brkn.Main.mp34_.volume = .5;
+  brkn.Main.mp31_.load();
+  brkn.Main.mp32_.load();
+  brkn.Main.mp33_.load();
+  brkn.Main.mp34_.load();
   
-  goog.events.listen(chord1, goog.events.EventType.CLICK, function(e) {
-    mp31.load();
-    mp31.play();
+  goog.events.listen(brkn.Main.chord1_, goog.events.EventType.CLICK, function(e) {
+    brkn.Main.mp31_.load();
+    brkn.Main.mp31_.play();
   });
-  goog.events.listen(chord2, goog.events.EventType.CLICK, function(e) {
-    mp32.load();
-    mp32.play();
+  goog.events.listen(brkn.Main.chord2_, goog.events.EventType.CLICK, function(e) {
+    brkn.Main.mp32_.load();
+    brkn.Main.mp32_.play();
   });
-  goog.events.listen(chord3, goog.events.EventType.CLICK, function(e) {
-    mp33.load();
-    mp33.play();
+  goog.events.listen(brkn.Main.chord3_, goog.events.EventType.CLICK, function(e) {
+    brkn.Main.mp33_.load();
+    brkn.Main.mp33_.play();
   });
-  goog.events.listen(chord4, goog.events.EventType.CLICK, function(e) {
-    mp34.load();
-    mp34.play();
+  goog.events.listen(brkn.Main.chord4_, goog.events.EventType.CLICK, function(e) {
+    brkn.Main.mp34_.load();
+    brkn.Main.mp34_.play();
   });
-  
+};
+
+
+brkn.Main.playJingle = function() {
   goog.Timer.callOnce(function() {
-    goog.dom.classes.add(chord1, 'strike');
-    mp31.play();
+    goog.dom.classes.add(brkn.Main.chord1_, 'strike');
+    brkn.Main.mp31_.play();
   }, 500);
   goog.Timer.callOnce(function() {
-    goog.dom.classes.remove(chord1, 'strike');
-    goog.dom.classes.add(chord2, 'strike');
-    mp32.play();
+    goog.dom.classes.remove(brkn.Main.chord1_, 'strike');
+    goog.dom.classes.add(brkn.Main.chord2_, 'strike');
+    brkn.Main.mp32_.play();
   }, 800);
   goog.Timer.callOnce(function() {
-    goog.dom.classes.remove(chord2, 'strike');
-    goog.dom.classes.add(chord3, 'strike');
-    mp33.play();
+    goog.dom.classes.remove(brkn.Main.chord2_, 'strike');
+    goog.dom.classes.add(brkn.Main.chord3_, 'strike');
+    brkn.Main.mp33_.play();
   }, 1100);
   goog.Timer.callOnce(function() {
-    goog.dom.classes.remove(chord3, 'strike');
-    goog.dom.classes.add(chord4, 'strike');
-    mp34.play();
+    goog.dom.classes.remove(brkn.Main.chord3_, 'strike');
+    goog.dom.classes.add(brkn.Main.chord4_, 'strike');
+    brkn.Main.mp34_.play();
   }, 1400);
   goog.Timer.callOnce(function() {
-    goog.dom.classes.remove(chord4, 'strike');
-    goog.dom.classes.add(chord3, 'strike');
-    mp33.load();
-    mp33.play();
+    goog.dom.classes.remove(brkn.Main.chord4_, 'strike');
+    goog.dom.classes.add(brkn.Main.chord3_, 'strike');
+    brkn.Main.mp33_.load();
+    brkn.Main.mp33_.play();
   }, 1700);
   goog.Timer.callOnce(function() {
-    goog.dom.classes.remove(chord3, 'strike');
-    goog.dom.classes.add(chord2, 'strike');
-    mp32.load();
-    mp32.play();
+    goog.dom.classes.remove(brkn.Main.chord3_, 'strike');
+    goog.dom.classes.add(brkn.Main.chord2_, 'strike');
+    brkn.Main.mp32_.load();
+    brkn.Main.mp32_.play();
   }, 2000);
   goog.Timer.callOnce(function() {
-    goog.dom.classes.remove(chord2, 'strike');
-    goog.dom.classes.add(chord1, 'strike');
-    mp31.load();
-    mp31.play();
+    goog.dom.classes.remove(brkn.Main.chord2_, 'strike');
+    goog.dom.classes.add(brkn.Main.chord1_, 'strike');
+    brkn.Main.mp31_.load();
+    brkn.Main.mp31_.play();
   }, 2300);
   goog.Timer.callOnce(function() {
-    goog.dom.classes.remove(chord1, 'strike');
+    goog.dom.classes.remove(brkn.Main.chord1_, 'strike');
   }, 2600);
 };
 
@@ -437,7 +504,6 @@ brkn.Main.login = function() {
         // not_authorized
         //brkn.Main.notAuthorized();
         goog.dom.classes.remove(fbLogin, 'disabled');
-        brkn.Main.makeMusic();
       }
     }, {scope: 'email'});
   });
@@ -478,15 +544,14 @@ brkn.Main.getSessionAndInit = function(response) {
           };
           
           goog.dom.classes.remove(document.body, 'login');
-          goog.Timer.callOnce(reveal, 300);
-          brkn.Main.init(response, data['token'], data['channels'], data['programs'],
-              data['current_user'], data['viewer_sessions']);
-
-          
+          goog.Timer.callOnce(reveal);
+          brkn.Main.init(response, data['channels'], data['programs'], data['current_user']);
         } else if (e.target.getStatus() == 500) {
           brkn.Main.noLogin('error', 'Opps, check back later');
+          brkn.Main.playJingle();
         } else {
           brkn.Main.noLogin('wait');
+          brkn.Main.playJingle();
         }
       }, 'POST');
 };

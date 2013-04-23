@@ -31,11 +31,11 @@ div#sidebar div.stream {
     }
     &.digest {
       &.comment div.template {
-        padding-bottom: 0px;
+
       }
       div.template {
         left: 10px;
-        margin-bottom: 5px;
+        margin-bottom: 0;
         padding-bottom: 8px;
         width: 300px;
         span {
@@ -60,7 +60,7 @@ div#sidebar div.stream {
         }
       }
       div.medias {
-        margin-top: 13px; 
+        margin-top: 5px; 
       }
     }
     div.picture {
@@ -68,7 +68,6 @@ div#sidebar div.stream {
       background: #ccc;
       width: 34px;
       height: 34px;
-      margin-top: 5px;
       .border-radius(18px);
       .box-shadow(inset, 0px, 0px, 2px, 1px, rgba(0, 0, 0, 0.6));
       display: inline-block;
@@ -87,11 +86,19 @@ div#sidebar div.stream {
         }
       }
     }
+    div.comment {
+      div.template {
+        margin-bottom: 0;
+      }
+      div.picture {
+        margin-top: 5px;
+      }
+    }
     div.template {
       position: relative;
       left: 50px;
-      top: 0px;
-      min-height: 20px;
+      top: 0;
+      margin-bottom: 25px;
       width: 260px;
       font-family: MuseoSans500;
       a {

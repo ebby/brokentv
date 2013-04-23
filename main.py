@@ -50,8 +50,6 @@ jinja_environment = jinja2.Environment(
 
 class MainHandler(BaseHandler):
     def get(self, path=None):
-      self.session['user'] = None
-
       mobile = self.request.host_url.startswith('http://m.') or self.request.get('mobile')
 
       template_data = {}
@@ -197,6 +195,7 @@ def create_handlers_map():
     ('/_like/(.*)', rpc.LikeHandler),
     ('/_link', rpc.LinkHandler),
     ('/_optin', rpc.OptInHandler),
+    ('/_presence', rpc.PresenceHandler),
     ('/_programming/(.*)', rpc.ProgramHandler),
     ('/_publisher/(.*)', rpc.PublisherHandler),
     ('/_queue', rpc.QueueHandler),

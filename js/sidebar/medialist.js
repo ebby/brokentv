@@ -212,6 +212,7 @@ brkn.sidebar.MediaList.prototype.addMedia = function(media) {
     media: media
   });
   var previewEl = goog.dom.getElementByClass('list-play', mediaEl);
+  var plusEl = goog.dom.getElementByClass('list-plus', mediaEl);
   goog.dom.appendChild(this.mediasEl_, mediaEl);
   if (this.isAdmin_) {
     this.dragDropGroup_.addItem(mediaEl);
@@ -225,11 +226,17 @@ brkn.sidebar.MediaList.prototype.addMedia = function(media) {
     .listen(previewEl,
         goog.events.EventType.CLICK,
         goog.bind(function(e) {
+          e.preventDefault();
           e.stopPropagation();
           var program = brkn.model.Program.async(media);
           brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.PLAY_ASYNC, program);
-          brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.MEDIA_INFO, media);
-        }, this));
+        }, this))
+   .listen(plusEl, goog.events.EventType.CLICK, function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        brkn.model.Channels.getInstance().getMyChannel().publish(brkn.model.Channel.Action.ADD_QUEUE,
+            media, true);
+      });
   this.mediaEls_[media.id] = mediaEl;
 };
 

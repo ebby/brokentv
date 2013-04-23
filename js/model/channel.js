@@ -334,7 +334,8 @@ brkn.model.Channel.prototype.getNextProgram = function() {
  */
 brkn.model.Channel.prototype.getNextQueue = function() {
   if (this.queue.length) {
-    var media = this.queue.shift();
+    var media = this.queue[0];
+    this.publish(brkn.model.Channel.Action.ADD_QUEUE, media, false);
     var program = brkn.model.Program.async(media);
     brkn.model.Channels.getInstance().getMyChannel().publish(
         brkn.model.Channel.Action.ADD_PROGRAM, program);

@@ -33,7 +33,8 @@ TWITTER_USER_BLACKLIST = [
   'usabusinessnews',
   'newsheadlinesco',
   'businessnewsvid',
-  'ivantrajkovic1'                   
+  'ivantrajkovic1',
+  'dailynewsvideo'                   
 ]
 
 TWITTER_PHRASE_BLACKLIST = [
@@ -116,7 +117,7 @@ class Privacy:
 class ActivityType:
   COMMENT = 'comment'
   SESSION = 'session'
-  STARRED = 'starred'
+  LIKED = 'liked'
   WATCHED = 'watched' # Streamed media by selection
 
 class MediaType:

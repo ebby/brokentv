@@ -104,7 +104,10 @@ brkn.model.BrowserChannel.prototype.onMessage_ = function(rawMessage) {
 	    break;
 	  case 'new_activity':
 	    brkn.model.Users.getInstance().publish(brkn.model.Users.Action.NEW_ACTIVITY,
-	        message['activity'])
+	        message['activity']);
+	    if (message['activity']['user']['id'] != brkn.model.Users.getInstance().currentUser.id) {
+	      brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NEW_ACTIVITIES, 1);
+	    }
       break;
 	  case 'update_programs':
 	    var programs = message['programs'];

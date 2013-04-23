@@ -320,7 +320,7 @@ div#guide {
           div.remove, div.repos {
             display: none;
           }
-          div.stats {
+          div.stats, div.program-play, div.program-plus {
             display: none;
           }
           &:active {
@@ -439,6 +439,9 @@ div#guide {
             div.thumb {
               .box-shadow(e('inset 0 0 0 1px rgba(255,255,255,.2)'));
             }
+            div.program-play, div.program-plus {
+              display: block;
+            }
           }
           &:active {
             div.thumb {
@@ -537,6 +540,43 @@ div#guide {
               font-size: 10px;
               float: right;
               position: relative;
+            }
+          }
+          div.program-play, div.program-plus {
+            display: none;
+            bottom: 6px;
+            position: absolute;
+            opacity: .6;         
+            width: 20px;
+            height: 20px;
+            .border-radius(12px);
+            border: 1px solid rgba(0, 0, 0, .7);
+            background: rgba(0, 0, 0, .5);
+            &:active {
+              background: rgba(0, 0, 0, .7);
+              border-color: rgba(0, 0, 0, .9);
+            }
+          }
+          div.program-play {
+            left: 6px;
+            .icon {
+              .icon-play();
+              font-size: 14px;
+              margin-top: 3px;
+              margin-left: 7px;
+              text-shadow: none;
+              color: #f5f5f5;
+            }
+          }
+          div.program-plus {
+            left: 32px;
+            .icon {
+              .icon-plus();
+              font-size: 14px;
+              margin-top: 3px;
+              margin-left: 6px;
+              text-shadow: none;
+              color: #f5f5f5;
             }
           }
 	        &.current {

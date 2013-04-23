@@ -171,6 +171,7 @@ div#sidebar {
         display: table-cell;
         vertical-align: middle;
         cursor: pointer;
+        position: relative;
         &.admin {
           display: none;
         }
@@ -187,6 +188,20 @@ div#sidebar {
           font-size: 11px;
           color: #8d8d8d;
           text-shadow: 1px 1px 0 white;
+        }
+        div.activities-count {
+          position: absolute;
+          height: 10px;
+          background: rgb(255, 85, 85);
+          padding: 1px 4px;
+          border-radius: 3px;
+          color: #fefefe;
+          text-shadow: none;
+          border: 1px solid #B7432E;
+          font-size: 9px;
+          top: 4px;
+          display: inline-block;
+          right: 4px;
         }
       }
     }

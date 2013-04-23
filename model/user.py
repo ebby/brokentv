@@ -26,6 +26,7 @@ class User(db.Model):
     demo = db.BooleanProperty(default=False)
     welcomed = db.BooleanProperty(default=False)
     email_reply = db.BooleanProperty(default=True)
+    current_channel_id = db.StringProperty()
     
     # Stats
     session_count = db.IntegerProperty(default=0)
@@ -97,8 +98,8 @@ class User(db.Model):
       welcome_email = emailer.Email(emailer.Message.WELCOME, {'name' : self.first_name})
       welcome_email.send(self)
       
-    @staticmethod
-    def update_waitlist(user_id, channel_id):
+    @classmethod
+    def update_waitlist(cls, user_id, channel_id):
       if constants.INVITE_POLICY() != constants.InvitePolicy.NOBODY:
         user = User.get_by_key_name(user_id)
         for fid in user.friends:

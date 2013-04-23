@@ -157,10 +157,6 @@ div.list-media {
       div.thumb {
         opacity: .7;
       }
-      div.list-play {
-        visibility: visible;
-        opacity: .95;
-      }
       div.title, div.published {
         color: #f7f7f7;
         text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5), -1px -1px rgba(0, 0, 0, 0.5),
@@ -205,29 +201,6 @@ div.list-media {
         background-position: center;
         border-top-left-radius: 3px;
         border-top-right-radius: 3px;
-      }
-      div.list-play {
-        top: 50%;
-        margin-top: -12px;
-        right: 8px;
-        position: absolute;
-        opacity: .6;         
-        width: 20px;
-        height: 20px;
-        .border-radius(12px);
-        border: 2px solid rgba(0, 0, 0, .7);
-        background: rgba(0, 0, 0, .5);
-        opacity: 0;
-        visibility: hidden;
-        .transition(opacity, .3s, ease);
-        .icon {
-          .icon-play();
-          font-size: 14px;
-          margin-top: 3px;
-          margin-left: 7px;
-          text-shadow: none;
-          color: #f5f5f5;
-        }
       }
       div.title {
         left: 5px;
@@ -304,7 +277,7 @@ div.list-media {
     top: 3px;
     left: 0px;
     margin-bottom: 4px;
-    width: 272px;
+    width: 290px;
     padding: 3px;
     color: #181818;
     text-shadow: 1px 1px 1px white;
@@ -319,7 +292,7 @@ div.list-media {
     div.name {
       font-size: 11px;
       line-height: 3px;
-      margin: 0 5px;
+      margin: 2px 0px -2px 5px;
       display: inline-block;
     }
     div.duration {
@@ -328,18 +301,54 @@ div.list-media {
       top: 3px;
     }
   }
+  div.list-play, div.list-plus {
+    top: 50%;
+    margin-top: -12px;
+    position: absolute;
+    opacity: .6;         
+    width: 20px;
+    height: 20px;
+    .border-radius(12px);
+    border: 1px solid rgba(0, 0, 0, .7);
+    background: rgba(0, 0, 0, .4);
+    &:active {
+      background: rgba(0, 0, 0, .7);
+      border-color: rgba(0, 0, 0, .9);
+    }
+  }
+  div.list-play {
+    right: 6px;
+    .icon {
+      .icon-play();
+      font-size: 14px;
+      margin-top: 3px;
+      margin-left: 7px;
+      text-shadow: none;
+      color: #f5f5f5;
+    }
+  }
+  div.list-plus {
+    right: 32px;
+    .icon {
+      .icon-plus();
+      font-size: 14px;
+      margin-top: 3px;
+      margin-left: 6px;
+      text-shadow: none;
+      color: #f5f5f5;
+    }
+  }
   div.stats {
     position: absolute;
     right: 3px;
     bottom: 7px;
-    color: #181818;
-    text-shadow: 1px 1px 1px white;
+    color: #f5f5f5;
+    text-shadow: 1px 1px 1px #181818;
     div.comment-count {
       div.icon {
         .icon-comment();
         font-size: 15px;
         margin-top: -2px;
-        color: #666;
         position: absolute;
         top: 0;
         left: 0;
@@ -355,7 +364,6 @@ div.list-media {
       div.icon {
         .icon-like();
         font-size: 12px;
-        color: #666;
         position: absolute;
         top: 0;
         left: 0;

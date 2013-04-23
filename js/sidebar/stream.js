@@ -51,17 +51,32 @@ brkn.sidebar.Stream = function(activities, opt_uid) {
   /**
    * @type {Object}
    */
-  this.fetched_ = [];
+  this.fetched_ = {};
   
   /**
    * @type {Object}
    */
-  this.channelDigest_ = [];
+  this.channelDigest_ = {};
   
   /**
    * @type {Object}
    */
-  this.mediaDigest_ = [];
+  this.mediaDigest_ = {};
+  
+  /**
+   * @type {Object}
+   */
+  this.likeDigest_ = {};
+  
+  /**
+   * @type {Object}
+   */
+  this.userLikes_ = {};
+  
+  /**
+   * @type {Object}
+   */
+  this.renderedLikes_ = {};
   
   /**
    * Activity elements, sorted by timestamp
@@ -149,7 +164,7 @@ brkn.sidebar.Stream.prototype.fetchMore_ = function() {
           return;
         }
         this.fetched_[e.target.getLastUri()] = true;
-        var activities = /** @type {Array.<Object>} */ e.target.getResponseJson();
+        var activities = /** @type {Array.<Object>} */ e.target.getResponseJson()['activities'];
         this.finished_ = !activities.length;
         goog.dom.classes.enable(this.spinner_, 'finished', this.finished_);
         goog.style.showElement(this.spinner_, this.finished_);
@@ -165,6 +180,7 @@ brkn.sidebar.Stream.prototype.fetchMore_ = function() {
 brkn.sidebar.Stream.prototype.digest_ = function(activities) {
   this.channelDigest_ = [];
   this.mediaDigest_ = [];
+  this.likeDigest_ = [];
   goog.array.forEach(activities, function(activity) {
     this.count_++;
     // Group sessions by channel and comments by media
@@ -175,23 +191,49 @@ brkn.sidebar.Stream.prototype.digest_ = function(activities) {
         sessions.push(session);
         this.channelDigest_[session['channel_id']] = sessions;
         break;
+      case 'liked':
+        if (!this.mediaDigest_[activity['media']['id']]) {
+          var likes = goog.object.get(this.likeDigest_, activity['media']['id'], []);
+          likes.push(activity)
+          this.likeDigest_[activity['media']['id']] = likes;
+
+          var userLikes = goog.object.get(this.userLikes_, activity['user']['id'], []);
+          userLikes.push(activity)
+          this.userLikes_[activity['user']['id']] = userLikes
+        }
+        break;
       case 'comment':
         var comment = activity['comment']
         var comments = goog.object.get(this.mediaDigest_, comment['media']['id'], []);
         comments.push(comment);
         this.mediaDigest_[comment['media']['id']] = comments;
+        if (this.likeDigest_[comment['media']['id']]) {
+          goog.object.remove(this.likeDigest_, comment['media']['id']);
+        }
         break;
     };
   }, this);
 
   // Render sessions
-  goog.object.forEach(this.channelDigest_, function(sessions, channelId) {
+  goog.object.forEach(this.channelDigest_, function(sessions) {
     this.addActivity_(undefined, sessions, 'session');
   }, this);
   
   // Render medias
-  goog.object.forEach(this.mediaDigest_, function(activities, channelId) {
+  goog.object.forEach(this.mediaDigest_, function(activities) {
     this.addActivity_(undefined, activities, 'comment');
+  }, this);
+  
+  // Render likes
+  goog.object.forEach(this.likeDigest_, function(activities) {
+    if (activities.length > 1) {
+      this.addActivity_(undefined, activities, 'liked');
+    }
+  }, this);
+  
+  // Render likes
+  goog.object.forEach(this.userLikes_, function(activities) {
+    this.addActivity_(undefined, activities, 'liked');
   }, this);
 };
 
@@ -224,11 +266,14 @@ brkn.sidebar.Stream.prototype.addActivity_ = function(opt_activity, opt_digest, 
 
       if (type == 'session') {
         goog.array.forEach(obj['media'], function(media, i) {
-          if (!this.mediaDigest_[media['id']] &&
+          if (!this.mediaDigest_[media['id']] && !this.likeDigest_[media['id']] &&
               !goog.array.find(medias, function(m) {return m['id'] == media['id']})) {
             medias.push(media);
           }
         }, this);
+      } else if (type == 'liked' && !this.renderedLikes_[obj['media']['id']]) {
+        medias.push(obj['media']);
+        this.renderedLikes_[obj['media']['id']] = true;
       }
     }, this);
   }
@@ -236,9 +281,15 @@ brkn.sidebar.Stream.prototype.addActivity_ = function(opt_activity, opt_digest, 
   var activityEl;
   switch(type) {
     case 'session':
+      if (users.length < 2) {
+        return;
+      }
       var session = activity ? activity['session'] : digest[0];
       var channel = brkn.model.Channels.getInstance().get(session['channel_id']);
       medias = activity ? activity['session']['media'] : medias;
+      if (medias.length > 5) {
+        medias = medias.slice(0, 5);
+      }
       activityEl = soy.renderAsElement(brkn.sidebar.sessionActivity, {
         users: users,
         channel: channel,
@@ -247,7 +298,8 @@ brkn.sidebar.Stream.prototype.addActivity_ = function(opt_activity, opt_digest, 
       });
       break
     case 'comment':
-      medias = activity ? [activity['comment']['media']] : [digest[0]['media']]
+      medias = activity ? [activity['comment']['media']] :
+          [brkn.model.Medias.getInstance().getOrAdd(digest[0]['media'])]
       var comments = activity ? [new brkn.model.Comment(activity['comment'])] : [];
       if (digest) {
         goog.array.forEach(digest, function(obj) {
@@ -258,6 +310,14 @@ brkn.sidebar.Stream.prototype.addActivity_ = function(opt_activity, opt_digest, 
         comments: comments.reverse().slice(0, 3),
         users: users,
         media: medias[0]
+      });
+      break
+    case 'liked':
+      medias = activity ? [activity['media']] : medias
+      activityEl = soy.renderAsElement(brkn.sidebar.likeActivity, {
+        users: users,
+        media_count: medias.length,
+        time: goog.date.relative.format(time.getTime())
       });
       break
     default:
@@ -280,9 +340,10 @@ brkn.sidebar.Stream.prototype.addActivity_ = function(opt_activity, opt_digest, 
 
   var mediasEl = goog.dom.getElementByClass('medias', activityEl);
   goog.array.forEach(medias, function(m) {
-    var media = new brkn.model.Media(m);
+    var media = brkn.model.Medias.getInstance().getOrAdd(m);
     var mediaEl = soy.renderAsElement(brkn.sidebar.listMedia, { media: media });
     var previewEl = goog.dom.getElementByClass('list-play', mediaEl);
+    var plusEl = goog.dom.getElementByClass('list-plus', mediaEl);
     var img = goog.dom.getElementByClass('thumb', mediaEl);
     goog.dom.appendChild(mediasEl, mediaEl);
 
@@ -291,11 +352,17 @@ brkn.sidebar.Stream.prototype.addActivity_ = function(opt_activity, opt_digest, 
           brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.MEDIA_INFO, media);
         })
         .listen(previewEl, goog.events.EventType.CLICK, function(e) {
+          e.preventDefault();
           e.stopPropagation();
           var program = brkn.model.Program.async(media);
           brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.PLAY_ASYNC, program);
-          brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.MEDIA_INFO, media);
         })
+        .listen(plusEl, goog.events.EventType.CLICK, function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          brkn.model.Channels.getInstance().getMyChannel().publish(brkn.model.Channel.Action.ADD_QUEUE,
+              media, true);
+        });
   }, this);
 
   if (opt_insertTop) {

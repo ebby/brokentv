@@ -21,7 +21,35 @@ class UserSession(db.Model):
     session = UserSession(user=user, channel=channel, tune_in=datetime.datetime.now(),
                           with_friends=with_friends)
     session.put()
+    
+    cached_user = memcache.get(user.id) or {}
+    cached_user['last_session'] = session.toJson()
+    memcache.set(user.id, cached_user)
+
     return session
+
+  @classmethod
+  def reset_last_tune_out(cls, user):
+    cached_user = memcache.get(user.id) or {}
+    last_session_json = cached_user.get('last_session')
+    if last_session_json:
+      last_session_json['tune_out'] = None
+      cached_user['last_session'] = last_session_json
+      memcache.set(user.id, cached_user)
+    return last_session_json
+
+  @classmethod
+  def get_last_session(cls, uid):
+    cached_user = memcache.get(uid) or {}
+    last_session_json = cached_user.get('last_session')
+    if not last_session_json:
+      user = User.get_by_key_name(uid)
+      last_session = UserSession.all().filter('user =', user).order('-tune_in').get()
+      if last_session:
+        last_session_json = last_session.toJson()
+        cached_user['last_session'] = last_session_json
+        memcache.set(user.id, cached_user)
+    return last_session_json
 
   @classmethod
   def get_by_user(cls, user):
