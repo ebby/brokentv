@@ -93,12 +93,6 @@ brkn.Channel = function(model, timeline, startTime, startTimeOffset, minTime) {
    * @type {number}
    * @private
    */
-  this.pixelsPerSecond_;
-  
-  /**
-   * @type {number}
-   * @private
-   */
   this.changeTime_ = 6;
   
   /**
@@ -223,9 +217,8 @@ brkn.Channel.prototype.enterDocument = function() {
     goog.style.showElement(this.suggestEl_, false);
   }
   
-
-  this.pixelsPerSecond_ = (goog.style.getSize(this.programsEl_).width - brkn.Guide.NAME_WIDTH) /
-      this.timeline_;
+  brkn.model.Channels.getInstance().setPixelsPerSecond((goog.style.getSize(this.programsEl_).width - brkn.Guide.NAME_WIDTH) /
+      this.timeline_);
 
   if (this.showGraph_) {
     var sampleTime = 0;
@@ -374,7 +367,7 @@ brkn.Channel.prototype.addProgram = function(program) {
 	  'class': 'program',
 	  'id': program.id
 	});
-	var width = program.media.duration * this.pixelsPerSecond_;
+	var width = program.media.duration * brkn.model.Channels.getInstance().pixelsPerSecond;
 	var showAdmin = this.isAdmin_ &&
 	    (program.time.getTime() + program.media.duration*1000) > goog.now();
 	soy.renderElement(programEl, brkn.channel.program, {
@@ -405,11 +398,11 @@ brkn.Channel.prototype.addProgram = function(program) {
     goog.dom.classes.enable(programEl, 'stretched', program.media.thumbSize.height > 360);
   });
 	
-	var offset = (program.time.getTime() - this.minTime_.getTime())/1000 * this.pixelsPerSecond_;
+	var offset = (program.time.getTime() - this.minTime_.getTime())/1000 * brkn.model.Channels.getInstance().pixelsPerSecond;
 
 	if (program.media.live) {
 	  var diff = (goog.now() - program.time.getTime())/1000
-	  var cutoff = diff * this.pixelsPerSecond_ - 100;
+	  var cutoff = diff * brkn.model.Channels.getInstance().pixelsPerSecond - 100;
 	  width -= cutoff;
 	  offset += cutoff;
 	}
@@ -498,7 +491,7 @@ brkn.Channel.prototype.addProgram = function(program) {
 brkn.Channel.prototype.updateProgram = function(program) {
   var programEl = this.programs_[program.id];
   var offset = (goog.date.fromIsoString(program.time + 'Z').getTime() - this.minTime_.getTime()) /
-      1000 * this.pixelsPerSecond_;
+      1000 * brkn.model.Channels.getInstance().pixelsPerSecond;
   goog.style.setPosition(programEl, offset);
 };
 
@@ -561,8 +554,8 @@ brkn.Channel.prototype.addViewer = function(session) {
       var watchWith = goog.dom.getElementByClass('watch-with', lineEl);
       var tuneInTime = Math.max(session.tuneIn.getTime(), this.minTime_.getTime());
       var offset = (tuneInTime - this.minTime_.getTime()) / 1000 *
-          this.pixelsPerSecond_ + brkn.Guide.NAME_WIDTH;
-      var elapsed = (goog.now() - tuneInTime) / 1000 * this.pixelsPerSecond_;
+          brkn.model.Channels.getInstance().pixelsPerSecond + brkn.Guide.NAME_WIDTH;
+      var elapsed = (goog.now() - tuneInTime) / 1000 * brkn.model.Channels.getInstance().pixelsPerSecond;
       goog.style.setWidth(lineEl, elapsed);
       goog.style.setPosition(lineEl, offset);
       goog.style.setStyle(lineEl, 'background', session.user.color);
@@ -715,12 +708,12 @@ brkn.Channel.prototype.update = function() {
 		if (this.getModel().getCurrentProgram() && !session.tuneOut && this.viewers_[session.user.id]) {
 			var tuneInTime = Math.max(session.tuneIn.getTime(), this.minTime_.getTime());
 			var width = goog.style.getSize(this.programsEl_).width;
-			var elapsed = Math.floor((goog.now() - tuneInTime)/1000 * this.pixelsPerSecond_);
+			var elapsed = Math.floor((goog.now() - tuneInTime)/1000 * brkn.model.Channels.getInstance().pixelsPerSecond);
 			var myCurrentProgram = brkn.model.Player.getInstance().getCurrentProgram();
 			if (session.user.id == brkn.model.Users.getInstance().currentUser.id && myCurrentProgram) {
 			  elapsed = Math.floor((myCurrentProgram.time.getTime() +
             brkn.model.Player.getInstance().getProgress()*1000 - tuneInTime)/1000 *
-            this.pixelsPerSecond_);
+            brkn.model.Channels.getInstance().pixelsPerSecond);
 			}
 			this.viewers_[session.user.id].lastChild &&
 			    goog.style.setWidth(this.viewers_[session.user.id].lastChild, elapsed);

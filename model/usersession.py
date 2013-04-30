@@ -29,7 +29,7 @@ class UserSession(db.Model):
     return session
 
   @classmethod
-  def reset_last_tune_out(cls, user):
+  def reset_last_session(cls, user):
     cached_user = memcache.get(user.id) or {}
     last_session_json = cached_user.get('last_session')
     if last_session_json:

@@ -43,12 +43,17 @@ brkn.model.User = function(user) {
   /**
    * @type {boolean}
    */
+  this.online = user['online'];
+  
+  /**
+   * @type {boolean}
+   */
   this.demo = user['demo'];
-
+  
   /**
    * @type {brkn.model.Media}
    */
-  this.currentMedia;
+  this.currentMedia = user['last_seen'] ? brkn.model.Media.getInstance().getOrAdd(user['last_seen']) : null;
 
   /**
    * @type {Array.<brkn.model.Media>}

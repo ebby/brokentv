@@ -1,0 +1,130 @@
+div.friendlist {
+  text-shadow: 1px 1px 1px #f5f5f5;
+
+  div.label {
+    font-size: 11px;
+    color: #888;
+    font-family: MuseoSans700;
+    margin: 6px 10px;
+    text-shadow: 1px 1px 1px rgba(255,255,255,.6);
+    a {
+      color: #888;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+    &.show-all {
+      position: absolute;
+      top: 0;
+      right: 15px;
+    }
+  }
+  div.user {
+    position: relative;
+    height: 35px;
+    padding: 5px 0;
+    border-bottom: 1px solid #FFF;
+    .box-shadow(0, 1px, 1px, rgba(0, 0, 0, .1));
+    cursor: pointer;
+    background: #eee;
+    &:hover {
+      background: #f5f5f5;
+    }
+    &:active {
+      background: #e5e5e5;
+    }
+    &:first-child {
+      border-top: 1px solid #fff;
+    }
+    &.online {
+      div.media div.watching {
+        display: inline-block;
+      }
+      div.media div.watched {
+        display: none;
+      }
+      div.timestamp {
+        display: none;
+      }
+    }
+    &.media {
+      div.name {
+        top: 7px;
+      }
+      div.timestamp {
+        top: 8px;
+      }
+    }
+    
+    a {
+      color: #181818;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+    div.name {
+      position: absolute;
+      font-size: 13px;
+      left: 50px;
+      top: 15px;
+      font-family: MuseoSans700;
+    }
+    div.picture {
+      position: absolute;
+      background: #ccc;
+      width: 34px;
+      height: 34px;
+      .border-radius(18px);
+      .box-shadow(inset, 0px, 0px, 2px, 1px, rgba(0, 0, 0, 0.6));
+      display: inline-block;
+      margin-left: 9px;
+      img {
+        width: 26px;
+        height: 26px;
+        margin-left: 4px;
+        margin-top: 4px;
+        .border-radius(15px);
+        .box-shadow(0, 0, 2px, 1px, rgba(0, 0, 0, .4));
+      }
+      &:active {
+        img {
+          .box-shadow(0, 0, 1px, 1px, rgba(0, 0, 0, .1));
+        }
+      }
+    }
+    div.timestamp {
+      font-size: 10px;
+      font-family: MuseoSans300;
+      color: #666;
+      position: absolute;
+      top: 17px;
+      right: 10px;
+    }
+    div.media {
+      font-size: 10px;
+      font-family: MuseoSans300;
+      position: absolute;
+      left: 50px;
+      bottom: 7px;
+      max-width: 260px;
+      font-size: 10px;
+      font-family: MuseoSans700;
+      div.watched, div.watching {
+        color: #666;
+        display: inline-block;
+        margin-right: 5px;
+      }
+      div.watching {
+        display: none;
+      }
+      a.media-link {
+        width: 170px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        position: absolute;
+      }
+    }
+  }
+
+}

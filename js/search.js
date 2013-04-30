@@ -1,6 +1,7 @@
 goog.provide('brkn.Search');
 
 goog.require('brkn.model.Search');
+goog.require('brkn.search');
 goog.require('brkn.sidebar');
 
 goog.require('goog.ui.Component');
@@ -58,6 +59,13 @@ brkn.Search.prototype.searchEl_;
  * @type {Element}
  * @private
  */
+brkn.Search.prototype.resultChannels_;
+
+
+/**
+ * @type {Element}
+ * @private
+ */
 brkn.Search.prototype.resultMedias_;
 
 
@@ -76,16 +84,20 @@ brkn.Search.prototype.decorateInternal = function(el) {
   this.toggle_.decorate(goog.dom.getElement('search-icon'));
   this.searchEl_ = goog.dom.getElement('search-results');
   this.resultMedias_ = goog.dom.getElementByClass('result-medias', this.getElement());
+  this.resultChannels_ = goog.dom.getElementByClass('result-channels', this.getElement());
   this.clearEl_ = goog.dom.getElement('clear-icon');
   var keyHandler = new goog.events.KeyHandler(this.input_.getElement());
   var searchThrottle = new goog.Throttle(function() {
     if (this.input_.getValue()) {
+      brkn.model.Search.getInstance().searchChannels(this.input_.getValue(), goog.bind(this.onChannelSearch_, this));
       brkn.model.Search.getInstance().search(this.input_.getValue(), goog.bind(this.onSearch_, this));
       goog.style.showElement(this.clearEl_, true);
       goog.dom.classes.add(this.getElement(), 'show');
     } else {
       this.resultMedias_.innerHTML = '';
+      this.resultChannels_.innerHTML = '';
       this.hasResults_ = false;
+      goog.dom.classes.enable(this.searchEl_, 'no-medias', true);
     }
   }, 1000, this);
   
@@ -112,7 +124,9 @@ brkn.Search.prototype.decorateInternal = function(el) {
             this.toggle_.setChecked(false);
             goog.style.showElement(this.clearEl_, false);
             this.resultMedias_.innerHTML = '';
+            this.resultChannels_.innerHTML = '';
             this.hasResults_ = false;
+            goog.dom.classes.enable(this.searchEl_, 'no-medias', true);
           }, this))
       .listen(window,
           goog.events.EventType.CLICK,
@@ -130,13 +144,28 @@ brkn.Search.prototype.decorateInternal = function(el) {
 
 
 /**
+ * @param {Array.<Object>} channels
+ * @private
+ */
+brkn.Search.prototype.onChannelSearch_ = function(channels) {
+  this.resultChannels_.innerHTML = '';
+
+  this.hasResults_ = !!channels.length || this.hasResults_;
+  goog.dom.classes.enable(this.searchEl_, 'no-medias', !this.hasResults_);
+  goog.array.forEach(channels, function(channel) {
+    this.addChannel_(channel);
+  }, this);
+};
+
+
+/**
  * @param {Array.<brkn.model.Media>} medias
  * @private
  */
 brkn.Search.prototype.onSearch_ = function(medias) {
   this.resultMedias_.innerHTML = '';
 
-  this.hasResults_ = !!medias.length;
+  this.hasResults_ = !!medias.length || this.hasResults_;
   goog.dom.classes.enable(this.searchEl_, 'no-medias', !this.hasResults_);
   goog.array.forEach(medias, function(media) {
     this.addMedia_(media);
@@ -177,4 +206,37 @@ brkn.Search.prototype.addMedia_ = function(media) {
         brkn.model.Channels.getInstance().getMyChannel().publish(brkn.model.Channel.Action.ADD_QUEUE,
             media, true);
       });
+};
+
+
+/**
+ * @param {Object} channel
+ * @private
+ */
+brkn.Search.prototype.addChannel_ = function(channel) {
+  var channelEl = soy.renderAsElement(brkn.search.channel, {
+    name: channel['name'],
+    thumb: channel['thumbnail']
+  });
+  goog.dom.appendChild(this.resultChannels_, channelEl); 
+
+  this.getHandler()
+      .listen(channelEl, goog.events.EventType.CLICK, goog.bind(function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        goog.dom.classes.add(channelEl, 'loading');
+        goog.net.XhrIo.send('/_ytchannel', goog.bind(function(e) {
+          var response = e.target.getResponseJson();
+          channel = brkn.model.Channels.getInstance().addChannel(response['channel']);
+          var p = new brkn.model.Program(response['program']);
+          channel.publish(brkn.model.Channel.Action.ADD_PROGRAM, p);
+          brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.CHANGE_CHANNEL,
+              channel);
+          goog.dom.classes.remove(channelEl, 'loading');
+        }, this),
+        'POST',
+        '&name=' + channel['name'] +
+        (channel['channel_id'] ? '&channel_id=' + channel['channel_id'] : '') +
+        (channel['playlist_id'] ? '&playlist_id=' + channel['playlist_id'] : ''));
+      }, this));
 };

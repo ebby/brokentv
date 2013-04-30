@@ -49,6 +49,19 @@ def get_session(current_user, media_id=None, channel_id=None, single_channel_id=
     if user_programs:
       cached_channels.append(user_channel.toJson())
       cached_programming = dict(cached_programming.items() + user_programs.items())
+  
+  user_json = memcache.get(current_user.id) or {}
+  if 'channels' in user_json:
+    for cid in user_json['channels']:
+      c = memcache.get(cid) 
+      if c and len(c.get('programs', [])):
+        last_program_time = iso8601.parse_date(c.get('programs')[-1]['time']).replace(tzinfo=None)
+        if last_program_time > datetime.datetime.now():
+          cached_channels.append(c['channel'])
+          cached_programming = dict(cached_programming.items() + {cid:c['programs']}.items())
+        else:
+          user_json['channels'].remove(cid)
+          memcache.delete(cid)
 
   data['channels'] = channels or cached_channels
   data['programs'] = cached_programming
@@ -62,12 +75,6 @@ def get_session(current_user, media_id=None, channel_id=None, single_channel_id=
   user_obj['current_channel'] = current_channel.id if current_channel else current_user.current_channel_id \
       if current_user.current_channel_id else channels[0].id
   data['current_user'] = user_obj
-
-  # Potentially send friend invites
-  if not current_user.last_login:
-    deferred.defer(User.update_waitlist, current_user.id, current_channel.id,
-                   _name='update_waitlist' + '-' + str(uuid.uuid1()),
-                   _queue='programming')
 
   # Update login
   current_user.last_login = datetime.datetime.now()
@@ -88,7 +95,7 @@ class SessionHandler(BaseHandler):
 
       user_agent = self.request.headers.get('user_agent')
       if self.current_user.id not in constants.SUPER_ADMINS:
-        if 'Mobile' in user_agent:
+        if 'Mobile' in user_agent and False: # Allow all mobile for now
           data['error'] = 'Mobile access is not supported yet.'
         ie = re.search('/MSIE\s([\d]+)/', user_agent)
         ff = re.search('/firefox\/([\d]+)/', user_agent)
@@ -114,6 +121,11 @@ class PresenceHandler(BaseHandler):
     
     # CREATE BROWSER CHANNEL
     token = browserchannel.create_channel(current_user.id)
+    User.set_online(current_user.id, True)
+    def add_client(web_channels, client_id, token):
+      web_channels[client_id] = token
+      return web_channels
+    memcache_cas('web_channels', add_client, current_user.id, token)
     data['token'] = token
     
     current_viewers = memcache.get('current_viewers') or {}
@@ -168,11 +180,20 @@ class PresenceHandler(BaseHandler):
     media_id = self.session.get('media_id', None)
     if media_id:
       media = Media.get_by_key_name(media_id)
+      
+    # Potentially send friend invites
+#    if not current_user.last_login:
+#      deferred.defer(update_waitlist, current_user.id, current_channel_id,
+#                     _name='update_waitlist' + '-' + str(uuid.uuid1()),
+#                     _queue='programming')
     
-    broadcast.broadcastViewerChange(current_user, None, current_channel.id,
+    broadcast.broadcastViewerChange(current_user, None, current_channel_id,
                                     session_json['id'], session_json['tune_in'], media);
 
     self.response.out.write(simplejson.dumps(data))
+
+def update_waitlist(*args, **kwargs):
+  User.update_waitlist(*args, **kwargs)
 
 class SettingsHandler(BaseHandler):
   @BaseHandler.logged_in
@@ -235,7 +256,22 @@ class InfoHandler(BaseHandler):
       response['comments'] = [c.toJson() for c in Comment.get_by_media(media, uid=self.current_user.id)]
       response['tweets'] = media.get_tweets()
       self.response.out.write(simplejson.dumps(response))
-        
+
+class FriendsHandler(BaseHandler):
+  @BaseHandler.logged_in
+  def get(self):
+    if self.request.get('offline'):
+      following = self.current_user.get_following()
+      self.response.out.write(simplejson.dumps([f.toJson() for f in following if not User.get_entry(f)]))
+      return
+
+    friends_json = []
+    for fid in self.current_user.friends:
+      user_json = User.get_entry(fid, fetch=False)
+      if user_json:
+        friends_json.append(user_json)
+    self.response.out.write(simplejson.dumps(friends_json))
+
 class PublisherHandler(BaseHandler):
   @BaseHandler.logged_in
   def get(self, id):
@@ -309,6 +345,28 @@ class CommentHandler(BaseHandler):
                   }
       self.response.out.write(simplejson.dumps(response))
 
+class MessageHandler(BaseHandler):
+  @BaseHandler.logged_in
+  def get(self, id):
+    offset = self.request.get('offset') or 0
+    messages = []
+    if id == self.current_user.id:
+      messages = Message.get(self.current_user.id)
+    else:
+      messages = Message.get(self.current_user.id, id)
+    self.response.out.write(simplejson.dumps([m.toJson() for m in messages]))
+  @BaseHandler.logged_in
+  def post(self):
+    from_id = self.request.get('from_id')
+    to_id = self.request.get('to_id')
+    text = self.request.get('text')
+    if from_id and to_id and text:
+      from_user = User.get_by_key_name(from_id)
+      to_user = User.get_by_key_name(to_id)
+      message = Message.add(from_user=from_user, to_user=to_user, text=text)
+      broadcast.broadcastNewMessage(message)
+      self.response.out.write(simplejson.dumps(message.toJson()))
+
 class LinkHandler(BaseHandler):
   @BaseHandler.logged_in
   def post(self):
@@ -368,28 +426,22 @@ class ChangeChannelHandler(BaseHandler):
     if not channel and channel_id == self.current_user.id:
       channel = Channel.get_my_channel(self.current_user)
 
-    user_sessions = UserSession.get_by_user(self.current_user)
+    last_session_json = UserSession.get_last_session(self.current_user.id)
+    last_channel_id = None
     remove_user = False
-    if len(user_sessions):
-      last_channel_id = user_sessions[0].channel.id
+    if last_session_json:
       remove_user = True
-      
-      if (datetime.datetime.now() - user_sessions[0].tune_in).seconds < 30:
-        if len(user_sessions) > 1 and user_sessions[1].channel.id == channel.id:
-          # If they switched to another channel, then switched back.
-          session = user_sessions[1]
-          session.tune_out = None
-          session.put()
-          user_sessions[0].delete()
-        else:
-          # Re-purpose last session
-          session = user_sessions[0]
-          session.tune_in = datetime.datetime.now()
-          session.channel = channel
-          session.put()
+      last_session = UserSession.get_by_id(int(last_session_json['id']))
+      last_channel_id = last_session_json['channel_id']  
+      if (datetime.datetime.now() - last_session.tune_in).seconds < 30:
+        # Re-purpose last session
+        session = last_session
+        session.tune_in = datetime.datetime.now()
+        session.channel = channel
+        session.put()
       else:
         # End last session
-        user_sessions[0].end_session()
+        last_session.end_session()
         # New session for new channel
         session = UserSession.new(self.current_user, channel, with_friends=with_friends)
         
@@ -578,3 +630,14 @@ class WelcomedHandler(BaseHandler):
     current_user = self.current_user
     current_user.welcomed = True
     current_user.put()
+    
+class YoutubeChannelHandler(BaseHandler):
+  @BaseHandler.logged_in
+  def post(self):
+    response = {}
+    name = self.request.get('name')
+    yt_channel_id = self.request.get('channel_id')
+    yt_playlist_id = self.request.get('playlist_id')
+    data_json = Channel.youtube_channel(self.current_user, name, yt_channel_id=yt_channel_id,
+                                        yt_playlist_id=yt_playlist_id)
+    self.response.out.write(simplejson.dumps(data_json))

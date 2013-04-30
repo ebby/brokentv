@@ -1,11 +1,8 @@
 CACHE MANIFEST
-# version 0.0.197
+# version 0.0.2
  
 /static/img/homepage.jpg
 /static/img/content-texture.png
-/static/css/main.css
-/static/js/mobile-min.js
-/static/js/main-min.js
 /static/js/raphael-min.js
 /static/webfonts/museosans/300.woff
 /static/webfonts/museosans/500.woff

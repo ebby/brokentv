@@ -1,0 +1,28 @@
+{namespace brkn.sidebar.messages}
+
+/**
+ * @param message
+ * @param flip
+ */
+{template .message}
+  <div class="message{if $flip}{sp}flip{/if}">
+    <a href="#user:{$message.fromUser.id}">
+      <div class="picture" style="background:{$message.fromUser.color}">
+        <img src="{$message.fromUser.picture}"/>
+      </div>
+    </a>
+    <div class="body">
+      <a class="user" href="#user:{$message.fromUser.id}">{$message.fromUser.name}</a>{sp}{sp}
+      <div class="texts">
+        <div class="text">{$message.text}<div class="timestamp">{$message.relativeTime}</div></div>
+      </div>
+    </div>
+  </div>
+{/template}
+
+/**
+ * @param message
+ */
+{template .text}
+  <div class="text">{$message.text}<div class="timestamp">{$message.relativeTime}</div></div>
+{/template}

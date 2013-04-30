@@ -47,7 +47,7 @@ brkn.model.BrowserChannel.prototype.init = function(token) {
 	var socket = channel.open();
 	socket.onmessage = goog.bind(this.onMessage_, this);
 	socket.onclose = goog.bind(this.onClose_, this);
-	window.onbeforeunload = goog.bind(this.onClose_, this);
+	goog.events.listen(window, 'onbeforeunload', goog.bind(this.onClose_, this));
 	return this;
 };
 
@@ -62,6 +62,10 @@ brkn.model.BrowserChannel.prototype.onMessage_ = function(rawMessage) {
 	switch(message.type) {
 	  case 'viewer_change':
 	    var user = brkn.model.Users.getInstance().get_or_add(message['user']);
+	    
+	    if (user.online != message['online']) {
+	      brkn.model.Users.getInstance().publish(brkn.model.Users.Action.ONLINE, user, message['online']);
+	    }
 
 	    var time = message['time'] && goog.date.fromIsoString(message['time'] + 'Z'); 
 	    if (user.currentSession && time) {
@@ -102,6 +106,10 @@ brkn.model.BrowserChannel.prototype.onMessage_ = function(rawMessage) {
   	    }
 	    }
 	    break;
+	  case 'new_message':
+      var m = new brkn.model.Message(message['message']);
+      brkn.model.Users.getInstance().publish(brkn.model.Users.Action.NEW_MESSAGE, m);
+      break;
 	  case 'new_activity':
 	    brkn.model.Users.getInstance().publish(brkn.model.Users.Action.NEW_ACTIVITY,
 	        message['activity']);
@@ -117,10 +125,14 @@ brkn.model.BrowserChannel.prototype.onMessage_ = function(rawMessage) {
 	    }, this);
 	    break;
 	  case 'new_programs':
+	    var channel;
+	    if (message['channel']) {
+	      channel = brkn.model.Channels.getInstance().addChannel(message['channel']);
+	    }
 	    goog.array.forEach((/** @type {Array.<Object>} */ message['programs']),
 	        goog.bind(function(program) {
 	          var p = new brkn.model.Program(program);
-	          var channel = brkn.model.Channels.getInstance().get(message['channel_id']);
+	          channel = channel || brkn.model.Channels.getInstance().get(message['channel_id']);
 	          if (channel) {
   	          channel.publish(brkn.model.Channel.Action.ADD_PROGRAM, p);
   	          var currentProgram = brkn.model.Channels.getInstance().currentChannel &&

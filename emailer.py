@@ -54,6 +54,13 @@ class Message():
             'subject' : name + ' replied to your comment!',
             'template': 'comment.html'
            }
+    
+  @staticmethod
+  def MESSAGE(name):
+    return {
+            'subject' : name + ' sent you a message!',
+            'template': 'message.html'
+           }
   
   @staticmethod
   def WELCOME_FRIEND(name):

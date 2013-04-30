@@ -55,6 +55,12 @@ brkn.Sidebar = function() {
    * @private
    */
   this.stream_;
+  
+  /**
+   * @type {brkn.sidebar.FriendList}
+   * @private
+   */
+  this.friendList_;
 
   /**
    * @type {Object.<string, Element>}
@@ -147,6 +153,13 @@ brkn.Sidebar.prototype.conversationEl_;
  * @type {Element}
  * @private
  */
+brkn.Sidebar.prototype.friendListEl_;
+
+
+/**
+ * @type {Element}
+ * @private
+ */
 brkn.Sidebar.prototype.activitiesCountEl_;
 
 
@@ -158,6 +171,7 @@ brkn.Sidebar.prototype.enterDocument = function() {
   this.contentEl_ = goog.dom.getElement('sidebar-content');
   this.mediaListEl_ = goog.dom.getElement('media-list');
   this.profileEl_ = goog.dom.getElement('profile');
+  this.friendListEl_ = goog.dom.getElement('friendlist');
   this.conversationEl_ = goog.dom.getElement('conversation');
   this.toolbar_ = goog.dom.getElement('toolbar');
   this.tabsEl_ = goog.dom.getElementByClass('tabs', this.getElement());
@@ -176,7 +190,7 @@ brkn.Sidebar.prototype.enterDocument = function() {
   this.starred_ = new brkn.sidebar.Profile(brkn.model.Users.getInstance().currentUser);
   this.starred_.decorate(goog.dom.getElement('my-profile'));
   
-  if (this.info_) {
+  if (this.info_ && DESKTOP) {
     this.currentScreen_ = goog.dom.getElement('info');
     this.currentTab_ = 'info';
     this.tabNav_('info', 'info');
@@ -273,6 +287,8 @@ brkn.Sidebar.prototype.enterDocument = function() {
       this.showMediaList, this);
   brkn.model.Sidebar.getInstance().subscribe(brkn.model.Sidebar.Actions.MEDIA_INFO,
       this.showMediaInfo, this);
+  brkn.model.Sidebar.getInstance().subscribe(brkn.model.Sidebar.Actions.FRIEND_LIST,
+      this.showFriendList, this);
   brkn.model.Sidebar.getInstance().subscribe(brkn.model.Sidebar.Actions.PROFILE,
       this.showProfile, this);
   brkn.model.Channels.getInstance().subscribe(brkn.model.Channels.Actions.NEXT_PROGRAM,
@@ -470,6 +486,16 @@ brkn.Sidebar.prototype.showMediaList = function(name, opt_medias, opt_url, opt_t
   mediaList.decorate(this.mediaListEl_);
   brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NAVIGATE,
       this.mediaListEl_, false, name, opt_thumb, opt_desc);
+};
+
+
+/**
+ */
+brkn.Sidebar.prototype.showFriendList = function() {
+  this.friendList_ = new brkn.sidebar.FriendList(undefined, true);
+  this.friendList_.decorate(this.friendListEl_);
+  brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NAVIGATE,
+      this.friendListEl_, false, 'Friends');
 };
 
 

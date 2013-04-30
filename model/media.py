@@ -105,13 +105,17 @@ class Media(db.Model):
                     description=db.Text(item['snippet']['description'].replace("\n", r" ") if item['snippet']['description'] else ''),
                     host_views=int(item['statistics']['viewCount']) if item['statistics']['viewCount'] else 0)
         media.put()
+        logging.info('FETCHED: ' + media.name)
 
       collection_media = None
       if collection and \
           (not enforce_category or (item['snippet'].get('categoryId') in collection.categories)):
         collection_media = CollectionMedia.add(collection, media, publisher=publisher, approved=(True if approve else None))
 
-      PublisherMedia.add(publisher=publisher, media=media)
+      if not publisher and item['snippet']['channelId']:
+        publisher = Publisher.get_by_channel_id(item['snippet']['channelId'])
+      if publisher:
+        PublisherMedia.add(publisher=publisher, media=media)
 
       if item.get('topicDetails'):
         for topic_id in item['topicDetails']['topicIds']:
@@ -120,7 +124,6 @@ class Media(db.Model):
           if collection_media:
             TopicCollectionMedia.add(topic, collection_media)
       
-      logging.info('FETCHED: ' + media.name)
       medias.append(media)
     return medias
         
@@ -213,6 +216,8 @@ class Media(db.Model):
     return cached_tweets_json[offset:offset+limit]
 
   def set_seen_by(self, user=None):
+    if user:
+      User.set_last_media(user, self)
     if user and not user.id in self.seen:
       self.seen.append(user.id)
       self.put()
@@ -227,6 +232,7 @@ class Media(db.Model):
     obj = Media.get_by_key_name(key_name)
     if obj:
       obj.like_count += 1
+      obj.put()
     
   @classmethod
   @db.transactional
@@ -234,6 +240,7 @@ class Media(db.Model):
     obj = Media.get_by_key_name(key_name)
     if obj:
       obj.dislike_count -= 1
+      obj.put()
 
   @classmethod
   @db.transactional

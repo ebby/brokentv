@@ -11,6 +11,7 @@ class Publisher(db.Model):
   host_id = db.StringProperty()
   channel_id = db.StringProperty()
   picture = db.BlobProperty()
+  picture_url = db.StringProperty()
   link = db.StringProperty()
   description = db.TextProperty()
   last_fetch = db.DateTimeProperty()
@@ -19,6 +20,28 @@ class Publisher(db.Model):
   def id(self):
     return self.key().name()
 
+  @classmethod
+  def get_by_channel_id(self, channel_id):
+    publisher = Publisher.all().filter('channel_id =', channel_id).get()
+    if not publisher:
+      youtube3 = get_youtube3_service()
+      response = youtube3.channels().list(
+          id=channel_id,
+          part='snippet',
+          fields='items'
+        ).execute()
+      items = response.get('items', [])
+      if len(items):
+        publisher = Publisher(key_name=MediaHost.YOUTUBE + channel_id,
+                              name=items[0]['snippet']['title'],
+                              description=items[0]['snippet']['description'],
+                              link='http://www.youtube.com/channel/' + channel_id,
+                              channel_id=channel_id,
+                              picture_url=items[0]['snippet']['thumbnails']['default']['url'],
+                              host=MediaHost.YOUTUBE)
+        publisher.put()
+    return publisher
+  
   def get_medias(self, limit, offset=0):
     # add .order('-published')
     pub_medias = PublisherMedia.all().filter('publisher =', self) \
@@ -31,7 +54,7 @@ class Publisher(db.Model):
     json['name'] = self.name
     if get_desc:
       json['description'] = self.description
-    json['picture'] = '/images/publisher/' + self.id
+    json['picture'] = self.picture_url or '/images/publisher/' + self.id
     json['link'] = self.link
     return json
 

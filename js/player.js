@@ -173,18 +173,7 @@ brkn.Player.prototype.enterDocument = function() {
         e.stopPropagation();
         e.preventDefault();
       }, this))
-      .listen(this.restart_, goog.events.EventType.CLICK, goog.bind(function(e) {
-        e.preventDefault();
-        e.stopPropagation()
-        if (this.currentProgram_) {
-          this.playProgram(this.currentProgram_);
-        }
-      }, this))
       .listen(expandEl, goog.events.EventType.CLICK, goog.bind(this.toggleExpand_, this))
-      .listen(this.likeEl_, goog.events.EventType.CLICK,
-          goog.bind(this.onLike_, this, this.likeEl_, true))
-      .listen(this.dislikeEl_, goog.events.EventType.CLICK,
-          goog.bind(this.onLike_, this, this.dislikeEl_, false))
       .listen(this.getElement(), goog.events.EventType.MOUSEMOVE, goog.bind(function(e) {
         var xPer = e.offsetX/this.height_;
         var yPer = e.offsetY/this.width_;
@@ -235,6 +224,19 @@ brkn.Player.prototype.enterDocument = function() {
       }, this);
   
   if (DESKTOP) {
+    this.getHandler()
+        .listen(this.restart_, goog.events.EventType.CLICK, goog.bind(function(e) {
+          e.preventDefault();
+          e.stopPropagation()
+          if (this.currentProgram_) {
+            this.playProgram(this.currentProgram_);
+          }
+        }, this))
+        .listen(this.likeEl_, goog.events.EventType.CLICK,
+            goog.bind(this.onLike_, this, this.likeEl_, true))
+        .listen(this.dislikeEl_, goog.events.EventType.CLICK,
+            goog.bind(this.onLike_, this, this.dislikeEl_, false));
+    
     brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_SIDEBAR,
         function(show) {
           this.resize(show);
@@ -387,6 +389,9 @@ brkn.Player.prototype.play = function(media, opt_tries) {
  * Resize
  */
 brkn.Player.prototype.resize = function() {
+  if (IPHONE) {
+    return;
+  }
   var stagecover = goog.dom.getElement('stagecover');
   var message = goog.dom.getElementByClass('message', stagecover)
   var guideHeight = goog.dom.getElement('guide').style.height;
@@ -511,6 +516,7 @@ brkn.Player.prototype.playerStateChange_ = function(event) {
           this.currentProgram_.media);
       break;
     case YT.PlayerState.ENDED:
+      window.console.log('HERE')
   	  brkn.model.Users.getInstance().currentUser.currentSession.seen(this.currentProgram_.media);
   	  this.resetLike_();
   	  
@@ -569,6 +575,10 @@ brkn.Player.prototype.onPlayerError_ = function(event) {
  * @private
  */
 brkn.Player.prototype.updateStagecover_ = function(opt_message, opt_beforeEnd, opt_restart) {
+  if (IPHONE) {
+    return;
+  }
+  
   var stagecover = goog.dom.getElement('stagecover');
 //  var seek = this.currentProgram_ ? (goog.now() - this.currentProgram_.time.getTime())/1000 : 0;
   var seek = this.currentProgram_ ? brkn.model.Player.getInstance().getCurrentTime() : 0;

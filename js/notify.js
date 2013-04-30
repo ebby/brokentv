@@ -64,6 +64,8 @@ brkn.Notify.prototype.show_ = function(flash, action, content, opt_user, opt_img
         goog.dom.removeNode(noteEl);
       })
       .listen(noteEl, goog.events.EventType.CLICK, function(e) {
+        e.preventDefault();
+        e.stopPropagation();
         goog.dom.removeNode(noteEl);
       })
       .listen(image,

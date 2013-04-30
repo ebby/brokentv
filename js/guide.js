@@ -100,6 +100,12 @@ brkn.Guide = function() {
    */
   this.cursor_ = [brkn.model.Channels.getInstance().currentChannel,
                   brkn.model.Channels.getInstance().currentChannel.getCurrentProgram()];
+
+  /**
+   * @type {number}
+   * @private
+   */
+  this.maxLastProgram_ = 0;
 };
 goog.inherits(brkn.Guide, goog.ui.Component);
 
@@ -300,30 +306,7 @@ brkn.Guide.prototype.enterDocument = function() {
   
   var maxLastProgram = 0;
   goog.array.forEach(brkn.model.Channels.getInstance().channels, goog.bind(function(c) {
-    if (!(c.myChannel && !brkn.Exp.MY_CHANNEL)) {
-      var channel = new brkn.Channel(c, this.timeline, this.startTime_, 0, this.minTime_);
-      channel.render(this.channelsEl_);
-      this.channels_.push(channel);
-      this.channelMap_[c.id] = channel;
-
-      c.subscribe(brkn.model.Channel.Action.ONLINE, function(online) {
-        this.resize_();
-      }, this);
-
-      var programs = goog.dom.getElementsByClass('program', channel.getElement());
-      var lastProgram = /** @type {Element} */ goog.array.peek(programs);
-      if (lastProgram) {
-        maxLastProgram = Math.max(maxLastProgram, goog.style.getPosition(lastProgram).x +
-            goog.style.getSize(lastProgram).width + 170 /* for suggestion box */);
-      }
-    }
-    if (c.id == brkn.model.Channels.getInstance().currentChannel.id && channel) {
-      goog.dom.classes.add(channel.getElement(), 'current');
-      this.currentChannel_ = channel;
-      // Stored for use in dragger override
-      window['currentChannel'] = this.currentChannel_;
-    }
-    this.myChannel_ = c.myChannel ? c : this.myChannel_;
+    this.addChannel_(c);
   }, this));
   
   this.dragger_ = new goog.fx.Dragger(this.getElement());
@@ -401,6 +384,9 @@ brkn.Guide.prototype.enterDocument = function() {
 
   brkn.model.Channels.getInstance().subscribe(brkn.model.Channels.Actions.RESIZE,
       this.resize_, this);
+  
+  brkn.model.Channels.getInstance().subscribe(brkn.model.Channels.Actions.ADD_CHANNEL,
+      this.addChannel_, this);
   brkn.model.Channels.getInstance().subscribe(brkn.model.Channels.Actions.CHANGE_CHANNEL,
       this.changeChannel, this);
   brkn.model.Channels.getInstance().subscribe(brkn.model.Channels.Actions.NEXT_PROGRAM,
@@ -416,9 +402,9 @@ brkn.Guide.prototype.enterDocument = function() {
   brkn.model.Player.getInstance().subscribe(brkn.model.Player.Actions.PLAY_ASYNC,
       this.playAsync_, this);
 
-  while (goog.style.getSize(this.getElement()).width < maxLastProgram) {
-    this.expand_();
-  }
+//  while (goog.style.getSize(this.getElement()).width < maxLastProgram) {
+//    this.expand_();
+//  }
   this.resize_();
 
   if (this.isAdmin_) {
@@ -432,6 +418,40 @@ brkn.Guide.prototype.enterDocument = function() {
   }
 };
 
+
+/**
+ * @param {brkn.model.Channel} c
+ */
+brkn.Guide.prototype.addChannel_ = function(c) {
+  if (this.channelMap_[c['id']]) {
+    // Already exists
+    return;
+  }
+  if (!(c.myChannel && !brkn.Exp.MY_CHANNEL)) {
+    var channel = new brkn.Channel(c, this.timeline, this.startTime_, 0, this.minTime_);
+    channel.render(this.channelsEl_);
+    this.channels_.push(channel);
+    this.channelMap_[c.id] = channel;
+
+    c.subscribe(brkn.model.Channel.Action.ONLINE, function(online) {
+      this.resize_();
+    }, this);
+
+    var programs = goog.dom.getElementsByClass('program', channel.getElement());
+    var lastProgram = /** @type {Element} */ goog.array.peek(programs);
+    if (lastProgram) {
+      this.maxLastProgram_ = Math.max(this.maxLastProgram_, goog.style.getPosition(lastProgram).x +
+          goog.style.getSize(lastProgram).width + 170 /* for suggestion box */);
+    }
+  }
+  if (c.id == brkn.model.Channels.getInstance().currentChannel.id && channel) {
+    goog.dom.classes.add(channel.getElement(), 'current');
+    this.currentChannel_ = channel;
+    // Stored for use in dragger override
+    window['currentChannel'] = this.currentChannel_;
+  }
+  this.myChannel_ = c.myChannel ? c : this.myChannel_;
+};
 
 
 /**
@@ -796,5 +816,7 @@ brkn.Guide.prototype.resize_ = function() {
   goog.style.setHeight(this.channelsEl_, goog.dom.classes.has(this.getElement(), 'toggled')
       ? channelsHeight : this.controllerHeight_);
   goog.style.setHeight(this.getElement(), goog.dom.classes.has(this.getElement(), 'collapsed') ?
+      this.controllerHeight_ : channelsHeight + this.controllerHeight_ + 19);
+  goog.style.setHeight(goog.dom.getElement('right-grad'), !goog.dom.classes.has(this.getElement(), 'toggled') ?
       this.controllerHeight_ : channelsHeight + this.controllerHeight_ + 19);
 };

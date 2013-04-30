@@ -1,9 +1,11 @@
+import datetime
 import simplejson
 import urllib
 import gdata.youtube
 import gdata.youtube.service
 import gdata.alt.appengine
 import inits
+import iso8601
 import logging
 import random
 import uuid
@@ -86,6 +88,9 @@ class Programming():
   @classmethod
   def set_programming(cls, channel_id, duration=2400, schedule_next=False, fetch_twitter=True,
                       queue='programming', target=None, kickoff=False):
+    from model import Channel
+    from model import Program
+    
     # Stored programming
     programming = memcache.get('programming') or {}
     onlineUsers = memcache.get('web_channels') or {}
@@ -131,8 +136,8 @@ class Programming():
                    (datetime.datetime.now() - c.last_programmed).seconds > 3600]
           
           # At most, 30% of the audience has already "witnessed" this program
-          filtered_medias = [m for m in filtered_medias if not len(viewers) or
-                    float(len(Programming.have_seen(m, viewers)))/len(viewers) < .3]
+          # filtered_medias = [m for m in filtered_medias if not len(viewers) or
+          #           float(len(Programming.have_seen(m, viewers)))/len(viewers) < .3]
           all_medias += filtered_medias
           offset += limit
 
@@ -173,7 +178,9 @@ class Programming():
           if len(pickle.dumps(programming)) > 1000000:
             # We can only fit 1mb into memcache
             break
-      broadcast.broadcastNewPrograms(channel, programs)
+      
+      if len(programs):
+        broadcast.broadcastNewPrograms(channel, programs)
   
       memcache.set('programming', programming)
 
@@ -218,10 +225,47 @@ class Programming():
       if not programming.get(channel.id, None):
         programming[channel.id] = []
       programming.get(channel.id).append(program.toJson(fetch_channel=False, fetch_media=True, media_desc=False, pub_desc=False))
-      logging.info('ADDING LIVE: ' + media.name + ' at: ' + program.time.isoformat())
 
     memcache.set('programming', programming)
-  
+
+  @classmethod
+  def set_user_channel_programs(self, key, channel, medias, time=None, reset=False):
+    from model import Program
+
+    programs = []
+    programs_json = []
+    channel_json = {}
+
+    if not reset and memcache.get(channel.id):
+      channel_json = memcache.get(channel.id) or {}
+      programs_json = channel_json.get('programs', [])
+    else:
+      channel_json['channel'] = channel.toJson()
+
+    next_time = time or datetime.datetime.now()
+    if len(programs_json):
+      next_time = iso8601.parse_date(programs_json[-1]['time']).replace(tzinfo=None) + \
+        datetime.timedelta(seconds=programs_json[-1]['media']['duration'])
+    for media in medias:
+      program = Program.add_program(channel, media, time=next_time)
+      if program:
+        programs.append(program)
+        programs_json.append(program.toJson(fetch_channel=False, fetch_media=True, media_desc=False, pub_desc=False))
+        next_time = next_time + datetime.timedelta(seconds=media.duration)
+        if len(pickle.dumps(programs_json)) > 1000000:
+            # We can only fit 1mb into memcache
+            break
+
+    user_obj = memcache.get(key) or {}
+    user_channels = (user_obj.get('channels') or []) if user_obj else []
+    if not channel.id in user_channels:
+      user_channels.append(channel.id)
+      user_obj['channels'] = user_channels
+      memcache.set(key, user_obj)
+    channel_json['programs'] = programs_json
+    memcache.set(channel.id, channel_json)
+    return programs
+
   '''
     Our secret sauce sorting algorithm
   '''

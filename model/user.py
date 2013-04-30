@@ -1,5 +1,11 @@
 from common import *
 
+'''
+  JUST FOR NOW: FRIENDS IS A LIST OF FB FRIENDS THAT MAY NOT BE XYLO USERS
+  FOLLOWING ARE FB FRIENDS WITH XYLO ACCOUNTS
+  FOLLOWERS IS NOT SUPPORTED YET
+'''
+
 class User(db.Model):
     id = db.StringProperty()
     access_level = db.IntegerProperty(default=AccessLevel.WAITLIST)
@@ -13,6 +19,8 @@ class User(db.Model):
     access_token = db.StringProperty()
     location = db.StringProperty()
     friends = db.StringListProperty(default=[])
+    following = db.StringListProperty(default=[])
+    followers = db.StringListProperty(default=[])
     twitter_token = db.StringProperty()
     twitter_secret = db.StringProperty()
     twitter_id = db.IntegerProperty()
@@ -26,6 +34,7 @@ class User(db.Model):
     demo = db.BooleanProperty(default=False)
     welcomed = db.BooleanProperty(default=False)
     email_reply = db.BooleanProperty(default=True)
+    email_message = db.BooleanProperty(default=True)
     current_channel_id = db.StringProperty()
     
     # Stats
@@ -53,6 +62,10 @@ class User(db.Model):
       split = self.name.split(' ')
       return split[0] if len(split) else self.name
 
+    @property
+    def thumbnail(self):
+      return 'https://graph.facebook.com/%s/picture' % self.id
+
     @classmethod
     def get_by_twitter_id(cls, id):
       return User.all().filter('twitter_id =', id).get()
@@ -62,6 +75,23 @@ class User(db.Model):
         if User.get_by_key_name(friend):
           return True
       return False
+    
+    def get_following(self):
+      following_ids = []
+      following = []
+      list = self.following if len(self.following) else self.friends
+      for fid in list:
+        friend = User.get_by_key_name(fid)
+        if friend:
+          following.append(friend)
+          if not len(self.following):
+            # if no following, we need to populate our list
+            following_ids.append(fid)
+      if len(following_ids):
+        # if we populated our list
+        self.following = following_ids
+        self.put()
+      return following
 
     def has_female_friend(self):
       for friend in self.friends:
@@ -116,6 +146,43 @@ class User(db.Model):
       self.access_level = AccessLevel.USER
       self.put()
 
+    @classmethod
+    def set_online(cls, uid, online):
+      user_obj = memcache.get(uid) or {}
+      user_obj['online'] = online
+      memcache.set(uid, user_obj)
+      return user_obj
+    
+    @classmethod
+    def set_last_media(cls, user, media):
+      user_obj = memcache.get(user.id) or {}
+      user_obj['last_seen'] = media.toJson()
+      memcache.set(user.id, user_obj)
+      return user_obj
+
+    @classmethod
+    def get_user_entry(cls, uid, fetch=True):
+      user_obj = memcache.get(uid) or {}
+      user_entry = None
+      if user_obj.get('entry'):
+        user_entry = user_obj.get('entry')
+      elif fetch or user_obj.get('online') is not None:
+        user = User.get_by_key_name(uid)
+        if user:
+          user_entry = user.toJson()
+          user_obj['entry'] = user_entry
+          memcache.set(uid, user_obj)
+      return user_entry
+
+    @classmethod
+    def get_entry(cls, uid, fetch=True):
+      user_entry = User.get_user_entry(uid, fetch=fetch)
+      if user_entry is not None:
+        user_obj = memcache.get(uid) or {}
+        user_entry['online'] = user_obj.get('online') or False
+        user_entry['last_seen'] = user_obj.get('last_seen')
+      return user_entry
+
     def toJson(self, admin=False, configs=False):
       json = {}
       json['id'] = self.id
@@ -123,7 +190,7 @@ class User(db.Model):
       json['profile_url'] = self.profile_url
       json['location'] = self.location
       json['access_level'] = self.access_level
-      json['welcomed'] = self.welcomed
+      json['last_login'] = self.last_login.isoformat() if self.last_login else None
       if admin:
         json['demo'] = self.demo
         json['last_login'] = self.last_login.isoformat() if self.last_login else None
@@ -135,4 +202,5 @@ class User(db.Model):
         json['show_guide'] = self.show_guide
         json['post_twitter'] = self.post_twitter
         json['post_facebook'] = self.post_facebook
+        json['welcomed'] = self.welcomed
       return json

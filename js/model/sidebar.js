@@ -28,6 +28,7 @@ brkn.model.Sidebar.prototype.toggled = function() {
  * @enum {string}
  */
 brkn.model.Sidebar.Actions = {
+  FRIEND_LIST: 'friend-list',
   NAVIGATE: 'navigate',
   NEW_ACTIVITIES: 'new-activites',
   MEDIA_INFO: 'media-info',

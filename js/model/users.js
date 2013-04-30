@@ -17,11 +17,25 @@ brkn.model.Users = function() {
 	 * @type {Object.<string, brkn.model.User>}
 	 */
 	this.userMap = {};
+
+	/**
+   * @type {boolean}
+   */
+  this.friendsFetched_ = false;
+
+	/**
+   * @type {Array.<brkn.model.User>}
+   */
+  this.friends = [];
 	
 	/**
    * @type {Array.<brkn.model.User>}
    */
   this.onlineFriends = [];
+  
+  this.subscribe(brkn.model.Users.Action.ONLINE, function(user, online) {
+    user.online = online;
+  }, this);
 };
 goog.inherits(brkn.model.Users, goog.pubsub.PubSub);
 goog.addSingletonGetter(brkn.model.Users);
@@ -60,6 +74,29 @@ brkn.model.Users.prototype.addOnline = function(user) {
 
 
 /**
+ * @param {?Function=} opt_callback
+ * @return {Array.<brkn.model.User>} The user
+ */
+brkn.model.Users.prototype.getFriends = function(opt_callback) {
+  if (!this.friendsFetched_) {
+    goog.net.XhrIo.send('/_friends', goog.bind(function(e) {
+      var response = /** @type {Array.<Object>} */ e.target.getResponseJson();
+      this.friends = goog.array.map(response, function(u) {
+        return this.get_or_add(u);
+      }, this);
+      this.friendsFetched_ = true;
+      if (opt_callback) {
+        opt_callback(this.friends);
+      }
+    }, this));
+  } else if (opt_callback) {
+    opt_callback(this.friends);
+  }
+  return this.friends;
+};
+
+
+/**
  * @return {brkn.model.User} The user
  */
 brkn.model.Users.prototype.get = function(id) {
@@ -77,6 +114,8 @@ brkn.model.Users.prototype.get_or_add = function(user) {
 		u = new brkn.model.User(user);
 		this.add(u)
 	}
+	u.online = user['online']; // Update online presence
+	u.currentMedia = u.currentMedia || user['last_seen']; // Update media
 	return u;
 };
 
@@ -85,5 +124,7 @@ brkn.model.Users.prototype.get_or_add = function(user) {
  * @enum {string}
  */
 brkn.model.Users.Action = {
-  NEW_ACTIVITY: 'new-activity'
+  NEW_ACTIVITY: 'new-activity',
+  NEW_MESSAGE: 'new-message',
+  ONLINE: 'online'
 };

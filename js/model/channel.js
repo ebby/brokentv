@@ -266,6 +266,7 @@ brkn.model.Channel.prototype.getCurrentProgram = function(opt_offset) {
  */
 brkn.model.Channel.prototype.fetchCurrentProgramming = function() {
   goog.net.XhrIo.send('/_programming/' + this.id, goog.bind(function(e) {
+    goog.DEBUG && window.console.log(e.target.getResponse());
     var programs = /** Array.<Object> */ e.target.getResponseJson();
     if (!programs.length) {
       // Try again in 1 second

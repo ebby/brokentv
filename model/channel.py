@@ -4,6 +4,8 @@ from media import Media
 from user import User
 from collection import Collection
 
+import util
+
 class Channel(db.Model):
   name = db.StringProperty()
   current_program = db.IntegerProperty()
@@ -57,6 +59,77 @@ class Channel(db.Model):
       channel = Channel(key_name=user.id, name=name, privacy=Privacy.PRIVATE, user=user)
       channel.put()
     return channel
+  
+  @classmethod
+  def youtube_channel(cls, user, name, yt_channel_id=None, yt_playlist_id=None):
+    channel = Channel(key_name= user.id + '-' + (yt_channel_id or yt_playlist_id),
+                      name=name, privacy=Privacy.FRIENDS, online=True, user=user)
+    channel_id = (yt_channel_id or yt_playlist_id)
+    medias = []
+
+    youtube3 = get_youtube3_service()
+    search_response = {}
+    if yt_channel_id:
+      if yt_channel_id.startswith('HC'):
+        channel_response = youtube3.channels().list(
+          id=yt_channel_id,
+          part='topicDetails',
+          maxResults=1
+        ).execute()
+        if len(channel_response.get('items', [])):
+          topic_id = channel_response.get('items')[0]['topicDetails']['topicIds'][0]
+          search_response = youtube3.search().list(
+            topicId=topic_id,
+            part='id,snippet',
+            order='date',
+            maxResults=1,
+            type='video'
+          ).execute()
+      else:   
+        search_response = youtube3.search().list(
+            channelId=yt_channel_id,
+            part='id,snippet',
+            order='date',
+            maxResults=1,
+            fields='items',
+            type='video'
+          ).execute()
+    elif yt_playlist_id:
+      search_response = youtube3.playlistItems().list(
+          playlistId=yt_playlist_id,
+          part='id,snippet',
+          maxResults=1,
+          fields='items'
+        ).execute()
+
+    if len(search_response.get('items', [])):
+      search_ids = ''
+      for item in search_response.get('items', []):
+        if item['kind'] == 'youtube#searchResult':
+          search_ids += item['id']['videoId'] + ','
+        elif item['kind'] == 'youtube#playlistItem':
+          search_ids += item['snippet']['resourceId']['videoId'] + ','
+      videos_response = youtube3.videos().list(
+        id=search_ids,
+        part="id,snippet,topicDetails,contentDetails,statistics"
+      ).execute()
+
+      medias = Media.add_from_snippet(videos_response.get("items", []), approve=True)
+        
+      deferred.defer(util.schedule_youtube_channel, user.id, name, channel_id, yt_channel_id=yt_channel_id,
+                     yt_playlist_id=yt_playlist_id,
+                     _name='youtube-channel-' + channel_id + '-' + str(uuid.uuid1()), _queue='youtube')
+
+    programs = programming.Programming.set_user_channel_programs(user.id, channel, medias,
+                                                    time=datetime.datetime.now(), reset=True)
+
+    broadcast.broadcastNewPrograms(channel, programs, new_channel=True, to_owner=False)
+    
+    data_json = {
+      'channel': channel.toJson(),
+      'program': programs[0].toJson() if len(programs) else None
+    }
+    return data_json
   
   def get_programming(self):
     channel_programs = ChannelProgram.all().filter('channel =', self).order('-time').fetch(limit=100)
@@ -168,3 +241,5 @@ class ChannelCollection(db.Model):
 class ChannelAdmins(db.Model):
   channel = db.ReferenceProperty(Channel, collection_name='admins')
   admin = db.ReferenceProperty(User, collection_name='channels')
+
+

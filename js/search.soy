@@ -1,17 +1,15 @@
 {namespace brkn.search}
 
 /**
- * @param media
+ * @param name
+ * @param thumb
  */
-{template .media}
-  <div class="search-media">
+{template .channel}
+  <div class="search-channel">
     <div class="pic">
-      <img src="{$media.thumbnail}">
+      <img src="{$thumb}">
     </div>
-    <div class="title">{$media.name}</div>
-    <div class="options">
-      <div class="play"></div>
-      <div class="plus"></div>
-    </div>
+    <div class="title">{$name}</div>
+    <div class="loading loading-channel"><div class="loading-spinner"></div></div>
   </div>
 {/template}

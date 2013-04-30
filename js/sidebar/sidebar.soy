@@ -490,8 +490,11 @@
 /**
  */
 {template .profile}
-  <div class="tabbed activity">
+  <div class="tabbed messages">
     <ul class="tabs">
+      <li class="tab messages">
+        <div class="label">MESSAGES</div>
+      </li>
       <li class="tab activity">
         <div class="label">ACTIVITY</div>
       </li>
@@ -499,6 +502,9 @@
         <div class="label"><div class="heart"></div>'d</div>
       </li>
     </ul>
+    <div class="messages-content content messages">
+      <div class="loading loading-activity"><div class="loading-spinner"></div></div>
+    </div>
     <div class="activity-content content activity">
       <div class="loading loading-activity"><div class="loading-spinner"></div></div>
     </div>

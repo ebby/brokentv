@@ -3,7 +3,11 @@ goog.provide('brkn.sidebar.Profile');
 goog.require('soy');
 goog.require('brkn.model.Media');
 goog.require('brkn.model.Medias');
+goog.require('brkn.model.Message');
 goog.require('brkn.sidebar');
+goog.require('brkn.sidebar.MediaList');
+goog.require('brkn.sidebar.Messages');
+goog.require('brkn.sidebar.Stream');
 
 goog.require('goog.events.KeyHandler.EventType');
 goog.require('goog.fx.dom.Scroll');
@@ -35,7 +39,7 @@ brkn.sidebar.Profile = function(user) {
    * @type {Array.<string>}
    * @private
    */
-  this.tabs_ = ['activity', 'starred'];
+  this.tabs_ = ['messages', 'activity', 'starred'];
 };
 goog.inherits(brkn.sidebar.Profile, goog.ui.Component);
 
@@ -45,6 +49,27 @@ goog.inherits(brkn.sidebar.Profile, goog.ui.Component);
  * @private
  */
 brkn.sidebar.Profile.prototype.tabsEl_;
+
+
+/**
+ * @type {brkn.sidebar.Messages}
+ * @private
+ */
+brkn.sidebar.Profile.prototype.messages_;
+
+
+/**
+ * @type {brkn.sidebar.MediaList}
+ * @private
+ */
+brkn.sidebar.Profile.prototype.starred_;
+
+
+/**
+ * @type {brkn.sidebar.Stream}
+ * @private
+ */
+brkn.sidebar.Profile.prototype.stream_;
 
 
 /** @inheritDoc */
@@ -61,6 +86,18 @@ brkn.sidebar.Profile.prototype.decorateInternal = function(el) {
 brkn.sidebar.Profile.prototype.enterDocument = function() {
   
   this.tabsEl_ = goog.dom.getElementByClass('tabs', this.getElement());
+  
+  goog.net.XhrIo.send(
+      '/_message/' + this.user_.id,
+      goog.bind(function(e) {
+        var response = /** @type {Array.<Object>} */ e.target.getResponseJson();
+        window.console.log(response);
+        var messages = goog.array.map(response, function(m) {
+          return new brkn.model.Message(m);
+        }, this);
+        this.messages_ = new brkn.sidebar.Messages(this.user_, messages);
+        this.messages_.decorate(goog.dom.getElementByClass('messages-content', this.getElement()));
+      }, this));
 
   goog.net.XhrIo.send(
       '/_star/' + this.user_.id,

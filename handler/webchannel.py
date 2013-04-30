@@ -7,10 +7,6 @@ from common import *
 class WebChannelConnectedHandler(BaseHandler):
   def post(self):
     client_id = self.request.get('from')
-    def add_client(web_channels, client_id):
-      web_channels[client_id] = 1
-      return web_channels
-    web_channels = memcache_cas('web_channels', add_client, client_id)
 
 class WebChannelDisconnectedHandler(BaseHandler):
   def post(self):
@@ -18,6 +14,8 @@ class WebChannelDisconnectedHandler(BaseHandler):
       del self.session['user']
 
     client_id = self.request.get('from')
+    User.set_online(client_id, False)
+
     def remove_client(clients, client_id):
       if clients.get(client_id):
         del clients[client_id]
@@ -49,4 +47,4 @@ class WebChannelDisconnectedHandler(BaseHandler):
 
       if last_session:    
         broadcast.broadcastViewerChange(user, last_session.channel.id, None, last_session.id,
-                                        datetime.datetime.now().isoformat())
+                                        datetime.datetime.now().isoformat(), online=False)

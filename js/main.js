@@ -201,14 +201,19 @@ brkn.Main.prototype.enterDocument = function() {
                 var media = brkn.model.Medias.getInstance().get(matches[2]);
                 brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.MEDIA_INFO, media);
                 break;
+              case 'friendlist':
+                brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.FRIEND_LIST);
+                break;
             }
           }
         }
       });
   
-  window.onbeforeunload = function(e) {
-    return 'Leaving so soon?'
-  }
+  window.onload = function() {
+    window.onbeforeunload = function(e) {
+      return 'Leaving so soon?'
+    };
+  };
   
   goog.net.XhrIo.send('/_presence', goog.bind(function(e) {
     var data = e.target.getResponseJson();

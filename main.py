@@ -50,7 +50,8 @@ jinja_environment = jinja2.Environment(
 
 class MainHandler(BaseHandler):
     def get(self, path=None):
-      mobile = self.request.host_url.startswith('http://m.') or self.request.get('mobile')
+      mobile = self.request.host_url.startswith('http://m.') or self.request.get('mobile') \
+          or 'Mobile' in self.request.headers.get('user_agent')
 
       template_data = {}
       template_data['host_url'] = self.request.host_url
@@ -104,7 +105,6 @@ class AdminHandler(BaseHandler):
         template_data['css_location'] = constants.ADMIN_CSS_SOURCE
       template_data['js_location'] = constants.ADMIN_JS_SOURCE
       template_data['stats'] = simplejson.dumps(Stat.to_json())
-      logging.info(constants.INVITE_POLICY())
       template_data['invite_policy'] = constants.INVITE_POLICY()
       template_data['invite_limit'] = constants.INVITE_LIMIT()
       path = os.path.join(os.path.dirname(__file__), 'templates/admin.html')
@@ -130,6 +130,10 @@ class UnsubscribeHandler(BaseHandler):
     if type == 'reply':
       current_user = self.current_user
       current_user.email_reply = False
+      current_user.put()
+    if type == 'message':
+      current_user = self.current_user
+      current_user.email_message = False
       current_user.put()
     self.redirect('/?unsub=1')
 
@@ -190,10 +194,13 @@ def create_handlers_map():
     ('/_comment/(.*)', rpc.CommentHandler),
     ('/_dislike', rpc.DislikeHandler),
     ('/_dislike/(.*)', rpc.DislikeHandler),
+    ('/_friends', rpc.FriendsHandler),
     ('/_info/(.*)', rpc.InfoHandler),
     ('/_like', rpc.LikeHandler),
     ('/_like/(.*)', rpc.LikeHandler),
     ('/_link', rpc.LinkHandler),
+    ('/_message', rpc.MessageHandler),
+    ('/_message/(.*)', rpc.MessageHandler),
     ('/_optin', rpc.OptInHandler),
     ('/_presence', rpc.PresenceHandler),
     ('/_programming/(.*)', rpc.ProgramHandler),
@@ -211,6 +218,7 @@ def create_handlers_map():
     ('/_twitter', rpc.TwitterHandler),
     ('/_twitter/callback', rpc.TwitterCallbackHandler),
     ('/_welcomed', rpc.WelcomedHandler),
+    ('/_ytchannel', rpc.YoutubeChannelHandler),
 
     # Admin
     ('/admin/_access', admin.AccessLevelHandler),

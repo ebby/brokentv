@@ -1,0 +1,35 @@
+{namespace brkn.sidebar.friendlist}
+
+/**
+ */
+{template .main}
+  <div class="friendlist">
+    <div class="online-friends"></div>
+    <div class="offline-friends"></div>
+  </div>
+{/template}
+
+
+/**
+ * @param user
+ * @param? timestamp
+ * @param? media
+ */
+{template .user}
+  <div class="user{if $media}{sp}media{/if}">
+    <div class="name">{$user.name}</div>
+    <div class="picture" style="background:{$user.color}">
+      <img src="{$user.picture}"/>
+    </div>
+    {if $timestamp}
+      <div class="timestamp">{$timestamp}</div>
+    {/if}
+    {if $media}
+      <div class="media">
+        <div class="watched">LAST WATCHED{sp}</div>
+        <div class="watching">NOW WATCHING{sp}</div>
+        <a class="media-link" href="#info:{$media.id}">{$media.name}</a>
+      </div>
+    {/if}
+  </div>
+{/template}

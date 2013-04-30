@@ -416,16 +416,9 @@ brkn.Controller.prototype.resize = function() {
         goog.style.getPosition(lastProgram).x + goog.style.getSize(lastProgram).width + 210 : 9999999;
     var width = Math.min(goog.dom.getViewportSize().width - 200,
         Math.max(100, goog.dom.getViewportSize().width - viewportLeft));
-    var rightWidth = Math.max(100,
-        (this.sidebarToggle_.isChecked() && width > 250 ? width - 247 : width + 5));
     var showWindow = (goog.dom.classes.has(this.getElement(), 'collapsed') && !!lastProgram &&
         width < goog.dom.getViewportSize().width - 203);
-    if (showWindow && this.rightWidth_ != rightWidth) {
-      this.rightWidth_ = rightWidth;
-      goog.style.setWidth(this.rightEl_, rightWidth);
-    } else {
-      this.rightEl_.style.width = '';
-    }
+ 
     goog.Timer.callOnce(goog.bind(function() {
       goog.dom.classes.enable(this.getElement(), 'window', showWindow &&
           goog.dom.classes.has(this.getElement(), 'collapsed'));

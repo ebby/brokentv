@@ -4,6 +4,7 @@ goog.require('soy');
 goog.require('brkn.model.Media');
 goog.require('brkn.model.Users');
 goog.require('brkn.sidebar');
+goog.require('brkn.sidebar.FriendList');
 
 goog.require('goog.events.KeyHandler.EventType');
 goog.require('goog.fx.dom.Scroll');
@@ -41,6 +42,12 @@ brkn.sidebar.Stream = function(activities, opt_uid) {
    * @private
    */
   this.count_ = 0;
+  
+  /**
+   * @type {boolean}
+   * @private
+   */
+  this.showFriendList_ = !opt_uid;
   
   /**
    * @type {boolean}
@@ -92,6 +99,13 @@ goog.inherits(brkn.sidebar.Stream, goog.ui.Component);
  * @type {Element}
  * @private
  */
+brkn.sidebar.Stream.prototype.friendlistEl_;
+
+
+/**
+ * @type {Element}
+ * @private
+ */
 brkn.sidebar.Stream.prototype.activitiesEl_;
 
 
@@ -118,6 +132,14 @@ brkn.sidebar.Stream.prototype.decorateInternal = function(el) {
 
   goog.dom.classes.add(el, 'stream');
   goog.dom.classes.add(el, 'ios-scroll');
+  
+  if (this.showFriendList_) {
+    this.friendlistEl_ = goog.dom.createDom('div', 'friendlist');
+    goog.dom.appendChild(this.getElement(), this.friendlistEl_);
+    var activitiesLabel = goog.dom.createDom('div', 'label', 'ACTIVITY');
+    goog.dom.appendChild(this.getElement(), activitiesLabel);
+  }
+
   this.activitiesEl_ = goog.dom.createDom('div', 'activities');
   goog.dom.appendChild(this.getElement(), this.activitiesEl_);
 
@@ -128,10 +150,14 @@ brkn.sidebar.Stream.prototype.decorateInternal = function(el) {
   this.noActivitiesEl_ = goog.dom.createDom('div', 'no-comments', this.uid_ ?
       'Your activity will appear here.': 'Friends\' activity will appear here.');
   goog.dom.appendChild(this.getElement(), this.noActivitiesEl_);
-  
 
   this.digest_(this.activities_);
-  
+
+  if (this.showFriendList_) {
+    this.friendList_ = new brkn.sidebar.FriendList(undefined, false);
+    this.friendList_.decorate(this.friendlistEl_);
+  }
+
   brkn.model.Users.getInstance().subscribe(brkn.model.Users.Action.NEW_ACTIVITY, function(activity) {
     if (this.uid_ == activity['user']['id'] ||
         (!this.uid_ && activity['user']['id'] != brkn.model.Users.getInstance().currentUser.id)) {

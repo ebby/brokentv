@@ -15,10 +15,36 @@ brkn.model.Search = function() {
   /**
    * @type {Array.<brkn.model.Media>}
    */
+  this.channelResults_ = [];
+  
+  /**
+   * @type {Array.<brkn.model.Media>}
+   */
   this.results_ = [];
 };
 goog.inherits(brkn.model.Search, goog.pubsub.PubSub);
 goog.addSingletonGetter(brkn.model.Search);
+
+
+/**
+ * @param {string} query
+ */
+brkn.model.Search.prototype.searchChannels = function(query, opt_callback) {
+  goog.net.XhrIo.send('https://www.googleapis.com/youtube/v3/search?q=' + query + '&type=channel,playlist' +
+      '&part=snippet&maxResults=3&key=AIzaSyAUF3ESL0wYUuSWmOezgZclQFpNGZNBePw',
+      goog.bind(function(e) {
+        var response = e.target.getResponseJson();
+        this.channelResults_ = goog.array.map(response['items'], function(item) {
+          return {
+            'playlist_id': item['id']['playlistId'],
+            'channel_id': item['id']['channelId'],
+            'name': item['snippet']['title'],
+            'thumbnail': item['snippet']['thumbnails']['default']['url']
+          };
+        }, this);
+        opt_callback && opt_callback(this.channelResults_);
+      }, this));
+};
 
 
 /**

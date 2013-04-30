@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<!--<html lang="en" xmlns:fb="http://ogp.me/ns/fb#" manifest="/static/cache.manifest"> -->
-<html lang="en" xmlns:fb="http://ogp.me/ns/fb#">
+<html lang="en" xmlns:fb="http://ogp.me/ns/fb#" manifest="/static/cache.manifest">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
@@ -205,10 +204,9 @@
  	    
 		  var ytLoaded = false;
 		  var fbLoaded = false;
-		  var cacheUpdate = false
 		  function onYouTubePlayerAPIReady() {
 		    ytLoaded = true;
-		    fbLoaded && !cacheUpdate && brkn.Main.auth();
+		    fbLoaded && brkn.Main.auth();
 		  }
 	    window.fbAsyncInit = function() {
 	      FB.init({appId: '{{ facebook_app_id }}', status: true, cookie: true,
@@ -223,7 +221,7 @@
 	        xfbml      : true  // parse XFBML
 	      });
 	      fbLoaded = true;
-	      ytLoaded && !cacheUpdate && brkn.Main.auth();
+	      ytLoaded && brkn.Main.auth();
 	      
 	    };
 	 		// Load the SDK Asynchronously
@@ -234,16 +232,6 @@
 	       js.src = "//connect.facebook.net/en_US/all.js";
 	       ref.parentNode.insertBefore(js, ref);
 	     }(document));
-      // Check if a new cache is available on page load.
-      window.addEventListener('load', function(e) {
-        window.applicationCache && window.applicationCache.addEventListener('updateready', function(e) {
-          if (window.applicationCache.status == window.applicationCache.UPDATEREADY) {
-            cacheUpdate = true;
-            window.applicationCache.swapCache();
-            window.location.reload();
-          }
-        }, false);
-      }, false);
     </script>
   </body>
 </html>

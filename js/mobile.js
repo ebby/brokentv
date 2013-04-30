@@ -20,18 +20,11 @@ goog.require('goog.ui.media.YoutubeModel');
 
 
 /**
- * @param {string} channelToken
  * @constructor
  * @extends {goog.ui.Component}
  */
-brkn.Mobile = function(channelToken) {
+brkn.Mobile = function() {
   goog.base(this);
-
-  /**
-   * @type {brkn.model.BrowserChannel}
-   * @private
-   */
-  this.BrowserChannel_ = brkn.model.BrowserChannel.getInstance().init(channelToken);
   
   /**
    * @type {brkn.Sidebar}
@@ -56,6 +49,13 @@ goog.inherits(brkn.Mobile, goog.ui.Component);
  * @private
  */
 brkn.Mobile.prototype.popup_;
+
+
+/**
+ * @type {brkn.model.BrowserChannel}
+ * @private
+ */
+brkn.Mobile.prototype.browserChannel_;
 
 
 /** @inheritDoc */
@@ -118,6 +118,12 @@ brkn.Mobile.prototype.enterDocument = function() {
       }
     }
   });
+  
+  goog.net.XhrIo.send('/_presence', goog.bind(function(e) {
+    var data = e.target.getResponseJson();
+    this.browserChannel_ = brkn.model.BrowserChannel.getInstance().init(data['token']);
+    brkn.model.Channels.getInstance().loadViewersFromJson(data['viewer_sessions']);
+  }, this));
 };
 
 
@@ -132,14 +138,11 @@ brkn.Mobile.prototype.welcome_ = function(user) {
 
 /**
  * @param {Object} response Facebook response data.
- * @param {string} channelToken Channel token.
  * @param {Object} channels Channels json object.
  * @param {Object} programs Programs json object.
  * @param {Object} currentUser The curernt user json object.
- * @param {Object} viewerSessions Viewers json object.
  */
-brkn.Mobile.init = function(response, channelToken, channels, programs,
-    currentUser, viewerSessions) {
+brkn.Mobile.init = function(response, channels, programs, currentUser) {
 
   if (!goog.object.isEmpty(currentUser)) {
     brkn.model.Users.getInstance().setCurrentUser(currentUser);
@@ -147,11 +150,10 @@ brkn.Mobile.init = function(response, channelToken, channels, programs,
 
   brkn.model.Channels.getInstance().loadFromJson(channels);
   brkn.model.Programs.getInstance().loadFromJson(programs);
-  brkn.model.Channels.getInstance().loadViewersFromJson(viewerSessions);
   brkn.model.Channels.getInstance().setCurrentChannel(currentUser['current_channel']);
   brkn.model.Clock.getInstance().init();
   
-  var main = new brkn.Mobile(channelToken);
+  var main = new brkn.Mobile();
   main.decorate(document.body);
   
   brkn.model.Analytics.getInstance().login();
@@ -345,8 +347,7 @@ brkn.Mobile.getSessionAndInit = function(response) {
           
           goog.dom.classes.remove(document.body, 'login');
           
-          brkn.Mobile.init(response, data['token'], data['channels'], data['programs'],
-              data['current_user'], data['viewer_sessions']);
+          brkn.Mobile.init(response, data['channels'], data['programs'], data['current_user']);
 
           goog.Timer.callOnce(reveal);
         } else if (e.target.getStatus() == 500) {

@@ -41,6 +41,12 @@ goog.addSingletonGetter(brkn.model.Channels);
 
 
 /**
+ * @type {number}
+ */
+brkn.model.Channels.prototype.pixelsPerSecond;
+
+
+/**
  * @type {brkn.model.Channel}
  */
 brkn.model.Channels.prototype.currentChannel;
@@ -94,18 +100,36 @@ brkn.model.Channels.prototype.findOnline = function(opt_public) {
 
 
 /**
+ * @param {number} pps
+ */
+brkn.model.Channels.prototype.setPixelsPerSecond = function(pps) {
+  this.pixelsPerSecond = this.pixelsPerSecond || pps;
+};
+
+
+/**
  * @param {Object} channels Channels json object.
  */
 brkn.model.Channels.prototype.loadFromJson = function(channels) {
 	goog.object.forEach((/** @type {Object.<string, Object>} */ channels),
 			goog.bind(function(channel, id) {
-				var c = new brkn.model.Channel(channel)
-				this.channels.push(c);
-				this.channelMap[channel.id] = c;
-				if (c.myChannel) {
-				  this.myChannel = c;
-				}
+				this.addChannel(channel);
 			}, this));
+};
+
+
+/**
+ * @param {Object} channel Channels json object.
+ */
+brkn.model.Channels.prototype.addChannel = function(channel) {
+  var c = new brkn.model.Channel(channel);
+  this.channels.push(c);
+  this.channelMap[channel.id] = c;
+  if (c.myChannel) {
+    this.myChannel = c;
+  }
+  this.publish(brkn.model.Channels.Actions.ADD_CHANNEL, c);
+  return c;
 };
 
 
@@ -213,6 +237,7 @@ brkn.model.Channels.prototype.getMyChannel = function() {
 brkn.model.Channels.Actions = {
 	CHANGE_CHANNEL: 'change-channel',
 	NEXT_PROGRAM: 'next-program',
+	ADD_CHANNEL: 'add-channel',
 	PLAY_ASYNC: 'play-async',
 	RESIZE: 'resize'
 };
