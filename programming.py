@@ -256,6 +256,11 @@ class Programming():
             # We can only fit 1mb into memcache
             break
 
+    deferred.defer(Programming.fetch_related_tweets, medias,
+                   _name='twitter-' + channel_id + '-' + str(uuid.uuid1()),
+                   _queue='twitter',
+                   _countdown=30)
+
     user_obj = memcache.get(key) or {}
     user_channels = (user_obj.get('channels') or []) if user_obj else []
     if not channel.id in user_channels:
@@ -452,7 +457,7 @@ class Programming():
         media.last_twitter_fetch = datetime.datetime.now()
         media.put()
         logging.info(str(total) + ' TWEETS FETCHED')
-      except TweepError, e:
+      except tweepy.TweepError, e:
         logging.info('query: ' + media.host_id + '\nreason: ' + e.reason + '\nresponse: ' + e.response)
 
   @classmethod

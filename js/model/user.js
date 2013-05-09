@@ -58,6 +58,11 @@ brkn.model.User = function(user) {
   /**
    * @type {Array.<brkn.model.Media>}
    */
+  this.history = [];
+
+  /**
+   * @type {Array.<brkn.model.Media>}
+   */
   this.starred = [];
 
   /**

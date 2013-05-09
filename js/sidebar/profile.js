@@ -91,7 +91,6 @@ brkn.sidebar.Profile.prototype.enterDocument = function() {
       '/_message/' + this.user_.id,
       goog.bind(function(e) {
         var response = /** @type {Array.<Object>} */ e.target.getResponseJson();
-        window.console.log(response);
         var messages = goog.array.map(response, function(m) {
           return new brkn.model.Message(m);
         }, this);

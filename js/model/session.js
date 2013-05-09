@@ -50,7 +50,7 @@ brkn.model.Session = function(id, user, channel, tuneIn, opt_tuneOut) {
  */
 brkn.model.Session.prototype.seen = function(media) {
   this.medias.push(media);
-  if (this.channel.myChannel && this.channel.currentProgram) {
+  if (this.channel && this.channel.myChannel && this.channel.currentProgram) {
     this.channel.currentProgram.seek = null;
     this.channel.currentProgram = null;
   }
@@ -61,7 +61,7 @@ brkn.model.Session.prototype.seen = function(media) {
       'POST',
       'media_id=' + media.id +
       '&session_id=' + this.id +
-      '&async=' + this.channel.myChannel);
+      '&async=' + (this.channel ? this.channel.myChannel : false));
 };
 
 

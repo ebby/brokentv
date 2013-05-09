@@ -70,13 +70,20 @@ brkn.sidebar.Conversation = function(media, opt_comments, opt_tweets, opt_twitte
    * @type {brkn.sidebar.CommentInput}
    * @private
    */
-  this.commentInput_ = new brkn.sidebar.CommentInput();
+  this.commentInput_ = new brkn.sidebar.CommentInput(true);
 
   /**
    * @type {Array.<string>}
    * @private
    */
   this.tabs_ = ['comments', 'tweets'];
+  
+  /**
+   * Comment el's waiting for their IDs
+   * @type {Object.<string, Element>}
+   * @private
+   */
+  this.tempCommentEl_ = {};
 };
 goog.inherits(brkn.sidebar.Conversation, goog.ui.Component);
 
@@ -175,14 +182,15 @@ brkn.sidebar.Conversation.prototype.onNoComments_ = function(e) {
  * @private
  */
 brkn.sidebar.Conversation.prototype.onAddComment_ = function(e) {
-  goog.net.XhrIo.send(
-      '/_comment',
-      e.callback,
-      'POST',
-      'media_id=' + this.media_.id + '&text=' + e.text +
-      '&tweet=' + e.twitter + '&facebook=' + e.facebook +
-      (e.parentId ? '&parent_id=' + e.parentId : '') +
-      (e.toUserId ? '&to_user_id=' + e.toUserId : ''));
+  var comment = brkn.model.Comment.add(brkn.model.Users.getInstance().currentUser, 
+      this.media_.id, e.text, e.facebook, e.twitter, e.parentId, e.toUserId,
+      goog.bind(function(comment) {
+        var el = this.tempCommentEl_[comment.time.getTime()];
+        el.id = 'infocomment-' + comment.id;
+        this.commentList_.activateComment(comment, el);
+      }, this));
+  var commentEl = this.commentList_.addComment(comment);
+  this.tempCommentEl_[comment.time.getTime()] = commentEl;
 
   if (e.facebook && !e.parentId) {
     FB.api('/me/feed', 'POST', {

@@ -81,11 +81,18 @@ brkn.sidebar.Info = function(media, opt_noFetch, opt_lastMedia, opt_lastInput) {
   this.commentsMap_ = {};
 
   /**
-   * The last comment/reply element for a comment thread
+   * The parent comment element for a comment thread
    * @type {Object.<string, Element>}
    * @private
    */
   this.lastCommentEl_ = {};
+  
+  /**
+   * Comment el's waiting for their IDs
+   * @type {Object.<string, Element>}
+   * @private
+   */
+  this.tempCommentEl_ = {};
 
   /**
    * @type {Array.<brkn.model.Tweet>}
@@ -103,7 +110,7 @@ brkn.sidebar.Info = function(media, opt_noFetch, opt_lastMedia, opt_lastInput) {
    * @type {brkn.sidebar.CommentInput}
    * @private
    */
-  this.commentInput_ = new brkn.sidebar.CommentInput();
+  this.commentInput_ = new brkn.sidebar.CommentInput(true);
   
   /**
    * @type {goog.ui.CustomButton}
@@ -343,13 +350,12 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
       .listen(this.commentInput_,
           goog.events.EventType.FOCUS,
           goog.bind(function(e) {
-            this.resize(brkn.sidebar.CommentInput.COMMENT_CONTROLS_HEIGHT, true);
+            this.resize(0, true);
           }, this))
       .listen(this.commentInput_,
           'resize',
           goog.bind(function(e) {
-            this.resize(brkn.sidebar.CommentInput.COMMENT_CONTROLS_HEIGHT +
-                (e.target.height_ - brkn.sidebar.CommentInput.INPUT_HEIGHT))
+            this.resize(e.target.height_ - brkn.sidebar.CommentInput.INPUT_HEIGHT)
           }, this))
       .listen(this.dotNavEl_,
           goog.events.EventType.CLICK,
@@ -618,14 +624,15 @@ brkn.sidebar.Info.prototype.toDot_ = function(dotEl) {
  * @private
  */
 brkn.sidebar.Info.prototype.onAddComment_ = function(e) {
-  goog.net.XhrIo.send(
-      '/_comment',
-      e.callback,
-      'POST',
-      'media_id=' + this.media_.id + '&text=' + e.text +
-      '&tweet=' + e.twitter + '&facebook=' + e.facebook +
-      (e.parentId ? '&parent_id=' + e.parentId : '') +
-      (e.toUserId ? '&to_user_id=' + e.toUserId : ''));
+  var comment = brkn.model.Comment.add(brkn.model.Users.getInstance().currentUser, 
+      this.media_.id, e.text, e.facebook, e.twitter, e.parentId, e.toUserId,
+      goog.bind(function(comment) {
+        var el = this.tempCommentEl_[comment.time.getTime()];
+        el.id = 'infocomment-' + comment.id;
+        this.activateComment_(comment, el);
+      }, this));
+  var commentEl = this.addComment_(comment);
+  this.tempCommentEl_[comment.time.getTime()] = commentEl;
 
   if (e.facebook && !e.parentId) {
     FB.api('/me/feed', 'POST', {
@@ -636,9 +643,6 @@ brkn.sidebar.Info.prototype.onAddComment_ = function(e) {
       'caption': 'on XYLO',
       'description': this.media_.description
     }, function(response) {});
-
-    // Disable facebook posting after first post
-    this.commentInput_.setFacebook(false);
   }
 
   brkn.model.Analytics.getInstance().comment(this.media_.id, e.facebook, e.twitter);
@@ -689,36 +693,65 @@ brkn.sidebar.Info.prototype.addTweet_ = function(tweet, opt_first) {
 /**
  * @param {brkn.model.Comment} comment
  * @param {?boolean=} opt_last
+ * @return {Element}
  * @private
  */
 brkn.sidebar.Info.prototype.addComment_ = function(comment, opt_last) {
   this.comments_.push(comment);
-  this.commentsMap_[comment.id] = comment;
 
   goog.style.showElement(this.noCommentsEl_, false);
   var commentEl = soy.renderAsElement(brkn.sidebar.comment, {
     prefix: 'infocomment',
     comment: comment,
     text: goog.string.linkify.linkifyPlainText(comment.text),
-    timestamp: goog.date.relative.format(comment.time.getTime()),
     owner: (comment.user.id == brkn.model.Users.getInstance().currentUser.id)
   });
   brkn.model.Clock.getInstance().addTimestamp(comment.time,
       goog.dom.getElementByClass('timestamp', commentEl));
   if (comment.parentId) {
-    goog.dom.insertSiblingAfter(commentEl, this.lastCommentEl_[comment.parentId]);
+    goog.dom.appendChild(goog.dom.getElementByClass('replies', this.lastCommentEl_[comment.parentId]), 
+        commentEl);
   } else {
     goog.dom.appendChild(this.commentsEl_, commentEl);
   }
-  this.lastCommentEl_[(comment.parentId || comment.id)] = commentEl;
-  this.resize(this.commentInput_.isFocused()
-      ? brkn.sidebar.CommentInput.COMMENT_CONTROLS_HEIGHT : 0, true);
   goog.array.forEach(comment.replies, function(reply) {
     this.addComment_(reply, opt_last);
   }, this);
-  
-  if (opt_last && this.media_.onlineViewers[comment.user.id]) {
-    this.commentInput_.reply((comment.parentId || comment.id), comment.user);
+  if (!comment.parentId && opt_last) {
+    this.commentsEl_.scrollTop = this.commentsEl_.scrollHeight;
+    this.contentsEl_.firstChild.scrollTop = this.contentsEl_.firstChild.scrollHeight;
+  }
+  if (comment.id) {
+    this.activateComment_(comment, commentEl);
+  }
+  return commentEl;
+};
+
+
+/**
+ * @param {brkn.model.Comment} comment
+ * @param {Element} commentEl
+ * @private
+ */
+brkn.sidebar.Info.prototype.activateComment_ = function(comment, commentEl) {
+  this.commentsMap_[comment.id] = comment;
+  if (!comment.parentId) {
+    this.lastCommentEl_[comment.id] = commentEl;
+    // Handle reply input
+    var replyInput = goog.dom.getElementByClass('reply-textarea', commentEl);
+    var keyHandler = new goog.events.KeyHandler(replyInput);
+    this.getHandler().listen(keyHandler,
+        goog.events.KeyHandler.EventType.KEY,
+        goog.bind(function(e) {
+          e.stopPropagation();
+          if (e.keyCode == '13' && replyInput.value) {
+            e.preventDefault();
+            var reply = brkn.model.Comment.add(brkn.model.Users.getInstance().currentUser, 
+                this.media_.id, replyInput.value, false, false, comment.id, comment.user.id);
+            this.addComment_(reply);
+            replyInput.value = '';
+          }
+        }, this));
   }
 };
 
@@ -796,8 +829,8 @@ brkn.sidebar.Info.prototype.commentClick_ = function(e) {
     var commentId = commentEl.id.split('-')[1];
     var comment = this.commentsMap_[commentId];
     if (goog.dom.classes.has(targetEl, 'reply')) {
-      brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.REPLY_COMMENT,
-          comment.parentId ? this.commentsMap_[comment.parentId] : comment, comment.user);
+      var parentCommentEl = this.lastCommentEl_[(comment.parentId ? comment.parentId : comment.id)];
+      goog.dom.getElementByClass('reply-textarea', parentCommentEl).focus();
     } else if (goog.dom.classes.has(targetEl, 'remove')) {
       this.media_.publish(brkn.model.Media.Actions.REMOVE_COMMENT, commentId);
     }

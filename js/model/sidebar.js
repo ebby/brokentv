@@ -17,6 +17,12 @@ goog.addSingletonGetter(brkn.model.Sidebar);
 
 
 /**
+ * @type {boolean}
+ */
+brkn.model.Sidebar.prototype.currentProfile; 
+
+
+/**
  * @return {boolean}
  */
 brkn.model.Sidebar.prototype.toggled = function() {

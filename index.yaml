@@ -41,6 +41,28 @@ indexes:
   - name: media
   - name: time
 
+- kind: Message
+  properties:
+  - name: to_user
+  - name: time
+
+- kind: Message
+  properties:
+  - name: acl
+  - name: time
+  
+- kind: Message
+  properties:
+  - name: to_user
+  - name: time
+    direction: desc
+
+- kind: Message
+  properties:
+  - name: acl
+  - name: time
+    direction: desc
+
 - kind: PublisherMedia
   properties:
   - name: publisher

@@ -362,81 +362,89 @@ div#sidebar {
     min-height: 31px;
     position: absolute;
     bottom: 42px;
+    
     div.comment-controls {
-      width: 100%;
       height: 24px;
-      border-top: 1px solid #b8b8b8;
-      background: rgba(255, 255, 255, .7);
       color: #444;
       text-shadow: 1px 1px 1px white;
-      top: 27px;
+      top: 12px;
+      position: absolute;
+      right: 65px;
+    }
+    div.comment-toggle {
+      width: 20px;
+      height: 100%;
+      display: inline-block;
+      font-size: 12px;
+      outline: none;
+      cursor: pointer;
       position: relative;
-      div.comment-button {
-        width: 106px;
-        height: 100%;
-        display: inline-block;
-        border-right: 1px solid #ccc;
-        font-size: 12px;
-        outline: none;
-        cursor: pointer;
-        position: relative;
+      &.tweet-toggle div.icon {
+        .icon-twitter();
+        top: 4px;
+        left: 6px;
+        font-size: 13px;
+        color: #bbb;
+      }
+      &.fb-toggle div.icon {
+        .icon-facebook();
+        top: 5px;
+        left: 10px;
+        font-size: 13px;
+        color: #bbb;
+      }
+       &.goog-custom-button-checked div.icon {
+         color: #497882;
+       }
+    }
+    div.comment-button {
+      height: 22px;
+      width: 50px;
+      display: inline-block;
+      font-size: 11px;
+      outline: none;
+      cursor: pointer;
+      position: absolute;
+      right: 10px;
+      top: 9px;
+      border: 1px solid #aaa;
+      .border-radius(3px);
+      background: #e5e5e5;
+      color: #497882;
+      font-family: MuseoSans700;
+      .goog-custom-button-inner-box {
+        margin-top: 5px;
+        text-align: center;
+      }
+      &.goog-custom-button-checked, &.add-comment {
+        background-color: #fff;
+      }
+      &.goog-custom-button-disabled {
         background: #e5e5e5;
-        &:first-child {
-          margin-left: -2px;
-        }
-        &:last-child {
-          border-right: none;
-        }
-        &.tweet-toggle div.icon {
-          .icon-twitter();
-          top: 4px;
-          left: 11px;
-          font-size: 13px;
-          color: #bbb;
-        }
-        &.fb-toggle div.icon {
-          .icon-facebook();
-          top: 5px;
-          left: 10px;
-          font-size: 13px;
-          color: #bbb;
-        }
-        .goog-custom-button-inner-box {
-          margin-top: 5px;
-          text-align: center;
-        }
-        &.goog-custom-button-checked, &.add-comment {
-          background-color: #fff;
-        }
-        &.goog-custom-button-checked div.check {
-          .icon-check();
-        }
-        &.goog-custom-button-disabled {
-          background: #e5e5e5;
-          cursor: normal;
-        }
-        &.add-comment.goog-custom-button-active {
-          background: rgba(0, 0, 0, .1);
-          color: #6D6D6D;
-        }
-        div.check {
-          position: absolute;
-          top: 6px;
-          right: 7px;
-        }
-        div.icon {
-          position: absolute;
-        }
-        div.return {
-          width: 100%;
-          height: 100%;
-          position: absolute;
-          top: 4px;
-          left: 6px;
-          width: 10px;
-          font-size: 16px;
-          color: #bbb;
-        }
+        cursor: normal;
+        color: #bbb;
+      }
+      &.add-comment.goog-custom-button-active {
+        background: rgba(0, 0, 0, .1);
+        color: #6D6D6D;
+      }
+      div.check {
+        position: absolute;
+        top: 6px;
+        right: 7px;
+      }
+      div.icon {
+        position: absolute;
+      }
+      div.return {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 4px;
+        left: 6px;
+        width: 10px;
+        font-size: 16px;
+        color: #bbb;
       }
     }
     div.input-holder {
@@ -444,23 +452,12 @@ div#sidebar {
       width: 100%;
       height: 100%;
       border-top: 1px solid #ccc;
-      .box-shadow(e('0 -2px 2px 0 rgba(0, 0, 0, 0.3), inset 4px -2px 6px -3px rgba(0, 0, 0, 0.4)'));
+      .box-shadow(e('0 -1px 4px 0 rgba(0, 0, 0, 0.3), inset 4px -2px 6px -3px rgba(0, 0, 0, 0.4)'));
       position: relative;
       textarea {
-        resize:none;
-        height: auto;
-        .border-radius(3px);
-        width: 300px;
-        font-size: 13px;
-        min-height: 16px;
-        outline: none;
-        border: 1px solid #CCC;
-        resize: none;
         margin-left: 10px;
-        margin-top: 9px;
-        margin-bottom: 5px;
-        font-family: MuseoSans300;
-        .select-text();
+        margin-top: 8px;
+        margin-bottom: 3px;
       }
       div.token {
         position: absolute;
@@ -476,6 +473,23 @@ div#sidebar {
         display: inline;
       }
     }
+    &.show-controls div.input-holder textarea {
+      padding: 4px 40px 4px 4px;
+    }
+  }
+  textarea {
+    resize:none;
+    height: auto;
+    .border-radius(3px);
+    width: 240px;
+    font-size: 13px;
+    min-height: 16px;
+    padding: 4px;
+    outline: none;
+    border: 1px solid #aaa;
+    resize: none;
+    font-family: MuseoSans300;
+    .select-text();
   }
   div.info.current div.comment-input, div.conversation div.comment-input {
     visibility: visible;
@@ -483,13 +497,18 @@ div#sidebar {
   }
   
   div.tabbed {
+    div.tab-container {
+      padding: 5px;
+      background: rgba(0, 0, 0, .2);
+    }
     ul.tabs {
-      height: 30px;
-      width: 100%;
+      height: 20px;
+      width: 308px;
       display: table;
       table-layout: fixed;
       border-collapse: collapse;
       margin: 0;
+      .box-shadow(e('0 1px 4px 0 rgba(0, 0, 0, 0.3), inset 4px -2px 6px -3px rgba(0, 0, 0, 0.4)'));
       border-bottom: 1px solid rgba(112, 108, 108, 0.7);
       li.tab {
         height: 100%;
@@ -619,13 +638,13 @@ div#sidebar {
     }
     div.tweet {
       position: relative;
-      width: 298px;
-      background: rgba(0, 0, 0, 0.15);
-      border: 1px solid #888;
+      width: 300px;
       padding-bottom: 20px;
       overflow: hidden;
-      .box-shadow(inset, 0, 0, 1px, 1px, rgba(0, 0, 0, 0.2));
-
+      background: #c1c1c1;
+      .border-radius(3px);
+      .box-shadow(inset, 0, 0, 2px, 1px, rgba(0, 0, 0, 0.2));
+      
       img {
         width: 28px;
         height: 28px;
@@ -638,18 +657,19 @@ div#sidebar {
         a.handle {
           color: #181818;
           font-family: MuseoSans700;
-          font-size: 13px;
+          font-size: 11px;
         }
         a {
           color: #181818;
-          font-family: MuseoSans300;
+          font-family: MuseoSans500;
         }
         position: relative;
         left: 37px;
         top: 3px;
-        font-size: 12px;
+        font-size: 11px;
         line-height: 16px;
         width: 230px;
+        font-family: MuseoSans500;
       }
       div.timestamp {
         position: absolute;
@@ -710,10 +730,71 @@ div#sidebar {
       }
     }
   }
+
+  div.user-picture {
+    position: absolute;
+    background: #ccc;
+    width: 34px;
+    height: 34px;
+    .border-radius(18px);
+    .box-shadow(inset, 0px, 0px, 2px, 1px, rgba(0, 0, 0, 0.6));
+    display: inline-block;
+    margin-left: 9px;
+    img {
+      width: 26px;
+      height: 26px;
+      margin-left: 4px;
+      margin-top: 4px;
+      .border-radius(15px);
+      .box-shadow(0, 0, 2px, 1px, rgba(0, 0, 0, .4));
+    }
+    &:active {
+      img {
+        .box-shadow(0, 0, 1px, 1px, rgba(0, 0, 0, .1));
+      }
+    }
+  }
+  div.template {
+    position: relative;
+    left: 50px;
+    top: 0;
+    width: 260px;
+    font-family: MuseoSans500;
+    a {
+      color: #181818;
+      font-family: MuseoSans700;
+    }
+    div.text {
+      background: #c1c1c1;
+      margin-top: 4px;
+      padding: 5px;
+      font-family: MuseoSans700;
+      .border-radius(3px);
+      .box-shadow(inset, 0, 0, 2px, 1px, rgba(0, 0, 0, 0.2));
+      position: relative;
+      img {
+        position: absolute;
+        width: 25px;
+        height: 25px;
+        border-top-left-radius: 3px;
+        border-bottom-left-radius: 3px;
+        top: 0;
+        left: 0;
+        .box-shadow(2px, 0, 2px, -1px, rgba(0, 0, 0, .5));
+      }
+    }
+    div.timestamp {
+      font-size: 10px;
+      font-family: MuseoSans300;
+      position: absolute;
+      top: 0;
+      right: 0;
+    }
+  }
+
   div.comments-holder {
     position: relative;
     div.comments {
-      margin: 10px;
       .transition(max-height, .5s, ease);
     }
     &.top-grad div.top-grad, &.bottom-grad div.bottom-grad {
@@ -724,10 +805,10 @@ div#sidebar {
       width: 302px;
       height: 10px;
       position: absolute;
-      top: 20px;
+      top: 19px;
       background: @radial-grad no-repeat center;
       left: 9px;
-      border-top: 2px solid rgba(0, 0, 0, 0.5);
+      border-top: 1px solid rgba(0, 0, 0, 0.5);
       opacity: .6;
       .box-shadow(0, -3px, 3px, -1px, rgba(0, 0,0, .2));
     }
@@ -739,20 +820,16 @@ div#sidebar {
       bottom: -1px;
       background: @radial-grad-up no-repeat center;
       left: 9px;
-      border-bottom: 2px solid rgba(0, 0, 0, 0.5);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.5);
       opacity: .6;
       .box-shadow(0, 3px, 3px, -1px, rgba(0, 0,0, .2));
     }
     div.comment {
       position: relative;
-      width: 297px;
-      background: rgba(0, 0, 0, 0.15);
-      border: 1px solid #888;
-      padding-top: 5px;
-      padding-bottom: 21px;
+      font-size: 11px;
+      width: 320px;
       overflow: hidden;
       margin-top: -1px;
-      .box-shadow(0, 1px, 0, 1px, rgba(255, 255, 255, .5));
       .border-radius(3px);
       &:first-child {
         border-top-left-radius: 3px;
@@ -764,45 +841,34 @@ div#sidebar {
         border-bottom-right-radius: 3px;
       }
       &.reply {
-        background: rgba(0, 0, 0, .05);
-        border-left: 5px solid #888;
-        width: 293px;
+        div.template {
+          left: 0;
+          margin-top: 5px;
+        }
       }
-      img {
-        width: 28px;
-        height: 28px;
-        left: 4px;
-        top: 7px;
-        position: absolute;
-        .border-radius(3px);
-      }
-      div.text {
-        a {
-          color: #181818;
-          font-family: MuseoSans300;
-          &.username {
-            font-size: 13px;
-            font-family: MuseoSans700;
+      div.reply-input {
+        margin-top: 5px;
+        textarea {
+          width: 250px;
+          background: #ddd;
+          font-family: MuseoSans700;
+          font-size: 11px;
+          margin-top: 0;
+          padding-bottom: 1px;
+          &:focus {
+            background: white;
           }
         }
-        position: relative;
-        left: 37px;
-        top: 3px;
-        font-size: 12px;
-        line-height: 16px;
-        width: 240px;
       }
-      div.timestamp {
-        position: absolute;
-        bottom: 3px;
-        right: 5px;
-        font-size: 10px;
+      div.text:hover div.comment-options {
+        visibility: visible;
+        opacity: .7;
       }
       div.comment-options {
         position: absolute;
         height: 9px;
-        top: 5px;
-        right: 5px;
+        top: 1px;
+        right: 1px;
         visibility: hidden;
         opacity: 0;
         color: #f5f5f5;
@@ -827,10 +893,6 @@ div#sidebar {
           margin-top: -2px;
           font-size: 12px;
         }
-      }
-      &:hover div.comment-options {
-        visibility: visible;
-        opacity: .7;
       }
     }
   }

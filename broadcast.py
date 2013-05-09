@@ -82,6 +82,7 @@ def broadcastNewMessage(message):
       message_email = emailer.Email(emailer.Message.MESSAGE(message.from_user.first_name),
                                     {'first_name' : message.from_user.first_name,
                                      'name': message.from_user.name,
+                                     'text': message.text,
                                      'image': message.from_user.thumbnail,
                                      'link': 'http://www.xylocast.com'
                                     })

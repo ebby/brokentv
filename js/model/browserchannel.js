@@ -109,6 +109,9 @@ brkn.model.BrowserChannel.prototype.onMessage_ = function(rawMessage) {
 	  case 'new_message':
       var m = new brkn.model.Message(message['message']);
       brkn.model.Users.getInstance().publish(brkn.model.Users.Action.NEW_MESSAGE, m);
+      brkn.model.Notify.getInstance().publish(brkn.model.Notify.Actions.SHOW,
+          'messaged you', m.text, m.fromUser, m.fromUser.picture,
+          '#profile:' + m.fromUser.id);
       break;
 	  case 'new_activity':
 	    brkn.model.Users.getInstance().publish(brkn.model.Users.Action.NEW_ACTIVITY,

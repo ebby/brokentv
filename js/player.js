@@ -141,7 +141,7 @@ brkn.Player.prototype.enterDocument = function() {
   this.updateStagecover_();
 
   if (this.currentProgram_) {
-    if (DESKTOP) {
+    if (DESKTOP || this.currentChannel_.myChannel) {
       this.playProgram(this.currentProgram_);
     }
   } else  {
@@ -516,7 +516,6 @@ brkn.Player.prototype.playerStateChange_ = function(event) {
           this.currentProgram_.media);
       break;
     case YT.PlayerState.ENDED:
-      window.console.log('HERE')
   	  brkn.model.Users.getInstance().currentUser.currentSession.seen(this.currentProgram_.media);
   	  this.resetLike_();
   	  

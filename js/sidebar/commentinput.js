@@ -14,11 +14,18 @@ goog.require('goog.ui.Textarea.EventType');
 
 
 /**
+ * @param {?boolean} opt_showControls
  * @constructor
  * @extends {goog.ui.Component}
  */
-brkn.sidebar.CommentInput = function() {
+brkn.sidebar.CommentInput = function(opt_showControls) {
   goog.base(this);
+  
+  /**
+   * @type {boolean}
+   * @private
+   */
+  this.showControls_ = !!opt_showControls;
   
   /**
    * @type {goog.ui.Textarea}
@@ -130,6 +137,9 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
   var keyHandler = new goog.events.KeyHandler(this.commentInput_.getKeyEventTarget());
    
   this.commentControls_ = goog.dom.getElementByClass('comment-controls', this.getElement());
+  goog.style.showElement(this.commentControls_, this.showControls_);
+  goog.dom.classes.enable(this.getElement(), 'show-controls', this.showControls_);
+  
   this.inputHolder_ = goog.dom.getElementByClass('input-holder', this.getElement());
   
   this.addChild(this.tweetToggle_);
@@ -157,7 +167,7 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
       .listen(this.commentInput_.getElement(),
           goog.events.EventType.FOCUS,
           goog.bind(function(e) {
-            goog.style.setPosition(this.commentControls_, 0, 0);
+            //goog.style.setPosition(this.commentControls_, 0, 0);
             this.dispatchEvent(goog.events.EventType.FOCUS)
           }, this))
       .listen(keyHandler,
@@ -293,14 +303,14 @@ brkn.sidebar.CommentInput.prototype.setValue = function(text) {
  * @return {boolean} true if collapsing, false if already collapsed
  */
 brkn.sidebar.CommentInput.prototype.collapse = function() {
-  if (goog.style.getPosition(this.commentControls_).y !=
-      brkn.sidebar.CommentInput.COMMENT_CONTROLS_HEIGHT) {
-    goog.style.setPosition(this.commentControls_, 0,
-        brkn.sidebar.CommentInput.COMMENT_CONTROLS_HEIGHT);
-    return true;
-  } else {
-    return false;
-  }
+//  if (goog.style.getPosition(this.commentControls_).y !=
+//      brkn.sidebar.CommentInput.COMMENT_CONTROLS_HEIGHT) {
+//    goog.style.setPosition(this.commentControls_, 0,
+//        brkn.sidebar.CommentInput.COMMENT_CONTROLS_HEIGHT);
+//    return true;
+//  } else {
+//    return false;
+//  }
 }
 
 
@@ -334,9 +344,9 @@ brkn.sidebar.CommentInput.prototype.setFacebook = function(enabled) {
 brkn.sidebar.CommentInput.prototype.setFocused = function(focus) {
   if (focus) {
     this.commentInput_.getElement().focus();
-    goog.Timer.callOnce(goog.bind(function() {
-      goog.style.setPosition(this.commentControls_, 0, 0);
-    }, this));
+//    goog.Timer.callOnce(goog.bind(function() {
+//      goog.style.setPosition(this.commentControls_, 0, 0);
+//    }, this));
   }
   return goog.dom.classes.enable(this.getElement(), 'focused', focus);
 };
@@ -351,12 +361,14 @@ brkn.sidebar.CommentInput.prototype.onAddComment_ = function(e) {
       type: 'add',
       callback: goog.bind(function(e) {
           var response = e.target.getResponseJson();
-          var comment = new brkn.model.Comment(response['comment']);
-          var tweet = response['tweet'] ? new brkn.model.Tweet(response['tweet']) : null;
-          var media = brkn.model.Medias.getInstance().getOrAdd(response['comment']['media']);
-          if (media) {
-            media.publish(brkn.model.Media.Actions.ADD_COMMENT, comment);
-            tweet && media.publish(brkn.model.Media.Actions.ADD_TWEET, tweet);
+          if (response['comment']) {
+            var comment = new brkn.model.Comment(response['comment']);
+            var tweet = response['tweet'] ? new brkn.model.Tweet(response['tweet']) : null;
+            var media = brkn.model.Medias.getInstance().getOrAdd(response['comment']['media']);
+            if (media) {
+              media.publish(brkn.model.Media.Actions.ADD_COMMENT, comment);
+              tweet && media.publish(brkn.model.Media.Actions.ADD_TWEET, tweet);
+            }
           }
         }, this),
       facebook: this.fbToggle_.isChecked(),

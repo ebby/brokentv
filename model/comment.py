@@ -32,9 +32,10 @@ class Comment(db.Model):
 
     media.comment_count += 1
     media.put()
-
-    from useractivity import UserActivity
-    broadcast.broadcastNewActivity(UserActivity.add_comment(c.user, c))
+    
+    if c.is_parent:
+      from useractivity import UserActivity
+      broadcast.broadcastNewActivity(UserActivity.add_comment(c.user, c))
     return c
 
   def toJson(self):

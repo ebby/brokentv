@@ -262,11 +262,12 @@ class FriendsHandler(BaseHandler):
   def get(self):
     if self.request.get('offline'):
       following = self.current_user.get_following()
-      self.response.out.write(simplejson.dumps([f.toJson() for f in following if not User.get_entry(f)]))
+      self.response.out.write(simplejson.dumps([f.toJson() for f in following if not User.get_entry(f.id)]))
       return
 
     friends_json = []
-    for fid in self.current_user.friends:
+    list = self.current_user.following if len(self.current_user.following) else self.current_user.friends
+    for fid in list:
       user_json = User.get_entry(fid, fetch=False)
       if user_json:
         friends_json.append(user_json)
@@ -294,7 +295,10 @@ class CommentHandler(BaseHandler):
     if delete and id:
       c = Comment.get_by_id(int(id))
       if c:
+        c_a = UserActivity.all().filter('comment =', c).get()
         c.delete()
+        if c_a:
+          c_a.delete()
       return
 
     media = Media.get_by_key_name(self.request.get('media_id'))
@@ -347,14 +351,15 @@ class CommentHandler(BaseHandler):
 
 class MessageHandler(BaseHandler):
   @BaseHandler.logged_in
-  def get(self, id):
+  def get(self, id=None):
     offset = self.request.get('offset') or 0
     messages = []
-    if id == self.current_user.id:
-      messages = Message.get(self.current_user.id)
+    if not id or id == self.current_user.id:
+      messages = Message.get(self.current_user, offset=int(offset))
     else:
-      messages = Message.get(self.current_user.id, id)
-    self.response.out.write(simplejson.dumps([m.toJson() for m in messages]))
+      user2 = User.get_by_key_name(id)
+      messages = Message.get(self.current_user, user2=user2, offset=int(offset))
+    self.response.out.write(simplejson.dumps(messages))
   @BaseHandler.logged_in
   def post(self):
     from_id = self.request.get('from_id')

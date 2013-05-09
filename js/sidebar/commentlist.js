@@ -68,6 +68,13 @@ brkn.sidebar.CommentList = function(media, opt_comments, opt_twitter, opt_tweets
    * @private
    */
   this.resizeExtra_ = 0;
+  
+  /**
+   * The parent comment element for a comment thread
+   * @type {Object.<string, Element>}
+   * @private
+   */
+  this.lastCommentEl_ = {};
 };
 goog.inherits(brkn.sidebar.CommentList, goog.ui.Component);
 
@@ -125,7 +132,7 @@ brkn.sidebar.CommentList.prototype.decorateInternal = function(el) {
 
   if (this.comments_.length) {
     goog.array.forEach(this.comments_, function(comment) {
-      this.addComment_(comment);
+      this.addComment(comment);
     }, this);
     this.mediasHeight_ = goog.style.getSize(this.commentsEl_).height;
   } else if (this.twitter_ && this.tweets_.length) {
@@ -160,13 +167,13 @@ brkn.sidebar.CommentList.prototype.decorateInternal = function(el) {
           var comments = /** @type {Array.<Object>} */ goog.json.parse(e.target.getResponse());
           comments = goog.array.map(comments, function(c) {
             var comment = new brkn.model.Comment(c);
-            this.addComment_(comment);
+            this.addComment(comment);
             return comment;
           }, this);
           this.mediasHeight_ = goog.style.getSize(this.commentsEl_).height;
           this.resize();
         }, this));
-    this.media_.subscribe(brkn.model.Media.Actions.ADD_COMMENT, this.addComment_, this);
+    this.media_.subscribe(brkn.model.Media.Actions.ADD_COMMENT, this.addComment, this);
     this.media_.subscribe(brkn.model.Media.Actions.REMOVE_COMMENT, this.removeComment_, this);
   }
   this.resize(brkn.sidebar.CommentInput.INPUT_HEIGHT);
@@ -226,8 +233,8 @@ brkn.sidebar.CommentList.prototype.commentClick_ = function(e) {
       var commentId = commentEl.id.split('-')[1];
       var comment = this.commentsMap_[commentId];
       if (goog.dom.classes.has(targetEl, 'reply')) {
-        brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.REPLY_COMMENT,
-            comment.parentId ? this.commentsMap_[comment.parentId] : comment, comment.user);
+        var parentCommentEl = this.lastCommentEl_[(comment.parentId ? comment.parentId : comment.id)];
+        goog.dom.getElementByClass('reply-textarea', parentCommentEl).focus();
       } else if (goog.dom.classes.has(targetEl, 'remove')) {
         this.media_.publish(brkn.model.Media.Actions.REMOVE_COMMENT, commentId);
       }
@@ -253,22 +260,63 @@ brkn.sidebar.CommentList.prototype.removeComment_ = function(commentId) {
 
 /**
  * @param {brkn.model.Comment} comment
- * @private
+ * @return {Element}
  */
-brkn.sidebar.CommentList.prototype.addComment_ = function(comment) {
+brkn.sidebar.CommentList.prototype.addComment = function(comment) {
+  this.comments_.push(comment);
+
   goog.style.showElement(this.noCommentsEl_, false);
-  this.commentsMap_[comment.id] = comment;
   var commentEl = soy.renderAsElement(brkn.sidebar.comment, {
     prefix: 'listcomment',
     comment: comment,
     text: goog.string.linkify.linkifyPlainText(comment.text),
-    timestamp: goog.date.relative.format(comment.time.getTime()),
     owner: (comment.user.id == brkn.model.Users.getInstance().currentUser.id)
   });
   brkn.model.Clock.getInstance().addTimestamp(comment.time,
       goog.dom.getElementByClass('timestamp', commentEl));
-  goog.dom.appendChild(this.commentsEl_, commentEl);
-  this.resize();
+  if (comment.parentId) {
+    goog.dom.appendChild(goog.dom.getElementByClass('replies', this.lastCommentEl_[comment.parentId]), 
+        commentEl);
+  } else {
+    goog.dom.appendChild(this.commentsEl_, commentEl);
+  }
+  goog.array.forEach(comment.replies, function(reply) {
+    this.addComment(reply);
+  }, this);
+  if (!comment.parentId) {
+    this.commentsEl_.scrollTop = this.commentsEl_.scrollHeight;
+  }
+  if (comment.id) {
+    this.activateComment(comment, commentEl);
+  }
+  return commentEl;
+};
+
+
+/**
+ * @param {brkn.model.Comment} comment
+ * @param {Element} commentEl
+ */
+brkn.sidebar.CommentList.prototype.activateComment = function(comment, commentEl) {
+  this.commentsMap_[comment.id] = comment;
+  if (!comment.parentId) {
+    this.lastCommentEl_[comment.id] = commentEl;
+    // Handle reply input
+    var replyInput = goog.dom.getElementByClass('reply-textarea', commentEl);
+    var keyHandler = new goog.events.KeyHandler(replyInput);
+    this.getHandler().listen(keyHandler,
+        goog.events.KeyHandler.EventType.KEY,
+        goog.bind(function(e) {
+          e.stopPropagation();
+          if (e.keyCode == '13' && replyInput.value) {
+            e.preventDefault();
+            var reply = brkn.model.Comment.add(brkn.model.Users.getInstance().currentUser, 
+                this.media_.id, replyInput.value, false, false, comment.id, comment.user.id);
+            this.addComment(reply);
+            replyInput.value = '';
+          }
+        }, this));
+  }
 };
 
 

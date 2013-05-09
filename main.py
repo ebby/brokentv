@@ -51,7 +51,7 @@ jinja_environment = jinja2.Environment(
 class MainHandler(BaseHandler):
     def get(self, path=None):
       mobile = self.request.host_url.startswith('http://m.') or self.request.get('mobile') \
-          or 'Mobile' in self.request.headers.get('user_agent')
+          or 'iPhone' in self.request.headers.get('user_agent')
 
       template_data = {}
       template_data['host_url'] = self.request.host_url

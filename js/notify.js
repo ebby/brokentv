@@ -79,7 +79,7 @@ brkn.Notify.prototype.show_ = function(flash, action, content, opt_user, opt_img
             });
           });
   goog.dom.appendChild(this.getElement(), noteEl);
-  
+
   var dispEl = goog.dom.getElementByClass('note', noteEl);
   goog.Timer.callOnce(function() {
     if (dispEl) {
@@ -93,7 +93,9 @@ brkn.Notify.prototype.show_ = function(flash, action, content, opt_user, opt_img
           }, 5100);
         }, 3000);
       } else {
-        goog.dom.classes.add(dispEl, 'dim'); 
+        goog.Timer.callOnce(function() {
+          goog.dom.classes.add(dispEl, 'dim'); 
+        }, 3000);
       }
     }
   });

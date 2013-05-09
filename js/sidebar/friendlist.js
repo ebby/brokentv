@@ -4,6 +4,7 @@ goog.require('soy');
 goog.require('brkn.model.User');
 goog.require('brkn.sidebar.friendlist');
 
+goog.require('goog.Timer');
 goog.require('goog.ui.Component');
 goog.require('goog.ui.Component.EventType');
 
@@ -53,6 +54,12 @@ brkn.sidebar.FriendList = function(opt_users, opt_showOffline) {
    * @private
    */
   this.showOffline_ = !!opt_showOffline;
+  
+  /**
+   * @type {number}
+   * @private
+   */
+  this.resizeExtra_ = 0;
 };
 goog.inherits(brkn.sidebar.FriendList, goog.ui.Component);
 
@@ -148,15 +155,40 @@ brkn.sidebar.FriendList.prototype.decorateInternal = function(el) {
             return user;
           });
         }, this));
+    
+    this.showOffline_ && this.resize();
+    this.getHandler().listen(window, 'resize', goog.bind(function() {
+      this.showOffline_ && goog.Timer.callOnce(goog.bind(function() {
+        this.resize();
+      }, this));
+    }, this));
   }
 
   if (this.users_) {
+    goog.array.sort(this.users_, function(u1, u2) {
+      if (u1.lastLogin && !u2.lastLogin) {
+        return 1;
+      } else if (!u1.lastLogin && u2.lastLogin) {
+        return -1;
+      } else {
+        return u1.lastLogin.getTime() > u2.lastLogin.getTime() ? 1 : -1;
+      }
+    });
     goog.array.forEach(this.users_, function(u) {
       this.addUser_(u)
     }, this);
   } else {
     brkn.model.Users.getInstance().getFriends(goog.bind(function(friends) {
       this.users_ = friends;
+      goog.array.sort(this.users_, function(u1, u2) {
+        if (u1.lastLogin && !u2.lastLogin) {
+          return 1;
+        } else if (!u1.lastLogin && u2.lastLogin) {
+          return -1;
+        } else {
+          return u1.lastLogin.getTime() > u2.lastLogin.getTime() ? 1 : -1;
+        }
+      });
       goog.array.forEach(this.users_, function(u) {
         this.addUser_(u)
       }, this);
@@ -199,7 +231,7 @@ brkn.sidebar.FriendList.prototype.addUser_ = function(user, opt_offlineOnly) {
       goog.dom.appendChild(this.onlineEl_, userEl);
       this.onlineUsers_.push(user);
     }
-  } else if (user.lastLogin && !opt_offlineOnly) {
+  } else if (user.lastLogin && !opt_offlineOnly && this.recentUsers_.length < 5) {
     goog.style.showElement(this.recentLabel_, true);
     goog.array.forEach(this.recentUsers_, function(u, i) {
       if (u.lastLogin && user.lastLogin && u.lastLogin.getTime() < user.lastLogin.getTime()) {
@@ -267,4 +299,14 @@ brkn.sidebar.FriendList.prototype.updateStatus_ = function(user, online) {
     }
   }
   this.addUser_(user);
+};
+
+/**
+ * @param {?number=} opt_extra Extra space to subtract
+ * @private
+ */
+brkn.sidebar.FriendList.prototype.resize = function(opt_extra) {
+  this.resizeExtra_ = opt_extra || this.resizeExtra_;
+  goog.style.setHeight(this.getElement(), goog.dom.getViewportSize().height - 42 -
+      this.resizeExtra_ - (goog.dom.getAncestorByClass(this.getElement(), 'tabbed') ? 30 : 0));
 };

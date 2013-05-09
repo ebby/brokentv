@@ -121,26 +121,38 @@
   </div>
 {/template}
 
+
 /**
  * @param comment
- * @param text
- * @param timestamp
  * @param owner
+ * @param text
  * @param prefix
  */
 {template .comment}
-  <div class="comment{if $comment.parentId}{sp}reply{/if}" id="{$prefix}-{$comment.id}">
-    <a href="#user:{$comment.user.id}">
-      <img src="{$comment.user.picture}"/>
-    </a>
-    <div class="text">
-      <a class="username" href="#user:{$comment.user.id}">{$comment.user.name}</a>{sp}
-      {$text|noAutoescape}
-    </div>
-    <div class="timestamp">{$timestamp}</div>
-    <div class="comment-options">
-      {if $owner}<div class="remove"></div> {/if}
-      <div class="reply"></div>
+  <div class="comment{if $comment.parentId}{sp}reply{/if}" {if $comment.id}id="{$prefix}-{$comment.id}"{/if}>
+    {if not $comment.parentId}
+      <a href="#user:{$comment.user.id}">
+        <div class="user-picture" style="background:{$comment.user.color}">
+          <img src="{$comment.user.picture}"/>
+        </div>
+      </a>
+    {/if}
+    <div class="template">
+      <a class="user" href="#user:{$comment.user.id}">{$comment.user.name}</a>{sp}{sp}
+      <div class="text">
+        {$text|noAutoescape}
+        <div class="comment-options">
+          {if $owner}<div class="remove"></div> {/if}
+          <div class="reply"></div>
+        </div>
+      </div>
+      <div class="timestamp">{$comment.relativeTime}</div>
+      <div class="replies"></div>
+      {if not $comment.parentId}
+        <div class="reply-input">
+          <textarea class="reply-textarea" rows="1" placeholder="reply..."></textarea>
+        </div>
+      {/if}
     </div>
   </div>
 {/template}
@@ -150,14 +162,14 @@
  */
 {template .commentInput}
   <div class="comment-input">
-    <div class="comment-controls">
-      <div class="comment-button tweet-toggle"><div class="icon"></div>tweet<div class="check"></div></div>
-      <div class="comment-button fb-toggle"><div class="icon"></div>post<div class="check"></div></div>
-      <div class="comment-button add-comment"><div class="return">&#8618;</div>add</div>
-    </div>
     <div class="input-holder">
       <textarea class="comment-textarea" rows="1" placeholder="Add to the conversation..."></textarea>
     </div>
+    <div class="comment-controls">
+      <div class="comment-toggle tweet-toggle"><div class="icon"></div></div>
+      <div class="comment-toggle fb-toggle"><div class="icon"></div></div>
+    </div>
+    <div class="comment-button add-comment">POST</div>
   </div>
 {/template}
 
