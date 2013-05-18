@@ -56,6 +56,15 @@ class StorySortHandler(BaseHandler):
       path = os.path.join(os.path.dirname(__file__), '../templates/storysort.html')
       self.response.out.write(template.render(path, template_data))
 
+class InviteHandler(BaseHandler):
+    @BaseHandler.super_admin
+    def post(self):
+      id = self.request.get('id') 
+      email = self.request.get('email')
+      if id or email:
+        invite = Invite.get_or_insert(id or email,
+                                      id=id, email=email)
+
 class UsersHandler(BaseHandler):
     @BaseHandler.super_admin
     def get(self, id=None):

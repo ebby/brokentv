@@ -1,7 +1,7 @@
 from common import *
 
 def get_session(current_user, media_id=None, channel_id=None, single_channel_id=None,
-                set_programming=True):
+                youtube_channel_id=None, set_programming=True):
   data = {}
 
   # RETREIVE CHANNELS AND PROGRAMMING
@@ -17,6 +17,26 @@ def get_session(current_user, media_id=None, channel_id=None, single_channel_id=
     single_channel = filter(lambda c: c['id'] == single_channel_id, cached_channels)
     if len(single_channel):
       channels = single_channel
+      
+  if youtube_channel_id:
+    user_json = memcache.get(current_user.id) or {}
+    youtube_channel_name = youtube_channel_id.split(',')[0]
+    youtube_channel_id = youtube_channel_id.split(',')[1]
+    cid = current_user.id + '-' + youtube_channel_id
+    cached_channel = memcache.get(cid)
+    already_programmed = False
+    if cached_channel and len(cached_channel.get('programs', [])):
+        last_program_time = iso8601.parse_date(
+            cached_channel.get('programs')[-1]['time']).replace(tzinfo=None)
+        if last_program_time > datetime.datetime.now() - datetime.timedelta(seconds=1200):
+          youtube_channel = cached_channel['channel']
+          already_programmed = True
+
+    if not already_programmed:
+      data_json = Channel.youtube_channel(current_user, youtube_channel_name,
+                                          yt_channel_id=youtube_channel_id)
+      youtube_channel = data_json['channel']
+    channels = [youtube_channel]
 
   cached_programming = memcache.get('programming') or {}
 
@@ -41,6 +61,7 @@ def get_session(current_user, media_id=None, channel_id=None, single_channel_id=
   if media_id:
     media = Media.get_by_key_name(media_id)
     if media:
+      logging.info(media.name)
       current_channel = user_channel or Channel.get_my_channel(current_user)
       program = Program.add_program(current_channel, media, time=datetime.datetime.now(), async=True)
 
@@ -56,7 +77,7 @@ def get_session(current_user, media_id=None, channel_id=None, single_channel_id=
       c = memcache.get(cid) 
       if c and len(c.get('programs', [])):
         last_program_time = iso8601.parse_date(c.get('programs')[-1]['time']).replace(tzinfo=None)
-        if last_program_time > datetime.datetime.now():
+        if last_program_time > datetime.datetime.now() - datetime.timedelta(seconds=1200):
           cached_channels.append(c['channel'])
           cached_programming = dict(cached_programming.items() + {cid:c['programs']}.items())
         else:
@@ -105,10 +126,12 @@ class SessionHandler(BaseHandler):
       media_id = self.session.get('media_id', None)
       channel_id = self.session.get('channel_id', None)
       single_channel_id = self.session.get('single_channel_id', None)
+      youtube_channel_id = self.session.get('youtube_channel_id', None)
 
       if not data.get('error'):
         data = get_session(self.current_user, media_id=media_id, channel_id=channel_id,
-                           single_channel_id=single_channel_id)
+                           single_channel_id=single_channel_id,
+                           youtube_channel_id=youtube_channel_id)
       if self.session.get('message'):
         data['message'] = self.session['message']
       self.response.out.write(simplejson.dumps(data))

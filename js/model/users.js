@@ -115,7 +115,8 @@ brkn.model.Users.prototype.get_or_add = function(user) {
 		this.add(u)
 	}
 	u.online = user['online']; // Update online presence
-	u.currentMedia = u.currentMedia || user['last_seen']; // Update media
+	u.currentMedia = user['last_seen'] ? brkn.model.Medias.getInstance().getOrAdd(user['last_seen']) :
+	    u.currentMedia; // Update media
 	return u;
 };
 

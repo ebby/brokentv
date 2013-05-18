@@ -23,10 +23,11 @@ goog.require('goog.ui.Textarea.EventType');
  * @param {?boolean=} opt_noFetch
  * @param {?brkn.model.Media=} opt_lastMedia
  * @param {?string=} opt_lastInput
+ * @param {?boolean=} opt_mini
  * @constructor
  * @extends {goog.ui.Component}
  */
-brkn.sidebar.Info = function(media, opt_noFetch, opt_lastMedia, opt_lastInput) {
+brkn.sidebar.Info = function(media, opt_noFetch, opt_lastMedia, opt_lastInput, opt_mini) {
   goog.base(this);
 
   media.updateChannels();
@@ -61,6 +62,18 @@ brkn.sidebar.Info = function(media, opt_noFetch, opt_lastMedia, opt_lastInput) {
    * @private
    */
   this.fetch_ = !opt_noFetch;
+  
+  /**
+   * @type {boolean}
+   * @private
+   */
+  this.mini_ = EMBED || !!opt_mini;
+  
+  /**
+   * @type {Array.<brkn.model.User>}
+   * @private
+   */
+  this.viewers_ = [];
   
   /**
    * @type {Object.<string, Element>}
@@ -149,6 +162,13 @@ brkn.sidebar.Info = function(media, opt_noFetch, opt_lastMedia, opt_lastInput) {
 
 };
 goog.inherits(brkn.sidebar.Info, goog.ui.Component);
+
+
+/**
+ * @type {Element}
+ * @private
+ */
+brkn.sidebar.Info.prototype.userPollEl_;
 
 
 /**
@@ -256,6 +276,7 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
   this.spinner_ = goog.dom.getElementByClass('loading', this.getElement())
   var img = /** @type {Element} */ picEl.firstChild;
   this.contentsEl_ = goog.dom.getElementByClass('info-contents', this.getElement());
+  this.userPollEl_ = goog.dom.getElementByClass('user-poll', this.getElement());
   this.tweetHolderEl_ = goog.dom.getElementByClass('tweet-holder', this.getElement());
   this.tweetsEl_ = goog.dom.getElementByClass('tweets', this.getElement());
   this.dotNavEl_ = goog.dom.getElementByClass('dot-nav', this.getElement());
@@ -270,6 +291,8 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
   this.plusButton_.decorate(goog.dom.getElementByClass('plus', this.getElement()));
   this.tweetTimer_ = new goog.Timer(5000);
   this.watchWith_ = goog.dom.getElementByClass('watch-with', this.getElement());
+  
+  goog.dom.classes.enable(this.getElement(), 'mini', this.mini_);
 
   if (!this.fetch_ || this.media_.fetched) {
     this.renderInfo(false, this.media_.description, this.media_.seen, this.media_.tweets,
@@ -283,6 +306,11 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
       var comments = /** @type {Array.<Object>} */ response['comments'];
       this.renderInfo(true, description, seen, tweets, comments);
     }, this));
+  }
+
+  if (this.media_.publisher.id == 'youtubeUCAMPco9PqjBbI_MLsDOO4Jw' ||
+      this.media_.publisher.id == 'youtubeAMPco9PqjBbI_MLsDOO4Jw') {
+    this.setupUserPoll_(); 
   }
 
   this.getHandler()
@@ -409,7 +437,7 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
       .listen(scrollable,
               goog.events.EventType.SCROLL,
               goog.bind(function() {
-                var opacity = (120-scrollable.scrollTop)/100;
+                var opacity = ((this.mini_ ? 100 : 120)-scrollable.scrollTop)/100;
                 goog.style.setOpacity(publisherEl, Math.min(1, Math.max(opacity, 0)));
                 goog.style.setOpacity(titleEl, Math.min(1, Math.max(opacity, 0)));
                 goog.style.setOpacity(linksEl, Math.min(1, Math.max(opacity, 0)));
@@ -431,7 +459,7 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
             var scrolled = goog.dom.classes.toggle(picEl, 'scrolled');
             var scrollAnim = new goog.fx.dom.Scroll(scrollable,
                 [scrollable.scrollLeft, scrollable.scrollTop],
-                [scrollable.scrollLeft, (scrolled ? 170 : 0)], 300);
+                [scrollable.scrollLeft, (scrolled ? (this.mini_ ? 70 : 170) : 0)], 300);
             scrollAnim.play();
           }, this));
   
@@ -456,7 +484,7 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
     this.addTweet_(tweet, true);
   }, this);
   this.media_.subscribe(brkn.model.Media.Actions.WATCHING, function(user, channel, offline) {
-    this.addViewer_(user, offline);
+    this.addViewer_(user, !offline);
   }, this);
   brkn.model.Users.getInstance().currentUser.subscribe(
       brkn.model.User.Actions.SET_STARRED, function() {
@@ -500,26 +528,19 @@ brkn.sidebar.Info.prototype.renderInfo = function(fetched, description, seen, tw
   }
   
   // Viewers
-  var viewers = goog.array.map(seen, function(viewer) {
-    var user = fetched ? brkn.model.Users.getInstance().get_or_add(viewer) : viewer;
+  this.viewers_ = goog.array.map(seen, function(viewer) {
+    var user = fetched ? brkn.model.Users.getInstance().get_or_add(viewer) :
+        /** @type {brkn.model.User} */ viewer;
     if (user.id != brkn.model.Users.getInstance().currentUser.id) {
       goog.style.showElement(this.viewersEl_, true);
       this.hasSeen_ = true;
-      var viewerEl = soy.renderAsElement(brkn.sidebar.viewer, {
-        user: user,
-        firstName: user.firstName
-      });
-      goog.dom.appendChild(this.viewersEl_, viewerEl);
-      this.viewerEls_[viewer.id] = viewerEl;
-      this.getHandler().listen(viewerEl, goog.events.EventType.CLICK, function() {
-        brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.PROFILE, viewer);
-      });
+      this.addViewer_(user, false);
     }
     return user;
   }, this);
 
   goog.object.forEach(this.media_.onlineViewers, function(viewer) {
-    this.addViewer_(viewer);
+    this.addViewer_(viewer, true);
   }, this);
   
   // Tweets
@@ -538,7 +559,7 @@ brkn.sidebar.Info.prototype.renderInfo = function(fetched, description, seen, tw
   comments = goog.array.map(comments, function(comment, i) {
     var c = fetched ? new brkn.model.Comment(comment) : /** @type {brkn.model.Comment} */ comment;
     if (!c.parentId) {
-      this.addComment_(c, i == comments.length - 1);
+      this.addComment_(c);
     }
     return c;
   }, this);
@@ -548,9 +569,49 @@ brkn.sidebar.Info.prototype.renderInfo = function(fetched, description, seen, tw
   if (fetched) {
     this.media_.tweets = this.tweets_;
     this.media_.comments = comments;
-    this.media_.seen = viewers;
+    this.media_.seen = this.viewers_;
     this.media_.fetched = true;
   }
+};
+
+
+/**
+ * @private 
+ */
+brkn.sidebar.Info.prototype.setupUserPoll_ = function() {
+  var question = goog.dom.getElementByClass('status', this.userPollEl_);
+  var options = goog.dom.getElementByClass('poll-options', this.userPollEl_);
+  
+  goog.dom.setTextContent(question, 'WHO\'S YOUR FAVORITE FINALIST?');
+  goog.dom.appendChild(options, soy.renderAsElement(brkn.sidebar.pollOption, {
+    name: 'Kree Harrison',
+    percent: '31%'
+  }));
+  goog.dom.appendChild(options, soy.renderAsElement(brkn.sidebar.pollOption, {
+    name: 'Angie Miller',
+    percent: '52%'
+  }));
+  goog.dom.appendChild(options, soy.renderAsElement(brkn.sidebar.pollOption, {
+    name: 'Candice Glover',
+    percent: '17%'
+  }));
+  
+  goog.style.showElement(this.userPollEl_, true);
+  
+  this.getHandler().listen(options, goog.events.EventType.CLICK, goog.bind(function(e) {
+    if (!goog.dom.classes.has(this.userPollEl_, 'voted')) {
+      goog.dom.classes.add(this.userPollEl_, 'voted');
+      var selected = goog.dom.getAncestorByClass(e.target, 'option');
+      var name = goog.dom.getTextContent(goog.dom.getElementByClass('name', selected));
+      goog.dom.classes.add(selected, 'selected');
+      this.commentInput_.setValue('@americanidol I just voted for ' + name, true, true);
+      this.commentInput_.setFocused(true);
+      goog.array.forEach(goog.dom.getChildren(options), function(op) {
+        var percentage = goog.dom.getTextContent(goog.dom.getElementByClass('percent-number', op));
+        goog.dom.getElementByClass('percent', op).style.width = percentage;
+      }, this);
+    }
+  }, this));
 };
 
 
@@ -758,11 +819,11 @@ brkn.sidebar.Info.prototype.activateComment_ = function(comment, commentEl) {
 
 /**
  * @param {brkn.model.User} user
- * @param {?boolean=} opt_offline
+ * @param {boolean} online
  * @private
  */
-brkn.sidebar.Info.prototype.addViewer_ = function(user, opt_offline) {
-  if (opt_offline && this.viewerEls_[user.id]) {
+brkn.sidebar.Info.prototype.addViewer_ = function(user, online) {
+  if (!online && this.viewerEls_[user.id]) {
     goog.dom.classes.remove(this.viewerEls_[user.id], 'online');
     return;
   }
@@ -785,7 +846,7 @@ brkn.sidebar.Info.prototype.addViewer_ = function(user, opt_offline) {
                 (goog.dom.classes.has(viewerEl, 'online') ? ' is watching' : ' saw this'));
             var cardSize = goog.style.getSize(hovercard);
             hovercard.style.right = 320 - containerPos.x - pos.x - cardSize.width/2 - 12 + 'px';
-            hovercard.style.top = containerPos.y + pos.y + 210 + 'px';
+            hovercard.style.top = containerPos.y + pos.y + 13 + 'px';
             goog.style.showElement(hovercard, true);
           })
           .listen(viewerEl, goog.events.EventType.MOUSEOUT, function(e) {
@@ -794,9 +855,9 @@ brkn.sidebar.Info.prototype.addViewer_ = function(user, opt_offline) {
           });
     }
     goog.style.showElement(this.viewersEl_, true);
-    goog.dom.setTextContent(goog.dom.getElementByClass('status', this.viewersEl_),
-        'WATCHING' + (this.hasSeen_ ? ' + SEEN' : ''));
-    goog.dom.classes.add(this.viewerEls_[user.id], 'online');
+//    goog.dom.setTextContent(goog.dom.getElementByClass('status', this.viewersEl_),
+//        'WATCHING' + (this.hasSeen_ ? ' + SEEN' : ''));
+    goog.dom.classes.enable(this.viewerEls_[user.id], 'online', online);
   }
 };
 
@@ -877,10 +938,13 @@ brkn.sidebar.Info.prototype.scrollGrad_ = function() {
 brkn.sidebar.Info.prototype.resize = function(opt_extra, opt_scrollComments) {
   this.resizeExtra_ = opt_extra != undefined ? opt_extra : this.resizeExtra_;
   var viewHeight = goog.dom.getViewportSize().height;
-  goog.style.setHeight(this.contentsEl_, viewHeight - 283);
+
+  goog.style.setHeight(this.contentsEl_, viewHeight - (this.mini_ ? 183 : 283) -
+      (this.viewers_.length ? 38 : 0));
   if (viewHeight > 640 && this.commentsEl_ && this.commentsEl_.parentElement) {
     goog.style.setStyle(this.commentsEl_, 'max-height', viewHeight -
-        goog.style.getPosition(this.commentsEl_.parentElement).y - 313 - this.resizeExtra_ + 'px'); 
+        goog.style.getPosition(this.commentsEl_.parentElement).y - (this.mini_ ? 213 : 313) - 
+        (this.viewers_.length ? 38 : 0) - this.resizeExtra_ + 'px'); 
     this.scrollGrad_();
   } else if (viewHeight < 640) {
     goog.style.setStyle(this.commentsEl_, 'max-height', '');

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:fb="http://ogp.me/ns/fb#" manifest="/static/cache.manifest">
+<html lang="en" xmlns:fb="http://ogp.me/ns/fb#">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
@@ -30,6 +30,7 @@
       var IPHONE = !!navigator.userAgent.match(/iPhone/i);
       var HTML5 = '{{ html5 }}' == 'True';
       var DESKTOP = true;
+      var EMBED = '{{ embed }}' == 'True';
 
 			// Re-namespace to avoid closure conflict.
 			var appengine = goog.appengine; 
@@ -88,15 +89,18 @@
 		          <div class="page-title">About</div>
 		          <div class="page-content">
 		            <div class="bold">Company</div><br>
-		            XYLO is a new media company obsessed with storytelling.
+		            Xylo is a new media company obsessed with great social TV technology.
 		            We create immersive experiences for television and web content.
                 <br/><br/>
                 <div class="bold">Product</div><br/>
 		            We're reinventing TV for today; TV that's social and connected to our lives.
 		            Our product is now in limited beta.
 		            <br/><br/>
+		            <div class="bold">Publishers</div><br/>
+                We work with top publishers to transform their digital content experiences. Contact us as <a href="mailto:info@xylocast.com">info@xylocast.com</a> to find out more.
+                <br/><br/>
 		            <div class="bold">Team</div><br>
-		            We are (currently) located in Brooklyn, NY.
+		            We are located in New York, NY and Mountain View, CA.
 		            <br/><br/>
 		            To get in touch, please email <a href="mailto:info@xylocast.com">info@xylocast.com</a>
 		          </div>
@@ -189,7 +193,7 @@
 		          <a class="section" id="privacy" href='#'>PRIVACY POLICY</a> &middot;
 		         -->
 		        <a href='http://blog.xylovision.com' target="_blank">BLOG</a> &middot;
-		        <div class="copyright">COPYRIGHT &copy; 2013 XYLO INC. ALL RIGHTS RESERVED. &middot;</div>
+		        <div class="copyright">COPYRIGHT &copy; 2013 XYLO MEDIA INC. ALL RIGHTS RESERVED. &middot;</div>
 		        <a href='http://facebook.com/xyloinc' class="icon" target="_blank"><div class="home-facebook"></div></a> &middot;
             <a href='http://twitter.com/xyloinc'  class="icon" target="_blank"><div class="home-twitter"></div></a>
 		      </div>

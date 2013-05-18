@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# version 0.0.21
+# version 0.0.253
  
 /static/img/homepage.jpg
 /static/img/content-texture.png
@@ -14,5 +14,3 @@ CACHE MANIFEST
 
 NETWORK:
 *
-http://*
-https://*

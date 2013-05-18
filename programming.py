@@ -1,3 +1,4 @@
+import broadcast
 import datetime
 import simplejson
 import urllib
@@ -88,6 +89,8 @@ class Programming():
   @classmethod
   def set_programming(cls, channel_id, duration=2400, schedule_next=False, fetch_twitter=True,
                       queue='programming', target=None, kickoff=False):
+    import broadcast
+    import constants
     from model import Channel
     from model import Program
     
@@ -109,8 +112,7 @@ class Programming():
       media = Media.get_by_key_name(programming[channel_id][0]['media']['id'])
       deferred.defer(Programming.fetch_related_tweets, [],
                      _name='twitter-' + channel_id + '-' + str(uuid.uuid1()),
-                     _queue='twitter',
-                     _countdown=30)
+                     _queue='twitter')
 
     programs = []
     if not programming.get(channel_id) or gap > 60:
@@ -257,9 +259,8 @@ class Programming():
             break
 
     deferred.defer(Programming.fetch_related_tweets, medias,
-                   _name='twitter-' + channel_id + '-' + str(uuid.uuid1()),
-                   _queue='twitter',
-                   _countdown=30)
+                   _name='twitter-' + channel.id + '-' + str(uuid.uuid1()),
+                   _queue='twitter')
 
     user_obj = memcache.get(key) or {}
     user_channels = (user_obj.get('channels') or []) if user_obj else []
@@ -439,6 +440,9 @@ class Programming():
 
   @classmethod
   def fetch_related_tweets(cls, medias):
+    import constants
+    from model import Tweet
+    
     api = tweepy.API()
     total = 0
     for media in medias:

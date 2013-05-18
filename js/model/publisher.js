@@ -7,7 +7,7 @@ goog.provide('brkn.model.Publisher');
  */
 brkn.model.Publisher = function(publisher) {
   /**
-   * @type {number}
+   * @type {string}
    * @private
    */
   this.id = publisher['id'];

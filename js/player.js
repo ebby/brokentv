@@ -141,9 +141,9 @@ brkn.Player.prototype.enterDocument = function() {
   this.updateStagecover_();
 
   if (this.currentProgram_) {
-    if (DESKTOP || this.currentChannel_.myChannel) {
+    //if (DESKTOP || this.currentChannel_.myChannel) {
       this.playProgram(this.currentProgram_);
-    }
+    //}
   } else  {
     brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.NO_MEDIA);
   }
@@ -338,7 +338,9 @@ brkn.Player.prototype.playProgram = function(program) {
     this.lastNote_ = program.id;
   }
   this.play(program.media);
-  this.fetchLike_(program.media);
+  if (DESKTOP) {
+    this.fetchLike_(program.media);
+  }
 };
 
 
@@ -390,6 +392,7 @@ brkn.Player.prototype.play = function(media, opt_tries) {
  */
 brkn.Player.prototype.resize = function() {
   if (IPHONE) {
+    goog.style.setWidth(this.getElement(), goog.dom.getViewportSize().width - 320); 
     return;
   }
   var stagecover = goog.dom.getElement('stagecover');

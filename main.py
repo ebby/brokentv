@@ -50,8 +50,10 @@ jinja_environment = jinja2.Environment(
 
 class MainHandler(BaseHandler):
     def get(self, path=None):
+      self.session.clear()
+      
       mobile = self.request.host_url.startswith('http://m.') or self.request.get('mobile') \
-          or 'iPhone' in self.request.headers.get('user_agent')
+          or 'iPhone;' in self.request.headers.get('user_agent')
 
       template_data = {}
       template_data['host_url'] = self.request.host_url
@@ -73,10 +75,16 @@ class MainHandler(BaseHandler):
 
       # SINGLE CHANNEL
       self.session['single_channel_id'] = self.request.get('sc')
+      
+      # SINGLE YOUTUBE CHANNEL
+      self.session['youtube_channel_id'] = self.request.get('ytc')
 
       # LINKS
       channel_id = self.request.get('c')
       media_id = self.request.get('m')
+      
+      # EMBED
+      template_data['embed'] = self.request.get('embed') == '1'
 
       if path:
         link = Link.get_by_path(path)
@@ -85,6 +93,7 @@ class MainHandler(BaseHandler):
           qs = urlparse.parse_qs(parsed.query)
           if qs.get('m'):
             media_id = qs['m'][0]
+            logging.info(media_id)
       self.session['channel_id'] = channel_id
       self.session['media_id'] = media_id
   
@@ -235,6 +244,7 @@ def create_handlers_map():
     ('/admin/_constants', admin.ConstantsHandler),
     ('/admin/_demo', admin.DemoHandler),
     ('/admin/_fetch', admin.FetchHandler),
+    ('/admin/_invite', admin.InviteHandler),
     ('/admin/_program', admin.ProgramHandler),
     ('/admin/_launchsettings', admin.LaunchSettingsHandler),
     ('/admin/_media/collection', admin.CollectionMediaHandler),

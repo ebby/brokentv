@@ -8,6 +8,8 @@ var DESKTOP;
 
 var HTML5;
 
+var EMBED;
+
 var appengine = {};
 
 /** 

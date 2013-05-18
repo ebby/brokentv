@@ -262,8 +262,7 @@ brkn.Controller.prototype.enterDocument = function() {
               if (remaining < 3) {
                 brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.BEFORE_END);
               }
-              if (brkn.model.Channels.getInstance().currentChannel.myChannel &&
-                  !goog.dom.classes.has(this.progressEl_, 'drag')) {
+              if (!goog.dom.classes.has(this.progressEl_, 'drag')) {
                 goog.dom.setTextContent(this.durationEl_,
                     (brkn.model.Player.getInstance().getCurrentTime() ?
                     brkn.model.Player.getInstance().getCurrentTime().toString().toHHMMSS() + ' / ' : '') +
@@ -405,7 +404,8 @@ brkn.Controller.prototype.toggleGuide_ = function(show) {
  * Resize
  */
 brkn.Controller.prototype.resize = function() {
-  if (!brkn.model.Channels.getInstance().currentChannel.myChannel) {
+  if (!brkn.model.Channels.getInstance().currentChannel.myChannel &&
+      !brkn.model.Controller.getInstance().timeless) {
     goog.style.showElement(this.progressEl_, false);
     
     var guide = goog.dom.getElement('guide');
@@ -423,7 +423,9 @@ brkn.Controller.prototype.resize = function() {
       goog.dom.classes.enable(this.getElement(), 'window', showWindow &&
           goog.dom.classes.has(this.getElement(), 'collapsed'));
     }, this), 400);
-  } else if (brkn.model.Player.getInstance().getCurrentProgram()) {
+  }
+  
+  if (brkn.model.Player.getInstance().getCurrentProgram()) {
     goog.style.showElement(this.progressEl_, true);
     this.setAsync_(brkn.model.Player.getInstance().getCurrentProgram());
     this.progressWidth_ = goog.dom.getViewportSize().width -

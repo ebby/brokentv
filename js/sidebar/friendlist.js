@@ -170,8 +170,10 @@ brkn.sidebar.FriendList.prototype.decorateInternal = function(el) {
         return 1;
       } else if (!u1.lastLogin && u2.lastLogin) {
         return -1;
+      } else if (!u1.lastLogin && !u2.lastLogin) {
+        return 0;
       } else {
-        return u1.lastLogin.getTime() > u2.lastLogin.getTime() ? 1 : -1;
+        return u1.lastLogin.getTime() < u2.lastLogin.getTime() ? 1 : -1;
       }
     });
     goog.array.forEach(this.users_, function(u) {
@@ -185,8 +187,10 @@ brkn.sidebar.FriendList.prototype.decorateInternal = function(el) {
           return 1;
         } else if (!u1.lastLogin && u2.lastLogin) {
           return -1;
+        } else if (!u1.lastLogin && !u2.lastLogin) {
+          return 0;
         } else {
-          return u1.lastLogin.getTime() > u2.lastLogin.getTime() ? 1 : -1;
+          return u1.lastLogin.getTime() < u2.lastLogin.getTime() ? 1 : -1;
         }
       });
       goog.array.forEach(this.users_, function(u) {
@@ -247,7 +251,7 @@ brkn.sidebar.FriendList.prototype.addUser_ = function(user, opt_offlineOnly) {
   } else if (this.showOffline_) {
     goog.style.showElement(this.offlineLabel_, true);
     goog.array.forEach(this.offlineUsers_, function(u, i) {
-      if (u.firstName() > user.firstName()) {
+      if (u.lastLogin && user.lastLogin && u.lastLogin.getTime() < user.lastLogin.getTime()) {
         goog.dom.insertChildAt(this.offlineEl_, userEl, i);
         goog.array.insertAt(this.offlineUsers_, user, i);
         inserted = true;
@@ -271,8 +275,10 @@ brkn.sidebar.FriendList.prototype.addUser_ = function(user, opt_offlineOnly) {
   }, this));
   if (media) {
     this.getHandler().listen(media, goog.events.EventType.CLICK, goog.bind(function(e) {
-      e.preventDefault();
       e.stopPropagation();
+      e.preventDefault();
+      brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.MEDIA_INFO,
+          user.currentMedia);
     }, this));
   }
 };

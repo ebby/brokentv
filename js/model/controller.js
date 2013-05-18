@@ -19,6 +19,10 @@ brkn.model.Controller = function() {
 	this.sidebarToggled = !el || goog.dom.classes.has(el, 'sidebar-toggled');
 	
 	this.guideToggled = el && goog.dom.classes.has(el, 'guide-toggled');
+	
+	
+	var guideEl = goog.dom.getElement('guide');
+	this.timeless = guideEl && goog.dom.classes.has(guideEl, 'timeless');
 
 	this.subscribe(brkn.model.Controller.Actions.TOGGLE_SIDEBAR, function(show) {
 	  this.sidebarToggled = show;

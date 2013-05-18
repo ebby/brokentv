@@ -224,7 +224,14 @@ brkn.model.Media.prototype.updateChannels = function() {
  * @param {brkn.model.Comment} comment
  */
 brkn.model.Media.prototype.addComment = function(comment) {
-  this.comments.push(comment);
+  if (!comment.parentId) {
+    this.comments.push(comment);
+  } else {
+    var parentComment = goog.array.find(this.comments, function(c) {
+      return c.id == comment.parentId; 
+    });
+    parentComment && parentComment.replies.push(comment);
+  }
   this.commentCount += 1;
   if (comment.user.id != brkn.model.Users.getInstance().currentUser.id) {
     brkn.model.Notify.getInstance().publish(brkn.model.Notify.Actions.SHOW,

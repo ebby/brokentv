@@ -59,6 +59,39 @@ div#guide {
       .box-shadow(e('inset 1px 0px 2px -1px #dedede, inset -4px 0 2px -2px #181818'));
     }
   }
+  
+  
+  &.timeless {
+    div.header {
+      div.times {
+        div.time {
+          display: none;
+        }
+        div.browse {
+          display: none;
+        }
+      }
+    }
+    div.ticker {
+      display: none !important;
+    }
+    div.channels {
+      div.channel {
+        div.programs {
+          div.program {
+            width: 200px !important;
+            position: relative !important;
+            left: 0 !important;
+            margin-left: -1px !important;
+          }
+        }
+        div.viewers {
+          display: none;
+        }
+      }
+    }
+  }
+  
   div.pan-handle {
     display: none;
     position: fixed;
@@ -220,6 +253,7 @@ div#guide {
       padding-left: @name-width - 10;
       background: #7E7E7E @grad-flat;
       border-top: 1px solid #ccc;
+      height: 20px;
       .box-shadow(e('inset 0 -3px 7px -3px rgba(0,0,0,0.2), 0 0 6px 2px rgba(0, 0, 0, .8)'));
       div.time {
         display: inline-block;
@@ -366,6 +400,7 @@ div#guide {
         .box-shadow(0, 0, 3px rgba(0, 0, 0, .8));
         -webkit-backface-visibility: hidden;
         -webkit-perspective: 1000;
+        border-right: 1px solid rgba(255, 255, 255, .6);
         cursor: pointer;
         z-index: 1;
         div.text {
@@ -401,7 +436,7 @@ div#guide {
         width: 100%;
       }
       div.programs-container {
-        height: 60px;
+        height: 80px;
       }
       div.programs {
         display: inline-block;
@@ -475,10 +510,10 @@ div#guide {
 					div.thumb {
 					  width: 100%;
 					  height: 100%;
-					  opacity: .1;
+					  opacity: .2;
 					  background-size: 110% auto;
 					  background-position: 50% 37%;
-					  .box-shadow(e('inset 0 0 0 1px rgba(255,255,255,.9)'));
+					  .box-shadow(e('inset 0 0 0 1px white'));
 					  &.fix-height {
               background-size: auto 100%;
             }
@@ -629,7 +664,7 @@ div#guide {
         }
       }
       div.graph {
-        display: inline-block;
+        display: none;
 	      width: 100%;
 	      position: relative;
 	      pointer-events: none;
@@ -929,7 +964,7 @@ div#guide {
       background: #181818 !important;
       z-index: 2 !important;
       cursor: default !important;
-      &:after {
+      &:after, &:before {
         left: 100%;
         border: solid transparent;
         content: " ";
@@ -938,12 +973,17 @@ div#guide {
         position: absolute;
         pointer-events: none;
       }
-      
       &:after {
         border-left-color: #181818;
         border-width: 15px;
         top: 50%;
         margin-top: -15px;
+      }
+      &:before {
+        border-left-color: rgba(255, 255, 255, .6);
+        border-width: 16px;
+        top: 50%;
+        margin-top: -16px;
       }
     }
   }

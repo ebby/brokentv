@@ -56,17 +56,22 @@ class BaseHandler(SessionRequest):
                 friends = graph.get_connections("me", "friends")['data']
                 user.friends = [f['id'] for f in friends]
                 
-                # Determine access level
-                if new_user and user_number < constants.INVITE_LIMIT():
-                  if constants.INVITE_POLICY() == constants.InvitePolicy.NIGHTCLUB:
-                    if (user.gender == 'female' and user.has_friend()) or \
-                        (user.gender == 'male' and user.has_female_friend()):
+                if Invite.get_by_key_name(user.id) or Invite.get_by_key_name(user.email):
+                  # If they're invited
+                  user.demo = True
+                  user.access_level = AccessLevel.USER
+                else:   
+                  # Determine access level
+                  if new_user and user_number < constants.INVITE_LIMIT():
+                    if constants.INVITE_POLICY() == constants.InvitePolicy.NIGHTCLUB:
+                      if (user.gender == 'female' and user.has_friend()) or \
+                          (user.gender == 'male' and user.has_female_friend()):
+                        user.access_level = AccessLevel.USER
+                    if constants.INVITE_POLICY() == constants.InvitePolicy.HAS_FRIEND:
+                      if user.has_friend():
+                        user.access_level = AccessLevel.USER
+                    if constants.INVITE_POLICY() == constants.InvitePolicy.ANYBODY:
                       user.access_level = AccessLevel.USER
-                  if constants.INVITE_POLICY() == constants.InvitePolicy.HAS_FRIEND:
-                    if user.has_friend():
-                      user.access_level = AccessLevel.USER
-                  if constants.INVITE_POLICY() == constants.InvitePolicy.ANYBODY:
-                    user.access_level = AccessLevel.USER
 
                 user.put()
 
