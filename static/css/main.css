@@ -1525,21 +1525,20 @@ div.channels {
   -o-transition: padding-top 0.5s ease;
   -ms-transition: padding-top 0.5s ease;
   transition: padding-top 0.5s ease;
+  background: #525252 url(/static/img/content-texture.png);
   width: 100%;
-  overflow-x: hidden;
   overflow-y: scroll;
   font-size: 12px;
 }
 div.channels div.channel {
   border-bottom: 1px solid rgba(0, 0, 0, 0.8);
   position: relative;
-  background: #525252 url(/static/img/content-texture.png);
-  overflow: hidden;
   -webkit-transition: height 0.3s ease;
   -moz-transition: height 0.3s ease;
   -o-transition: height 0.3s ease;
   -ms-transition: height 0.3s ease;
   transition: height 0.3s ease;
+  width: 100%;
 }
 div.channels div.channel div.name {
   width: 200px;
@@ -1554,6 +1553,11 @@ div.channels div.channel div.name {
   -webkit-box-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
   -moz-box-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
   box-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
+  -webkit-transition: left 1s linear;
+  -moz-transition: left 1s linear;
+  -o-transition: left 1s linear;
+  -ms-transition: left 1s linear;
+  transition: left 1s linear;
   -webkit-backface-visibility: hidden;
   -webkit-perspective: 1000;
   border-right: 1px solid rgba(255, 255, 255, 0.6);
@@ -1612,7 +1616,7 @@ div.channels div.channel div.programs div.program {
   height: 100%;
   color: #aaa;
   text-shadow: 1px 1px 1px #181818;
-  background: #424242;
+  background: #353535;
   z-index: 0;
   border-left: 1px solid rgba(0, 0, 0, 0.8);
   border-right: 1px solid rgba(0, 0, 0, 0.8);

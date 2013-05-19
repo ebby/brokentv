@@ -106,6 +106,12 @@ brkn.Guide = function() {
    * @private
    */
   this.maxLastProgram_ = 0;
+  
+  /**
+   * @type {number}
+   * @private
+   */
+  this.pixelsPerProgram_ = 200;
 };
 goog.inherits(brkn.Guide, goog.ui.Component);
 
@@ -309,18 +315,20 @@ brkn.Guide.prototype.enterDocument = function() {
     this.addChannel_(c);
   }, this));
   
-  this.dragger_ = new goog.fx.Dragger(this.getElement());
+  this.dragger_ = new goog.fx.Dragger(this.channelsEl_);
   var channelNameStyle = this.channelNameStyle_;
   var el = this.getElement();
   var channelsEl = this.channelsEl_;
   this.dragger_.defaultAction = function(x, y) {
-    if (x < 0 && x > (-goog.style.getSize(el).width + goog.dom.getViewportSize().width)) {
+    window.console.log(x)
+ //   if (x < 0 && x > (-goog.style.getSize(el).width + goog.dom.getViewportSize().width)) {
       // Has no access to this object's scope
-      window['currentChannel'] && window['currentChannel'].update();
-      this.target.style.left = x + 'px';
-      channelNameStyle.innerHTML = 'div#guide div.channels div.channel div.name' + '{left:' + -x
-          + 'px !important}';
-    }
+//      window['currentChannel'] && window['currentChannel'].update();
+      this.target.scrollLeft -= x/5;
+      this.target.scrollTop -= y;
+//      channelNameStyle.innerHTML = 'div#guide div.channels div.channel div.name' + '{left:' + -x
+//          + 'px !important}';
+ //   }
   };
 
   var nowLeft = goog.dom.getElement('now-left');
@@ -347,6 +355,7 @@ brkn.Guide.prototype.enterDocument = function() {
         goog.bind(function() {
           goog.dom.classes.remove(this.getElement(), 'animate');
           goog.dom.classes.add(this.getElement(), 'drag');
+          channelNameStyle.innerHTML = '';
           this.dragging_ = true;
         }, this))
     .listen(this.dragger_,
@@ -356,6 +365,8 @@ brkn.Guide.prototype.enterDocument = function() {
           goog.dom.classes.add(this.getElement(), 'animate');
           this.dragging_ = false;
           this.aligned_ = false;
+        channelNameStyle.innerHTML = 'div#guide div.channels div.channel div.name' +
+            '{left:' + this.channelsEl_.scrollLeft + 'px !important}';
           this.updateNowButtons_();
         }, this))
     .listen(this.headerEl_,
@@ -673,7 +684,8 @@ brkn.Guide.prototype.expand_ = function() {
  * @private
  */
 brkn.Guide.prototype.tick_ = function() {
-  if (brkn.model.Controller.getInstance().guideToggled || this.firstAlign_) {
+  if ((brkn.model.Controller.getInstance().guideToggled &&
+      !brkn.model.Controller.getInstance().timeless) || this.firstAlign_) {
     var isMyChannel = brkn.model.Channels.getInstance().currentChannel &&
         brkn.model.Channels.getInstance().currentChannel.myChannel || false;
     var currentProgram = brkn.model.Channels.getInstance().currentChannel &&
@@ -750,40 +762,54 @@ brkn.Guide.prototype.align_ = function(opt_setAligned, opt_offset, opt_setScroll
         myCurrentProgress - this.minTime_.getTime())/1000 *
         this.pixelsPerSecond_) : elapsed;
 
-    // Expand timeline if need be
-    while (elapsed + goog.dom.getViewportSize().width > this.width_ -
-        (brkn.model.Controller.getInstance().sidebarToggled ? 320 : 0)) {
-      this.expand_();
-    }
-
     var viewWidth = goog.dom.getViewportSize().width - 
         (brkn.model.Controller.getInstance().sidebarToggled ? 320 : 0);
 
-    var offset = 0;
-    if (program) {
-      offset = -(program.time.getTime() - this.minTime_.getTime())/1000 * this.pixelsPerSecond_ + 5;
-    }
+    if (brkn.model.Controller.getInstance().timeless) {
+      goog.array.forEach(brkn.model.Channels.getInstance().channels, function(channel) {
+        var channelUi = this.channelMap_[channel.id];
+        if (channelUi) {
+          var program = channel.getCurrentProgram();
+          var index = channel.currentProgramIndex || 0;
+          var offset = (index + this.guideOffset_) * this.pixelsPerProgram_ - brkn.Guide.NAME_WIDTH;
+          goog.style.setPosition(goog.dom.getElementByClass('channel', channelUi.getElement()), -offset);
+          var nameEl = goog.dom.getElementByClass('name', channelUi.getElement());
+          nameEl.style.marginLeft = offset + 'px';
+        }
+      }, this);
+    } else {
+      // Expand timeline if need be
+      while (elapsed + goog.dom.getViewportSize().width > this.width_ -
+          (brkn.model.Controller.getInstance().sidebarToggled ? 320 : 0)) {
+        this.expand_();
+      }
+      
+      var offset = 0;
+      if (program) {
+        offset = -(program.time.getTime() - this.minTime_.getTime())/1000 * this.pixelsPerSecond_ + 5;
+      }
 
-    // Align to current playing program
-    //    if (!opt_offset && brkn.model.Controller.getInstance().guideToggled &&
-    //        elapsed > -offset + viewWidth - 300) {
-    //      // If program is off-screen, keep up.
-    //      window.console.log('PROGRAM IS OFF SCREEN')
-    //      offset = (opt_live ? -elapsed : -myElapsed) + viewWidth - 350;
-    //    }
-
-    if (!program || (!opt_offset && brkn.model.Controller.getInstance().guideToggled &&
-        elapsed > -offset + viewWidth - 320)) {
-      // If off-screen (last program is done), align to ticker
-      offset = -goog.style.getPosition(this.tickerEl_).x + viewWidth - 200;
-      goog.dom.classes.add(this.getElement(), 'tick-along');
+      // Align to current playing program
+      //    if (!opt_offset && brkn.model.Controller.getInstance().guideToggled &&
+      //        elapsed > -offset + viewWidth - 300) {
+      //      // If program is off-screen, keep up.
+      //      window.console.log('PROGRAM IS OFF SCREEN')
+      //      offset = (opt_live ? -elapsed : -myElapsed) + viewWidth - 350;
+      //    }
+      
+      if (!program || (!opt_offset && brkn.model.Controller.getInstance().guideToggled &&
+          elapsed > -offset + viewWidth - 320)) {
+        // If off-screen (last program is done), align to ticker
+        offset = -goog.style.getPosition(this.tickerEl_).x + viewWidth - 200;
+        goog.dom.classes.add(this.getElement(), 'tick-along');
+      }
+     
+      offset = Math.max(offset, -goog.style.getSize(this.getElement()).width + viewWidth)
+      offset = Math.min(offset, 0);
+      goog.style.setPosition(this.getElement(), offset);
+      this.channelNameStyle_.innerHTML = 'div#guide div.channels div.channel div.name' +
+          '{left:' + -offset + 'px !important}'; 
     }
-   
-    offset = Math.max(offset, -goog.style.getSize(this.getElement()).width + viewWidth)
-    offset = Math.min(offset, 0);
-    goog.style.setPosition(this.getElement(), offset);
-    this.channelNameStyle_.innerHTML = 'div#guide div.channels div.channel div.name' +
-        '{left:' + -offset + 'px !important}';
 
     if (!this.scrolled_ && this.currentChannel_) {
       var scrollTo = goog.style.getPosition(this.currentChannel_.getElement()).y -

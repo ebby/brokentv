@@ -213,10 +213,6 @@
 		    fbLoaded && brkn.Main.auth();
 		  }
 	    window.fbAsyncInit = function() {
-	      FB.init({appId: '{{ facebook_app_id }}', status: true, cookie: true,
-	               xfbml: true, oauth: true});
-	    };
-	    window.fbAsyncInit = function() {
 	      FB.init({
 	        appId      : '{{ facebook_app_id }}', // App ID
 	        channelUrl : '{{ host_url }}/static/channel.html', // Channel File
