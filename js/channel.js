@@ -40,12 +40,6 @@ brkn.Channel = function(model, timeline, startTime, startTimeOffset, minTime) {
    * @private
    */
   this.adminMode_ = false;
-	
-  /**
-   * @type {boolean}
-   * @private
-   */
-  this.showGraph_ = false;
   
 	/**
 	 * @type {number}
@@ -126,12 +120,6 @@ brkn.Channel.PROGRAM_PADDING = 1;
 
 
 /**
- * @type {goog.ui.LabelInput}
- */
-brkn.Channel.prototype.suggestInput_;
-
-
-/**
  * @type {Element}
  * @private
  */
@@ -156,30 +144,18 @@ brkn.Channel.prototype.viewersEl_;
  * @type {Element}
  * @private
  */
-brkn.Channel.prototype.suggestEl_;
-
-
-/**
- * @type {Element}
- * @private
- */
 brkn.Channel.prototype.nameEl_;
-
-
-/**
- * @private
- */
-brkn.Channel.prototype.graph_;
 
 
 /** @inheritDoc */
 brkn.Channel.prototype.createDom = function() {
-	var el = soy.renderAsElement(brkn.channel.main, {
-		name: this.getModel().name,
-		current_program: this.getModel().currentProgram,
-		timeline: this.timeline_
-	});
+	var el = soy.renderAsElement(brkn.channel.main);
 	this.setElementInternal(el);
+	
+	this.nameEl_ = soy.renderAsElement(brkn.channel.name, {
+    name: this.getModel().name
+  });
+	goog.dom.appendChild(goog.dom.getElement('channel-names'), this.nameEl_);
 };
 
 
@@ -189,55 +165,9 @@ brkn.Channel.prototype.enterDocument = function() {
 
   this.programsEl_ = goog.dom.getElementByClass('programs', this.getElement());
   this.viewersEl_ = goog.dom.getElementByClass('viewers', this.getElement());
-  this.nameEl_ = goog.dom.getElementByClass('name', this.getElement());
-  this.graphEl_ = goog.dom.getElementByClass('graph', this.getElement());
-  this.suggestEl_ = goog.dom.getElementByClass('suggest', this.getElement());
   
-  if (!this.getModel().myChannel) {
-    this.suggestInput_ = new goog.ui.LabelInput('Paste YouTube link');
-    this.suggestInput_.decorate(goog.dom.getElementByClass('program-input', this.getElement()));
-    var keyHandler = new goog.events.KeyHandler(this.suggestInput_.getElement());
-    var pasteHandler = new goog.events.PasteHandler(this.suggestInput_.getElement());
-    var throttle = new goog.Throttle(goog.bind(this.onSuggestInput_, this), 1000);
-    this.getHandler()
-        .listen(pasteHandler,
-            goog.events.PasteHandler.EventType.AFTER_PASTE,
-            goog.bind(this.onSuggestInput_, this))
-        .listen(keyHandler,
-            goog.events.KeyHandler.EventType.KEY,
-            goog.bind(function() {
-              if (throttle) {
-                throttle.fire();
-              }
-            }, this))
-        .listen(this.suggestInput_,
-            goog.events.EventType.FOCUS,
-            goog.bind(this.onSuggestInput_, this));
-  } else {
-    goog.style.showElement(this.suggestEl_, false);
-  }
-  
-  brkn.model.Channels.getInstance().setPixelsPerSecond((goog.style.getSize(this.programsEl_).width - brkn.Guide.NAME_WIDTH) /
+  brkn.model.Channels.getInstance().setPixelsPerSecond((goog.style.getSize(this.getElement()).width - brkn.Guide.NAME_WIDTH) /
       this.timeline_);
-
-  if (this.showGraph_) {
-    var sampleTime = 0;
-    var viewers = 40;
-    this.max_ = 0;
-    this.fakeViewerData_ = [new goog.math.Coordinate(sampleTime, viewers)];
-    this.fakeCurrentTime_ = Math.floor((goog.now() - this.minTime_.getTime())/1000);
-
-    for (var i = 0; i < this.timeline_/40; i++) {
-      this.fakeViewerData_.push(new goog.math.Coordinate(
-          (sampleTime += 40),
-          (viewers += [-30, -5, 15, 10, 25][Math.floor(Math.random() * 5)])));
-      this.max_ = Math.max(this.max_, viewers);
-    }
-    
-    var raphael = Raphael(this.graphEl_, '100%', 60);
-    //var c = graph.path("M0,0").attr({fill: "none", "stroke-width": 1, "stroke-linecap": "round"});
-    this.graph_ = raphael.path("M0,0").attr({stroke: "none", opacity: .8, fill: '#5d5d5d'});
-  }
   
   // Color the name
   goog.style.setStyle(this.nameEl_, 'background', Raphael.getColor());
@@ -261,17 +191,7 @@ brkn.Channel.prototype.enterDocument = function() {
   goog.array.forEachRight(this.getModel().viewerSessions, this.addViewer, this);
 
 	this.getHandler()
-		.listen(this.suggestEl_,
-				goog.events.EventType.CLICK,
-				goog.bind(this.onSuggest_, this))
-		.listen(goog.dom.getElementByClass('close', this.suggestEl_),
-        goog.events.EventType.CLICK,
-        goog.bind(function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          this.onCloseSuggest_();
-        }, this))
-		.listen(goog.dom.getElementByClass('name', this.getElement()),
+		.listen(this.nameEl_,
 				goog.events.EventType.CLICK,
 				goog.bind(function() {
 				  if (this.getModel().id != brkn.model.Channels.getInstance().currentChannel.id &&
@@ -330,36 +250,6 @@ brkn.Channel.prototype.updateCurrentProgram_ = function() {
 
 
 /**
- */
-brkn.Channel.prototype.constructPath = function() {
-	var path = "";
-  var width = goog.style.getSize(this.programsEl_).width;
-  var height = 60;
-  var padding = 6;
-  var x, y, prevY;
-  var currentSeconds = (goog.now() - this.minTime_)/1000;
-  var viewerCounts = goog.array.slice(this.fakeViewerData_, 0, Math.floor(currentSeconds/40))
-  goog.array.forEach(viewerCounts, function(point, i) {
-  	x = point.x/this.timeline_ * width;
-		y = height - point.y/this.max_ * height;
-		if (i == viewerCounts.length - 1) {
-			// Persist last count with time.
-			x = currentSeconds/this.timeline_ * width;
-		}
-		x += padding;
-  	if (i) {
-  		path += "L" + [x - 30, prevY];
-  		path += "C" + [x - 20, prevY, x - 10, y, x, y];	
-  	} else {
-  		path += "M" + [x, y] + "R";
-  	}
-  	prevY = y;
-  }, this);
-  this.graph_.attr({path: path + 'L' + x +',60 10,60z'});
-};
-
-
-/**
  * @param {brkn.model.Program} program The program to add
  */
 brkn.Channel.prototype.addProgram = function(program) {
@@ -367,6 +257,7 @@ brkn.Channel.prototype.addProgram = function(program) {
 	  'class': 'program',
 	  'id': program.id
 	});
+
 	var width = program.media.duration * brkn.model.Channels.getInstance().pixelsPerSecond;
 	var showAdmin = this.isAdmin_ &&
 	    (program.time.getTime() + program.media.duration*1000) > goog.now();
@@ -406,10 +297,9 @@ brkn.Channel.prototype.addProgram = function(program) {
 	  width -= cutoff;
 	  offset += cutoff;
 	}
-	
+
 	goog.style.setWidth(programEl, Math.ceil(width - brkn.Channel.PROGRAM_PADDING));
 	goog.style.setPosition(programEl, Math.floor(offset));
-	goog.style.setPosition(this.suggestEl_, offset + width);
 	goog.dom.appendChild(this.programsEl_, programEl);
 	var clipped = width < 120;
 	goog.dom.classes.enable(programEl, 'clipped', clipped);
@@ -571,6 +461,15 @@ brkn.Channel.prototype.addViewer = function(session) {
 
 
 /**
+ * @param {boolean} current
+ */
+brkn.Channel.prototype.setCurrent = function(current) {
+  goog.dom.classes.enable(this.getElement(), 'current', current);
+  goog.dom.classes.enable(this.nameEl_, 'current', current);
+};
+
+
+/**
  * @param {brkn.model.User} user The user to display
  */
 brkn.Channel.prototype.removeViewer = function(user) {
@@ -579,95 +478,6 @@ brkn.Channel.prototype.removeViewer = function(user) {
   	goog.object.remove(this.viewers_, user.id);
     brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.RESIZE);
   } 
-};
-
-
-/**
- * @param {Event} e
- * @private
- */
-brkn.Channel.prototype.onSuggest_ = function(e) {
-  if (!goog.dom.classes.has(this.suggestEl_, 'show')) {
-    goog.style.setOpacity(goog.dom.getElementByClass('select-program', this.suggestEl_), 1);
-    goog.dom.classes.add(this.suggestEl_, 'show');
-    this.suggestInput_.focusAndSelect(); 
-  }
-};
-
-
-/**
- * @private
- */
-brkn.Channel.prototype.onCloseSuggest_ = function() {
-  goog.dom.classes.remove(this.suggestEl_, 'show');
-  this.suggestInput_.setValue('');
-  goog.dom.getElementByClass('page2', this.getElement()).innerHTML = '';
-};
-
-
-/**
- * @param e {Event} The event
- * @private
- */
-brkn.Channel.prototype.onSuggestInput_ = function(e) {
-  var contentEl = goog.dom.getElementByClass('select-content', this.getElement());
-  var el = goog.dom.getElementByClass('page2', this.getElement());
-  if (goog.dom.getChildren(el).length) {
-    return;
-  }
-
-  try {
-    var video = goog.ui.media.YoutubeModel.newInstance(this.suggestInput_.getValue());
-
-    goog.net.XhrIo.send(    
-        goog.string.subs(brkn.Channel.YOUTUBE_DATA, video.getVideoId()),
-        goog.bind(function(e){
-          var entry = goog.json.parse(e.target.getResponse())['entry'];
-          var title = entry['title']['$t'];
-          var thumb = entry['media$group']['media$thumbnail'][0]['url'];
-          soy.renderElement(el, brkn.channel.confirmMedia, {
-            title: title,
-            thumb: thumb
-          });
-          var confirmButton = new goog.ui.CustomButton('YES');
-          confirmButton.decorate(goog.dom.getElementByClass('button', el));
-          
-          var scrollAnim = new goog.fx.dom.Scroll(contentEl,
-              [0, 0], [160, 0], 300, goog.fx.easing.easeOut);
-          scrollAnim.play();
-          this.getHandler().listen(confirmButton,
-              goog.ui.Component.EventType.ACTION,
-              goog.bind(this.onSuggestProgram_, this, video));
-        }, this));
-  } catch (error) {
-    return;
-  }
-};
-
-
-/**
- * @param {goog.ui.media.YoutubeModel} video 
- * @private
- */
-brkn.Channel.prototype.onSuggestProgram_ = function(video) {
-  goog.net.XhrIo.send(
-    '/_addprogram',
-    goog.bind(function(e) {
-      var response = e.target.getResponseJson();
-      if (response['id']) {
-        var newProgram = new brkn.model.Program(response);
-        this.getModel().publish(brkn.model.Channel.Action.ADD_PROGRAM, newProgram); 
-      }
-    }, this),
-    'POST',
-    'channel_id=' + this.getModel().id +'&url=' + video.getUrl());
-  goog.style.setOpacity(goog.dom.getElementByClass('button', this.suggestEl_), 0);
-  goog.style.showElement(goog.dom.getElementByClass('added', this.suggestEl_), true);
-  goog.style.setOpacity(goog.dom.getElementByClass('select-program', this.suggestEl_), 0);
-  
-  goog.Timer.callOnce(goog.bind(function() {
-    this.onCloseSuggest_();
-  }, this), 3000);
 };
 
 
@@ -683,13 +493,9 @@ brkn.Channel.prototype.update = function() {
   // Hide if no content
   this.online = !!this.getModel().programming.length;
   goog.dom.classes.enable(this.getElement(), 'offline', !this.online);
+  goog.style.showElement(this.nameEl_, this.online);
   if (!this.getModel().programming.length) {
     return;
-  }
-  
-  if (this.showGraph_) {
-    // Update path
-    this.constructPath();
   }
  
   // Potentially move title for current program
@@ -720,14 +526,6 @@ brkn.Channel.prototype.update = function() {
 		}
 	}, this);
 	goog.style.getPosition(this.viewersEl_); // Refresh DOM
-	
-	// Overlay graph and viewers
-	var graphHeight = goog.style.getSize(this.graphEl_).height;
-	var viewersHeight = goog.style.getSize(this.viewersEl_).height;
-	var delta = graphHeight - viewersHeight;
-	if (delta < 0) {
-		goog.style.setStyle(this.graphEl_, 'margin-top', -delta + 'px');
-	}
 
 	//Set programs and name heights
 	//goog.style.setHeight(this.programsEl_, goog.style.getSize(this.getElement()).height - 21 /* padding */);

@@ -40,6 +40,8 @@ brkn.Popup = function() {
    * @private
    */
   this.model_ = brkn.model.Popup.getInstance();
+  this.model_.subscribe(brkn.model.Popup.Action.TOOLTIP,
+      this.showTooltip_, this);
   this.model_.subscribe(brkn.model.Popup.Action.SELECT_PROGRAM,
       this.showForSelectProgram_, this);
   this.model_.subscribe(brkn.model.Popup.Action.HIDE,
@@ -60,6 +62,22 @@ brkn.Popup.prototype.suggestInput_;
  * @constant
  */
 brkn.Popup.YOUTUBE_DATA = 'https://gdata.youtube.com/feeds/api/videos/%s?v=2&alt=json'
+  
+
+/**
+ * Show popup for a like object.
+ * @param {Element} anchor The like element.
+ * @param {string} action
+ * @param {?Object=} opt_args 
+ */
+brkn.Popup.prototype.hovercard = function(anchor, action, opt_args) {
+  goog.events.listen(anchor, goog.events.EventType.MOUSEOVER, goog.bind(function() {
+    this.model_.publish(action, anchor, opt_args);
+  }, this));
+  goog.events.listen(anchor, goog.events.EventType.MOUSEOUT, goog.bind(function() {
+    this.model_.publish(brkn.model.Popup.Action.HIDE);
+  }, this));
+}
 
 
 /**
@@ -93,6 +111,33 @@ brkn.Popup.prototype.onHideInternal_ = function() {
 brkn.Popup.prototype.getContentElement = function() {
 	return goog.dom.getElementByClass('content', this.getElement());
 };
+
+
+/**
+ * Show popup for a like object.
+ * @param {Element} anchor The like element.
+ * @param {Object} args 
+ * @private
+ */
+brkn.Popup.prototype.showTooltip_ = function(anchor, args) {
+  this.setVisible(false);
+  this.positionAtAnchor(anchor);
+//  this.setMargin(0, 0, 0, -goog.style.getSize(anchor).width/2);
+//  this.setPinnedCorner(goog.positioning.Corner.TOP_LEFT);
+//  var topMargin = -1 * (goog.style.getSize(this.getElement()).height -
+//      goog.style.getSize(anchor).height) / 2;
+//  this.setMargin(topMargin, 0, 0, 5);
+//  this.setPosition(new goog.positioning.AnchoredViewportPosition(
+//      anchor,
+//      goog.positioning.Corner.TOP_END));
+  
+  goog.dom.classes.add(this.getElement(), 'left');
+  
+  soy.renderElement(this.getContentElement(), brkn.popup.tooltip, {
+    text: args['text']
+  });
+  this.setVisible(true);
+}
 
 
 /**

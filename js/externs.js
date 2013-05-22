@@ -53,6 +53,7 @@ YT.Player.prototype.loadVideoById;
 YT.Player.prototype.playVideo;
 YT.Player.prototype.pauseVideo;
 YT.Player.prototype.seekTo;
+YT.Player.prototype.setPlaybackQuality;
 YT.Player.prototype.mute;
 YT.Player.prototype.unMute;
 YT.Player.prototype.isMuted;

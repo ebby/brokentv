@@ -1,36 +1,28 @@
 {namespace brkn.channel}
 
-/** 
- * @param name
+/**
  */
 {template .main}
 	<div class="channel">
 	  <div class="programs-container">
 			<div class="programs">
 			</div>
-			<div class="suggest">
-        <div class="spinner">...</div>
-        <div class="select-program">
-          <div class="select-header">SUGGESTION BOX <div class="close"></div></div>
-          <div class="select-content">
-            <div class="page">
-              <input type="text" class="program-input" placeholder="Paste YouTube link"/>
-              <div class="page2"></div>
-            </div>
-          </div>
-        </div>
-      </div>
  	  </div>
  	  <div class="graph"></div>
 		<div class="viewers"></div>
-		<div class="name">
-	    <div class="text">{$name}</div>
-	  	<div class="suggest-program">
-	    	<div class="add-program button dark">+</div>
-	    </div>
-	  </div>
 	</div>
 {/template}
+
+
+/** 
+ * @param name
+ */
+{template .name}
+  <div class="name">
+    <div class="text">{$name}</div>
+  </div>
+{/template}
+
 
 /**
  * @param program

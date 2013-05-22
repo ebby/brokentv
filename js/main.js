@@ -271,12 +271,12 @@ brkn.Main.init = function(response, channels, programs, currentUser) {
 	brkn.model.Analytics.getInstance().login();
 	
 	// UserVoice
-  var uvOptions = {};
-  (function() {
-    var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
-    uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/WGHjF5nSR8jL1GxXyQNxWA.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
-  })();
+	//  var uvOptions = {};
+	//  (function() {
+	//    var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
+	//    uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/WGHjF5nSR8jL1GxXyQNxWA.js';
+	//    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
+	//  })();
 };
 
 brkn.Main.staticInit = function() {

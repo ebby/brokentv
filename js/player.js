@@ -547,6 +547,7 @@ brkn.Player.prototype.onPlayerReady_ = function(event) {
       this.playProgram(this.currentProgram_);
     } else if (this.player_.getPlayerState()) {
       // If we did and cued the video
+      this.player_.setPlaybackQuality('large');
       var seek = this.currentProgram_.async ? this.currentProgram_.seek :
           (goog.now() - this.currentProgram_.time.getTime())/1000;
       this.player_.seekTo(seek);

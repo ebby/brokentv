@@ -60,23 +60,35 @@
       </div>
     </div>
   </div>
-  <div id="guide" class="guide timeless{if $guide}{sp}toggled{else}{sp}collapsed{/if}{if $sidebar}{sp}sidebar-toggled{/if}">
-    <div id="channels" class="channels">
+  <div id="guide" class="guide timeless position-hack{if $guide}{sp}toggled{else}{sp}collapsed{/if}{if $sidebar}{sp}sidebar-toggled{/if}">
+    <div class="channel-scrollable">
       <div id="channel-names" class="channel-names"></div>
+      <div class="channel-h-scrollable">
+        <div id="channels" class="channels"></div>
+      </div>
     </div>
     <div class="header" id="header">
       <div class="times">
+        <div id="schedule-toggle" class="schedule-toggle">
+          <div class="fader">
+            <div class="timeless"></div>
+            <div class="switcher">
+              <div class="switch"></div>
+            </div>
+            <div class="scheduled"></div>
+          </div>
+        </div>
         <div id="now-left" class="left browse">&#9664;<span> NOW</span></div>
         <div id="now-right" class="right browse"><span>NOW </span>&#x25B6;</div>
       </div>
-    </div>
-    <div id="my-ticker" class="my-ticker" style="display:none">
-      <div class="me" style="background:{$user.color};border-color:{$user.color};">
-        <img src="{$user.picture}"/>
+      <div id="ticker" class="ticker">
+        <div id="go-live" class="go-live">GO LIVE</div>
       </div>
-    </div>
-    <div id="ticker" class="ticker">
-      <div id="go-live" class="go-live">GO LIVE</div>
+      <div id="my-ticker" class="my-ticker" style="display:none">
+        <div class="me" style="background:{$user.color};border-color:{$user.color};">
+          <img src="{$user.picture}"/>
+        </div>
+      </div>
     </div>
     <div class="pan-handle" id="pan-handle"></div>
     <div id="right-grad"></div>
