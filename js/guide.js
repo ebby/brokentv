@@ -460,9 +460,11 @@ brkn.Guide.prototype.enterDocument = function() {
       this.changeChannel, this);
   brkn.model.Channels.getInstance().subscribe(brkn.model.Channels.Actions.NEXT_PROGRAM,
       goog.bind(function() {
-        goog.Timer.callOnce(goog.bind(function() {
-          this.align_(true);
-        }, this));
+        if (!this.dragging_) {
+          goog.Timer.callOnce(goog.bind(function() {
+            this.align_(true);
+          }, this));
+        }
       }, this));
   brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_ADMIN,
       function(show) {

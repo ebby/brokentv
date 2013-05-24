@@ -8,7 +8,12 @@ class Message(db.Model):
   to_user = db.ReferenceProperty(User, collection_name='to_user')
   text = db.StringProperty()
   acl = db.StringListProperty()
+  read = db.BooleanProperty(default=False)
   time = db.DateTimeProperty(auto_now_add=True)
+  
+  @property
+  def id(self):
+    return str(self.key().id())
 
   @classmethod
   def add(cls, from_user, to_user, text):
@@ -37,7 +42,7 @@ class Message(db.Model):
       if not ms:
         unique_senders = []
         senders = {}
-        ms = [1]
+        #ms = [1]
         while len(unique_senders) < 10:
           ms = Message.all().filter('to_user =', user1).order('-time').fetch(limit=limit, offset=offset)
           if not len(ms):
@@ -52,11 +57,27 @@ class Message(db.Model):
         memcache.set(user1.id, user_obj)
     return ms
 
+  def set_read(self):
+    self.read = True
+    self.put()
+    
+    user_obj = memcache.get(self.to_user.id) or {}
+    ms = user_obj.get('messages')
+    updated = False
+    for m in ms:
+      if m['id'] == self.id:
+        m['read'] = True
+        updated = True
+    if updated:
+      user_obj['messages'] = ms
+      memcache.set(self.to_user.id, user_obj)
+
   def toJson(self):
     json = {}
-    json['id'] = str(self.key().id())
+    json['id'] = self.id
     json['from_user'] = self.from_user.toJson()
     json['to_user'] = self.to_user.toJson()
     json['text'] = self.text
+    json['read'] = self.read
     json['time'] = self.time.isoformat()
     return json

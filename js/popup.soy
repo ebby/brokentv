@@ -13,11 +13,14 @@
 
 /**
  * @param text
+ * @param? link
  */
 {template .tooltip}
-  <div class="tooltip">
-    {$text}
-  </div>
+  {if $link}<a href="{$link}">{/if}
+    <div class="tooltip">
+      {$text}
+    </div>
+  {if $link}</a>{/if}
 {/template}
 
 

@@ -475,6 +475,19 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
   if (this.lastInput_) {
     this.setInput(this.lastInput_);
   }
+  
+  brkn.Popup.getInstance().hovercard(this.plusButton_.getElement(), brkn.model.Popup.Position.LEFT,
+      brkn.model.Popup.Action.TOOLTIP, {'text': 'Add to Queue'});
+  brkn.Popup.getInstance().hovercard(this.fbButton_.getElement(), brkn.model.Popup.Position.LEFT,
+      brkn.model.Popup.Action.TOOLTIP, {'text': 'Post to Facebook'});
+  brkn.Popup.getInstance().hovercard(this.twitterButton_.getElement(), brkn.model.Popup.Position.LEFT,
+      brkn.model.Popup.Action.TOOLTIP, {'text': 'Tweet'});
+  brkn.Popup.getInstance().hovercard(this.starToggle_.getElement(), brkn.model.Popup.Position.LEFT,
+      brkn.model.Popup.Action.TOOLTIP, {'text': 'Save'});
+  brkn.Popup.getInstance().hovercard(goog.dom.getElementByClass('eye-icon', this.getElement()),
+      brkn.model.Popup.Position.LEFT, brkn.model.Popup.Action.TOOLTIP, {'text': 'Seen by'});
+  brkn.Popup.getInstance().hovercard(goog.dom.getElementByClass('friends-icon', this.getElement()),
+      brkn.model.Popup.Position.LEFT, brkn.model.Popup.Action.TOOLTIP, {'text': 'Visible by only your Facebook friends'});
 
   this.media_.subscribe(brkn.model.Media.Actions.ADD_COMMENT, function(comment) {
     this.addComment_(comment, true);
@@ -837,26 +850,13 @@ brkn.sidebar.Info.prototype.addViewer_ = function(user, online) {
       this.getHandler()
           .listen(viewerEl, goog.events.EventType.CLICK, function() {
             brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.PROFILE, user);
-          })
-          .listen(viewerEl, goog.events.EventType.MOUSEOVER, function() {
-            var pos = goog.style.getPosition(viewerEl);
-            var containerPos = goog.style.getPosition(this.viewersEl_);
-            var hovercard = goog.dom.getElement('hovercard');
-            goog.dom.setTextContent(hovercard, user.firstName() +
-                (goog.dom.classes.has(viewerEl, 'online') ? ' is watching' : ' saw this'));
-            var cardSize = goog.style.getSize(hovercard);
-            hovercard.style.right = 320 - containerPos.x - pos.x - cardSize.width/2 - 12 + 'px';
-            hovercard.style.top = containerPos.y + pos.y + 13 + 'px';
-            goog.style.showElement(hovercard, true);
-          })
-          .listen(viewerEl, goog.events.EventType.MOUSEOUT, function(e) {
-            var hovercard = goog.dom.getElement('hovercard');
-            goog.style.showElement(hovercard, false);
           });
+      brkn.Popup.getInstance().hovercard(viewerEl, brkn.model.Popup.Position.TOP,
+          brkn.model.Popup.Action.TOOLTIP, {'text': user.firstName() +
+              (goog.dom.classes.has(viewerEl, 'online') ? ' is watching' : ' saw this')});
     }
+
     goog.style.showElement(this.viewersEl_, true);
-//    goog.dom.setTextContent(goog.dom.getElementByClass('status', this.viewersEl_),
-//        'WATCHING' + (this.hasSeen_ ? ' + SEEN' : ''));
     goog.dom.classes.enable(this.viewerEls_[user.id], 'online', online);
   }
 };

@@ -78,7 +78,9 @@ brkn.sidebar.Profile.prototype.decorateInternal = function(el) {
 
   goog.dom.classes.add(el, 'profile');
   goog.dom.classes.add(el, 'ios-scroll');
-  soy.renderElement(el, brkn.sidebar.profile);
+  soy.renderElement(el, brkn.sidebar.profile, {
+    myProfile: this.user_.id == brkn.model.Users.getInstance().currentUser.id
+  });
 };
 
 
@@ -91,9 +93,16 @@ brkn.sidebar.Profile.prototype.enterDocument = function() {
       '/_message/' + this.user_.id,
       goog.bind(function(e) {
         var response = /** @type {Array.<Object>} */ e.target.getResponseJson();
+        var unreadCount = 0;
         var messages = goog.array.map(response, function(m) {
-          return new brkn.model.Message(m);
+          var message = new brkn.model.Message(m);
+          unreadCount += (!message.read ? 1 : 0);
+          return message;
         }, this);
+        if (this.user_.id == brkn.model.Users.getInstance().currentUser.id) {
+          brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NEW_MESSAGES,
+              unreadCount);
+        }
         this.messages_ = new brkn.sidebar.Messages(this.user_, messages);
         this.messages_.decorate(goog.dom.getElementByClass('messages-content', this.getElement()));
       }, this));

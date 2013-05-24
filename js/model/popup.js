@@ -27,3 +27,13 @@ brkn.model.Popup.Action = {
   TOOLTIP: 'tooltip',
   HIDE: 'hide'
 };
+
+
+/**
+ * @enum {string}
+ */
+brkn.model.Popup.Position = {
+  TOP: 'top',
+  LEFT: 'left',
+  RIGHT: 'right'
+};

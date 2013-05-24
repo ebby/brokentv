@@ -1,31 +1,8 @@
 div.popup {
-/*	width: 260px;
-	min-height: 55px;
-	background: rgba(255,255,255,.9);
-	border: 1px solid #ccc;
-	.border-radius(3px);
-	.box-shadow(0, 0, 5px, 2px, rgba(255, 255, 255, 0.3));
-	z-index: 999;
-  position: absolute;
-  
-	&&.left::after {
-		content: "";
-		position: absolute;
-		top: 50%;
-		left: -10px;
-		border-width: 7px 10px 7px 0;
-		border-style: solid;
-		border-color: transparent rgba(255, 255, 255, .9);
-		display: block;
-		width: 0;
-		margin-top: -7px;
-	} */
-	
 	text-align: center;
   .transition(opacity, .3s, ease);
   position: absolute;
   padding: 5px;
-  margin-left: -5px;
   white-space: nowrap;
   .border-radius(3px);
   background: #dedede;
@@ -39,7 +16,6 @@ div.popup {
   cursor: pointer;
   z-index: 999999;
   &:after, &:before {
-    top: 100%;
     border: solid transparent;
     content: " ";
     height: 0;
@@ -47,19 +23,41 @@ div.popup {
     position: absolute;
     pointer-events: none;
   }
-  &:after {
+  &.top:after {
+    top: 100%;
     border-color: rgba(222, 222, 222, 0);
     border-top-color: #dedede;
     border-width: 5px;
     left: 50%;
     margin-left: -5px;
   }
-  &:before {
+  &.top:before {
+    top: 100%;
     border-color: rgba(204, 204, 204, 0);
     border-top-color: rgba(0, 0, 0, .6);
     border-width: 6px;
     left: 50%;
     margin-left: -6px;
+  }
+  &.left:after {
+    left: 100%;
+    border-color: rgba(222, 222, 222, 0);
+    border-left-color: #dedede;
+    border-width: 5px;
+    top: 50%;
+    margin-top: -5px;
+  }
+  &.left:before {
+    left: 100%;
+    border-color: rgba(204, 204, 204, 0);
+    border-left-color: rgba(0, 0, 0, .6);
+    border-width: 6px;
+    top: 50%;
+    margin-top: -6px;
+  }
+  a {
+    color: #181818;
+    text-decoration: none;
   }
 	
 	div.select-program {

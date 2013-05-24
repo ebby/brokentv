@@ -505,12 +505,13 @@
 
 
 /**
+ * @param? myProfile
  */
 {template .profile}
   <div class="tabbed messages">
     <ul class="tabs">
       <li class="tab messages">
-        <div class="label">MESSAGES</div>
+        <div class="label">{if $myProfile}INBOX{else}MESSAGES{/if}</div>
       </li>
       <li class="tab activity">
         <div class="label">ACTIVITY</div>

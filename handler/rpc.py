@@ -388,6 +388,12 @@ class MessageHandler(BaseHandler):
     from_id = self.request.get('from_id')
     to_id = self.request.get('to_id')
     text = self.request.get('text')
+    id = self.request.get('id')
+    has_read = self.request.get('read')
+    if id and has_read:
+      message = Message.get_by_id(int(id))
+      message.set_read()
+      return
     if from_id and to_id and text:
       from_user = User.get_by_key_name(from_id)
       to_user = User.get_by_key_name(to_id)

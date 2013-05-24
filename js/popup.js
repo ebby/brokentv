@@ -34,6 +34,18 @@ brkn.Popup = function() {
       goog.bind(this.setVisible, this, false));
   goog.events.listen(this, goog.ui.PopupBase.EventType.HIDE,
       this.onHideInternal_);
+  
+  /**
+   * @type {boolean}
+   * @private
+   */
+  this.hovered_ = false;
+  
+  /**
+   * @type {boolean}
+   * @private
+   */
+  this.shouldClose_ = false;
 
   /**
    * @type {brkn.model.Popup}
@@ -46,6 +58,16 @@ brkn.Popup = function() {
       this.showForSelectProgram_, this);
   this.model_.subscribe(brkn.model.Popup.Action.HIDE,
       this.hide_, this);
+  
+  goog.events.listen(this.getElement(), goog.events.EventType.MOUSEOVER, goog.bind(function() {
+    this.hovered_ = true;
+  }, this));
+  goog.events.listen(this.getElement(), goog.events.EventType.MOUSEOUT, goog.bind(function(e) {
+    this.hovered_ = false;
+    if (this.shouldClose_) {
+      this.model_.publish(brkn.model.Popup.Action.HIDE);
+    }
+  }, this));
 };
 goog.inherits(brkn.Popup, goog.ui.Popup);
 goog.addSingletonGetter(brkn.Popup);
@@ -58,6 +80,13 @@ brkn.Popup.prototype.suggestInput_;
 
 
 /**
+ * @type {number}
+ * @private
+ */
+brkn.Popup.prototype.closeTimer_;
+
+
+/**
  * @type {string}
  * @constant
  */
@@ -67,15 +96,25 @@ brkn.Popup.YOUTUBE_DATA = 'https://gdata.youtube.com/feeds/api/videos/%s?v=2&alt
 /**
  * Show popup for a like object.
  * @param {Element} anchor The like element.
+ * @param {brkn.model.Popup.Position} pos
  * @param {string} action
  * @param {?Object=} opt_args 
  */
-brkn.Popup.prototype.hovercard = function(anchor, action, opt_args) {
+brkn.Popup.prototype.hovercard = function(anchor, pos, action, opt_args) {
   goog.events.listen(anchor, goog.events.EventType.MOUSEOVER, goog.bind(function() {
-    this.model_.publish(action, anchor, opt_args);
+    this.closeTimer_ && goog.Timer.clear(this.closeTimer_);
+    this.shouldClose_ = false;
+    this.model_.publish(action, anchor, pos, opt_args);
   }, this));
-  goog.events.listen(anchor, goog.events.EventType.MOUSEOUT, goog.bind(function() {
-    this.model_.publish(brkn.model.Popup.Action.HIDE);
+  goog.events.listen(anchor, goog.events.EventType.MOUSEOUT, goog.bind(function(e) {
+    this.closeTimer_ = goog.Timer.callOnce(goog.bind(function() {
+      if (!this.hovered_) {
+        this.model_.publish(brkn.model.Popup.Action.HIDE);
+      } else {
+        this.shouldClose_ = true;
+      }
+    }, this), 100);
+    
   }, this));
 }
 
@@ -85,17 +124,30 @@ brkn.Popup.prototype.hovercard = function(anchor, action, opt_args) {
  * reposition if it doesn't fit in the viewport.
  *
  * @param {Element} anchor The anchor element.
+ * @param {brkn.model.Popup.Position} pos
  */
-brkn.Popup.prototype.positionAtAnchor = function(anchor) {
-  this.setPinnedCorner(goog.positioning.Corner.BOTTOM_LEFT);
-  var topMargin = -1 * (goog.style.getSize(anchor).height +
-      goog.style.getSize(this.getElement()).height) / 2;
-  var leftMargin = -1 * (goog.style.getSize(this.getElement()).width -
-      goog.style.getSize(anchor).width) / 2;
-  this.setMargin(0, 3, 6, leftMargin);
-  this.setPosition(new goog.positioning.AnchoredViewportPosition(
-      anchor,
-      goog.positioning.Corner.TOP_START));
+brkn.Popup.prototype.positionAtAnchor = function(anchor, pos) {
+  if (pos == brkn.model.Popup.Position.TOP) {
+    this.setPinnedCorner(goog.positioning.Corner.BOTTOM_LEFT);
+    var leftMargin = -1 * (goog.style.getSize(this.getElement()).width -
+        goog.style.getSize(anchor).width) / 2;
+    this.setMargin(0, 0, 6, leftMargin);
+    this.setPosition(new goog.positioning.AnchoredViewportPosition(
+        anchor,
+        goog.positioning.Corner.TOP_START));
+    goog.dom.classes.set(this.getElement(), 'popup');
+    goog.dom.classes.add(this.getElement(), 'top');
+  } else if (pos == brkn.model.Popup.Position.LEFT) {
+    this.setPinnedCorner(goog.positioning.Corner.TOP_LEFT);
+    var topMargin = -1 * (goog.style.getSize(this.getElement()).height -
+        goog.style.getSize(anchor).height) / 2;
+    this.setMargin(topMargin, 6, 0, 0);
+    this.setPosition(new goog.positioning.AnchoredViewportPosition(
+        anchor,
+        goog.positioning.Corner.TOP_END));
+    goog.dom.classes.set(this.getElement(), 'popup');
+    goog.dom.classes.add(this.getElement(), 'left');
+  }
 };
 
 
@@ -116,25 +168,17 @@ brkn.Popup.prototype.getContentElement = function() {
 /**
  * Show popup for a like object.
  * @param {Element} anchor The like element.
+ * @param {brkn.model.Popup.Position} pos
  * @param {Object} args 
  * @private
  */
-brkn.Popup.prototype.showTooltip_ = function(anchor, args) {
+brkn.Popup.prototype.showTooltip_ = function(anchor, pos, args) {
   this.setVisible(false);
-  this.positionAtAnchor(anchor);
-//  this.setMargin(0, 0, 0, -goog.style.getSize(anchor).width/2);
-//  this.setPinnedCorner(goog.positioning.Corner.TOP_LEFT);
-//  var topMargin = -1 * (goog.style.getSize(this.getElement()).height -
-//      goog.style.getSize(anchor).height) / 2;
-//  this.setMargin(topMargin, 0, 0, 5);
-//  this.setPosition(new goog.positioning.AnchoredViewportPosition(
-//      anchor,
-//      goog.positioning.Corner.TOP_END));
-  
-  goog.dom.classes.add(this.getElement(), 'left');
+  this.positionAtAnchor(anchor, pos);
   
   soy.renderElement(this.getContentElement(), brkn.popup.tooltip, {
-    text: args['text']
+    text: args['text'],
+    link: args['link']
   });
   this.setVisible(true);
 }

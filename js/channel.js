@@ -436,12 +436,9 @@ brkn.Channel.prototype.addViewer = function(session) {
 
     if (!session.tuneOut || session.tuneOut.getTime() > this.minTime_.getTime()) {
       var lineEl = soy.renderAsElement(brkn.channel.line, {
-        user: session.user,
-        firstName: session.user.firstName().toUpperCase(),
-        channelId: session.channel.id
+        user: session.user
       });
       goog.dom.appendChild(userEl, lineEl);
-      var watchWith = goog.dom.getElementByClass('watch-with', lineEl);
       var tuneInTime = Math.max(session.tuneIn.getTime(), this.minTime_.getTime());
       var offset = (tuneInTime - this.minTime_.getTime()) / 1000 *
           brkn.model.Channels.getInstance().pixelsPerSecond + brkn.Guide.NAME_WIDTH;
@@ -449,12 +446,15 @@ brkn.Channel.prototype.addViewer = function(session) {
       goog.style.setWidth(lineEl, elapsed);
       goog.style.setPosition(lineEl, offset);
       goog.style.setStyle(lineEl, 'background', session.user.color);
-      goog.style.setStyle(watchWith, 'margin-left', -goog.style.getSize(watchWith).width/2 + 14 + 'px');
       this.getHandler().listen(lineEl, goog.events.EventType.CLICK, function(e) {
         if (!goog.dom.getAncestorByClass(e.target, 'watch-with')) {
           brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.PROFILE, session.user)
         }
       });
+      brkn.Popup.getInstance().hovercard(goog.dom.getElementByClass('pic', lineEl),
+          brkn.model.Popup.Position.TOP, brkn.model.Popup.Action.TOOLTIP,
+          {'text': 'JOIN ' + session.user.firstName().toUpperCase(),
+           'link': '#channel:' + session.channel.id});
     }
   }
 };

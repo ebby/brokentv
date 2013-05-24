@@ -199,9 +199,9 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
           goog.ui.Component.EventType.ACTION,
           goog.bind(this.onAddComment_, this));
 
-  brkn.Popup.getInstance().hovercard(this.tweetToggle_.getElement(),
+  brkn.Popup.getInstance().hovercard(this.tweetToggle_.getElement(), brkn.model.Popup.Position.TOP,
       brkn.model.Popup.Action.TOOLTIP, {'text': 'Share on Twitter'});
-  brkn.Popup.getInstance().hovercard(this.fbToggle_.getElement(),
+  brkn.Popup.getInstance().hovercard(this.fbToggle_.getElement(), brkn.model.Popup.Position.TOP,
       brkn.model.Popup.Action.TOOLTIP, {'text': 'Share on Facebook'});
 
   brkn.model.Sidebar.getInstance().subscribe(brkn.model.Sidebar.Actions.REPLY_COMMENT,

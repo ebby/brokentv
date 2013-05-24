@@ -1,6 +1,7 @@
 goog.provide('brkn.sidebar.Messages');
 
 goog.require('soy');
+goog.require('brkn.model.Message');
 goog.require('brkn.model.User');
 goog.require('brkn.sidebar.CommentInput');
 goog.require('brkn.sidebar.messages');
@@ -132,6 +133,13 @@ brkn.sidebar.Messages.prototype.decorateInternal = function(el) {
     .listen(this.moreMessagesEl_, goog.events.EventType.CLICK, goog.bind(this.loadMore_, this));
   } else {
     this.messages_ = this.messages_.reverse();
+    brkn.model.Users.getInstance().currentUser.subscribe(brkn.model.User.Actions.READ_MESSAGE, function(fromId) {
+      var msgEl = this.messageMap_[fromId];
+      if (msgEl && goog.dom.classes.has(msgEl, 'unread')) {
+        goog.dom.classes.remove(msgEl, 'unread');
+        brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NEW_MESSAGES, -1);
+      }
+    }, this);
   }
   
   this.getHandler()
@@ -144,12 +152,20 @@ brkn.sidebar.Messages.prototype.decorateInternal = function(el) {
 
   brkn.model.Users.getInstance().subscribe(brkn.model.Users.Action.NEW_MESSAGE, function(m) {
     if (m.fromUser.id == this.user_.id || m.toUser.id == this.user_.id) {
+      var incr = true;
       if (this.inbox_) {
         // Remove last message by this sender
         var last = this.messageMap_[m.fromUser.id];
-        last && goog.dom.removeNode(last);
+        if (last) {
+          incr = !goog.dom.classes.has(last, 'unread');
+          goog.dom.removeNode(last);
+        }
       }
-      this.addMessage_(m, this.inbox_); 
+      if (brkn.model.Sidebar.getInstance().currentProfileId != m.fromUser.id && incr) {
+        // If we're not currently in the message screen
+        brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NEW_MESSAGES, 1);
+      }
+      this.addMessage_(m, this.inbox_);
       this.resize();
     }
   }, this);
@@ -200,7 +216,7 @@ brkn.sidebar.Messages.prototype.addMessage_ = function(message, opt_first) {
   this.moreMessagesEl_ && goog.style.showElement(this.moreMessagesEl_,
       !this.inbox_ && this.messages_.length >= 10);
   var timeEl;
-  if (this.lastMessage_ && this.lastMessage_.fromUser.id == message.fromUser.id) {
+  if (!this.inbox_ && this.lastMessage_ && this.lastMessage_.fromUser.id == message.fromUser.id) {
     var textEl = soy.renderAsElement(brkn.sidebar.messages.text, {
       message: message
     });
@@ -219,9 +235,15 @@ brkn.sidebar.Messages.prototype.addMessage_ = function(message, opt_first) {
       goog.dom.appendChild(this.messagesEl_, messageEl); 
     }
     timeEl = goog.dom.getElementByClass('timestamp', messageEl);
+    goog.dom.classes.enable(messageEl, 'unread', !message.read)
     if (this.inbox_) {
       this.messageMap_[message.fromUser.id] = messageEl;
       this.getHandler().listen(messageEl, goog.events.EventType.CLICK, goog.bind(function() {
+        if (!message.read) {
+          message.setRead();
+          goog.dom.classes.remove(messageEl, 'unread');
+          brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NEW_MESSAGES, -1);
+        }
         brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.PROFILE, message.fromUser);
       }, this));
     }
@@ -229,6 +251,9 @@ brkn.sidebar.Messages.prototype.addMessage_ = function(message, opt_first) {
   brkn.model.Clock.getInstance().addTimestamp(message.time, timeEl);
   if (!opt_first) {
     this.getElement().scrollTop = this.getElement().scrollHeight; 
+  }
+  if (!this.inbox_ && !message.read) {
+    message.setRead();
   }
 };
 

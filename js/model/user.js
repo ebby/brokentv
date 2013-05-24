@@ -205,7 +205,8 @@ brkn.model.User.prototype.getLastLogin = function (opt_time) {
  */
 brkn.model.User.Actions = {
   TWITTER_AUTH: 'twitter-auth',
-  SET_STARRED: 'set-starred'
+  SET_STARRED: 'set-starred',
+  READ_MESSAGE: 'read-message'
 };
 
 

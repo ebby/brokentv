@@ -244,7 +244,7 @@ div.controller div.progress div.current-time {
   position: absolute;
   right: 40px;
   top: -18px;
-  font-size: 11px;
+  font-size: 10px;
   font-family: MuseoSans300;
   color: #f5f5f5;
   text-shadow: 1px 1px 1px #666;
@@ -253,7 +253,7 @@ div.controller div.progress div.duration {
   position: absolute;
   right: 0;
   top: -18px;
-  font-size: 11px;
+  font-size: 10px;
   font-family: MuseoSans300;
   color: #f5f5f5;
   text-shadow: 1px 1px 1px #666;
@@ -2910,28 +2910,6 @@ div.vote div.dislike.checked {
   opacity: .9;
 }
 div.popup {
-  /*	width: 260px;
-	min-height: 55px;
-	background: rgba(255,255,255,.9);
-	border: 1px solid #ccc;
-	.border-radius(3px);
-	.box-shadow(0, 0, 5px, 2px, rgba(255, 255, 255, 0.3));
-	z-index: 999;
-  position: absolute;
-  
-	&&.left::after {
-		content: "";
-		position: absolute;
-		top: 50%;
-		left: -10px;
-		border-width: 7px 10px 7px 0;
-		border-style: solid;
-		border-color: transparent rgba(255, 255, 255, .9);
-		display: block;
-		width: 0;
-		margin-top: -7px;
-	} */
-
   text-align: center;
   -webkit-transition: opacity 0.3s ease;
   -moz-transition: opacity 0.3s ease;
@@ -2940,7 +2918,6 @@ div.popup {
   transition: opacity 0.3s ease;
   position: absolute;
   padding: 5px;
-  margin-left: -5px;
   white-space: nowrap;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
@@ -2960,7 +2937,6 @@ div.popup {
 }
 div.popup:after,
 div.popup:before {
-  top: 100%;
   border: solid transparent;
   content: " ";
   height: 0;
@@ -2968,19 +2944,41 @@ div.popup:before {
   position: absolute;
   pointer-events: none;
 }
-div.popup:after {
+div.popup.top:after {
+  top: 100%;
   border-color: rgba(222, 222, 222, 0);
   border-top-color: #dedede;
   border-width: 5px;
   left: 50%;
   margin-left: -5px;
 }
-div.popup:before {
+div.popup.top:before {
+  top: 100%;
   border-color: rgba(204, 204, 204, 0);
   border-top-color: rgba(0, 0, 0, 0.6);
   border-width: 6px;
   left: 50%;
   margin-left: -6px;
+}
+div.popup.left:after {
+  left: 100%;
+  border-color: rgba(222, 222, 222, 0);
+  border-left-color: #dedede;
+  border-width: 5px;
+  top: 50%;
+  margin-top: -5px;
+}
+div.popup.left:before {
+  left: 100%;
+  border-color: rgba(204, 204, 204, 0);
+  border-left-color: rgba(0, 0, 0, 0.6);
+  border-width: 6px;
+  top: 50%;
+  margin-top: -6px;
+}
+div.popup a {
+  color: #181818;
+  text-decoration: none;
 }
 div.popup div.select-program {
   margin-top: 20px;
@@ -3367,7 +3365,8 @@ div#sidebar div#toolbar ul.tabs li.tab div.label {
   color: #8d8d8d;
   text-shadow: 1px 1px 0 white;
 }
-div#sidebar div#toolbar ul.tabs li.tab div.activities-count {
+div#sidebar div#toolbar ul.tabs li.tab div.activities-count,
+div#sidebar div#toolbar ul.tabs li.tab div.inbox-count {
   position: absolute;
   height: 10px;
   background: #ff5555;
@@ -3627,16 +3626,17 @@ div#sidebar div.comment-input div.comment-controls {
   text-shadow: 1px 1px 1px white;
   top: 12px;
   position: absolute;
-  right: 65px;
+  right: 73px;
 }
 div#sidebar div.comment-input div.comment-toggle {
-  width: 20px;
+  width: 17px;
   height: 100%;
   display: inline-block;
   font-size: 12px;
   outline: none;
   cursor: pointer;
   position: relative;
+  text-align: center;
 }
 div#sidebar div.comment-input div.comment-toggle.tweet-toggle div.icon {
   font-family: 'icons';
@@ -4906,12 +4906,12 @@ div#sidebar div.messages div.separator {
   border-bottom: 1px solid #aaa;
 }
 div#sidebar div.messages.inbox div.message {
-  border-bottom: 1px solid #FFF;
+  border-bottom: 1px solid #999;
   -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
   -moz-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
   cursor: pointer;
-  background: #eee;
+  background: #dedede;
   margin-top: 0;
   padding: 7px 0;
 }
@@ -4924,8 +4924,14 @@ div#sidebar div.messages.inbox div.message:active {
 div#sidebar div.messages.inbox div.message:first-child {
   border-top: 1px solid #fff;
 }
+div#sidebar div.messages.inbox div.message.unread {
+  background: #eee;
+}
 div#sidebar div.messages.inbox div.message div.body {
   margin-bottom: 0;
+}
+div#sidebar div.messages.inbox div.message div.body div.timestamp {
+  display: block;
 }
 div#sidebar div.messages div.message {
   margin-top: 10px;
@@ -4950,21 +4956,23 @@ div#sidebar div.messages div.message div.body a {
   color: #181818;
   font-family: MuseoSans700;
 }
+div#sidebar div.messages div.message div.body div.texts {
+  position: relative;
+}
 div#sidebar div.messages div.message div.body div.texts:hover div.text div.timestamp {
   display: none;
 }
 div#sidebar div.messages div.message div.body div.text {
-  background: rgba(0, 0, 0, 0.1);
+  background: #f1f1f1;
   margin-top: 4px;
   padding: 5px;
   font-family: MuseoSans700;
-  font-size: 13px;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
-  -webkit-box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.2);
-  -moz-box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.2);
-  box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.2);
+  -webkit-box-shadow: inset 0 0 2px 1px rgba(0, 0, 0, 0.4);
+  -moz-box-shadow: inset 0 0 2px 1px rgba(0, 0, 0, 0.4);
+  box-shadow: inset 0 0 2px 1px rgba(0, 0, 0, 0.4);
 }
 div#sidebar div.messages div.message div.body div.text:last-child div.timestamp {
   display: block;
@@ -4977,7 +4985,7 @@ div#sidebar div.messages div.message div.body div.timestamp {
   font-size: 10px;
   font-family: MuseoSans300;
   position: absolute;
-  top: 0;
+  top: -17px;
   right: 0;
 }
 div#sidebar div.messages div.message div.picture {
@@ -5892,14 +5900,14 @@ div#notify div.note {
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
-  font-size: 13px;
+  font-size: 11px;
   margin: 5px;
   padding: 5px;
   position: relative;
   color: #ccc;
   text-shadow: 1px 1px 1px #181818;
   opacity: 0;
-  height: 55px;
+  height: 43px;
   overflow: hidden;
   visibility: hidden;
 }
@@ -5953,7 +5961,6 @@ div#notify div.note a {
   color: #181818;
 }
 div#notify div.note div.action {
-  font-size: 12px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -5982,7 +5989,7 @@ div#notify div.note div.picture img {
 div#notify div.note div.content {
   font-family: MuseoSans500;
   width: 200px;
-  height: 30px;
+  height: 27px;
   overflow: hidden;
   text-overflow: ellipsis;
 }

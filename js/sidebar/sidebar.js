@@ -83,6 +83,12 @@ brkn.Sidebar = function() {
    * @private
    */
   this.activitiesCount_ = 0;
+  
+  /**
+   * @type {number}
+   * @private
+   */
+  this.inboxCount_ = 0;
 };
 goog.inherits(brkn.Sidebar, goog.ui.Component);
 
@@ -163,6 +169,13 @@ brkn.Sidebar.prototype.friendListEl_;
 brkn.Sidebar.prototype.activitiesCountEl_;
 
 
+/**
+ * @type {Element}
+ * @private
+ */
+brkn.Sidebar.prototype.inboxCountEl_;
+
+
 /** @inheritDoc */
 brkn.Sidebar.prototype.enterDocument = function() {
   goog.base(this, 'enterDocument');
@@ -176,6 +189,7 @@ brkn.Sidebar.prototype.enterDocument = function() {
   this.toolbar_ = goog.dom.getElement('toolbar');
   this.tabsEl_ = goog.dom.getElementByClass('tabs', this.getElement());
   this.activitiesCountEl_ = goog.dom.getElementByClass('activities-count', this.getElement());
+  this.inboxCountEl_ = goog.dom.getElementByClass('inbox-count', this.getElement());
   var keyHandler = new goog.events.KeyHandler(document);
 
   goog.array.forEach(goog.dom.getChildren(this.tabsEl_), function(tab) {
@@ -281,6 +295,8 @@ brkn.Sidebar.prototype.enterDocument = function() {
       this.navigate, this);
   brkn.model.Sidebar.getInstance().subscribe(brkn.model.Sidebar.Actions.NEW_ACTIVITIES,
       this.newActivities_, this);
+  brkn.model.Sidebar.getInstance().subscribe(brkn.model.Sidebar.Actions.NEW_MESSAGES,
+      this.newMessages_, this);
   brkn.model.Sidebar.getInstance().subscribe(brkn.model.Sidebar.Actions.CONVERSATION,
       this.showConversation, this);
   brkn.model.Sidebar.getInstance().subscribe(brkn.model.Sidebar.Actions.MEDIA_LIST,
@@ -344,6 +360,22 @@ brkn.Sidebar.prototype.newActivities_ = function(count, opt_reset) {
   this.activitiesCount_ += count;
   goog.dom.setTextContent(this.activitiesCountEl_, this.activitiesCount_.toString());
   goog.style.showElement(this.activitiesCountEl_, !!this.activitiesCount_);
+};
+
+
+/**
+ * @param {number} count
+ * @param {?number=} opt_reset
+ * @private
+ */
+brkn.Sidebar.prototype.newMessages_ = function(count, opt_reset) {
+  if (opt_reset) {
+    this.inboxCount_ = 0;
+    goog.style.showElement(this.inboxCountEl_, false);
+  }
+  this.inboxCount_ += count;
+  goog.dom.setTextContent(this.inboxCountEl_, this.inboxCount_.toString());
+  goog.style.showElement(this.inboxCountEl_, !!this.inboxCount_);
 };
 
 
@@ -452,7 +484,9 @@ brkn.Sidebar.prototype.navigate = function(to, opt_back, opt_title) {
   if (opt_title) {
     goog.dom.setTextContent(goog.dom.getElementByClass('back-title', this.toolbar_), opt_title);
   }
-  
+  if (this.currentScreen_ != this.profileEl_) {
+    brkn.model.Sidebar.getInstance().currentProfileId = null;
+  }
 };
 
 
@@ -532,6 +566,7 @@ brkn.Sidebar.prototype.showProfile = function(user) {
       this.currentScreen_ == this.profileEl_) {
     return;
   }
+  brkn.model.Sidebar.getInstance().currentProfileId = user.id;
   this.profile_ = new brkn.sidebar.Profile(user);
   this.profile_.decorate(this.profileEl_);
   brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NAVIGATE,

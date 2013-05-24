@@ -233,11 +233,6 @@ brkn.model.Media.prototype.addComment = function(comment) {
     parentComment && parentComment.replies.push(comment);
   }
   this.commentCount += 1;
-  if (comment.user.id != brkn.model.Users.getInstance().currentUser.id) {
-    brkn.model.Notify.getInstance().publish(brkn.model.Notify.Actions.SHOW,
-        'commented on ' + this.name, comment.text, comment.user, comment.user.picture,
-        '#info:' + this.id);
-  }
 };
 
 

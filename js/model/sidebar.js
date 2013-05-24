@@ -17,9 +17,9 @@ goog.addSingletonGetter(brkn.model.Sidebar);
 
 
 /**
- * @type {boolean}
+ * @type {?string}
  */
-brkn.model.Sidebar.prototype.currentProfile; 
+brkn.model.Sidebar.prototype.currentProfileId; 
 
 
 /**
@@ -37,6 +37,7 @@ brkn.model.Sidebar.Actions = {
   FRIEND_LIST: 'friend-list',
   NAVIGATE: 'navigate',
   NEW_ACTIVITIES: 'new-activites',
+  NEW_MESSAGES: 'new-messages',
   MEDIA_INFO: 'media-info',
   MEDIA_LIST: 'media-list',
   REPLY_COMMENT: 'reply-comment',
