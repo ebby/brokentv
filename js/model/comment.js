@@ -81,6 +81,8 @@ brkn.model.Comment.add = function(user, mediaId, text, facebook, twitter, opt_pa
   });
   comment.user = user;
   comment.parentId = opt_parentId || null;
+  var media = brkn.model.Medias.getInstance().get(mediaId);
+  media.addComment(comment);
   goog.net.XhrIo.send(
       '/_comment',
       goog.bind(function(e) {

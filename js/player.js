@@ -210,7 +210,7 @@ brkn.Player.prototype.enterDocument = function() {
   brkn.model.Channels.getInstance().subscribe(brkn.model.Channels.Actions.NEXT_PROGRAM,
       function(program) {
         this.currentProgram_ = program;
-        //this.playProgram(program);
+        this.playProgram(program);
         this.updateStagecover_();
       }, this);
   brkn.model.Player.getInstance().subscribe(brkn.model.Player.Actions.PLAY_ASYNC,
@@ -399,7 +399,6 @@ brkn.Player.prototype.play = function(opt_media, opt_channel, opt_tries) {
     if (opt_media) {
       this.player_.cueVideoById(opt_media.hostId);
     } else if (opt_channel) {
-      window.console.log(opt_channel.asPlaylist())
       this.player_.cuePlaylist(opt_channel.asPlaylist(), opt_channel.currentProgramIndex);
     }
     goog.Timer.callOnce(goog.bind(function() {
