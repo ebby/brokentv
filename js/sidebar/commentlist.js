@@ -308,20 +308,18 @@ brkn.sidebar.CommentList.prototype.activateComment = function(comment, commentEl
   if (!comment.parentId) {
     this.lastCommentEl_[comment.id] = commentEl;
     // Handle reply input
-    var replyInput = goog.dom.getElementByClass('reply-textarea', commentEl);
-    var keyHandler = new goog.events.KeyHandler(replyInput);
-    this.getHandler().listen(keyHandler,
-        goog.events.KeyHandler.EventType.KEY,
-        goog.bind(function(e) {
-          e.stopPropagation();
-          if (e.keyCode == '13' && replyInput.value) {
-            e.preventDefault();
-            var reply = brkn.model.Comment.add(brkn.model.Users.getInstance().currentUser, 
-                this.media_.id, replyInput.value, false, false, comment.id, comment.user.id);
-            this.addComment(reply);
-            replyInput.value = '';
-          }
+    var replyInput = goog.dom.getElementByClass('reply-input', commentEl);
+    var replyTextarea = goog.dom.getElementByClass('reply-textarea', commentEl);
+    this.getHandler().listen(replyTextarea, goog.events.EventType.CLICK, goog.bind(function() {
+      if (!goog.dom.classes.has(replyInput, 'decorated')) {
+        var commentInput = new brkn.sidebar.CommentInput(false, true, true);
+        commentInput.decorate(replyInput);
+        commentInput.reply(comment, comment.user);
+        this.getHandler().listen(commentInput, 'add', goog.bind(function(e) {
+          this.onAddComment_(e);
         }, this));
+      }
+    }, this));
   }
 };
 

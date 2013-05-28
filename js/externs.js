@@ -49,7 +49,9 @@ YT.Player.prototype.getPlayerState;
 YT.Player.prototype.getCurrentTime;
 
 YT.Player.prototype.cueVideoById;
+YT.Player.prototype.cuePlaylist;
 YT.Player.prototype.loadVideoById;
+YT.Player.prototype.loadPlaylist;
 YT.Player.prototype.playVideo;
 YT.Player.prototype.pauseVideo;
 YT.Player.prototype.seekTo;

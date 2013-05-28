@@ -391,7 +391,9 @@ brkn.Guide.prototype.enterDocument = function() {
     .listen(this.dragger_,
         goog.fx.Dragger.EventType.END,
         goog.bind(function() {
-          goog.dom.classes.remove(this.getElement(), 'drag');
+          goog.Timer.callOnce(goog.bind(function() {
+            goog.dom.classes.remove(this.getElement(), 'drag'); 
+          }, this));
           goog.dom.classes.add(this.getElement(), 'animate');
           this.dragging_ = false;
           this.aligned_ = false;

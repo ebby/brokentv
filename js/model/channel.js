@@ -112,6 +112,16 @@ brkn.model.Channel.prototype.addProgram = function(program) {
 
 
 /**
+ * @return {Array}
+ */
+brkn.model.Channel.prototype.asPlaylist = function() {
+  return goog.array.map(this.programming, function(p) {
+    return p.media.hostId;
+  })
+}
+
+
+/**
  * @param {?Function=} opt_callback
  */
 brkn.model.Channel.prototype.fetchQueue = function(opt_callback) {

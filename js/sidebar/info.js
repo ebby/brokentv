@@ -408,9 +408,7 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
             if (!goog.dom.getAncestorByClass(e.target, 'comment-input') &&
                 !this.commentInput_.getValue()) {
               this.commentInput_.setFocused(false);
-              if (this.commentInput_.collapse()) {
-                this.resize(0);
-              }
+              this.resize(0);
             }
           }, this))
       .listen(img,
@@ -828,19 +826,6 @@ brkn.sidebar.Info.prototype.activateComment_ = function(comment, commentEl) {
         }, this));
       }
     }, this));
-//    var keyHandler = new goog.events.KeyHandler(replyInput);
-//    this.getHandler().listen(keyHandler,
-//        goog.events.KeyHandler.EventType.KEY,
-//        goog.bind(function(e) {
-//          e.stopPropagation();
-//          if (e.keyCode == '13' && replyInput.value) {
-//            e.preventDefault();
-//            var reply = brkn.model.Comment.add(brkn.model.Users.getInstance().currentUser, 
-//                this.media_.id, replyInput.value, false, false, comment.id, comment.user.id);
-//            this.addComment_(reply);
-//            replyInput.value = '';
-//          }
-//        }, this));
   }
 };
 

@@ -121,12 +121,6 @@ brkn.sidebar.Conversation.prototype.enterDocument = function() {
         this.navigate_(tabEl);
       }, this))
       .listen(this.commentInput_, 'add', goog.bind(this.onAddComment_, this))
-//      .listen(this.commentInput_,
-//          goog.events.EventType.FOCUS,
-//          goog.bind(function(e) {
-//            this.commentList_.resize();
-//            this.tweetList_.resize();
-//          }, this))
       .listen(this.commentInput_,
           'resize',
           goog.bind(function(e) {
@@ -140,10 +134,6 @@ brkn.sidebar.Conversation.prototype.enterDocument = function() {
             if (!goog.dom.getAncestorByClass(e.target, 'comment-input') &&
                 !this.commentInput_.getValue()) {
               this.commentInput_.setFocused(false);
-              this.commentInput_.collapse();
-//              goog.dom.classes.has(this.getElement().firstChild, 'comments') ?
-//                  this.commentList_.resize(brkn.sidebar.CommentInput.INPUT_HEIGHT) :
-//                  this.tweetList_.resize(brkn.sidebar.CommentInput.INPUT_HEIGHT);
             }
           }, this))
       .listen(goog.dom.getElementByClass('no-comments', this.getElement()),

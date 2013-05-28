@@ -275,7 +275,7 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
                 var suggestionInput = this.commentInput_.getValue().slice(0,
                     this.commentInput_.getElement().selectionStart);
                 suggestionInput = suggestionInput.split(' ').pop()
-                var user = this.suggestions_.reverse()[this.cursorIndex_];
+                var user = this.suggestions_[this.cursorIndex_];
                 this.tokens_[user.id] = user;
                 this.updateTokens_(suggestionInput.match(brkn.sidebar.CommentInput.MENTION_REGEX)[0]);
                 this.commentInput_.getElement().focus();
@@ -466,21 +466,6 @@ brkn.sidebar.CommentInput.prototype.setValue = function(text, opt_facebook, opt_
   this.value = text;
   this.addCommentButton_.setEnabled(!!text);
 };
-
-
-/**
- * @return {boolean} true if collapsing, false if already collapsed
- */
-brkn.sidebar.CommentInput.prototype.collapse = function() {
-//  if (goog.style.getPosition(this.commentControls_).y !=
-//      brkn.sidebar.CommentInput.COMMENT_CONTROLS_HEIGHT) {
-//    goog.style.setPosition(this.commentControls_, 0,
-//        brkn.sidebar.CommentInput.COMMENT_CONTROLS_HEIGHT);
-//    return true;
-//  } else {
-//    return false;
-//  }
-}
 
 
 /**

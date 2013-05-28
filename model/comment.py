@@ -21,7 +21,7 @@ class Comment(db.Model):
     return query.order('time').fetch(limit, offset)
 
   @classmethod
-  def add(cls, media, user, text, acl, parent_id=None):
+  def add(cls, media, user, text, acl, parent_id=None, to_user=None):
     from notification import Notification
     
     c = Comment(media=media, user=user, text=text)
@@ -39,9 +39,10 @@ class Comment(db.Model):
     media.put()
     
     for m in c.mentions:
-      user = User.get_by_key_name(m)
-      n = Notification.add(user, constants.NotificationType.MENTION, c)
-      broadcast.broadcastNotification(n)
+      if m != to_user.id: 
+        user = User.get_by_key_name(m)
+        n = Notification.add(user, constants.NotificationType.MENTION, c)
+        broadcast.broadcastNotification(n)
 
     if c.is_parent:
       from useractivity import UserActivity

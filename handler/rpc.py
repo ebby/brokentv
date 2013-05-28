@@ -345,7 +345,7 @@ class CommentHandler(BaseHandler):
       if self.current_user.demo:
         acl += SUPER_ADMINS
       c = Comment.add(media, self.current_user, text,
-                      acl=acl, parent_id=parent_id)
+                      acl=acl, parent_id=parent_id, to_user=to_user)
       
       new_tweet = None
       if tweet:

@@ -305,7 +305,9 @@ brkn.Channel.prototype.addProgram = function(program) {
 	goog.dom.classes.enable(programEl, 'clipped', clipped);
 
 	this.getHandler().listen(programEl, goog.events.EventType.CLICK, function() {
-	  brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.MEDIA_INFO, program.media);
+	  if (!goog.dom.classes.has(goog.dom.getElement('guide'), 'drag')) {
+	    brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.MEDIA_INFO, program.media);
+	  }
 	});
 	
 	var programWidth = goog.dom.classes.has(programEl, 'clipped') ? 200 :
