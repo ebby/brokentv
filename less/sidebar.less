@@ -355,21 +355,49 @@ div#sidebar {
       }
     }
   }
+  div.comment-input, div.reply-input {
+    div.suggestions {
+      position: absolute;
+      bottom: 100%;
+      max-height: 100px;
+      overflow: hidden;
+      background: rgba(0, 0, 0, .7);
+      color: #f5f5f5;
+      text-shadow: 1px 1px 1px #181818;
+      width: 100%;
+      border-top-left-radius: 3px;
+      border-top-right-radius: 3px;
+      div.suggestion {
+        height: 15px;
+        padding: 5px;
+        border-bottom: 1px solid #999;
+        font-family: MuseoSans700;
+        font-size: 11px;
+        cursor: pointer;
+        &:hover, &.selected {
+          background: rgba(110, 179, 194, 0.7);
+        }
+      }
+    }
+  }
   div.comment-input {
     visibility: hidden;
     opacity: 0;
     width: 100%;
-    min-height: 31px;
+    min-height: 40px;
     position: absolute;
-    bottom: 42px;
-    
+    bottom: 41px;
+    background: #f7f7f7;
+    border-top: 1px solid #ccc;
+    .box-shadow(e('0 -1px 4px 0 rgba(0, 0, 0, 0.3), inset 4px -2px 6px -3px rgba(0, 0, 0, 0.4)'));
     div.comment-controls {
       height: 24px;
       color: #444;
       text-shadow: 1px 1px 1px white;
-      top: 12px;
+      top: 10px;
       position: absolute;
       right: 73px;
+      z-index: 1;
     }
     div.comment-toggle {
       width: 17px;
@@ -407,7 +435,7 @@ div#sidebar {
       cursor: pointer;
       position: absolute;
       right: 10px;
-      top: 9px;
+      top: 8px;
       border: 1px solid #aaa;
       .border-radius(3px);
       background: #e5e5e5;
@@ -449,33 +477,45 @@ div#sidebar {
       }
     }
     div.input-holder {
-      background: #f7f7f7;
-      width: 100%;
-      height: 100%;
-      border-top: 1px solid #ccc;
-      .box-shadow(e('0 -1px 4px 0 rgba(0, 0, 0, 0.3), inset 4px -2px 6px -3px rgba(0, 0, 0, 0.4)'));
       position: relative;
+      border: 1px solid #aaa;
+      .border-radius(3px);
+      background: #fff;
+      left: 10px;
+      top: 8px;
+      width: 238px;
+      min-height: 22px;
+      margin-bottom: 16px;
+      div.textarea-holder {
+        position: absolute;
+      }
       textarea {
-        margin-left: 10px;
-        margin-top: 8px;
-        margin-bottom: 3px;
+        background: transparent;
+        border: none;
+        margin: 0;
+        padding-bottom: 0;
+        position: relative;
+        z-index: 1;
       }
       div.token {
-        position: absolute;
-        top: 10px;
-        left: 12px;
-        background: #dedede;
-        color: #333;
         font-size: 13px;
+        background: rgba(110, 179, 194, 0.4);
         text-shadow: 1px 1px 1px white;
         .border-radius(3px);
         border: 1px solid #666;
-        padding: 1px;
         display: inline;
+        margin-left: -1px;
+      }
+      div.highlighter {
+        color: transparent;
+        text-shadow: none;
+        position: absolute;
+        padding: 4px;
+        font-size: 13px;
       }
     }
-    &.show-controls div.input-holder textarea {
-      padding: 4px 40px 4px 4px;
+    &.show-controls div.input-holder textarea, &.show-controls div.input-holder div.highlighter {
+      padding: 4px 40px 0 4px;
     }
   }
   textarea {
@@ -544,6 +584,32 @@ div#sidebar {
           color: #dedede;
           text-shadow: 1px 1px 1px #181818;
         }
+      }
+    }
+    &.inbox {
+      div.inbox, div.notifications, div.messages {
+        display: block;
+      }
+      ul.tabs li.inbox {
+        background: rgba(100, 100, 100, 0.7);
+        div.label {
+          color: #dedede;
+          text-shadow: 1px 1px 1px #181818;
+        }
+      }
+    }
+    div.inbox-content {
+      overflow-x: hidden;
+      overflow-y: scroll;
+      padding-right: 14px;
+      margin-right: -14px;
+      div.label {
+        font-family: MuseoSans700;
+        font-size: 11px;
+        color: #7d7d7d;
+        text-shadow: 1px 1px 1px white;
+        padding: 5px;
+        border-bottom: 1px solid #999;
       }
     }
     &.messages {
@@ -779,6 +845,9 @@ div#sidebar {
         left: 0;
         .box-shadow(2px, 0, 2px, -1px, rgba(0, 0, 0, .5));
       }
+      a {
+        color: #497882;
+      }
     }
     div.timestamp {
       font-size: 10px;
@@ -845,15 +914,50 @@ div#sidebar {
       }
       div.reply-input {
         margin-top: 5px;
+        position: relative;
+        border: 1px solid #aaa;
+        .border-radius(3px);
+        margin-bottom: 4px;
         textarea {
-          width: 250px;
-          background: #ddd;
+          width: 100%;
           font-family: MuseoSans700;
           font-size: 11px;
+          border: none;
           margin-top: 0;
-          padding-bottom: 1px;
-          &:focus {
-            background: white;
+          position: relative;
+          background: #ddd;
+          margin-bottom: -3px;
+          overflow-y: hidden;
+          overflow-x: auto;
+          box-sizing: border-box;
+        }
+        &.decorated {
+          background: #fff;
+          textarea {
+            z-index: 1;
+            &:focus {
+              background: transparent;
+            }
+          }
+          div.token {
+            font-size: 11px;
+            font-family: MuseoSans700;
+            background: rgba(110, 179, 194, 0.4);
+            text-shadow: 1px 1px 1px white;
+            .border-radius(3px);
+            border: 1px solid #666;
+            display: inline;
+            margin-left: -1px;
+          }
+          div.highlighter {
+            color: transparent;
+            text-shadow: none;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            padding: 2px;
+            font-family: MuseoSans700;
+            font-size: 11px;
           }
         }
       }

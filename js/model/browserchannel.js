@@ -95,6 +95,10 @@ brkn.model.BrowserChannel.prototype.onMessage_ = function(rawMessage) {
 	    }
 
 	    break;
+	  case 'notification':
+      var notification = new brkn.model.Notification(message['notification']);
+      brkn.model.Users.getInstance().publish(brkn.model.Users.Action.NEW_NOTIFICATION, notification);
+      break;
 	  case 'new_comment':
 	    var comment = new brkn.model.Comment(message['comment']);
 	    if (comment.user.id != brkn.model.Users.getInstance().currentUser.id) {

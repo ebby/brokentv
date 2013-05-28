@@ -266,10 +266,16 @@ brkn.sidebar.CommentList.prototype.addComment = function(comment) {
   this.comments_.push(comment);
 
   goog.style.showElement(this.noCommentsEl_, false);
+  
+  var textHtml = goog.string.linkify.linkifyPlainText(comment.text);
+  textHtml = textHtml.replace(/@\[(\d+):([a-zA-z\s]+)\]/g, function(str, id, name) {
+    return '<a href="#user:' + id + '">' + name + '</a>';
+  });
+
   var commentEl = soy.renderAsElement(brkn.sidebar.comment, {
     prefix: 'listcomment',
     comment: comment,
-    text: goog.string.linkify.linkifyPlainText(comment.text),
+    text: textHtml,
     owner: (comment.user.id == brkn.model.Users.getInstance().currentUser.id)
   });
   brkn.model.Clock.getInstance().addTimestamp(comment.time,

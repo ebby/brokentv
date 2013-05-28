@@ -16,9 +16,9 @@ class Email():
 
     if self.sendgrid:
       # make a message object
-      self.message = sendgrid.Message("ebby@xylocast.com", message['subject'], html)
+      self.message = sendgrid.Message("info@xylocast.com", message['subject'], html)
     else:
-      self.message = mail.EmailMessage(sender="Ebby at XYLO <ebby@xylocast.com>",
+      self.message = mail.EmailMessage(sender="XYLO <info@xylocast.com>",
                                        subject=message['subject'], html=html)
 
 
@@ -53,6 +53,13 @@ class Message():
     return {
             'subject' : name + ' replied to your comment!',
             'template': 'comment.html'
+           }
+    
+  @staticmethod
+  def MENTION(name):
+    return {
+            'subject' : name + ' mentioned you in a comment!',
+            'template': 'mention.html'
            }
     
   @staticmethod

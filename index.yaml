@@ -62,6 +62,12 @@ indexes:
   - name: acl
   - name: time
     direction: desc
+    
+- kind: Notification
+  properties:
+  - name: user
+  - name: time
+    direction: desc
 
 - kind: PublisherMedia
   properties:

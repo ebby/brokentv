@@ -130,7 +130,9 @@ brkn.sidebar.Messages.prototype.decorateInternal = function(el) {
       e.stopPropagation();
       this.commentInput_.setFocused(true);
     }, this))
-    .listen(this.moreMessagesEl_, goog.events.EventType.CLICK, goog.bind(this.loadMore_, this));
+    .listen(this.moreMessagesEl_, goog.events.EventType.CLICK, goog.bind(this.loadMore_, this))
+    .listen(this.commentInput_, 'add', goog.bind(this.onAddComment_, this))
+    .listen(window, 'resize', goog.partial(goog.Timer.callOnce, goog.bind(this.resize, this)));
   } else {
     this.messages_ = this.messages_.reverse();
     brkn.model.Users.getInstance().currentUser.subscribe(brkn.model.User.Actions.READ_MESSAGE, function(fromId) {
@@ -142,34 +144,26 @@ brkn.sidebar.Messages.prototype.decorateInternal = function(el) {
     }, this);
   }
   
-  this.getHandler()
-      .listen(this.commentInput_, 'add', goog.bind(this.onAddComment_, this))
-      .listen(window, 'resize', goog.partial(goog.Timer.callOnce, goog.bind(this.resize, this)));
-  
   goog.array.forEachRight(this.messages_, function(m) {
     this.addMessage_(m);
   }, this);
 
   brkn.model.Users.getInstance().subscribe(brkn.model.Users.Action.NEW_MESSAGE, function(m) {
     if (m.fromUser.id == this.user_.id || m.toUser.id == this.user_.id) {
-      var incr = true;
       if (this.inbox_) {
         // Remove last message by this sender
+        var incr = true;
         var last = this.messageMap_[m.fromUser.id];
         if (last) {
           incr = !goog.dom.classes.has(last, 'unread');
           goog.dom.removeNode(last);
         }
-      }
-      if (brkn.model.Sidebar.getInstance().currentProfileId != m.fromUser.id && incr) {
-        // If we're not currently in the message screen
-        brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NEW_MESSAGES, 1);
+        incr && brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NEW_MESSAGES, 1);
       }
       this.addMessage_(m, this.inbox_);
       this.resize();
     }
   }, this);
-  
   this.resize();
 };
 
@@ -252,7 +246,8 @@ brkn.sidebar.Messages.prototype.addMessage_ = function(message, opt_first) {
   if (!opt_first) {
     this.getElement().scrollTop = this.getElement().scrollHeight; 
   }
-  if (!this.inbox_ && !message.read) {
+  if (!this.inbox_ && !message.read &&
+      brkn.model.Sidebar.getInstance().currentProfileId == message.fromUser.id) {
     message.setRead();
   }
 };
@@ -287,7 +282,11 @@ brkn.sidebar.Messages.prototype.onAddComment_ = function(e) {
  * @private
  */
 brkn.sidebar.Messages.prototype.resize = function(opt_extra) {
-  this.resizeExtra_ = opt_extra || this.resizeExtra_;
-  goog.style.setHeight(this.getElement(), goog.dom.getViewportSize().height - 82 -
-      this.resizeExtra_ - (goog.dom.getAncestorByClass(this.getElement(), 'tabbed') ? 30 : 0));
+  if (this.inbox_) {
+    this.dispatchEvent('resize');
+  } else {
+    this.resizeExtra_ = opt_extra || this.resizeExtra_;
+    goog.style.setHeight(this.getElement(), goog.dom.getViewportSize().height - 82 -
+        this.resizeExtra_ - (goog.dom.getAncestorByClass(this.getElement(), 'tabbed') ? 30 : 0));
+  }
 };

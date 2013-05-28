@@ -1,5 +1,7 @@
 from common import *
 
+from google.appengine.api import channel as webchannel
+
 #--------------------------------------
 # CHANNEL HANDLERS
 #--------------------------------------
@@ -7,6 +9,18 @@ from common import *
 class WebChannelConnectedHandler(BaseHandler):
   def post(self):
     client_id = self.request.get('from')
+    
+    # Deliver outbox notifications (in case of reconnection, which is not yet implemented)
+    user_obj = memcache.get(client_id) or {}
+    outbox = user_obj.get('outbox', [])
+    channels = memcache.get('web_channels') or {}
+    while len(outbox):
+      msg = outbox.pop(0)
+      webchannel.send_message(channels.get(client_id), simplejson.dumps(msg))
+    if user_obj.get('outbox'):
+      del user_obj['outbox']
+      memcache.set(client_id, user_obj)
+      
 
 class WebChannelDisconnectedHandler(BaseHandler):
   def post(self):

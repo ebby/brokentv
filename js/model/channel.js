@@ -129,7 +129,7 @@ brkn.model.Channel.prototype.fetchQueue = function(opt_callback) {
  * @param {goog.date.DateTime} time The last programmed time on this channel
  */
 brkn.model.Channel.prototype.maybeFetchProgramming = function(time) {
-  if (this.lastTime_ <= time && !this.myChannel) {
+  if (this.lastTime_ <= time && !this.myChannel && !goog.DEBUG) {
     this.fetchCurrentProgramming();
   }
 };

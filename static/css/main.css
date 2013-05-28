@@ -3612,21 +3612,55 @@ div#sidebar div#sidebar-content div.media-list div.medias {
   margin: 9px;
   padding-bottom: 5px;
 }
+div#sidebar div.comment-input div.suggestions,
+div#sidebar div.reply-input div.suggestions {
+  position: absolute;
+  bottom: 100%;
+  max-height: 100px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.7);
+  color: #f5f5f5;
+  text-shadow: 1px 1px 1px #181818;
+  width: 100%;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+div#sidebar div.comment-input div.suggestions div.suggestion,
+div#sidebar div.reply-input div.suggestions div.suggestion {
+  height: 15px;
+  padding: 5px;
+  border-bottom: 1px solid #999;
+  font-family: MuseoSans700;
+  font-size: 11px;
+  cursor: pointer;
+}
+div#sidebar div.comment-input div.suggestions div.suggestion:hover,
+div#sidebar div.reply-input div.suggestions div.suggestion:hover,
+div#sidebar div.comment-input div.suggestions div.suggestion.selected,
+div#sidebar div.reply-input div.suggestions div.suggestion.selected {
+  background: rgba(110, 179, 194, 0.7);
+}
 div#sidebar div.comment-input {
   visibility: hidden;
   opacity: 0;
   width: 100%;
-  min-height: 31px;
+  min-height: 40px;
   position: absolute;
-  bottom: 42px;
+  bottom: 41px;
+  background: #f7f7f7;
+  border-top: 1px solid #ccc;
+  -webkit-box-shadow: 0 -1px 4px 0 rgba(0, 0, 0, 0.3), inset 4px -2px 6px -3px rgba(0, 0, 0, 0.4);
+  -moz-box-shadow: 0 -1px 4px 0 rgba(0, 0, 0, 0.3), inset 4px -2px 6px -3px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 -1px 4px 0 rgba(0, 0, 0, 0.3), inset 4px -2px 6px -3px rgba(0, 0, 0, 0.4);
 }
 div#sidebar div.comment-input div.comment-controls {
   height: 24px;
   color: #444;
   text-shadow: 1px 1px 1px white;
-  top: 12px;
+  top: 10px;
   position: absolute;
   right: 73px;
+  z-index: 1;
 }
 div#sidebar div.comment-input div.comment-toggle {
   width: 17px;
@@ -3696,7 +3730,7 @@ div#sidebar div.comment-input div.comment-button {
   cursor: pointer;
   position: absolute;
   right: 10px;
-  top: 9px;
+  top: 8px;
   border: 1px solid #aaa;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
@@ -3741,37 +3775,50 @@ div#sidebar div.comment-input div.comment-button div.return {
   color: #bbb;
 }
 div#sidebar div.comment-input div.input-holder {
-  background: #f7f7f7;
-  width: 100%;
-  height: 100%;
-  border-top: 1px solid #ccc;
-  -webkit-box-shadow: 0 -1px 4px 0 rgba(0, 0, 0, 0.3), inset 4px -2px 6px -3px rgba(0, 0, 0, 0.4);
-  -moz-box-shadow: 0 -1px 4px 0 rgba(0, 0, 0, 0.3), inset 4px -2px 6px -3px rgba(0, 0, 0, 0.4);
-  box-shadow: 0 -1px 4px 0 rgba(0, 0, 0, 0.3), inset 4px -2px 6px -3px rgba(0, 0, 0, 0.4);
   position: relative;
+  border: 1px solid #aaa;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  background: #fff;
+  left: 10px;
+  top: 8px;
+  width: 238px;
+  min-height: 22px;
+  margin-bottom: 16px;
+}
+div#sidebar div.comment-input div.input-holder div.textarea-holder {
+  position: absolute;
 }
 div#sidebar div.comment-input div.input-holder textarea {
-  margin-left: 10px;
-  margin-top: 8px;
-  margin-bottom: 3px;
+  background: transparent;
+  border: none;
+  margin: 0;
+  padding-bottom: 0;
+  position: relative;
+  z-index: 1;
 }
 div#sidebar div.comment-input div.input-holder div.token {
-  position: absolute;
-  top: 10px;
-  left: 12px;
-  background: #dedede;
-  color: #333;
   font-size: 13px;
+  background: rgba(110, 179, 194, 0.4);
   text-shadow: 1px 1px 1px white;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
   border: 1px solid #666;
-  padding: 1px;
   display: inline;
+  margin-left: -1px;
 }
-div#sidebar div.comment-input.show-controls div.input-holder textarea {
-  padding: 4px 40px 4px 4px;
+div#sidebar div.comment-input div.input-holder div.highlighter {
+  color: transparent;
+  text-shadow: none;
+  position: absolute;
+  padding: 4px;
+  font-size: 13px;
+}
+div#sidebar div.comment-input.show-controls div.input-holder textarea,
+div#sidebar div.comment-input.show-controls div.input-holder div.highlighter {
+  padding: 4px 40px 0 4px;
 }
 div#sidebar textarea {
   resize: none;
@@ -3846,6 +3893,32 @@ div#sidebar div.tabbed.friends ul.tabs li.friends {
 div#sidebar div.tabbed.friends ul.tabs li.friends div.label {
   color: #dedede;
   text-shadow: 1px 1px 1px #181818;
+}
+div#sidebar div.tabbed.inbox div.inbox,
+div#sidebar div.tabbed.inbox div.notifications,
+div#sidebar div.tabbed.inbox div.messages {
+  display: block;
+}
+div#sidebar div.tabbed.inbox ul.tabs li.inbox {
+  background: rgba(100, 100, 100, 0.7);
+}
+div#sidebar div.tabbed.inbox ul.tabs li.inbox div.label {
+  color: #dedede;
+  text-shadow: 1px 1px 1px #181818;
+}
+div#sidebar div.tabbed div.inbox-content {
+  overflow-x: hidden;
+  overflow-y: scroll;
+  padding-right: 14px;
+  margin-right: -14px;
+}
+div#sidebar div.tabbed div.inbox-content div.label {
+  font-family: MuseoSans700;
+  font-size: 11px;
+  color: #7d7d7d;
+  text-shadow: 1px 1px 1px white;
+  padding: 5px;
+  border-bottom: 1px solid #999;
 }
 div#sidebar div.tabbed.messages div.messages {
   display: block;
@@ -4129,6 +4202,9 @@ div#sidebar div.template div.text img {
   -moz-box-shadow: 2px 0 2px -1px rgba(0, 0, 0, 0.5);
   box-shadow: 2px 0 2px -1px rgba(0, 0, 0, 0.5);
 }
+div#sidebar div.template div.text a {
+  color: #497882;
+}
 div#sidebar div.template div.timestamp {
   font-size: 10px;
   font-family: MuseoSans300;
@@ -4203,17 +4279,56 @@ div#sidebar div.comments-holder div.comment.reply div.template {
 }
 div#sidebar div.comments-holder div.comment div.reply-input {
   margin-top: 5px;
+  position: relative;
+  border: 1px solid #aaa;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  margin-bottom: 4px;
 }
 div#sidebar div.comments-holder div.comment div.reply-input textarea {
-  width: 250px;
-  background: #ddd;
+  width: 100%;
   font-family: MuseoSans700;
   font-size: 11px;
+  border: none;
   margin-top: 0;
-  padding-bottom: 1px;
+  position: relative;
+  background: #ddd;
+  margin-bottom: -3px;
+  overflow-y: hidden;
+  overflow-x: auto;
+  box-sizing: border-box;
 }
-div#sidebar div.comments-holder div.comment div.reply-input textarea:focus {
-  background: white;
+div#sidebar div.comments-holder div.comment div.reply-input.decorated {
+  background: #fff;
+}
+div#sidebar div.comments-holder div.comment div.reply-input.decorated textarea {
+  z-index: 1;
+}
+div#sidebar div.comments-holder div.comment div.reply-input.decorated textarea:focus {
+  background: transparent;
+}
+div#sidebar div.comments-holder div.comment div.reply-input.decorated div.token {
+  font-size: 11px;
+  font-family: MuseoSans700;
+  background: rgba(110, 179, 194, 0.4);
+  text-shadow: 1px 1px 1px white;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  border: 1px solid #666;
+  display: inline;
+  margin-left: -1px;
+}
+div#sidebar div.comments-holder div.comment div.reply-input.decorated div.highlighter {
+  color: transparent;
+  text-shadow: none;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  padding: 2px;
+  font-family: MuseoSans700;
+  font-size: 11px;
 }
 div#sidebar div.comments-holder div.comment div.text:hover div.comment-options {
   visibility: visible;
@@ -4922,10 +5037,13 @@ div#sidebar div.messages.inbox div.message:active {
   background: #e5e5e5;
 }
 div#sidebar div.messages.inbox div.message:first-child {
-  border-top: 1px solid #fff;
+  border-top: 1px solid #999;
 }
 div#sidebar div.messages.inbox div.message.unread {
-  background: #eee;
+  background: rgba(110, 179, 194, 0.2);
+}
+div#sidebar div.messages.inbox div.message.unread:hover {
+  background: rgba(110, 179, 194, 0.4);
 }
 div#sidebar div.messages.inbox div.message div.body {
   margin-bottom: 0;
@@ -5015,6 +5133,133 @@ div#sidebar div.messages div.message div.picture img {
   box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.4);
 }
 div#sidebar div.messages div.message div.picture:active img {
+  -webkit-box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.1);
+  -moz-box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+div#sidebar div.notifications {
+  overflow-x: hidden;
+  overflow-y: scroll !important;
+  /* Hide scrollbars */
+
+  padding-right: 14px;
+  margin-right: -14px;
+}
+div#sidebar div.notifications div.no-comments {
+  margin: 10px;
+  cursor: default;
+}
+div#sidebar div.notifications div.spinner {
+  width: 100%;
+  height: 40px;
+  margin: 5px 0;
+  text-align: center;
+  background: url(data:image/gif;base64,R0lGODlhIwAjALMDAP/MZv+ZZv+ZM8zMzMzMmZnMzJnMmZmZmWaZzGaZZjOZZgAAAP///wAAAAAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh/wtYTVAgRGF0YVhNUDw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoTWFjaW50b3NoKSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDpBMzUyRkU4ODlBRkYxMUUyOERBOUYwQjNDMEE2REI1RCIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDpBMzUyRkU4OTlBRkYxMUUyOERBOUYwQjNDMEE2REI1RCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkEzNTJGRTg2OUFGRjExRTI4REE5RjBCM0MwQTZEQjVEIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOkEzNTJGRTg3OUFGRjExRTI4REE5RjBCM0MwQTZEQjVEIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+Af/+/fz7+vn49/b19PPy8fDv7u3s6+rp6Ofm5eTj4uHg397d3Nva2djX1tXU09LR0M/OzczLysnIx8bFxMPCwcC/vr28u7q5uLe2tbSzsrGwr66trKuqqainpqWko6KhoJ+enZybmpmYl5aVlJOSkZCPjo2Mi4qJiIeGhYSDgoGAf359fHt6eXh3dnV0c3JxcG9ubWxramloZ2ZlZGNiYWBfXl1cW1pZWFdWVVRTUlFQT05NTEtKSUhHRkVEQ0JBQD8+PTw7Ojk4NzY1NDMyMTAvLi0sKyopKCcmJSQjIiEgHx4dHBsaGRgXFhUUExIREA8ODQwLCgkIBwYFBAMCAQAAIfkEBQAAAwAsAAAAACMAIwAABF9wkCACGTjrzbsUIHh5ZEmFVal2aLi+WQvCsCzQr42v+l72Pg8wyBkSNcYjJqlkHp1EaFDqo+6sOCxNW5Mpi94vMixeksvc3Fmc5q2/bVX891aeQoFyhtAa6SUUFn8YEQAh+QQFAAADACwJAAUABwAeAAAEF3AQQImkeOLNu/9gKI5kaZ5oSmrZVQ0RACH5BAUAAAMALBIACgAHABkAAAQacJikkpEq56kz7WAojmRpnmiqrh5ogRdnDREAIfkECQAAAwAsAAAAACIAIwAABERwyEmrvTjrzbv/YCiOZGmeaKqubOu+sFYgdMHOdL3m/M7Tvl+wp/oBi8ZhTnlMGRFMKFI4JTqT1WW2iXqucDnbNzyIAAAh+QQJAAADACwAAAAAIwAjAAAEsHDISau9OOvNu/9gKHoEYBKjVppnirGwe8GsbNGmXeHAZCSKhCHFkxgUSORQVBwAk8FRE5qU4iRUpJWGzU4KiHBhM/UOwGGxpkyVpN/r6yCrcL/Dce7cfMdn2FB2d3kxe20DfQiENYaBiH2LOY1Vj4N/cnSCcJd6mZWbL5h8kJyFnomRPZNan2mpXYeopYynpKGdo5a3hU9JCZquGSssKANHUEtoaWMqxBQ/QUsSyswRACH5BAkAAAMALAAAAAAjACMAAAR5cMhJq7046827/2AojmRpnmiqikaiJMYqGUpdx6trv/Ju9z4F0DcpII4FUlA4MB6Ro6XkSY0Gp9SjlTjIakXSrne7w2bJP/EZfFVX2VwvAl0zv0NhOZ2ph5fdT3t2gX5pfXhthyA6NgmDXyE0OzhOT0kjLS84EpWXEQAh+QQFAAADACwAAAAAIwAjAAAERHDISau9OOvNu/9gKI5kaZ5oqq5s675wWiB00c50zeb8ztO+X7C3+gGLxmFOeVQZEUwoUjglOpPVZbaZerJwOds3LIkAADs=) no-repeat center 5px;
+  line-height: 40px;
+  -webkit-transition: height 0.3s linear;
+  -moz-transition: height 0.3s linear;
+  -o-transition: height 0.3s linear;
+  -ms-transition: height 0.3s linear;
+  transition: height 0.3s linear;
+}
+div#sidebar div.notifications div.spinner.finished {
+  height: 1px;
+  opacity: 0;
+  visibility: hidden;
+}
+div#sidebar div.notifications div.notification {
+  margin-top: 10px;
+  position: relative;
+  border-bottom: 1px solid #999;
+  -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  -moz-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  background: #dedede;
+  margin-top: 0;
+  padding: 7px 0;
+  position: relative;
+}
+div#sidebar div.notifications div.notification:hover {
+  background: #f5f5f5;
+}
+div#sidebar div.notifications div.notification:active {
+  background: #e5e5e5;
+}
+div#sidebar div.notifications div.notification:first-child {
+  border-top: 1px solid #999;
+}
+div#sidebar div.notifications div.notification.unread {
+  background: rgba(110, 179, 194, 0.2);
+}
+div#sidebar div.notifications div.notification.unread:hover {
+  background: rgba(110, 179, 194, 0.4);
+}
+div#sidebar div.notifications div.notification div.type {
+  width: 200px;
+}
+div#sidebar div.notifications div.notification div.body {
+  position: relative;
+  left: 50px;
+  top: 0;
+  margin-bottom: 0;
+  width: 260px;
+  font-family: MuseoSans500;
+  font-size: 11px;
+}
+div#sidebar div.notifications div.notification div.body a {
+  color: #181818;
+  font-family: MuseoSans700;
+}
+div#sidebar div.notifications div.notification div.body div.text {
+  background: #f1f1f1;
+  margin-top: 4px;
+  padding: 5px;
+  font-family: MuseoSans700;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  -webkit-box-shadow: inset 0 0 2px 1px rgba(0, 0, 0, 0.4);
+  -moz-box-shadow: inset 0 0 2px 1px rgba(0, 0, 0, 0.4);
+  box-shadow: inset 0 0 2px 1px rgba(0, 0, 0, 0.4);
+}
+div#sidebar div.notifications div.notification div.body div.text:last-child div.timestamp {
+  display: block;
+}
+div#sidebar div.notifications div.notification div.body div.timestamp {
+  font-size: 10px;
+  font-family: MuseoSans300;
+  position: absolute;
+  top: 1px;
+  right: 0;
+}
+div#sidebar div.notifications div.notification div.picture {
+  position: absolute;
+  background: #ccc;
+  width: 34px;
+  height: 34px;
+  -webkit-border-radius: 18px;
+  -moz-border-radius: 18px;
+  border-radius: 18px;
+  -webkit-box-shadow: inset 0px 0px 2px 1px rgba(0, 0, 0, 0.6);
+  -moz-box-shadow: inset 0px 0px 2px 1px rgba(0, 0, 0, 0.6);
+  box-shadow: inset 0px 0px 2px 1px rgba(0, 0, 0, 0.6);
+  display: inline-block;
+  margin-left: 9px;
+}
+div#sidebar div.notifications div.notification div.picture img {
+  width: 26px;
+  height: 26px;
+  margin-left: 4px;
+  margin-top: 4px;
+  -webkit-border-radius: 15px;
+  -moz-border-radius: 15px;
+  border-radius: 15px;
+  -webkit-box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.4);
+  -moz-box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.4);
+}
+div#sidebar div.notifications div.notification div.picture:active img {
   -webkit-box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.1);
   -moz-box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.1);
   box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.1);
@@ -6162,6 +6407,9 @@ div#sidebar div.stream div.activity div.template div.text {
   -webkit-box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.3);
   -moz-box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.3);
   box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.3);
+}
+div#sidebar div.stream div.activity div.template div.text a {
+  color: #497882;
 }
 div#sidebar div.stream div.activity div.template div.timestamp {
   font-size: 10px;

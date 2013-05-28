@@ -11,6 +11,7 @@ class Comment(db.Model):
   text = db.StringProperty()
   time = db.DateTimeProperty(auto_now_add=True)
   acl = db.StringListProperty(default=[])
+  mentions = db.StringListProperty(default=[])
 
   @classmethod
   def get_by_media(cls, media, uid=None, limit=20, offset=0):
@@ -21,7 +22,11 @@ class Comment(db.Model):
 
   @classmethod
   def add(cls, media, user, text, acl, parent_id=None):
+    from notification import Notification
+    
     c = Comment(media=media, user=user, text=text)
+    c.mentions = [x[0] for x in re.findall(r"@\[(\d+):([a-zA-z\s]+)\]", text)]
+    
     if parent_id:
       c.parent_comment = Comment.get_by_id(int(parent_id))
       c.is_parent = False
@@ -33,10 +38,19 @@ class Comment(db.Model):
     media.comment_count += 1
     media.put()
     
+    for m in c.mentions:
+      user = User.get_by_key_name(m)
+      n = Notification.add(user, constants.NotificationType.MENTION, c)
+      broadcast.broadcastNotification(n)
+
     if c.is_parent:
       from useractivity import UserActivity
       broadcast.broadcastNewActivity(UserActivity.add_comment(c.user, c))
     return c
+  
+  @classmethod
+  def flattenMentions(cls, text):
+    return re.sub(r"@\[(\d+):([a-zA-z\s]+)\]", r"\2", text)
 
   def toJson(self):
     json = {}

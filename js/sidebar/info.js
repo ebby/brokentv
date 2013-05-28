@@ -123,7 +123,7 @@ brkn.sidebar.Info = function(media, opt_noFetch, opt_lastMedia, opt_lastInput, o
    * @type {brkn.sidebar.CommentInput}
    * @private
    */
-  this.commentInput_ = new brkn.sidebar.CommentInput(true);
+  this.commentInput_ = new brkn.sidebar.CommentInput(true, true);
   
   /**
    * @type {goog.ui.CustomButton}
@@ -774,10 +774,14 @@ brkn.sidebar.Info.prototype.addComment_ = function(comment, opt_last) {
   this.comments_.push(comment);
 
   goog.style.showElement(this.noCommentsEl_, false);
+  var textHtml = goog.string.linkify.linkifyPlainText(comment.text);
+  textHtml = textHtml.replace(/@\[(\d+):([a-zA-z\s]+)\]/g, function(str, id, name) {
+    return '<a href="#user:' + id + '">' + name + '</a>';
+  });
   var commentEl = soy.renderAsElement(brkn.sidebar.comment, {
     prefix: 'infocomment',
     comment: comment,
-    text: goog.string.linkify.linkifyPlainText(comment.text),
+    text: textHtml,
     owner: (comment.user.id == brkn.model.Users.getInstance().currentUser.id)
   });
   brkn.model.Clock.getInstance().addTimestamp(comment.time,
@@ -812,20 +816,31 @@ brkn.sidebar.Info.prototype.activateComment_ = function(comment, commentEl) {
   if (!comment.parentId) {
     this.lastCommentEl_[comment.id] = commentEl;
     // Handle reply input
-    var replyInput = goog.dom.getElementByClass('reply-textarea', commentEl);
-    var keyHandler = new goog.events.KeyHandler(replyInput);
-    this.getHandler().listen(keyHandler,
-        goog.events.KeyHandler.EventType.KEY,
-        goog.bind(function(e) {
-          e.stopPropagation();
-          if (e.keyCode == '13' && replyInput.value) {
-            e.preventDefault();
-            var reply = brkn.model.Comment.add(brkn.model.Users.getInstance().currentUser, 
-                this.media_.id, replyInput.value, false, false, comment.id, comment.user.id);
-            this.addComment_(reply);
-            replyInput.value = '';
-          }
+    var replyInput = goog.dom.getElementByClass('reply-input', commentEl);
+    var replyTextarea = goog.dom.getElementByClass('reply-textarea', commentEl);
+    this.getHandler().listen(replyTextarea, goog.events.EventType.CLICK, goog.bind(function() {
+      if (!goog.dom.classes.has(replyInput, 'decorated')) {
+        var commentInput = new brkn.sidebar.CommentInput(false, true, true);
+        commentInput.decorate(replyInput);
+        commentInput.reply(comment, comment.user);
+        this.getHandler().listen(commentInput, 'add', goog.bind(function(e) {
+          this.onAddComment_(e);
         }, this));
+      }
+    }, this));
+//    var keyHandler = new goog.events.KeyHandler(replyInput);
+//    this.getHandler().listen(keyHandler,
+//        goog.events.KeyHandler.EventType.KEY,
+//        goog.bind(function(e) {
+//          e.stopPropagation();
+//          if (e.keyCode == '13' && replyInput.value) {
+//            e.preventDefault();
+//            var reply = brkn.model.Comment.add(brkn.model.Users.getInstance().currentUser, 
+//                this.media_.id, replyInput.value, false, false, comment.id, comment.user.id);
+//            this.addComment_(reply);
+//            replyInput.value = '';
+//          }
+//        }, this));
   }
 };
 

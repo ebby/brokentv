@@ -61,7 +61,6 @@ def get_session(current_user, media_id=None, channel_id=None, single_channel_id=
   if media_id:
     media = Media.get_by_key_name(media_id)
     if media:
-      logging.info(media.name)
       current_channel = user_channel or Channel.get_my_channel(current_user)
       program = Program.add_program(current_channel, media, time=datetime.datetime.now(), async=True)
 
@@ -100,6 +99,12 @@ def get_session(current_user, media_id=None, channel_id=None, single_channel_id=
   # Update login
   current_user.last_login = datetime.datetime.now()
   current_user.put()
+  
+  #clear outbox
+  memcached_user_obj = memcache.get(current_user.id) or {}
+  if memcached_user_obj.get('outbox'):
+    del memcached_user_obj['outbox']
+    memcache.set(current_user.id, memcached_user_obj)
 
   return data
 
@@ -364,6 +369,9 @@ class CommentHandler(BaseHandler):
       current_user.put()
       
       Stat.add_comment(self.current_user, facebook, tweet)
+      if to_user and to_user.id != self.current_user.id:
+        n = Notification.add(to_user, constants.NotificationType.REPLY, comment=c)
+        broadcast.broadcastNotification(n)
       broadcast.broadcastNewComment(c, new_tweet, to_user, self.request.host_url);
 
       response = {
@@ -400,6 +408,19 @@ class MessageHandler(BaseHandler):
       message = Message.add(from_user=from_user, to_user=to_user, text=text)
       broadcast.broadcastNewMessage(message)
       self.response.out.write(simplejson.dumps(message.toJson()))
+      
+class NotificationHandler(BaseHandler):
+  @BaseHandler.logged_in
+  def get(self):
+    notifications = Notification.get(self.current_user)
+    self.response.out.write(simplejson.dumps(notifications))
+  @BaseHandler.logged_in
+  def post(self):
+    id = self.request.get('id')
+    has_read = self.request.get('read')
+    if id and has_read:
+      notification = Notification.get_by_id(int(id))
+      notification.set_read()
 
 class LinkHandler(BaseHandler):
   @BaseHandler.logged_in

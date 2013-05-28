@@ -374,6 +374,7 @@ brkn.Sidebar.prototype.newMessages_ = function(count, opt_reset) {
     goog.style.showElement(this.inboxCountEl_, false);
   }
   this.inboxCount_ += count;
+  this.inboxCount_ = Math.max(this.inboxCount_, 0);
   goog.dom.setTextContent(this.inboxCountEl_, this.inboxCount_.toString());
   goog.style.showElement(this.inboxCountEl_, !!this.inboxCount_);
 };

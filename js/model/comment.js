@@ -28,6 +28,12 @@ brkn.model.Comment = function(comment) {
   this.text = comment['text'];
 
   /**
+   * @type {?brkn.model.Media}
+   * @private
+   */
+  this.media = comment['media'] ? brkn.model.Medias.getInstance().getOrAdd(comment['media']) : null;
+
+  /**
    * @type {goog.date.DateTime}
    */
   this.time = comment['time'] ? goog.date.fromIsoString(comment['time'] + 'Z') : new goog.date.DateTime();

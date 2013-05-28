@@ -307,14 +307,14 @@ brkn.sidebar.Stream.prototype.addActivity_ = function(opt_activity, opt_digest, 
   var activityEl;
   switch(type) {
     case 'session':
-      if (users.length < 2) {
+      if (!this.uid_ && users.length < 2) {
         return;
       }
       var session = activity ? activity['session'] : digest[0];
       var channel = brkn.model.Channels.getInstance().get(session['channel_id']);
       medias = activity ? activity['session']['media'] : medias;
-      if (medias.length > 5) {
-        medias = medias.slice(0, 5);
+      if (medias.length > 3) {
+        medias = medias.slice(0, 3);
       }
       activityEl = soy.renderAsElement(brkn.sidebar.sessionActivity, {
         users: users,
@@ -329,7 +329,12 @@ brkn.sidebar.Stream.prototype.addActivity_ = function(opt_activity, opt_digest, 
       var comments = activity ? [new brkn.model.Comment(activity['comment'])] : [];
       if (digest) {
         goog.array.forEach(digest, function(obj) {
-          comments.push(new brkn.model.Comment(obj));
+          var c = new brkn.model.Comment(obj);
+          c.text = goog.string.linkify.linkifyPlainText(c.text);
+          c.text = c.text.replace(/@\[(\d+):([a-zA-z\s]+)\]/g, function(str, id, name) {
+            return '<a href="#user:' + id + '">' + name + '</a>';
+          });
+          comments.push(c);
         });
       }
       activityEl = soy.renderAsElement(brkn.sidebar.commentActivity, {

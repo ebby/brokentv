@@ -167,8 +167,12 @@
  */
 {template .commentInput}
   <div class="comment-input">
-    <div class="input-holder">
-      <textarea class="comment-textarea" rows="1" placeholder="Add to the conversation..."></textarea>
+    <div class="textarea-holder">
+      <div class="input-holder">
+        <div class="highlighter"></div>
+        <textarea class="comment-textarea" rows="1" placeholder="Add to the conversation..."></textarea>
+        <div class="suggestions" style="display:none"></div>
+      </div>
     </div>
     <div class="comment-controls">
       <div class="comment-toggle tweet-toggle"><div class="icon"></div></div>
@@ -249,7 +253,7 @@
         </a>
         <div class="template">
           <a class="user" href="#user:{$comment.user.id}">{$comment.user.name}</a>{sp}{sp}
-          <div class="text">{$comment.text}</div>
+          <div class="text">{$comment.text|noAutoescape}</div>
           <div class="timestamp">{$comment.relativeTime}</div>
         </div>
       </div>
@@ -508,11 +512,17 @@
  * @param? myProfile
  */
 {template .profile}
-  <div class="tabbed messages">
+  <div class="tabbed {if $myProfile}inbox{else}messages{/if}">
     <ul class="tabs">
-      <li class="tab messages">
-        <div class="label">{if $myProfile}INBOX{else}MESSAGES{/if}</div>
-      </li>
+      {if $myProfile}
+        <li class="tab inbox">
+          <div class="label">INBOX</div>
+        </li>
+      {else}
+        <li class="tab messages">
+          <div class="label">MESSAGES</div>
+        </li>
+      {/if}
       <li class="tab activity">
         <div class="label">ACTIVITY</div>
       </li>
@@ -520,9 +530,22 @@
         <div class="label"><div class="heart"></div>'d</div>
       </li>
     </ul>
-    <div class="messages-content content messages">
-      <div class="loading loading-activity"><div class="loading-spinner"></div></div>
-    </div>
+    {if $myProfile}
+      <div class="inbox-content content inbox">
+        <div class="label">NOTIFICATIONS</div>
+        <div class="notifications-content content notifications">
+          <div class="loading loading-activity"><div class="loading-spinner"></div></div>
+        </div>
+        <div class="label">MESSAGES</div>
+        <div class="messages-content content messages">
+          <div class="loading loading-activity"><div class="loading-spinner"></div></div>
+        </div>
+      </div>
+    {else}
+      <div class="messages-content content messages">
+        <div class="loading loading-activity"><div class="loading-spinner"></div></div>
+      </div>
+    {/if}
     <div class="activity-content content activity">
       <div class="loading loading-activity"><div class="loading-spinner"></div></div>
     </div>

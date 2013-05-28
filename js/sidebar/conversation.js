@@ -70,7 +70,7 @@ brkn.sidebar.Conversation = function(media, opt_comments, opt_tweets, opt_twitte
    * @type {brkn.sidebar.CommentInput}
    * @private
    */
-  this.commentInput_ = new brkn.sidebar.CommentInput(true);
+  this.commentInput_ = new brkn.sidebar.CommentInput(true, true);
 
   /**
    * @type {Array.<string>}

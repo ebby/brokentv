@@ -119,6 +119,10 @@ class ActivityType:
   SESSION = 'session'
   LIKED = 'liked'
   WATCHED = 'watched' # Streamed media by selection
+  
+class NotificationType:
+  REPLY = 'reply'
+  MENTION = 'mention'
 
 class MediaType:
   VIDEO = 0

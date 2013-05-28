@@ -210,6 +210,7 @@ def create_handlers_map():
     ('/_link', rpc.LinkHandler),
     ('/_message', rpc.MessageHandler),
     ('/_message/(.*)', rpc.MessageHandler),
+    ('/_notification', rpc.NotificationHandler),
     ('/_optin', rpc.OptInHandler),
     ('/_presence', rpc.PresenceHandler),
     ('/_programming/(.*)', rpc.ProgramHandler),

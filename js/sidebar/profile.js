@@ -7,6 +7,7 @@ goog.require('brkn.model.Message');
 goog.require('brkn.sidebar');
 goog.require('brkn.sidebar.MediaList');
 goog.require('brkn.sidebar.Messages');
+goog.require('brkn.sidebar.Notifications');
 goog.require('brkn.sidebar.Stream');
 
 goog.require('goog.events.KeyHandler.EventType');
@@ -36,10 +37,16 @@ brkn.sidebar.Profile = function(user) {
   this.user_ = user;
   
   /**
+   * @type {boolean}
+   * @private
+   */
+  this.myProfile_ = user.id == brkn.model.Users.getInstance().currentUser.id;
+  
+  /**
    * @type {Array.<string>}
    * @private
    */
-  this.tabs_ = ['messages', 'activity', 'starred'];
+  this.tabs_ = [(this.myProfile_ ? 'inbox' : 'messages'), 'activity', 'starred'];
 };
 goog.inherits(brkn.sidebar.Profile, goog.ui.Component);
 
@@ -72,6 +79,13 @@ brkn.sidebar.Profile.prototype.starred_;
 brkn.sidebar.Profile.prototype.stream_;
 
 
+/**
+ * @type {Element}
+ * @private
+ */
+brkn.sidebar.Profile.prototype.inboxEl_;
+
+
 /** @inheritDoc */
 brkn.sidebar.Profile.prototype.decorateInternal = function(el) {
   goog.base(this, 'decorateInternal', el);
@@ -79,7 +93,7 @@ brkn.sidebar.Profile.prototype.decorateInternal = function(el) {
   goog.dom.classes.add(el, 'profile');
   goog.dom.classes.add(el, 'ios-scroll');
   soy.renderElement(el, brkn.sidebar.profile, {
-    myProfile: this.user_.id == brkn.model.Users.getInstance().currentUser.id
+    myProfile: this.myProfile_
   });
 };
 
@@ -88,6 +102,32 @@ brkn.sidebar.Profile.prototype.decorateInternal = function(el) {
 brkn.sidebar.Profile.prototype.enterDocument = function() {
   
   this.tabsEl_ = goog.dom.getElementByClass('tabs', this.getElement());
+  
+  
+  if (this.myProfile_) {
+    goog.net.XhrIo.send(
+        '/_notification',
+        goog.bind(function(e) {
+          var response = /** @type {Array.<Object>} */ e.target.getResponseJson();
+          var unreadCount = 0;
+          var notifications = goog.array.map(response, function(n) {
+            var notification = new brkn.model.Notification(n);
+            unreadCount += (!notification.read ? 1 : 0);
+            return notification;
+          }, this);
+          brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NEW_MESSAGES,
+              unreadCount);
+          this.notifications_ = new brkn.sidebar.Notifications(notifications);
+          this.getHandler().listen(this.notifications_, 'resize',
+              goog.partial(goog.Timer.callOnce, goog.bind(this.resizeInbox_, this)));
+          this.notifications_.decorate(goog.dom.getElementByClass('notifications-content',
+              this.getElement()));
+        }, this));
+    this.inboxEl_ = goog.dom.getElementByClass('inbox-content', this.getElement());
+    this.getHandler().listen(window, 'resize',
+        goog.partial(goog.Timer.callOnce, goog.bind(this.resizeInbox_, this)));
+    
+  }
   
   goog.net.XhrIo.send(
       '/_message/' + this.user_.id,
@@ -99,11 +139,13 @@ brkn.sidebar.Profile.prototype.enterDocument = function() {
           unreadCount += (!message.read ? 1 : 0);
           return message;
         }, this);
-        if (this.user_.id == brkn.model.Users.getInstance().currentUser.id) {
+        if (this.myProfile_) {
           brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NEW_MESSAGES,
               unreadCount);
         }
         this.messages_ = new brkn.sidebar.Messages(this.user_, messages);
+        this.getHandler().listen(this.messages_, 'resize',
+            goog.partial(goog.Timer.callOnce, goog.bind(this.resizeInbox_, this)));
         this.messages_.decorate(goog.dom.getElementByClass('messages-content', this.getElement()));
       }, this));
 
@@ -147,5 +189,13 @@ brkn.sidebar.Profile.prototype.navigate_ = function(tabEl) {
     goog.dom.classes.enable(this.tabsEl_.parentElement, tab, goog.dom.classes.has(tabEl, tab));
     this.currentTab_ = goog.dom.classes.has(tabEl, tab) ? tab : this.currentTab_;
   }, this);
+};
+
+
+/**
+ * @private
+ */
+brkn.sidebar.Profile.prototype.resizeInbox_ = function() {
+  goog.style.setHeight(this.inboxEl_, goog.dom.getViewportSize().height - 73);
 };
   

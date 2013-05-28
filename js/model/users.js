@@ -22,8 +22,8 @@ brkn.model.Users = function() {
    * @type {boolean}
    */
   this.friendsFetched_ = false;
-
-	/**
+  
+  /**
    * @type {Array.<brkn.model.User>}
    */
   this.friends = [];
@@ -68,7 +68,7 @@ brkn.model.Users.prototype.add = function(user) {
  */
 brkn.model.Users.prototype.addOnline = function(user) {
   if (!goog.array.find(this.onlineFriends, function(u) {return u.id == user.id})) {
-    this.onlineFriends.push(user); 
+    this.onlineFriends.push(user);
   }
 };
 
@@ -122,10 +122,23 @@ brkn.model.Users.prototype.get_or_add = function(user) {
 
 
 /**
+ * @param {string} query
+ */
+brkn.model.Users.prototype.search = function(query) {
+  var users = goog.object.getValues(this.userMap);
+  var results = goog.array.filter(users, function(u) {
+    return goog.string.caseInsensitiveStartsWith(u.name, query);
+  }, this);
+  return results;
+}
+
+
+/**
  * @enum {string}
  */
 brkn.model.Users.Action = {
   NEW_ACTIVITY: 'new-activity',
   NEW_MESSAGE: 'new-message',
+  NEW_NOTIFICATION: 'new-notification',
   ONLINE: 'online'
 };

@@ -1,0 +1,31 @@
+{namespace brkn.sidebar.notifications}
+
+/**
+ * @param notification
+ * @param text
+ * @param fromUser
+ */
+{template .notification}
+  <div class="notification">
+    <a href="#user:{$fromUser.id}">
+      <div class="picture" style="background:{$fromUser.color}">
+        <img src="{$fromUser.picture}"/>
+      </div>
+    </a>
+    <div class="body">
+      <div class="type">
+        <a class="user" href="#user:{$fromUser.id}">{$fromUser.name}</a>
+        {sp}
+        {if $notification.type == 'reply'}
+          replied to your comment
+        {/if}
+        {if $notification.type == 'mention'}
+          mentioned you in a comment
+        {/if}
+      </div>
+      <div class="texts">
+        <div class="text">{$text}<div class="timestamp">{$notification.relativeTime}</div></div>
+      </div>
+    </div>
+  </div>
+{/template}
