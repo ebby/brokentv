@@ -237,11 +237,18 @@ brkn.model.Media.prototype.addComment = function(comment) {
 
 
 /**
- * @param {string} commentId
+ * @param {brkn.model.Comment} comment
  */
-brkn.model.Media.prototype.removeComment = function(commentId) {
-  goog.net.XhrIo.send('/_comment', goog.functions.NULL(), 'POST', 'delete=true&id=' + commentId);
-  goog.array.removeIf(this.comments, function(c) {return c.id == commentId});
+brkn.model.Media.prototype.removeComment = function(comment) {
+  goog.net.XhrIo.send('/_comment', goog.functions.NULL(), 'POST', 'delete=true&id=' + comment.id);
+  if (!comment.parentId) {
+    goog.array.removeIf(this.comments, function(c) {return c.id == comment.id});
+  } else {
+    var parentComment = goog.array.find(this.comments, function(c) {
+      return c.id == comment.parentId; 
+    });
+    parentComment && goog.array.removeIf(parentComment.replies, function(c) {return c.id == comment.id});
+  }
   this.commentCount -= 1;
 };
 

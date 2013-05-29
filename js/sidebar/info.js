@@ -790,15 +790,15 @@ brkn.sidebar.Info.prototype.addComment_ = function(comment, opt_last) {
   } else {
     goog.dom.appendChild(this.commentsEl_, commentEl);
   }
+  if (comment.id) {
+    this.activateComment_(comment, commentEl);
+  }
   goog.array.forEach(comment.replies, function(reply) {
     this.addComment_(reply, opt_last);
   }, this);
   if (!comment.parentId && opt_last) {
     this.commentsEl_.scrollTop = this.commentsEl_.scrollHeight;
     this.contentsEl_.firstChild.scrollTop = this.contentsEl_.firstChild.scrollHeight;
-  }
-  if (comment.id) {
-    this.activateComment_(comment, commentEl);
   }
   return commentEl;
 };
@@ -811,6 +811,7 @@ brkn.sidebar.Info.prototype.addComment_ = function(comment, opt_last) {
  */
 brkn.sidebar.Info.prototype.activateComment_ = function(comment, commentEl) {
   this.commentsMap_[comment.id] = comment;
+  commentEl.id = 'infocomment-' + comment.id;
   if (!comment.parentId) {
     this.lastCommentEl_[comment.id] = commentEl;
     // Handle reply input
@@ -893,25 +894,20 @@ brkn.sidebar.Info.prototype.commentClick_ = function(e) {
       var parentCommentEl = this.lastCommentEl_[(comment.parentId ? comment.parentId : comment.id)];
       goog.dom.getElementByClass('reply-textarea', parentCommentEl).focus();
     } else if (goog.dom.classes.has(targetEl, 'remove')) {
-      this.media_.publish(brkn.model.Media.Actions.REMOVE_COMMENT, commentId);
+      this.media_.publish(brkn.model.Media.Actions.REMOVE_COMMENT, comment);
     }
   }
 };
 
 
 /**
- * @param {string} commentId
+ * @param {brkn.model.Comment} comment
  * @private
  */
-brkn.sidebar.Info.prototype.removeComment_ = function(commentId) {
-  var commentEl = goog.dom.getElement('infocomment-' + commentId);
-  var nextSibling = commentEl.nextSibling;
+brkn.sidebar.Info.prototype.removeComment_ = function(comment) {
+  var commentEl = goog.dom.getElement('infocomment-' + comment.id);
   goog.dom.removeNode(commentEl);
-  goog.array.removeIf(this.comments_, function(c) {return c.id == commentId});
-  while (nextSibling && goog.dom.classes.has(nextSibling, 'reply')) {
-    nextSibling = nextSibling.nextSibling;
-    goog.dom.removeNode(nextSibling);
-  }
+  goog.array.removeIf(this.comments_, function(c) {return c.id == comment.id});
 };
 
 

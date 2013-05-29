@@ -236,7 +236,7 @@ brkn.sidebar.CommentList.prototype.commentClick_ = function(e) {
         var parentCommentEl = this.lastCommentEl_[(comment.parentId ? comment.parentId : comment.id)];
         goog.dom.getElementByClass('reply-textarea', parentCommentEl).focus();
       } else if (goog.dom.classes.has(targetEl, 'remove')) {
-        this.media_.publish(brkn.model.Media.Actions.REMOVE_COMMENT, commentId);
+        this.media_.publish(brkn.model.Media.Actions.REMOVE_COMMENT, comment);
       }
     } 
   }
@@ -244,17 +244,13 @@ brkn.sidebar.CommentList.prototype.commentClick_ = function(e) {
 
 
 /**
- * @param {string} commentId
+ * @param {brkn.model.Comment} comment
  * @private
  */
-brkn.sidebar.CommentList.prototype.removeComment_ = function(commentId) {
-  var commentEl = goog.dom.getElement('listcomment-' + commentId);
-  var nextSibling = commentEl.nextSibling;
+brkn.sidebar.CommentList.prototype.removeComment_ = function(comment) {
+  var commentEl = goog.dom.getElement('listcomment-' + comment.id);
   goog.dom.removeNode(commentEl);
-  while (nextSibling && goog.dom.classes.has(nextSibling, 'reply')) {
-    nextSibling = nextSibling.nextSibling;
-    goog.dom.removeNode(nextSibling);
-  }
+  goog.array.removeIf(this.comments_, function(c) {return c.id == comment.id});
 };
 
 
@@ -305,6 +301,7 @@ brkn.sidebar.CommentList.prototype.addComment = function(comment) {
  */
 brkn.sidebar.CommentList.prototype.activateComment = function(comment, commentEl) {
   this.commentsMap_[comment.id] = comment;
+  commentEl.id = 'listcomment-' + comment.id;
   if (!comment.parentId) {
     this.lastCommentEl_[comment.id] = commentEl;
     // Handle reply input
