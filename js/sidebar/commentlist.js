@@ -282,14 +282,14 @@ brkn.sidebar.CommentList.prototype.addComment = function(comment) {
   } else {
     goog.dom.appendChild(this.commentsEl_, commentEl);
   }
+  if (comment.id) {
+    this.activateComment(comment, commentEl);
+  }
   goog.array.forEach(comment.replies, function(reply) {
     this.addComment(reply);
   }, this);
   if (!comment.parentId) {
     this.commentsEl_.scrollTop = this.commentsEl_.scrollHeight;
-  }
-  if (comment.id) {
-    this.activateComment(comment, commentEl);
   }
   return commentEl;
 };

@@ -259,9 +259,9 @@ brkn.Controller.prototype.enterDocument = function() {
                   brkn.model.Player.getInstance().getCurrentProgram().media.duration;
               var remaining = brkn.model.Player.getInstance().getCurrentProgram().media.duration -
                   brkn.model.Player.getInstance().getCurrentTime();
-              if (remaining < 3) {
-                brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.BEFORE_END);
-              }
+//              if (remaining < 3) {
+//                brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.BEFORE_END);
+//              }
               if (!goog.dom.classes.has(this.progressEl_, 'drag')) {
                 goog.dom.setTextContent(this.durationEl_,
                     (brkn.model.Player.getInstance().getCurrentTime() ?

@@ -1,6 +1,8 @@
 goog.provide('brkn.model.Media');
 
+goog.require('brkn.model.Notify');
 goog.require('brkn.model.Publisher');
+
 goog.require('goog.pubsub.PubSub');
 
 

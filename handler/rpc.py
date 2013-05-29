@@ -210,10 +210,9 @@ class PresenceHandler(BaseHandler):
       media = Media.get_by_key_name(media_id)
       
     # Potentially send friend invites
-#    if not current_user.last_login:
-#      deferred.defer(update_waitlist, current_user.id, current_channel_id,
-#                     _name='update_waitlist' + '-' + str(uuid.uuid1()),
-#                     _queue='programming')
+    if not current_user.last_login:
+      deferred.defer(util.update_waitlist, current_user.id, current_channel_id,
+                     _name='updat-_waitlist-' + str(uuid.uuid1()))
     
     broadcast.broadcastViewerChange(current_user, None, current_channel_id,
                                     session_json['id'], session_json['tune_in'], media);
@@ -288,17 +287,16 @@ class InfoHandler(BaseHandler):
 class FriendsHandler(BaseHandler):
   @BaseHandler.logged_in
   def get(self):
-    if self.request.get('offline'):
-      following = self.current_user.get_following()
-      self.response.out.write(simplejson.dumps([f.toJson() for f in following if not User.get_entry(f.id)]))
-      return
-
+    fetch_only = self.request.get('offline')
     friends_json = []
-    list = self.current_user.following if len(self.current_user.following) else self.current_user.friends
-    for fid in list:
-      user_json = User.get_entry(fid, fetch=False)
-      if user_json:
-        friends_json.append(user_json)
+    if self.current_user.has_following:
+      for fid in self.current_user.following:
+        # Only fetch if it's from the following list, otherwise this call would take too long
+        user_json = User.get_user_entry(fid, fetch=fetch_only, fetch_only=fetch_only)
+        if user_json:
+          friends_json.append(user_json)
+    else:
+      friends_json = self.current_user.get_following()
     self.response.out.write(simplejson.dumps(friends_json))
 
 class PublisherHandler(BaseHandler):

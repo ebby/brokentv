@@ -196,6 +196,8 @@ brkn.sidebar.Profile.prototype.navigate_ = function(tabEl) {
  * @private
  */
 brkn.sidebar.Profile.prototype.resizeInbox_ = function() {
-  goog.style.setHeight(this.inboxEl_, goog.dom.getViewportSize().height - 73);
+  var inboxSize = goog.dom.getViewportSize().height - 123;
+  this.notifications_ && goog.style.setHeight(this.notifications_.getElement(), Math.floor(inboxSize/2));
+  this.messages_ && goog.style.setHeight(this.messages_.getElement(), Math.ceil(inboxSize/2));
 };
   

@@ -2,6 +2,7 @@ goog.provide('brkn.model.User');
 goog.provide('brkn.model.User.Actions');
 
 goog.require('goog.date');
+goog.require('goog.date.relative');
 goog.require('goog.pubsub.PubSub');
 
 
@@ -188,11 +189,13 @@ brkn.model.User.prototype.isStarred = function(media) {
 
 /**
  * @param {?boolean=} opt_time Show the time 
- * @return {string} Last login date as a readable string
+ * @return {?string} Last login date as a readable string
  */
 brkn.model.User.prototype.getLastLogin = function (opt_time) {
   if (!this.lastLogin) {
     return 'Never';
+  } else if (goog.date.relative.format(this.lastLogin.getTime())) {
+    return goog.date.relative.format(this.lastLogin.getTime())
   }
   var date = (this.lastLogin.getMonth() + 1) + '/' + this.lastLogin.getDate() + '/' +
       this.lastLogin.getYear();

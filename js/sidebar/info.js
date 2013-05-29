@@ -485,7 +485,7 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
   brkn.Popup.getInstance().hovercard(goog.dom.getElementByClass('eye-icon', this.getElement()),
       brkn.model.Popup.Position.LEFT, brkn.model.Popup.Action.TOOLTIP, {'text': 'Seen by'});
   brkn.Popup.getInstance().hovercard(goog.dom.getElementByClass('friends-icon', this.getElement()),
-      brkn.model.Popup.Position.LEFT, brkn.model.Popup.Action.TOOLTIP, {'text': 'Visible by only your Facebook friends'});
+      brkn.model.Popup.Position.RIGHT, brkn.model.Popup.Action.TOOLTIP, {'text': 'Visible by only your Facebook friends'});
 
   this.media_.subscribe(brkn.model.Media.Actions.ADD_COMMENT, function(comment) {
     this.addComment_(comment, true);

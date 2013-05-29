@@ -2976,6 +2976,22 @@ div.popup.left:before {
   top: 50%;
   margin-top: -6px;
 }
+div.popup.right:after {
+  right: 100%;
+  border-color: rgba(222, 222, 222, 0);
+  border-right-color: #dedede;
+  border-width: 5px;
+  top: 50%;
+  margin-top: -5px;
+}
+div.popup.right:before {
+  right: 100%;
+  border-color: rgba(204, 204, 204, 0);
+  border-right-color: rgba(0, 0, 0, 0.6);
+  border-width: 6px;
+  top: 50%;
+  margin-top: -6px;
+}
 div.popup a {
   color: #181818;
   text-decoration: none;
@@ -3905,6 +3921,7 @@ div#sidebar div.tabbed.inbox ul.tabs li.inbox {
 div#sidebar div.tabbed.inbox ul.tabs li.inbox div.label {
   color: #dedede;
   text-shadow: 1px 1px 1px #181818;
+  position: relative;
 }
 div#sidebar div.tabbed div.inbox-content {
   overflow-x: hidden;
@@ -3919,6 +3936,28 @@ div#sidebar div.tabbed div.inbox-content div.label {
   text-shadow: 1px 1px 1px white;
   padding: 5px;
   border-bottom: 1px solid #999;
+  -webkit-box-shadow: 0 0 1px 0 rgba(0, 0, 0, 0.5);
+  -moz-box-shadow: 0 0 1px 0 rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 1px 0 rgba(0, 0, 0, 0.5);
+  position: relative;
+  z-index: 1;
+}
+div#sidebar div.tabbed div.inbox-content div.label.messages-label {
+  border-top: 1px solid #999;
+}
+div#sidebar div.tabbed div.inbox-content div.label.show-all {
+  position: absolute;
+  top: 0;
+  right: 0;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
+div#sidebar div.tabbed div.inbox-content div.label.show-all a {
+  color: #888;
+}
+div#sidebar div.tabbed div.inbox-content div.label.show-all a:hover {
+  text-decoration: underline;
 }
 div#sidebar div.tabbed.messages div.messages {
   display: block;

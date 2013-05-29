@@ -107,12 +107,13 @@ brkn.sidebar.Messages.prototype.decorateInternal = function(el) {
   this.spinner_ = goog.dom.createDom('div', 'spinner');
   goog.dom.appendChild(this.messagesEl_, this.spinner_);
   goog.style.showElement(this.spinner_, false);
-  this.noMessagesEl_ = goog.dom.createDom('div', 'no-comments', 'Start a private conversation.');
+  this.noMessagesEl_ = goog.dom.createDom('div', 'no-comments',
+      this.inbox_ ? 'No Messages' :'Start a private conversation.');
   goog.dom.appendChild(this.messagesEl_, this.noMessagesEl_);
   this.moreMessagesEl_ = goog.dom.createDom('div', 'no-comments', 'Load previous messages');
   goog.dom.appendChild(this.messagesEl_, this.moreMessagesEl_);
   goog.style.showElement(this.moreMessagesEl_, !this.inbox_ && this.messages_.length >= 10);
-  goog.style.showElement(this.noMessagesEl_, false);
+  goog.style.showElement(this.noMessagesEl_, true);
 
   if (!this.inbox_) {
     this.commentInput_.render(this.getElement());
@@ -120,9 +121,7 @@ brkn.sidebar.Messages.prototype.decorateInternal = function(el) {
       if (!goog.dom.getAncestorByClass(e.target, 'comment-input') &&
           !this.commentInput_.getValue()) {
         this.commentInput_.setFocused(false);
-        if (this.commentInput_.collapse()) {
-          this.resize(0);
-        }
+        this.resize(0);
       }
     }, this))
     .listen(this.noMessagesEl_, goog.events.EventType.CLICK, goog.bind(function(e) {

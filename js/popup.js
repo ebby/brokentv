@@ -147,6 +147,16 @@ brkn.Popup.prototype.positionAtAnchor = function(anchor, pos) {
         goog.positioning.Corner.TOP_END));
     goog.dom.classes.set(this.getElement(), 'popup');
     goog.dom.classes.add(this.getElement(), 'left');
+  } else if (pos == brkn.model.Popup.Position.RIGHT) {
+    this.setPinnedCorner(goog.positioning.Corner.TOP_LEFT);
+    var topMargin = -1 * (goog.style.getSize(this.getElement()).height -
+        goog.style.getSize(anchor).height) / 2;
+    this.setMargin(topMargin, 0, 0, 6);
+    this.setPosition(new goog.positioning.AnchoredViewportPosition(
+        anchor,
+        goog.positioning.Corner.TOP_END));
+    goog.dom.classes.set(this.getElement(), 'popup');
+    goog.dom.classes.add(this.getElement(), 'right');
   }
 };
 

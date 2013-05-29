@@ -148,7 +148,6 @@ brkn.sidebar.Conversation.prototype.enterDocument = function() {
             if (!goog.dom.getAncestorByClass(e.target, 'comment-input') &&
                 !this.commentInput_.getValue()) {
               this.commentInput_.setFocused(false);
-              this.commentInput_.collapse()
             }
           }, this));
 

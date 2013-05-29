@@ -595,6 +595,7 @@ div#sidebar {
         div.label {
           color: #dedede;
           text-shadow: 1px 1px 1px #181818;
+          position: relative;
         }
       }
     }
@@ -610,6 +611,24 @@ div#sidebar {
         text-shadow: 1px 1px 1px white;
         padding: 5px;
         border-bottom: 1px solid #999;
+        .box-shadow(0, 0, 1px, 0, rgba(0, 0, 0, .5));
+        position: relative;
+        z-index: 1;
+        &.messages-label {
+          border-top: 1px solid #999;
+        }
+        &.show-all {
+          position: absolute;
+          top: 0;
+          right: 0;
+          .box-shadow(none);
+          a {
+            color: #888;
+            &:hover {
+              text-decoration: underline;
+            }
+          }
+        }
       }
     }
     &.messages {

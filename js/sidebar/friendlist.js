@@ -153,7 +153,7 @@ brkn.sidebar.FriendList.prototype.decorateInternal = function(el) {
             var user = brkn.model.Users.getInstance().get_or_add(u);
             this.addUser_(user, true);
             return user;
-          });
+          }, this);
         }, this));
     
     this.showOffline_ && this.resize();
@@ -209,14 +209,15 @@ brkn.sidebar.FriendList.prototype.decorateInternal = function(el) {
  */
 brkn.sidebar.FriendList.prototype.addUser_ = function(user, opt_offlineOnly) {
   var inserted = false;
+  var lastLogin = user.lastLogin ? goog.date.relative.format(user.lastLogin.getTime()) : null;
   
   var userEl = soy.renderAsElement(brkn.sidebar.friendlist.user, {
     user: user,
-    timestamp: user.lastLogin ? goog.date.relative.format(user.lastLogin.getTime()) : null,
+    timestamp: lastLogin,
     media: user.currentMedia
   });
 
-  if (user.lastLogin) {
+  if (user.lastLogin && (goog.now() - user.lastLogin.getTime() < 43200000)) {
     brkn.model.Clock.getInstance().addTimestamp(user.lastLogin,
         goog.dom.getElementByClass('timestamp', userEl));
   }
@@ -235,7 +236,7 @@ brkn.sidebar.FriendList.prototype.addUser_ = function(user, opt_offlineOnly) {
       goog.dom.appendChild(this.onlineEl_, userEl);
       this.onlineUsers_.push(user);
     }
-  } else if (user.lastLogin && !opt_offlineOnly && this.recentUsers_.length < 5) {
+  } else if (lastLogin && (this.recentUsers_.length < 4 || opt_offlineOnly)) {
     goog.style.showElement(this.recentLabel_, true);
     goog.array.forEach(this.recentUsers_, function(u, i) {
       if (u.lastLogin && user.lastLogin && u.lastLogin.getTime() < user.lastLogin.getTime()) {
@@ -248,7 +249,9 @@ brkn.sidebar.FriendList.prototype.addUser_ = function(user, opt_offlineOnly) {
       goog.dom.appendChild(this.recentEl_, userEl);
       this.recentUsers_.push(user);
     }
-  } else if (this.showOffline_) {
+  } else if (this.showOffline_ &&
+      !goog.array.find(this.recentUsers_, function(f) {return user.id == f.id}) &&
+      !goog.array.find(this.offlineUsers_, function(f) {return user.id == f.id})) {
     goog.style.showElement(this.offlineLabel_, true);
     goog.array.forEach(this.offlineUsers_, function(u, i) {
       if (u.lastLogin && user.lastLogin && u.lastLogin.getTime() < user.lastLogin.getTime()) {

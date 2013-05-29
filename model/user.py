@@ -20,6 +20,7 @@ class User(db.Model):
     location = db.StringProperty()
     friends = db.StringListProperty(default=[])
     following = db.StringListProperty(default=[])
+    has_following = db.BooleanProperty(default=False)
     followers = db.StringListProperty(default=[])
     twitter_token = db.StringProperty()
     twitter_secret = db.StringProperty()
@@ -80,17 +81,18 @@ class User(db.Model):
     def get_following(self):
       following_ids = []
       following = []
-      list = self.following if len(self.following) else self.friends
+      list = self.following if self.has_following else self.friends
       for fid in list:
-        friend = User.get_by_key_name(fid)
-        if friend:
-          following.append(friend)
-          if not len(self.following):
+        friend_json = User.get_user_entry(fid, fetch=True)
+        if friend_json:
+          following.append(friend_json)
+          if not self.has_following:
             # if no following, we need to populate our list
-            following_ids.append(fid)
-      if len(following_ids):
+            following_ids.append(friend_json['id'])
+      if not self.has_following:
         # if we populated our list
-        self.following = following_ids
+        self.following += following_ids
+        self.has_following = True
         self.put()
       return following
 
@@ -128,15 +130,6 @@ class User(db.Model):
     def send_invite(self):
       welcome_email = emailer.Email(emailer.Message.WELCOME, {'name' : self.first_name})
       welcome_email.send(self)
-      
-    @classmethod
-    def update_waitlist(cls, user_id, channel_id):
-      if constants.INVITE_POLICY() != constants.InvitePolicy.NOBODY:
-        user = User.get_by_key_name(user_id)
-        for fid in user.friends:
-          friend = User.get_by_key_name(fid)
-          if friend and friend.access_level == constants.AccessLevel.WAITLIST:
-            friend.grant_access(user, channel_id)
 
     def grant_access(self, friend=None, channel_id=None):
       if self.access_level == 0:
@@ -162,11 +155,14 @@ class User(db.Model):
       return user_obj
 
     @classmethod
-    def get_user_entry(cls, uid, fetch=True):
+    def get_user_entry(cls, uid, fetch=True, fetch_only=False):
       user_obj = memcache.get(uid) or {}
       user_entry = None
       if user_obj.get('entry'):
-        user_entry = user_obj.get('entry')
+        if fetch_only:
+          return None
+        else:
+          user_entry = user_obj.get('entry')
       elif fetch or user_obj.get('online') is not None:
         user = User.get_by_key_name(uid)
         if user:

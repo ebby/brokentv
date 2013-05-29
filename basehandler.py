@@ -76,6 +76,8 @@ class BaseHandler(SessionRequest):
                 user.put()
 
                 if new_user:
+                  deferred.defer(util.update_following, user.id,
+                                   _name='update-following-' + user.id + '-' + str(uuid.uuid1()))
                   if user.access_level == AccessLevel.USER:
                     user.send_invite()
                   else:

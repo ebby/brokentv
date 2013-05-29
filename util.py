@@ -6,7 +6,28 @@ def cas(key, value):
     entity = client.gets(key)
     if client.cas(key, value):
        break
-     
+
+def update_following(user_id):
+  from model import User
+  
+  user = User.get_by_key_name(user_id)
+  for fid in user.friends:
+    friend = User.get_by_key_name(fid)
+    if friend and not user_id in friend.following:
+      friend.following.append(user_id)
+      friend.put()
+
+def update_waitlist(cls, user_id, channel_id):
+  import constants
+  from model import User
+
+  if constants.INVITE_POLICY() != constants.InvitePolicy.NOBODY:
+    user = User.get_by_key_name(user_id)
+    for fid in user.friends:
+      friend = User.get_by_key_name(fid)
+      if friend and friend.access_level == constants.AccessLevel.WAITLIST:
+        friend.grant_access(user, channel_id)
+
 def schedule_youtube_channel(user_id, name, channel_id, yt_channel_id=None, yt_playlist_id=None):
   import broadcast
   import constants
