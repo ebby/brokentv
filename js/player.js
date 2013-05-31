@@ -37,13 +37,6 @@ brkn.Player.prototype.playerState_;
 
 
 /**
- * @type {brkn.model.Program}
- * @private
- */
-brkn.Player.prototype.currentProgram_;
-
-
-/**
  * @type {brkn.model.Channel}
  * @private
  */
@@ -124,8 +117,9 @@ brkn.Player.prototype.enterDocument = function() {
   goog.base(this, 'enterDocument');
 
   this.currentChannel_ = brkn.model.Channels.getInstance().currentChannel;
-  this.currentProgram_ = this.currentChannel_ && this.currentChannel_.getCurrentProgram();
-  var seek = this.currentProgram_ ? (goog.now() - this.currentProgram_.time.getTime())/1000 : 0;
+  brkn.model.Player.getInstance().setCurrentProgram(this.currentChannel_ && this.currentChannel_.getCurrentProgram());
+  var seek = brkn.model.Player.getInstance().getCurrentProgram() ?
+      (goog.now() - brkn.model.Player.getInstance().getCurrentProgram().time.getTime())/1000 : 0;
   this.fullscreenEl_ = goog.dom.getElementByClass('fullscreen', this.getElement());
   var expandEl = goog.dom.getElementByClass('expand', this.getElement());
   goog.style.showElement(this.fullscreenEl_, this.supportsFullScreen_());
@@ -140,9 +134,9 @@ brkn.Player.prototype.enterDocument = function() {
   
   this.updateStagecover_();
 
-  if (this.currentProgram_) {
+  if (brkn.model.Player.getInstance().getCurrentProgram()) {
     if (DESKTOP || this.currentChannel_.myChannel) {
-      this.playProgram(this.currentProgram_);
+      this.playProgram(brkn.model.Player.getInstance().getCurrentProgram());
     }
   } else  {
     brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.NO_MEDIA);
@@ -177,7 +171,7 @@ brkn.Player.prototype.enterDocument = function() {
       .listen(this.getElement(), goog.events.EventType.MOUSEMOVE, goog.bind(function(e) {
         var xPer = e.offsetX/this.height_;
         var yPer = e.offsetY/this.width_;
-        if (xPer > .7 && xPer < 1 && yPer > .7 && yPer < 1 &&
+        if (xPer > .6 && xPer < 1 && yPer > .7 && yPer < 1 &&
             (this.playerState_ == YT.PlayerState.PLAYING ||
              this.playerState_ == YT.PlayerState.PAUSED)) {
           // Pass click through to flash to kill possible advertisement
@@ -209,7 +203,6 @@ brkn.Player.prototype.enterDocument = function() {
 			this.changeChannel, this);
   brkn.model.Channels.getInstance().subscribe(brkn.model.Channels.Actions.NEXT_PROGRAM,
       function(program) {
-        this.currentProgram_ = program;
         this.playProgram(program);
         this.updateStagecover_();
       }, this);
@@ -228,8 +221,8 @@ brkn.Player.prototype.enterDocument = function() {
         .listen(this.restart_, goog.events.EventType.CLICK, goog.bind(function(e) {
           e.preventDefault();
           e.stopPropagation()
-          if (this.currentProgram_) {
-            this.playProgram(this.currentProgram_);
+          if (brkn.model.Player.getInstance().getCurrentProgram()) {
+            this.playProgram(brkn.model.Player.getInstance().getCurrentProgram());
           }
         }, this))
         .listen(this.likeEl_, goog.events.EventType.CLICK,
@@ -448,7 +441,6 @@ brkn.Player.prototype.resize = function() {
 brkn.Player.prototype.changeChannel = function(channel) {
 	var program = channel.getCurrentProgram();
 	if (program) {
-	  this.currentProgram_ = program;
 	  this.playProgram(program);
 	}
 	this.updateStagecover_();
@@ -489,7 +481,7 @@ brkn.Player.prototype.fetchLike_ = function(media) {
 brkn.Player.prototype.onLike_ = function(el, like, e) {
   e.preventDefault();
   e.stopPropagation();
-  if (this.currentProgram_) {
+  if (brkn.model.Player.getInstance().getCurrentProgram()) {
     var checked = goog.dom.classes.toggle(el, 'checked');
     var flip = (like && goog.dom.classes.has(this.dislikeEl_, 'checked')) ||
         (!like && goog.dom.classes.has(this.likeEl_, 'checked'));
@@ -497,7 +489,7 @@ brkn.Player.prototype.onLike_ = function(el, like, e) {
       goog.dom.classes.remove((like ? this.dislikeEl_ : this.likeEl_), 'checked');
     }
     goog.net.XhrIo.send((like ? '/_like' : '/_dislike'), undefined, 'POST',
-        'media_id=' + this.currentProgram_.media.id + (!checked ? '&delete=1' : '') +
+        'media_id=' + brkn.model.Player.getInstance().getCurrentProgram().media.id + (!checked ? '&delete=1' : '') +
         (flip ? '&flip=1' : ''));
   }
 };
@@ -508,12 +500,11 @@ brkn.Player.prototype.onLike_ = function(el, like, e) {
  * @private
  */
 brkn.Player.prototype.playAsync_ = function(program) {
-  this.currentProgram_ = program;
   this.playProgram(program);
   this.updateStagecover_();
 
   goog.net.XhrIo.send('/_optin', goog.functions.NULL(), 'POST',
-      'media_id=' + this.currentProgram_.media.id);
+      'media_id=' + brkn.model.Player.getInstance().getCurrentProgram().media.id);
 };
 
 
@@ -534,20 +525,23 @@ brkn.Player.prototype.playerStateChange_ = function(event) {
   this.updateStagecover_();
   switch (event.data) {
     case YT.PlayerState.CUED:
-      var seek = this.currentProgram_.async ? this.currentProgram_.seek :
-          (goog.now() - this.currentProgram_.time.getTime())/1000;
+      var seek = brkn.model.Player.getInstance().getCurrentProgram().async ? brkn.model.Player.getInstance().getCurrentProgram().seek :
+          (goog.now() - brkn.model.Player.getInstance().getCurrentProgram().time.getTime())/1000;
       this.player_.seekTo(seek);
       this.player_.playVideo();
       brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.PLAY, true);
       break;
     case YT.PlayerState.PLAYING:
       brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.PLAYING,
-          this.currentProgram_.media);
+          brkn.model.Player.getInstance().getCurrentProgram().media);
       break;
     case YT.PlayerState.ENDED:
-  	  brkn.model.Users.getInstance().currentUser.currentSession.seen(this.currentProgram_.media);
+      if (brkn.model.Player.getInstance().getCurrentProgram()) {
+        brkn.model.Users.getInstance().currentUser.currentSession.seen(
+            brkn.model.Player.getInstance().getCurrentProgram().media);
+      }
   	  this.resetLike_();
-  	  
+  	  brkn.model.Player.getInstance().getCurrentProgram().ended = true;
   	  var nextProgram = brkn.model.Channels.getInstance().currentChannel.getCurrentProgram();
   	  if (nextProgram) {
         brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.NEXT_PROGRAM,
@@ -570,12 +564,13 @@ brkn.Player.prototype.onPlayerReady_ = function(event) {
   goog.Timer.callOnce(goog.bind(function() {
     if (this.player_ && (!this.player_.getPlayerState || !this.player_.getPlayerState())) {
       // In case we didn't load
-      this.playProgram(this.currentProgram_);
+      this.playProgram(brkn.model.Player.getInstance().getCurrentProgram());
     } else if (this.player_.getPlayerState()) {
       // If we did and cued the video
       this.player_.setPlaybackQuality('large');
-      var seek = this.currentProgram_.async ? this.currentProgram_.seek :
-          (goog.now() - this.currentProgram_.time.getTime())/1000;
+      var seek = brkn.model.Player.getInstance().getCurrentProgram().async ?
+          brkn.model.Player.getInstance().getCurrentProgram().seek :
+          (goog.now() - brkn.model.Player.getInstance().getCurrentProgram().time.getTime())/1000;
       this.player_.seekTo(seek);
       this.player_.playVideo();
       if (DESKTOP) {
@@ -609,8 +604,8 @@ brkn.Player.prototype.updateStagecover_ = function(opt_message, opt_beforeEnd, o
   }
   
   var stagecover = goog.dom.getElement('stagecover');
-//  var seek = this.currentProgram_ ? (goog.now() - this.currentProgram_.time.getTime())/1000 : 0;
-  var seek = this.currentProgram_ ? brkn.model.Player.getInstance().getCurrentTime() : 0;
+  var seek = brkn.model.Player.getInstance().getCurrentProgram() ?
+      brkn.model.Player.getInstance().getCurrentTime() : 0;
   
   if (opt_restart) {
     goog.style.showElement(this.spinner_, false);
@@ -619,7 +614,8 @@ brkn.Player.prototype.updateStagecover_ = function(opt_message, opt_beforeEnd, o
     return;
   }
   
-  if (!this.currentProgram_ || (this.currentProgram_ && seek > this.currentProgram_.media.duration)) {
+  if (!brkn.model.Player.getInstance().getCurrentProgram() || (brkn.model.Player.getInstance().getCurrentProgram() &&
+      seek > brkn.model.Player.getInstance().getCurrentProgram().media.duration)) {
     brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.NO_MEDIA);
     goog.dom.setTextContent((/** @type {Element} */ this.message_.firstChild),
         brkn.Player.Messages.OFFLINE);

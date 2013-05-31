@@ -36,7 +36,7 @@ brkn.Controller = function() {
   /**
    * @type {goog.ui.CustomButton}
    */
-  this.restartButton_ = new goog.ui.CustomButton('Restart');
+  this.nextButton_ = new goog.ui.CustomButton('Next');
   
   /**
    * @type {goog.ui.CustomButton}
@@ -157,8 +157,8 @@ brkn.Controller.prototype.enterDocument = function() {
   this.sidebarToggle_.decorate(goog.dom.getElement('sidebar-toggle'));
   this.sidebarToggle_.setChecked(goog.dom.classes.has(this.getElement(), 'sidebar-toggled'));
   
-  this.addChild(this.restartButton_);
-  this.restartButton_.decorate(goog.dom.getElementByClass('restart', this.getElement()));
+  this.addChild(this.nextButton_);
+  this.nextButton_.decorate(goog.dom.getElementByClass('next', this.getElement()));
   
   this.addChild(this.playButton_);
   this.playButton_.decorate(goog.dom.getElementByClass('play', this.getElement()));
@@ -210,17 +210,25 @@ brkn.Controller.prototype.enterDocument = function() {
   	            brkn.model.Controller.Actions.TOGGLE_SIDEBAR,
   	            this.sidebarToggle_.isChecked());
   	      }, this))
-  	  .listen(this.restartButton_,
+      .listen(this.nextButton_,
           goog.ui.Component.EventType.ACTION,
           goog.bind(function(e) {
             e.stopPropagation();
-            if (brkn.model.Player.getInstance().getCurrentProgram()) {
-              var program = brkn.model.Program.async(
-                  brkn.model.Player.getInstance().getCurrentProgram().media);
-              brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.PLAY_ASYNC,
-                  program);
-              this.resize();
+            brkn.model.Channels.getInstance().currentChannel.offline = true;
+            var currentProgram = brkn.model.Player.getInstance().getCurrentProgram();
+            if (currentProgram) {
+              currentProgram.ended = true;
             }
+            var nextProgram = brkn.model.Channels.getInstance().currentChannel.getCurrentProgram();
+            if (nextProgram) {
+              brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.NEXT_PROGRAM,
+                  nextProgram);  
+            } else {
+              brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.CHANGE_CHANNEL,
+                  brkn.model.Channels.getInstance().findOnline(), true);
+            }
+            this.nextButton_.setEnabled(
+                brkn.model.Channels.getInstance().currentChannel.hasNextProgram());
           }, this))
   	  .listen(this.playButton_,
           goog.ui.Component.EventType.ACTION,
@@ -259,9 +267,9 @@ brkn.Controller.prototype.enterDocument = function() {
                   brkn.model.Player.getInstance().getCurrentProgram().media.duration;
               var remaining = brkn.model.Player.getInstance().getCurrentProgram().media.duration -
                   brkn.model.Player.getInstance().getCurrentTime();
-//              if (remaining < 3) {
-//                brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.BEFORE_END);
-//              }
+              if (remaining < 3) {
+                brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.BEFORE_END);
+              }
               if (!goog.dom.classes.has(this.progressEl_, 'drag')) {
                 goog.dom.setTextContent(this.durationEl_,
                     (brkn.model.Player.getInstance().getCurrentTime() ?
@@ -314,10 +322,12 @@ brkn.Controller.prototype.enterDocument = function() {
       function() {
         goog.dom.classes.remove(this.getElement(), 'window');
         goog.Timer.callOnce(goog.bind(this.resize, this), 1000); // Account for timed animations.
+        this.nextButton_.setEnabled(brkn.model.Channels.getInstance().currentChannel.hasNextProgram());
       }, this);
   brkn.model.Channels.getInstance().subscribe(brkn.model.Channels.Actions.NEXT_PROGRAM,
       function() {
         this.resize();
+        this.nextButton_.setEnabled(brkn.model.Channels.getInstance().currentChannel.hasNextProgram());
       }, this);
   brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.MUTE,
       this.mute_, this);
@@ -337,8 +347,14 @@ brkn.Controller.prototype.enterDocument = function() {
     if (brkn.model.Channels.getInstance().currentChannel.myChannel &&
         brkn.model.Player.getInstance().getCurrentProgram()) {
       this.resize();
+      this.nextButton_.setEnabled(brkn.model.Channels.getInstance().currentChannel.hasNextProgram());
     }
   }, this);
+  brkn.model.Channels.getInstance().getMyChannel().subscribe(brkn.model.Channel.Action.ADD_QUEUE,
+      function() {
+        this.nextButton_.setEnabled(
+            brkn.model.Channels.getInstance().currentChannel.hasNextProgram());
+      }, this); 
 };
 
 

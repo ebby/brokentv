@@ -288,6 +288,14 @@ class FriendsHandler(BaseHandler):
   @BaseHandler.logged_in
   def get(self):
     fetch_only = self.request.get('offline')
+    reset = self.request.get('reset')
+
+    if reset:
+      user = self.current_user
+      user.has_following = False
+      user.following = []
+      user.put()
+
     friends_json = []
     if self.current_user.has_following:
       for fid in self.current_user.following:
@@ -322,9 +330,12 @@ class CommentHandler(BaseHandler):
       c = Comment.get_by_id(int(id))
       if c:
         c_a = UserActivity.all().filter('comment =', c).get()
+        n = Notification.all().filter('comment =', c).get()
         c.delete()
         if c_a:
           c_a.delete()
+        if n:
+          n.remove()
       return
 
     media = Media.get_by_key_name(self.request.get('media_id'))
@@ -418,7 +429,8 @@ class NotificationHandler(BaseHandler):
     has_read = self.request.get('read')
     if id and has_read:
       notification = Notification.get_by_id(int(id))
-      notification.set_read()
+      if notification:
+        notification.set_read()
 
 class LinkHandler(BaseHandler):
   @BaseHandler.logged_in

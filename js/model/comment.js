@@ -11,25 +11,21 @@ goog.require('brkn.model.Users');
 brkn.model.Comment = function(comment) {
   /**
    * @type {string}
-   * @private
    */
   this.id = comment['id'];
 
   /**
    * @type {?brkn.model.User}
-   * @private
    */
   this.user = comment['user'] ? brkn.model.Users.getInstance().get_or_add(comment['user']) : null;
 
   /**
    * @type {string}
-   * @private
    */
   this.text = comment['text'];
 
   /**
    * @type {?brkn.model.Media}
-   * @private
    */
   this.media = comment['media'] ? brkn.model.Medias.getInstance().getOrAdd(comment['media']) : null;
 
@@ -50,9 +46,14 @@ brkn.model.Comment = function(comment) {
 
   /**
    * @type {Array.<brkn.model.Comment>}
-   * @private
    */
   this.replies = [];
+
+  /**
+   * Only used for marking notifications as read
+   * @type {boolean}
+   */
+  this.read = false;
 
   if (comment['replies']) {
     goog.array.forEach(comment['replies'], function(reply) {

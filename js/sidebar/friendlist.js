@@ -236,7 +236,7 @@ brkn.sidebar.FriendList.prototype.addUser_ = function(user, opt_offlineOnly) {
       goog.dom.appendChild(this.onlineEl_, userEl);
       this.onlineUsers_.push(user);
     }
-  } else if (lastLogin && (this.recentUsers_.length < 4 || opt_offlineOnly)) {
+  } else if (lastLogin && (this.recentUsers_.length < 3 || opt_offlineOnly)) {
     goog.style.showElement(this.recentLabel_, true);
     goog.array.forEach(this.recentUsers_, function(u, i) {
       if (u.lastLogin && user.lastLogin && u.lastLogin.getTime() < user.lastLogin.getTime()) {

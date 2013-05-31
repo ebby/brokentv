@@ -109,6 +109,7 @@ brkn.sidebar.Profile.prototype.enterDocument = function() {
         '/_notification',
         goog.bind(function(e) {
           var response = /** @type {Array.<Object>} */ e.target.getResponseJson();
+          response = goog.array.filter(response, function(n) {return !!n;});
           var unreadCount = 0;
           var notifications = goog.array.map(response, function(n) {
             var notification = new brkn.model.Notification(n);

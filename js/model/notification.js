@@ -26,10 +26,10 @@ brkn.model.Notification = function(notification) {
   this.type = notification['type'];
   
   /**
-   * @type {brkn.model.Comment}
+   * @type {?brkn.model.Comment}
    * @private
    */
-  this.comment = new brkn.model.Comment(notification['comment']);
+  this.comment = notification['comment'] ? new brkn.model.Comment(notification['comment']) : null;
   
   /**
    * @type {boolean}

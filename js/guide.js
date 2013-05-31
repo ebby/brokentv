@@ -359,11 +359,9 @@ brkn.Guide.prototype.enterDocument = function() {
         goog.Timer.TICK,
         goog.bind(this.tick_, this))
     .listen(goLiveEl, goog.events.EventType.CLICK, goog.bind(function() {
+      brkn.model.Channels.getInstance().currentChannel.offline = false;
       brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.CHANGE_CHANNEL,
-          this.currentChannel_.getModel());
-      brkn.model.Controller.getInstance().publish(
-          brkn.model.Controller.Actions.PLAY,
-          true);
+          brkn.model.Channels.getInstance().currentChannel);
     }, this))
     .listen(window, goog.events.EventType.RESIZE, goog.bind(this.align_, this))
     .listen(this.tickerEl_, goog.events.EventType.CLICK,
@@ -421,7 +419,7 @@ brkn.Guide.prototype.enterDocument = function() {
           goog.dom.classes.add(this.getElement(), 'drag');
           this.dragging_ = true;
           var delta = e.wheelDelta ? e.wheelDelta : e.detail ? -e.detail : 0;
-          this.channelsEl_.scrollLeft += delta;
+          this.hScrollableEl_.scrollLeft += delta;
           goog.dom.classes.remove(this.getElement(), 'drag');
           goog.dom.classes.add(this.getElement(), 'animate');
           this.dragging_ = false;
@@ -520,8 +518,6 @@ brkn.Guide.prototype.addChannel_ = function(c) {
   if (c.id == brkn.model.Channels.getInstance().currentChannel.id && channel) {
     channel.setCurrent(true);
     this.currentChannel_ = channel;
-    // Stored for use in dragger override
-    window['currentChannel'] = this.currentChannel_;
   }
   this.myChannel_ = c.myChannel ? c : this.myChannel_;
 };
@@ -614,14 +610,15 @@ brkn.Guide.prototype.addTimeSlots = function(timeslots, startTime) {
  *          channel
  */
 brkn.Guide.prototype.changeChannel = function(channel) {
-  this.currentChannel_ && this.currentChannel_.setCurrent(false);
-  this.currentChannel_ = this.channelMap_[channel.id] || null;
-  window['currentChannel'] = this.currentChannel_;
-  if (this.currentChannel_) {
-    this.currentChannel_.setCurrent(true);
-    goog.Timer.callOnce(goog.bind(this.align_, this, true, undefined, false));
+  if (channel) {
+    this.currentChannel_ && this.currentChannel_.setCurrent(false);
+    this.currentChannel_ = this.channelMap_[channel.id] || null;
+    if (this.currentChannel_) {
+      this.currentChannel_.setCurrent(true);
+      goog.Timer.callOnce(goog.bind(this.align_, this, true, undefined, false));
+    }
+    this.cursor_[0] = channel;
   }
-  this.cursor_[0] = channel;
 };
 
 
@@ -805,7 +802,7 @@ brkn.Guide.prototype.align_ = function(opt_setAligned, opt_offset, opt_setScroll
   this.scrolled_ = opt_setAligned != undefined ? !!opt_setScrolled : this.aligned_;
   this.guideOffset_ = this.aligned_ ? 0 : opt_offset ? this.guideOffset_ + opt_offset : this.guideOffset_;
 
-  var liveProgram = brkn.model.Channels.getInstance().currentChannel.getCurrentProgram(this.guideOffset_);
+  var liveProgram = brkn.model.Channels.getInstance().currentChannel.getScheduledProgram();
   var program;
   if (!brkn.model.Channels.getInstance().currentChannel.myChannel) {
     program = opt_live ? liveProgram : this.aligned_ ?
@@ -840,14 +837,16 @@ brkn.Guide.prototype.align_ = function(opt_setAligned, opt_offset, opt_setScroll
         if (channelUi) {
           var program = channel.getCurrentProgram();
           var index = channel.currentProgramIndex || 0;
-          var offset = (index + this.guideOffset_) * this.pixelsPerProgram_ - brkn.Guide.NAME_WIDTH;
+          var offset = (index + this.guideOffset_) * this.pixelsPerProgram_;
           var channelEl = goog.dom.getElementByClass('channel', channelUi.getElement())
           var programsEl = goog.dom.getElementByClass('programs', channelUi.getElement());
           programsEl.style.paddingRight = goog.dom.getViewportSize().width - 200 + 'px';
-          var scrollAnim = new goog.fx.dom.Scroll(channelEl,
-              [channelEl.scrollLeft, channelEl.scrollTop],
-              [offset, channelEl.scrollTop], 300);
-          scrollAnim.play();
+          if (offset != channelEl.scrollLeft) {
+            var scrollAnim = new goog.fx.dom.Scroll(channelEl,
+                [channelEl.scrollLeft, channelEl.scrollTop],
+                [offset, channelEl.scrollTop], 300);
+            scrollAnim.play();
+          }
         }
       }, this);
     } else {
@@ -879,11 +878,11 @@ brkn.Guide.prototype.align_ = function(opt_setAligned, opt_offset, opt_setScroll
       
       offset = Math.max(offset, 0);
       offset = Math.min(offset, this.hScrollableEl_.scrollWidth - this.hScrollableEl_.clientWidth);
-
+      
       if (opt_offset || opt_setAligned) {
         var scrollAnim = new goog.fx.dom.Scroll(this.hScrollableEl_,
             [this.hScrollableEl_.scrollLeft, this.hScrollableEl_.scrollTop],
-            [offset, this.hScrollableEl_.scrollTop], 300);
+            [offset - 10 /* offset */, this.hScrollableEl_.scrollTop], 300);
         scrollAnim.play();
         this.headerEl_.style.left = -offset + 'px';
       } else {
@@ -912,6 +911,11 @@ brkn.Guide.prototype.align_ = function(opt_setAligned, opt_offset, opt_setScroll
   if (opt_offset) {
     this.updateNowButtons_();
   }
+  if (!brkn.model.Controller.getInstance().timeless && opt_live && (!liveProgram ||
+      !brkn.model.Player.getInstance().getCurrentProgram() ||
+      liveProgram.id != brkn.model.Player.getInstance().getCurrentProgram().id)) {
+    this.aligned_ = false;
+  }
 };
 
 /**
@@ -923,7 +927,5 @@ brkn.Guide.prototype.resize_ = function() {
       ? channelsHeight : this.controllerHeight_);
   goog.style.setHeight(this.hScrollableEl_, goog.style.getSize(this.channelsEl_).height + 22);
   goog.style.setHeight(this.getElement(), goog.dom.classes.has(this.getElement(), 'collapsed') ?
-      this.controllerHeight_ : channelsHeight + this.controllerHeight_);
-  goog.style.setHeight(goog.dom.getElement('right-grad'), !goog.dom.classes.has(this.getElement(), 'toggled') ?
       this.controllerHeight_ : channelsHeight + this.controllerHeight_);
 };

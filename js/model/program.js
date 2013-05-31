@@ -51,7 +51,13 @@ brkn.model.Program = function(opt_program, opt_media) {
    * @type {?number}
    * @private
    */
-  this.seek = program ? program['seek'] : null;
+  this.seek = program ? program['seek'] : opt_media ? 0 : null;
+  
+  /**
+   * @type {boolean}
+   * @private
+   */
+  this.ended = false;
 };
 goog.inherits(brkn.model.Program, goog.pubsub.PubSub);
 

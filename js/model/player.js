@@ -20,7 +20,7 @@ brkn.model.Player = function() {
   this.player_;
 
   /**
-   * @type {brkn.model.Program}
+   * @type {?brkn.model.Program}
    * @private
    */
   this.currentProgram_;
@@ -54,7 +54,7 @@ brkn.model.Player.prototype.setPlayer = function(player) {
 
 
 /**
- * @param {brkn.model.Program} program
+ * @param {?brkn.model.Program} program
  */
 brkn.model.Player.prototype.setCurrentProgram = function(program) {
   this.currentProgram_ = program;

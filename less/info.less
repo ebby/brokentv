@@ -33,6 +33,12 @@ div#sidebar div.info {
         visibility: visible;
       }
     }
+    &:hover {
+      div.play {
+        visibility: visible;
+        opacity: .9;
+      }
+    }
     div.play {
       width: 45px;
       height: 45px;
@@ -43,7 +49,8 @@ div#sidebar div.info {
       position: absolute;
       left: 115px;
       top: 80px;
-      opacity: .9;
+      opacity: 0;
+      visibility: hidden;
       .transition(opacity, .3s, ease);
       .icon {
         .icon-play();

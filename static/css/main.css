@@ -416,7 +416,7 @@ div.controller div.controls div.button:first-child {
   -webkit-border-top-left-radius: 3px;
   -webkit-border-bottom-left-radius: 3px;
 }
-div.controller div.controls div.restart .icon {
+div.controller div.controls div.next .icon {
   font-family: 'icons';
   font-style: normal;
   font-weight: normal;
@@ -429,15 +429,18 @@ div.controller div.controls div.restart .icon {
 
   /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
 
-  /* '⟲' */
+  /* '' */
 
   font-size: 16px;
   opacity: .9;
   text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
   margin: 4px 0 0 0;
 }
-div.controller div.controls div.restart .icon:before {
-  content: '\27f2';
+div.controller div.controls div.next .icon:before {
+  content: '\e802';
+}
+div.controller div.controls div.next.goog-custom-button-disabled .icon {
+  color: #999;
 }
 div.controller div.controls div.play .icon {
   font-family: 'icons';
@@ -1157,10 +1160,14 @@ div#guide.timeless div.channels div.channel {
 }
 div#guide.timeless div.channels div.channel div.programs {
   width: auto;
+  margin-left: 200px;
 }
 div#guide.timeless div.channels div.channel div.programs div.program {
   position: relative !important;
   margin-left: -1px !important;
+}
+div#guide.timeless div.channels div.channel div.programs div.program div.title {
+  left: 5px !important;
 }
 div#guide.timeless div.channels div.channel div.viewers {
   display: none;
@@ -1583,80 +1590,6 @@ div.header div.browse.now span {
   z-index: 1;
   width: 200px !important;
 }
-.collapsed div.channels {
-  height: 40px;
-  overflow: hidden;
-  margin-top: 2px;
-}
-.collapsed div.channels div.channel {
-  background: #5c5c5c;
-}
-.collapsed div.channels div.channel div.viewers {
-  display: none;
-}
-.collapsed div.channels div.channel div.name {
-  display: none;
-}
-.collapsed div.channels div.channel div.programs {
-  margin-top: 5px;
-}
-.collapsed div.channels div.channel div.programs div.program {
-  -webkit-border-radius: 0;
-  -moz-border-radius: 0;
-  border-radius: 0;
-  border: none;
-  border-left: 1px solid #2d3446;
-  padding-right: 10px;
-  margin-top: -1px;
-  -webkit-box-shadow: inset 0 0 1px -1px #F1F1F1, 0 0 1px #DEDEDE;
-  -moz-box-shadow: inset 0 0 1px -1px #F1F1F1, 0 0 1px #DEDEDE;
-  box-shadow: inset 0 0 1px -1px #F1F1F1, 0 0 1px #DEDEDE;
-  background: #3d3d3d url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAoCAIAAACw1AcgAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyRpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoTWFjaW50b3NoKSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDpCN0QxODVCQTUzREUxMUUyQUU0NkZEMEE1QkIwMzk4RCIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDpCN0QxODVCQjUzREUxMUUyQUU0NkZEMEE1QkIwMzk4RCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkI3RDE4NUI4NTNERTExRTJBRTQ2RkQwQTVCQjAzOThEIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOkI3RDE4NUI5NTNERTExRTJBRTQ2RkQwQTVCQjAzOThEIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+2i3rwAAAADRJREFUeNpi6OvrY/r//z8K/vfvHxMDAwMYg9ggDBOHycHYyPLIagiJIYuj2w8yH8oGCDAAI7RqXUjJdmoAAAAASUVORK5CYII=);
-  -webkit-transition: left .2s ease, width .2s ease;
-  -moz-transition: left .2s ease, width .2s ease;
-  -o-transition: left .2s ease, width .2s ease;
-  -ms-transition: left .2s ease, width .2s ease;
-  transition: left .2s ease, width .2s ease;
-}
-.collapsed div.channels div.channel div.programs div.program:last-child {
-  -webkit-box-shadow: none;
-  -moz-box-shadow: none;
-  box-shadow: none;
-  width: 100% !important;
-}
-.collapsed div.channels div.channel div.programs div.program div.info div.title {
-  position: relative;
-  top: 8px;
-  color: #f7f7f7;
-  font-family: MuseoSans700;
-  font-size: 11px;
-  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.7);
-  padding-right: 0;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.collapsed div.channels div.channel div.programs div.program div.remove,
-.collapsed div.channels div.channel div.programs div.program div.repos {
-  display: none;
-}
-.collapsed div.channels div.channel div.programs div.program div.stats,
-.collapsed div.channels div.channel div.programs div.program div.program-play,
-.collapsed div.channels div.channel div.programs div.program div.program-plus {
-  display: none;
-}
-.collapsed div.channels div.channel div.programs div.program:active {
-  background: #111;
-  -webkit-box-shadow: inset -1px 0 1px #000000;
-  -moz-box-shadow: inset -1px 0 1px #000000;
-  box-shadow: inset -1px 0 1px #000000;
-  color: #ddd;
-}
-.collapsed div.channels div.suggest {
-  display: none;
-}
-.collapsed div.channels div.channel div.programs div.program div.thumb {
-  display: none;
-}
 div.channel-scrollable {
   position: relative;
   overflow-y: scroll;
@@ -1679,6 +1612,7 @@ div.channel-names {
 }
 div.channel-names div.name {
   width: 200px;
+  height: 80px;
   text-align: center;
   display: block;
   position: relative;
@@ -1878,7 +1812,7 @@ div.channels div.channel div.programs div.program.playing div.thumb {
 div.channels div.channel div.programs div.program div.thumb {
   width: 100%;
   height: 100%;
-  opacity: .2;
+  opacity: .1;
   background-size: 110% auto;
   background-position: 50% 37%;
 }
@@ -2677,7 +2611,7 @@ div#logo {
 
   width: 20px;
   height: 20px;
-  right: 10px;
+  right: 40px;
   top: 10px;
   color: #f5f5f5;
   font-size: 18px;
@@ -2723,7 +2657,7 @@ div#logo {
 
   width: 20px;
   height: 20px;
-  right: 40px;
+  right: 10px;
   top: 10px;
   color: #f5f5f5;
   font-size: 18px;
@@ -5445,6 +5379,10 @@ div#sidebar div.info div.picture img.thumb.show {
   opacity: .5;
   visibility: visible;
 }
+div#sidebar div.info div.picture:hover div.play {
+  visibility: visible;
+  opacity: .9;
+}
 div#sidebar div.info div.picture div.play {
   width: 45px;
   height: 45px;
@@ -5455,7 +5393,8 @@ div#sidebar div.info div.picture div.play {
   position: absolute;
   left: 115px;
   top: 80px;
-  opacity: .9;
+  opacity: 0;
+  visibility: hidden;
   -webkit-transition: opacity 0.3s ease;
   -moz-transition: opacity 0.3s ease;
   -o-transition: opacity 0.3s ease;

@@ -28,9 +28,14 @@ brkn.model.Channel = function(channel) {
 	this.name = channel['name'];
 
 	/**
-   * @type {string}
+   * @type {boolean}
    */
   this.myChannel = channel['my_channel'];
+  
+  /**
+   * @type {boolean}
+   */
+  this.offline = this.myChannel;
 
   /**
    * @type {?brkn.model.Media}
@@ -83,6 +88,11 @@ brkn.model.Channel = function(channel) {
 	this.subscribe(brkn.model.Channel.Action.ADD_QUEUE, this.addQueue, this);
 	this.subscribe(brkn.model.Channel.Action.ADD_VIEWER, this.addViewer, this);
 	this.subscribe(brkn.model.Channel.Action.UPDATE_PROGRAM, this.updateProgram, this);
+	
+	if (!this.currentProgram) {
+    this.currentProgramIndex = 0;
+    this.currentProgram = this.programming[0];
+  }
 };
 goog.inherits(brkn.model.Channel, goog.pubsub.PubSub);
 
@@ -100,6 +110,10 @@ brkn.model.Channel.prototype.currentProgramIndex;
 brkn.model.Channel.prototype.addProgram = function(program) {
 	this.programming.push(program);
 	this.programMap_[program.id] = program;
+	if (program.async) {
+	  this.currentProgramIndex = this.programming.length - 1;
+	  this.currentProgram = program;
+	}
 	if (program.time.getTime() + program.media.duration*1000 > this.lastTime_) {
 	  this.lastTime_ = program.time.getTime() + program.media.duration*1000 - 120000;
 	  brkn.model.Clock.getInstance().addEvent(this.lastTime_,
@@ -125,13 +139,13 @@ brkn.model.Channel.prototype.asPlaylist = function() {
  * @param {?Function=} opt_callback
  */
 brkn.model.Channel.prototype.fetchQueue = function(opt_callback) {
-  goog.net.XhrIo.send('/_queue', function(e) {
+  goog.net.XhrIo.send('/_queue', goog.bind(function(e) {
     var response = e.target.getResponseJson();
-    this.queue_ = goog.array.map((/** @type {Array.<Object>} */ response), function(m) {
+    this.queue = goog.array.map((/** @type {Array.<Object>} */ response), function(m) {
       return brkn.model.Medias.getInstance().getOrAdd(m);
     }, this);
-    opt_callback && opt_callback(this.queue_);
-  });
+    opt_callback && opt_callback(this.queue);
+  }, this));
 };
 
 
@@ -214,60 +228,71 @@ brkn.model.Channel.prototype.updateProgram = function(program) {
  * @return {?brkn.model.Program}
  */
 brkn.model.Channel.prototype.getCurrentProgram = function(opt_offset) {
-  if (this.currentProgram && this.currentProgram.async && this.currentProgram.seek) {
+  if (this.currentProgram && this.currentProgram.async && this.currentProgram.seek != null
+      && !this.currentProgram.ended) {
     return this.currentProgram;
   }
 	if (!this.programming.length) {
 		return null;
-	}
-	var program = this.currentProgram;
-	if (!program) {
-		program = this.programming[0];
-		this.currentProgramIndex = 0;
 	}
 
   if (opt_offset) {
     return this.programming[this.currentProgramIndex + opt_offset];
   }
 
-	if (!this.myChannel && goog.now() >= program.time.getTime() &&
-	    goog.now() < program.time.getTime() + program.media.duration * 1000) {
-	  this.currentProgram = program;
-	  return this.currentProgram;
-	}
-
-//	if (!this.myChannel && this.currentProgram && this.currentProgram.id == program.id) {
-//	  this.currentProgram = program;
-//	  return this.currentProgram;
-//	}
-
-  while (goog.now() > program.time.getTime() &&
-      goog.now() >= program.time.getTime() + program.media.duration * 1000) {
-    var nextProgram = this.getNextProgram();
-    if (this.myChannel) {
-      if (nextProgram && nextProgram.async && nextProgram.seek) {
-        // If this is the program associated with the current media.
-        // Maybe just hold currentProgram in the backend channel object?
-        this.currentProgram = nextProgram;
-        return this.currentProgram;
-      }
-      if (!nextProgram) {
-        // If no scheduled program next, and this is user's channel, check queue
-        nextProgram = this.getNextQueue(); 
+  if (this.offline) {
+    if (this.currentProgram) {
+      if (this.currentProgram.ended) {
+        this.currentProgram = this.getNextProgram();
       }
     }
-  	if (!nextProgram) {
-      break;
-  	}
-  	program = nextProgram;
+  } else {
+    this.currentProgram = this.getScheduledProgram();
   }
-  if (goog.now() >= program.time.getTime() &&
+
+  if (this.currentProgram && (!this.programming[this.currentProgramIndex] ||
+      this.programming[this.currentProgramIndex].id != this.currentProgram.id)) {
+    // If index is incorrect
+    var index = goog.array.findIndex(this.programming, goog.bind(function(p) {
+      return p.id == this.currentProgram.id;
+    }, this));
+    this.currentProgramIndex = Math.max(index, 0);
+  } else if (!this.currentProgram) {
+    // If no program, index is after list
+    this.currentProgramIndex = this.programming.length;
+  }
+
+  return this.currentProgram;
+};
+
+
+/**
+ * @return {?brkn.model.Program}
+ */
+brkn.model.Channel.prototype.getScheduledProgram = function() {
+  var program = this.currentProgram;
+  var index = this.currentProgramIndex;
+
+  if (program && goog.now() >= program.time.getTime() &&
       goog.now() < program.time.getTime() + program.media.duration * 1000) {
+    // If this is the correct program
     this.currentProgram = program;
     return this.currentProgram;
-  } else {
-    return null;
   }
+  
+  if (!program || program.time.getTime() >= goog.now()) {
+    index = 0;
+    program = this.programming[0];
+  }
+  
+  for (var i = index; i < this.programming.length; i++) {
+    var p = this.programming[i];
+    if (goog.now() >= p.time.getTime() &&
+        goog.now() < p.time.getTime() + p.media.duration * 1000) {
+      return p;
+    }
+  }
+  return program;
 };
 
 
@@ -296,14 +321,16 @@ brkn.model.Channel.prototype.fetchCurrentProgramming = function() {
 
 /**
  * @param {?number=} opt_offset
+ * @param {?number=} opt_index
  * @return {boolean}
  */
-brkn.model.Channel.prototype.hasNextProgram = function(opt_offset) {
-  if (this.myChannel) {
-    return !!this.queue.length;
-  }
+brkn.model.Channel.prototype.hasNextProgram = function(opt_offset, opt_index) {
+  var index = opt_index || this.currentProgramIndex || 0;
   var offset = opt_offset || 0;
-  return this.currentProgramIndex + offset + 1 < this.programming.length;
+  if (this.myChannel) {
+    return index + offset + 1 < this.programming.length || !!this.queue.length;
+  }
+  return index + offset + 1 < this.programming.length;
 };
 
 
@@ -318,24 +345,16 @@ brkn.model.Channel.prototype.hasPrevProgram = function(opt_offset) {
 
 
 /**
+ * @param {?number=} opt_index
  * @return {?brkn.model.Program}
  */
-brkn.model.Channel.prototype.getNextProgram = function() {
-	if (!this.currentProgram) {
-		this.currentProgram = this.programming[0];
-		this.currentProgramIndex = 0;
-	}
-
-	if (this.programming.length >= this.currentProgramIndex + 1) {
-		this.currentProgramIndex++;
-		var program = this.programming[this.currentProgramIndex];
-	  if (this.myChannel) {
-	    this.currentProgram = program && program.seek ? program : null;
-	  } else {
-	    this.currentProgram = this.programming[this.currentProgramIndex]; 
-	  }
-		return this.currentProgram;
-	};
+brkn.model.Channel.prototype.getNextProgram = function(opt_index) {
+  var index = opt_index || this.currentProgramIndex;
+  if (this.programming[index + 1]) {
+    return this.programming[index + 1];
+  } else if (this.myChannel) {
+    return this.getNextQueue();
+  }
 	return null;
 };
 

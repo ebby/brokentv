@@ -26,10 +26,16 @@ brkn.sidebar.Notifications = function(notifications) {
   this.notifications_ = notifications;
 
   /**
-   * @type {?Object.<string, Element>}
+   * @type {Object.<string, Element>}
    * @private
    */
   this.notificationMap_ = {};
+
+  /**
+   * @type {Object.<string, Array.<brkn.model.Notification>>}
+   * @private
+   */
+  this.mediaMap_ = {};
 
   /**
    * @type {number}
@@ -97,6 +103,10 @@ brkn.sidebar.Notifications.prototype.decorateInternal = function(el) {
  * @private
  */
 brkn.sidebar.Notifications.prototype.addNotification_ = function(notification, opt_first) {
+  if (!notification.comment) {
+    return;
+  }
+  
   goog.style.showElement(this.noNotificationsEl_, false);
   var timeEl;
 
@@ -115,13 +125,17 @@ brkn.sidebar.Notifications.prototype.addNotification_ = function(notification, o
   } else {
     goog.dom.appendChild(this.notificationsEl_, notificationEl); 
   }
+  
+  this.notificationMap_[notification.id] = notificationEl;
+  var mediaNotifications = this.mediaMap_[notification.comment.media.id] || [];
+  mediaNotifications.push(notification);
+  this.mediaMap_[notification.comment.media.id] = mediaNotifications;
+
   timeEl = goog.dom.getElementByClass('timestamp', notificationEl);
   goog.dom.classes.enable(notificationEl, 'unread', !notification.read)
   this.getHandler().listen(notificationEl, goog.events.EventType.CLICK, goog.bind(function() {
     if (!notification.read) {
-      notification.setRead();
-      goog.dom.classes.remove(notificationEl, 'unread');
-      brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NEW_MESSAGES, -1);
+      this.setMediaRead(notification.comment.media.id);
     }
    brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.MEDIA_INFO,
        notification.comment.media);
@@ -131,5 +145,20 @@ brkn.sidebar.Notifications.prototype.addNotification_ = function(notification, o
   if (!opt_first) {
     this.getElement().scrollTop = this.getElement().scrollHeight; 
   }
+};
+
+
+/**
+ * @param {string} mediaId
+ * @private
+ */
+brkn.sidebar.Notifications.prototype.setMediaRead = function(mediaId) {
+  var ns = this.mediaMap_[mediaId] || [];
+  goog.array.forEach(ns, function(n) {
+    n.setRead();
+    brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NEW_MESSAGES, -1);
+    var nEl = this.notificationMap_[n.id];
+    nEl && goog.dom.classes.remove(nEl, 'unread');
+  }, this);
 };
 

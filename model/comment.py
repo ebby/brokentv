@@ -39,7 +39,7 @@ class Comment(db.Model):
     media.put()
     
     for m in c.mentions:
-      if m != to_user.id: 
+      if not to_user or (to_user and m != to_user.id): 
         user = User.get_by_key_name(m)
         n = Notification.add(user, constants.NotificationType.MENTION, c)
         broadcast.broadcastNotification(n)

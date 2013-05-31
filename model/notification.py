@@ -48,12 +48,19 @@ class Notification(db.Model):
     ns = user_obj.get('notifications')
     updated = False
     for n in ns:
-      if n['id'] == self.id:
+      if n and n['id'] == self.id:
         n['read'] = True
         updated = True
     if updated:
       user_obj['notifications'] = ns
       memcache.set(self.user.id, user_obj)
+      
+  def remove(self):
+    user_obj = memcache.get(self.user.id) or {}
+    ns = user_obj.get('notifications')
+    user_obj['notifications'] = [n for n in ns if n.id != self.id]
+    memcache.set(self.user.id, user_obj)
+    self.delete()
   
   def to_json(self):
     json = {}
@@ -62,7 +69,12 @@ class Notification(db.Model):
     json['user'] = self.user.toJson()
     json['time'] = self.time.isoformat()
     json['read'] = self.read
-    json['comment'] = self.comment.toJson() if self.comment else None
+    try:
+      json['comment'] = self.comment.toJson() if self.comment else None
+    except:
+      # Comment has been deleted
+      self.delete()
+      json['comment'] = None
     return json
   
   

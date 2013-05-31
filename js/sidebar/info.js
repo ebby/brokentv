@@ -854,7 +854,7 @@ brkn.sidebar.Info.prototype.addViewer_ = function(user, online) {
           });
       brkn.Popup.getInstance().hovercard(viewerEl, brkn.model.Popup.Position.TOP,
           brkn.model.Popup.Action.TOOLTIP, {'text': user.firstName() +
-              (goog.dom.classes.has(viewerEl, 'online') ? ' is watching' : ' saw this')});
+              (online ? ' is watching' : ' saw this')});
     }
 
     goog.style.showElement(this.viewersEl_, true);

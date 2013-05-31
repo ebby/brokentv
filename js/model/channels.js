@@ -180,6 +180,7 @@ brkn.model.Channels.prototype.changeChannel = function(channel, opt_forced) {
       (channel && this.currentChannel && this.currentChannel.id != channel.id)) {
     this.lastChannel = this.currentChannel;
     this.currentChannel = channel;
+    channel.offline = channel.myChannel;
     this.updateOnlineUsers(channel.getCurrentProgram());
     var program = channel.getCurrentProgram();
     var withFriends = program && !goog.object.isEmpty(program.media.onlineViewers);
@@ -224,7 +225,8 @@ brkn.model.Channels.prototype.getMyChannel = function() {
     var user = brkn.model.Users.getInstance().currentUser;
     this.myChannel = new brkn.model.Channel({
       id: user.id,
-      name: user.name.split(' ')[0] + '\'s Channel'
+      name: user.name.split(' ')[0] + '\'s Channel',
+      myChannel: true
     });
   }
   return this.myChannel;

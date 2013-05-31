@@ -86,9 +86,9 @@ class User(db.Model):
         friend_json = User.get_user_entry(fid, fetch=True)
         if friend_json:
           following.append(friend_json)
-          if not self.has_following:
+          if not self.has_following and fid not in self.following:
             # if no following, we need to populate our list
-            following_ids.append(friend_json['id'])
+            following_ids.append(fid)
       if not self.has_following:
         # if we populated our list
         self.following += following_ids
