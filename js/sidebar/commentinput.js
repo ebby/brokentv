@@ -268,9 +268,9 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
           goog.bind(function(e) {
             e.stopPropagation();
             
-            if (e.keyCode == '13') {
-              e.preventDefault();
+            if (e.keyCode == '13' || e.keyCode == '32') {
               if (this.suggestions_.length && this.suggestions_.reverse()[this.cursorIndex_]) {
+                e.preventDefault();
                 // Suggestion input is the last word up to the cursor
                 var suggestionInput = this.commentInput_.getValue().slice(0,
                     this.commentInput_.getElement().selectionStart);
@@ -283,7 +283,8 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
                 this.suggestions_ = [];
                 this.cursorIndex_ = -1;
                 this.setCaretToPos(this.getValue().length);
-              } else {   
+              } else if (e.keyCode == '13') {  
+                e.preventDefault();
                 this.addCommentButton_.setActive(this.commentInput_.getValue());
                 this.onAddComment_(e);
               }

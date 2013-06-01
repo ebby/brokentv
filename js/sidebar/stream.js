@@ -326,17 +326,14 @@ brkn.sidebar.Stream.prototype.addActivity_ = function(opt_activity, opt_digest, 
     case 'comment':
       medias = activity ? [activity['comment']['media']] :
           [brkn.model.Medias.getInstance().getOrAdd(digest[0]['media'])]
-      var comments = activity ? [new brkn.model.Comment(activity['comment'])] : [];
-      if (digest) {
-        goog.array.forEach(digest, function(obj) {
+      var comments = goog.array.map(activity ? [activity['comment']] : digest, function(obj) {
           var c = new brkn.model.Comment(obj);
           c.text = goog.string.linkify.linkifyPlainText(c.text);
           c.text = c.text.replace(/@\[(\d+):([a-zA-z\s]+)\]/g, function(str, id, name) {
             return '<a href="#user:' + id + '">' + name + '</a>';
           });
-          comments.push(c);
+          return c;
         });
-      }
       activityEl = soy.renderAsElement(brkn.sidebar.commentActivity, {
         comments: comments.reverse().slice(0, 3),
         users: users,

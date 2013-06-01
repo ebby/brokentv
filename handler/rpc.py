@@ -300,7 +300,7 @@ class FriendsHandler(BaseHandler):
     if self.current_user.has_following:
       for fid in self.current_user.following:
         # Only fetch if it's from the following list, otherwise this call would take too long
-        user_json = User.get_user_entry(fid, fetch=fetch_only, fetch_only=fetch_only)
+        user_json = User.get_user_entry(fid)
         if user_json:
           friends_json.append(user_json)
     else:
@@ -537,7 +537,7 @@ class ChangeChannelHandler(BaseHandler):
 
     broadcast.broadcastViewerChange(self.current_user, last_channel_id, channel_id,
                                     session.key().id(), session.tune_in.isoformat(),
-                                    (current_program.media if current_program else None));
+                                    (current_program.media if not channel.my_channel and current_program else None));
 
 class CollectionsMediaHandler(BaseHandler):
   @BaseHandler.logged_in

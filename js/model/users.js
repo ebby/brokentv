@@ -117,7 +117,9 @@ brkn.model.Users.prototype.get_or_add = function(user) {
 	if (user['online'] != undefined && u.online != undefined && user['online'] != u.online) {
 	  u.lastLogin = new goog.date.DateTime()
 	}
-	u.online = user['online']; // Update online presence
+	u.online = user['online'] || !!goog.array.find(this.onlineFriends, function(user) {
+	  return user.id == u.id;
+	}, this); // Update online presence
 	u.currentMedia = user['last_seen'] ? brkn.model.Medias.getInstance().getOrAdd(user['last_seen']) :
 	    u.currentMedia; // Update media
 	return u;

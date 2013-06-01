@@ -1738,7 +1738,7 @@ div.channels div.channel div.programs div.program {
   overflow: hidden;
   vertical-align: middle;
   height: 100%;
-  color: #ccc;
+  color: #aaa;
   text-shadow: 1px 1px 1px #181818;
   background: #222;
   z-index: 0;
@@ -4001,6 +4001,12 @@ div#sidebar div.tweet-holder div.tweet div.text {
   line-height: 16px;
   width: 230px;
   font-family: MuseoSans500;
+  -webkit-touch-callout: text;
+  -webkit-user-select: text;
+  -khtml-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
 }
 div#sidebar div.tweet-holder div.tweet div.text a.handle {
   color: #181818;
@@ -4162,6 +4168,12 @@ div#sidebar div.template div.text {
   -moz-box-shadow: inset 0 0 2px 1px rgba(0, 0, 0, 0.4);
   box-shadow: inset 0 0 2px 1px rgba(0, 0, 0, 0.4);
   position: relative;
+  -webkit-touch-callout: text;
+  -webkit-user-select: text;
+  -khtml-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
 }
 div#sidebar div.template div.text img {
   position: absolute;
@@ -4232,7 +4244,6 @@ div#sidebar div.comments-holder div.comment {
   font-size: 11px;
   width: 320px;
   overflow: hidden;
-  margin-top: -1px;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
@@ -5064,6 +5075,12 @@ div#sidebar div.messages div.message div.body div.text {
   -webkit-box-shadow: inset 0 0 2px 1px rgba(0, 0, 0, 0.4);
   -moz-box-shadow: inset 0 0 2px 1px rgba(0, 0, 0, 0.4);
   box-shadow: inset 0 0 2px 1px rgba(0, 0, 0, 0.4);
+  -webkit-touch-callout: text;
+  -webkit-user-select: text;
+  -khtml-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
 }
 div#sidebar div.messages div.message div.body div.text:last-child div.timestamp {
   display: block;
@@ -6385,6 +6402,12 @@ div#sidebar div.stream div.activity div.template div.text {
   -webkit-box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.3);
   -moz-box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.3);
   box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.3);
+  -webkit-touch-callout: text;
+  -webkit-user-select: text;
+  -khtml-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
 }
 div#sidebar div.stream div.activity div.template div.text a {
   color: #497882;

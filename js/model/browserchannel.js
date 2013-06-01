@@ -62,8 +62,7 @@ brkn.model.BrowserChannel.prototype.onMessage_ = function(rawMessage) {
 	switch(message.type) {
 	  case 'viewer_change':
 	    var user = brkn.model.Users.getInstance().get_or_add(message['user']);
-	    
-	    if (user.online != message['online']) {
+	    if (message['online'] != undefined && message['online'] != null) {
 	      brkn.model.Users.getInstance().publish(brkn.model.Users.Action.ONLINE, user, message['online']);
 	    }
 
@@ -75,9 +74,9 @@ brkn.model.BrowserChannel.prototype.onMessage_ = function(rawMessage) {
 	    var lastChannel = message['last_channel_id'] && brkn.model.Channels.getInstance().get(message['last_channel_id']);
 	    if (lastChannel) {
   	    lastChannel.publish(brkn.model.Channel.Action.REMOVE_VIEWER, user);
-  	    user.currentMedia && user.currentMedia.publish(brkn.model.Media.Actions.WATCHING, user,
-  	        lastChannel, true);
 	    }
+      user.currentMedia && user.currentMedia.publish(brkn.model.Media.Actions.WATCHING, user,
+          lastChannel, true);
 
 	    var channel = message['channel_id'] && brkn.model.Channels.getInstance().get(message['channel_id']);
 	    var media = message['media'] && brkn.model.Medias.getInstance().getOrAdd(message['media']);
@@ -91,7 +90,7 @@ brkn.model.BrowserChannel.prototype.onMessage_ = function(rawMessage) {
 	    }
 
 	    if (media) {
-	      media.publish(brkn.model.Media.Actions.WATCHING, user, channel);
+	      media.publish(brkn.model.Media.Actions.WATCHING, user, channel, message['online'] != true);
 	    }
 
 	    break;

@@ -145,16 +145,16 @@ brkn.sidebar.FriendList.prototype.decorateInternal = function(el) {
     this.offlineEl_ = goog.dom.createDom('div', 'offline-friends');
     goog.dom.appendChild(this.getElement(), this.offlineEl_); 
     
-    goog.net.XhrIo.send(
-        '/_friends?offline=1',
-        goog.bind(function(e) {
-          var response = /** @type {Array.<Object>} */ e.target.getResponseJson();
-          this.offlineUsers_ = goog.array.map(response, function(u) {
-            var user = brkn.model.Users.getInstance().get_or_add(u);
-            this.addUser_(user, true);
-            return user;
-          }, this);
-        }, this));
+//    goog.net.XhrIo.send(
+//        '/_friends?offline=1',
+//        goog.bind(function(e) {
+//          var response = /** @type {Array.<Object>} */ e.target.getResponseJson();
+//          this.offlineUsers_ = goog.array.map(response, function(u) {
+//            var user = brkn.model.Users.getInstance().get_or_add(u);
+//            this.addUser_(user, true);
+//            return user;
+//          }, this);
+//        }, this));
     
     this.showOffline_ && this.resize();
     this.getHandler().listen(window, 'resize', goog.bind(function() {
@@ -208,6 +208,10 @@ brkn.sidebar.FriendList.prototype.decorateInternal = function(el) {
  * @param {?boolean=} opt_offlineOnly
  */
 brkn.sidebar.FriendList.prototype.addUser_ = function(user, opt_offlineOnly) {
+  if (this.userMap_[user.id]) {
+    return;
+  }
+  
   var inserted = false;
   var lastLogin = user.lastLogin ? goog.date.relative.format(user.lastLogin.getTime()) : null;
   
@@ -292,11 +296,12 @@ brkn.sidebar.FriendList.prototype.addUser_ = function(user, opt_offlineOnly) {
  * @param {boolean} online
  */
 brkn.sidebar.FriendList.prototype.updateStatus_ = function(user, online) {
-  var inserted = false;
+  var updated = false;
   
   var userEl = this.userMap_[user.id];
   if (userEl) {
     goog.dom.removeNode(userEl);
+    goog.object.remove(this.userMap_, user.id);
     if (goog.array.removeIf(this.offlineUsers_, function(u) { return u.id == user.id; })) {
       goog.style.showElement(this.offlineLabel_, !!this.offlineUsers_.length);
     }

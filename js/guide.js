@@ -882,11 +882,11 @@ brkn.Guide.prototype.align_ = function(opt_setAligned, opt_offset, opt_setScroll
       if (opt_offset || opt_setAligned) {
         var scrollAnim = new goog.fx.dom.Scroll(this.hScrollableEl_,
             [this.hScrollableEl_.scrollLeft, this.hScrollableEl_.scrollTop],
-            [offset - 10 /* offset */, this.hScrollableEl_.scrollTop], 300);
+            [offset - 5 /* offset */, this.hScrollableEl_.scrollTop], 300);
         scrollAnim.play();
         this.headerEl_.style.left = -offset + 'px';
       } else {
-        this.hScrollableEl_.scrollLeft = offset;
+        this.hScrollableEl_.scrollLeft = offset - 5;
         this.headerEl_.style.left = -offset + 'px';
       }
     }

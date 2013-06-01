@@ -30,6 +30,10 @@ class Channel(db.Model):
   @property
   def id(self):
     return str(self.key().name())
+  
+  @property
+  def my_channel(self):
+    return self.privacy == Privacy.PRIVATE
 
   @classmethod
   def make_key(cls, name):
@@ -193,6 +197,7 @@ class Channel(db.Model):
     if not col.channels.get():
       ChannelCollection.add(self, col)
     return col
+    
 
   def toJson(self, get_programming=False):
     current_program = self.get_current_program() if self.privacy == Privacy.PRIVATE else None
@@ -203,7 +208,7 @@ class Channel(db.Model):
     if get_programming:
       json['programming'] = [p.toJson(False) for p in self.get_programming()]
     json['online'] = self.online
-    json['my_channel'] = self.privacy == Privacy.PRIVATE
+    json['my_channel'] = self.my_channel
     json['next_time'] = self.next_time.isoformat() if self.next_time else datetime.datetime.now().isoformat()
     json['current_program'] = current_program.toJson(fetch_channel=False, media_desc=False) if current_program else None
     json['current_media'] = self.current_media.toJson() if self.current_media else None

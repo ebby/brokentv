@@ -109,7 +109,7 @@ brkn.model.User = function(user) {
   /**
    * @type {number}
    */
-  this.aveSession = user['ave_session'] ? user['ave_session'].toFixed(2) : null;
+  this.aveSession = user['ave_session_time'] ? user['ave_session_time'].toFixed(2) : null;
   
   /**
    * @type {boolean}

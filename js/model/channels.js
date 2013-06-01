@@ -156,6 +156,8 @@ brkn.model.Channels.prototype.loadViewersFromJson = function(viewerSessions) {
 				var u = brkn.model.Users.getInstance().get_or_add(session['user']);
 				brkn.model.Users.getInstance().addOnline(u);
 				var channel = this.channelMap[session['channel_id']];
+				var media = session['media'][0] ?
+				    brkn.model.Medias.getInstance().getOrAdd(session['media'][0]) : null;
 				var tuneIn = goog.date.fromIsoString(session['tune_in'] + 'Z');
 				var tuneOut = session['tune_out'] ?
 				    goog.date.fromIsoString(session['tune_out'] + 'Z') : null;
@@ -165,8 +167,13 @@ brkn.model.Channels.prototype.loadViewersFromJson = function(viewerSessions) {
 				  channel.viewerSessions.push(newSession);
 				  channel.publish(brkn.model.Channel.Action.ADD_VIEWER, newSession);
 				  var program = channel.getCurrentProgram();
-	        program && program.media.publish(brkn.model.Media.Actions.WATCHING, u, channel);
-				}	
+				} else if (media) {
+				  var program = brkn.model.Program.async(media);
+				}
+				if (u.id != brkn.model.Users.getInstance().currentUser.id) {
+				  program && program.media.publish(brkn.model.Media.Actions.WATCHING, u, channel);
+	        brkn.model.Users.getInstance().publish(brkn.model.Users.Action.ONLINE, u, true);
+				}
 			}, this));
 };
 
@@ -199,7 +206,7 @@ brkn.model.Channels.prototype.updateOnlineUsers = function(program) {
     if (this.currentProgram_) {
       // If previous program, remove channel viewers.
       goog.array.forEach(this.currentChannel.viewerSessions, function(s) {
-        goog.object.remove(this.currentProgram_.media.onlineViewers, s.user.id);
+        this.currentProgram_.media.addViewer(s.user, this.currentChannel, true);
       }, this);
     }
     
@@ -208,9 +215,9 @@ brkn.model.Channels.prototype.updateOnlineUsers = function(program) {
       this.currentProgram_ = program;
       var viewers = goog.array.forEach(this.currentChannel.viewerSessions, function(s) {
         if (!s.tuneOut) {
-          program.media.onlineViewers[s.user.id] = s.user;
+          this.currentProgram_.media.addViewer(s.user, this.currentChannel);
         }
-      });
+      }, this);
     }
   }
 };
