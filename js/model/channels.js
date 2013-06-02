@@ -206,7 +206,9 @@ brkn.model.Channels.prototype.updateOnlineUsers = function(program) {
     if (this.currentProgram_) {
       // If previous program, remove channel viewers.
       goog.array.forEach(this.currentChannel.viewerSessions, function(s) {
-        this.currentProgram_.media.addViewer(s.user, this.currentChannel, true);
+        if (!this.currentChannel.offline || s.user.id == brkn.model.Users.getInstance().currentUser.id) {
+          this.currentProgram_.media.addViewer(s.user, this.currentChannel, true);
+        }
       }, this);
     }
     
@@ -215,7 +217,9 @@ brkn.model.Channels.prototype.updateOnlineUsers = function(program) {
       this.currentProgram_ = program;
       var viewers = goog.array.forEach(this.currentChannel.viewerSessions, function(s) {
         if (!s.tuneOut) {
-          this.currentProgram_.media.addViewer(s.user, this.currentChannel);
+          if (!this.currentChannel.offline || s.user.id == brkn.model.Users.getInstance().currentUser.id) {
+            this.currentProgram_.media.addViewer(s.user, this.currentChannel);
+          }
         }
       }, this);
     }

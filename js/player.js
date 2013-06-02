@@ -365,22 +365,30 @@ brkn.Player.prototype.playChannel = function(channel) {
  */
 brkn.Player.prototype.play = function(opt_media, opt_channel, opt_tries) {
   var retry = 1000;
+  var seek = brkn.model.Player.getInstance().getCurrentProgram().async ?
+      brkn.model.Player.getInstance().getCurrentProgram().seek :
+      (goog.now() - brkn.model.Player.getInstance().getCurrentProgram().time.getTime())/1000;
 
   if (!this.player_ || !this.player_.loadVideoById) {
+    var playerVars = {
+      'controls': 0,
+      'showinfo': 0,
+      'iv_load_policy': 3,
+      'modestbranding': 1,
+      'wmode': 'opaque',
+      'origin': HOST_URL,
+      'enablejsapi': 1,
+      'rel': 0
+    };
+    if (!DESKTOP) {
+      playerVars['start'] = seek;
+      playerVars['autoplay'] = 1;
+    }
     this.player_ = new YT.Player('ytplayer', {
       'height': goog.dom.getViewportSize().height - 40,
       'width': goog.dom.getViewportSize().width,
       'videoId': opt_media ? opt_media.hostId : null,
-      'playerVars': {
-        'controls': 0,
-        'showinfo': 0,
-        'iv_load_policy': 3,
-        'modestbranding': 1,
-        'wmode': 'opaque',
-        'origin': HOST_URL,
-        'enablejsapi': 1,
-        'rel': 0
-      },
+      'playerVars': playerVars,
       'events': {
           'onStateChange': goog.bind(this.playerStateChange_, this),
           'onReady': goog.bind(this.onPlayerReady_, this),
@@ -390,18 +398,22 @@ brkn.Player.prototype.play = function(opt_media, opt_channel, opt_tries) {
     brkn.model.Player.getInstance().setPlayer(this.player_);
   } else {
     if (opt_media) {
-      this.player_.cueVideoById(opt_media.hostId);
+      if (DESKTOP) {
+        this.player_.cueVideoById(opt_media.hostId);
+      } else {
+        this.player_.loadVideoById(opt_media.hostId, seek);
+      }
     } else if (opt_channel) {
       this.player_.cuePlaylist(opt_channel.asPlaylist(), opt_channel.currentProgramIndex);
     }
-    goog.Timer.callOnce(goog.bind(function() {
-      var tries = opt_tries || 0;
-      if (!this.player_.getPlayerState() && tries < 4) {
-        this.play(opt_media, opt_channel, ++tries);
-      } else if (tries >= 4) {
-        this.updateStagecover_(undefined, undefined, true);
-      }
-    }, this), retry);
+//    goog.Timer.callOnce(goog.bind(function() {
+//      var tries = opt_tries || 0;
+//      if (!this.player_.getPlayerState() && tries < 4) {
+//        this.play(opt_media, opt_channel, ++tries);
+//      } else if (tries >= 4) {
+//        this.updateStagecover_(undefined, undefined, true);
+//      }
+//    }, this), retry);
   }
 };
 
@@ -567,13 +579,13 @@ brkn.Player.prototype.onPlayerReady_ = function(event) {
       this.playProgram(brkn.model.Player.getInstance().getCurrentProgram());
     } else if (this.player_.getPlayerState()) {
       // If we did and cued the video
-      this.player_.setPlaybackQuality('large');
-      var seek = brkn.model.Player.getInstance().getCurrentProgram().async ?
-          brkn.model.Player.getInstance().getCurrentProgram().seek :
-          (goog.now() - brkn.model.Player.getInstance().getCurrentProgram().time.getTime())/1000;
-      this.player_.seekTo(seek);
-      this.player_.playVideo();
       if (DESKTOP) {
+        this.player_.setPlaybackQuality('large');
+        var seek = brkn.model.Player.getInstance().getCurrentProgram().async ?
+            brkn.model.Player.getInstance().getCurrentProgram().seek :
+            (goog.now() - brkn.model.Player.getInstance().getCurrentProgram().time.getTime())/1000;
+        this.player_.seekTo(seek);
+        this.player_.playVideo();
         brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.MUTE,
             this.player_.isMuted());
       }

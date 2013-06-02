@@ -312,22 +312,25 @@ brkn.Controller.prototype.enterDocument = function() {
         }, this))
 
   brkn.model.Player.getInstance().subscribe(brkn.model.Player.Actions.PLAY_ASYNC, function(program) {
+    goog.dom.classes.remove(this.elapsedEl_, 'animate');
     this.setAsync_(program, true);
-  }, this);
-  brkn.model.Player.getInstance().subscribe(brkn.model.Player.Actions.PLAYING, function() {
-    this.dragger_.setEnabled(true);
-    this.resize();
   }, this);
   brkn.model.Channels.getInstance().subscribe(brkn.model.Channels.Actions.CHANGE_CHANNEL,
       function() {
+        goog.dom.classes.remove(this.elapsedEl_, 'animate');
         goog.dom.classes.remove(this.getElement(), 'window');
         goog.Timer.callOnce(goog.bind(this.resize, this), 1000); // Account for timed animations.
         this.nextButton_.setEnabled(brkn.model.Channels.getInstance().currentChannel.hasNextProgram());
+        if (brkn.model.Channels.getInstance().currentChannel.getCurrentProgram()) {
+          this.setAsync_(brkn.model.Channels.getInstance().currentChannel.getCurrentProgram(), true);
+        }
       }, this);
   brkn.model.Channels.getInstance().subscribe(brkn.model.Channels.Actions.NEXT_PROGRAM,
-      function() {
+      function(p) {
         this.resize();
+        goog.dom.classes.remove(this.elapsedEl_, 'animate');
         this.nextButton_.setEnabled(brkn.model.Channels.getInstance().currentChannel.hasNextProgram());
+        this.setAsync_(p, true);
       }, this);
   brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.MUTE,
       this.mute_, this);
@@ -346,9 +349,11 @@ brkn.Controller.prototype.enterDocument = function() {
   brkn.model.Player.getInstance().subscribe(brkn.model.Player.Actions.PLAYING, function() {
     if (brkn.model.Channels.getInstance().currentChannel.myChannel &&
         brkn.model.Player.getInstance().getCurrentProgram()) {
-      this.resize();
       this.nextButton_.setEnabled(brkn.model.Channels.getInstance().currentChannel.hasNextProgram());
     }
+    this.dragger_.setEnabled(true);
+    goog.dom.classes.add(this.elapsedEl_, 'animate');
+    this.resize();
   }, this);
   brkn.model.Channels.getInstance().getMyChannel().subscribe(brkn.model.Channel.Action.ADD_QUEUE,
       function() {
