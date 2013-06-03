@@ -179,6 +179,7 @@ brkn.sidebar.FriendList.prototype.decorateInternal = function(el) {
     goog.array.forEach(this.users_, function(u) {
       this.addUser_(u)
     }, this);
+    goog.style.showElement(this.getElement(), true);
   } else {
     brkn.model.Users.getInstance().getFriends(goog.bind(function(friends) {
       this.users_ = friends;
@@ -196,6 +197,7 @@ brkn.sidebar.FriendList.prototype.decorateInternal = function(el) {
       goog.array.forEach(this.users_, function(u) {
         this.addUser_(u)
       }, this);
+      goog.style.showElement(this.getElement(), true);
     }, this));
   }
 
@@ -321,6 +323,7 @@ brkn.sidebar.FriendList.prototype.updateStatus_ = function(user, online) {
  */
 brkn.sidebar.FriendList.prototype.resize = function(opt_extra) {
   this.resizeExtra_ = opt_extra || this.resizeExtra_;
-  goog.style.setHeight(this.getElement(), goog.dom.getViewportSize().height - 42 -
+  goog.style.setHeight(this.getElement(), goog.dom.getViewportSize().height + 
+      (IPHONE && SAFARI ? 61 : 0) - 42 -
       this.resizeExtra_ - (goog.dom.getAncestorByClass(this.getElement(), 'tabbed') ? 30 : 0));
 };

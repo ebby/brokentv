@@ -554,15 +554,7 @@ brkn.Player.prototype.playerStateChange_ = function(event) {
       }
   	  this.resetLike_();
   	  brkn.model.Player.getInstance().getCurrentProgram().ended = true;
-  	  var nextProgram = brkn.model.Channels.getInstance().currentChannel.getCurrentProgram();
-  	  if (nextProgram) {
-        brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.NEXT_PROGRAM,
-            nextProgram);
-      } else {
-        brkn.model.Player.getInstance().setCurrentProgram(null);
-        brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.CHANGE_CHANNEL,
-            brkn.model.Channels.getInstance().findOnline(), true);
-      }
+  	  this.next_();
   	  break;
 	}
 };
@@ -573,13 +565,13 @@ brkn.Player.prototype.playerStateChange_ = function(event) {
  */
 brkn.Player.prototype.onPlayerReady_ = function(event) {
   // Do a health check
-  goog.Timer.callOnce(goog.bind(function() {
-    if (this.player_ && (!this.player_.getPlayerState || !this.player_.getPlayerState())) {
-      // In case we didn't load
-      this.playProgram(brkn.model.Player.getInstance().getCurrentProgram());
-    } else if (this.player_.getPlayerState()) {
-      // If we did and cued the video
-      if (DESKTOP) {
+  //goog.Timer.callOnce(goog.bind(function() {
+//    if (this.player_ && (!this.player_.getPlayerState || !this.player_.getPlayerState())) {
+//      // In case we didn't load
+//      this.playProgram(brkn.model.Player.getInstance().getCurrentProgram());
+//    } else if (this.player_.getPlayerState()) {
+//      // If we did and cued the video
+//      if (DESKTOP) {
         this.player_.setPlaybackQuality('large');
         var seek = brkn.model.Player.getInstance().getCurrentProgram().async ?
             brkn.model.Player.getInstance().getCurrentProgram().seek :
@@ -588,9 +580,9 @@ brkn.Player.prototype.onPlayerReady_ = function(event) {
         this.player_.playVideo();
         brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.MUTE,
             this.player_.isMuted());
-      }
-    }
-  }, this), 1000);
+//      }
+//    }
+  //}, this), 1000);
 };
 
 
@@ -599,8 +591,12 @@ brkn.Player.prototype.onPlayerReady_ = function(event) {
  */
 brkn.Player.prototype.onPlayerError_ = function(event) {
   goog.DEBUG && window.console.log(event);
-  brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.NO_MEDIA);
-  this.updateStagecover_(undefined, undefined, true);
+  if (event == 100) {
+    this.next_();
+  } else {
+    brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.NO_MEDIA);
+    this.updateStagecover_(undefined, undefined, true);
+  }
 };
 
 
@@ -651,6 +647,19 @@ brkn.Player.prototype.updateStagecover_ = function(opt_message, opt_beforeEnd, o
   }
   goog.style.setOpacity(stagecover, this.playerState_ == YT.PlayerState.BUFFERING ? .9 : 1);
   this.resize();
+};
+
+
+brkn.Player.prototype.next_ = function() {
+  var nextProgram = brkn.model.Channels.getInstance().currentChannel.getCurrentProgram();
+  if (nextProgram) {
+    brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.NEXT_PROGRAM,
+        nextProgram);
+  } else {
+    brkn.model.Player.getInstance().setCurrentProgram(null);
+    brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.CHANGE_CHANNEL,
+        brkn.model.Channels.getInstance().findOnline(), true);
+  }
 };
 
 

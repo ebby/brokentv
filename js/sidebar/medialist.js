@@ -245,7 +245,8 @@ brkn.sidebar.MediaList.prototype.addMedia = function(media) {
  * @private
  */
 brkn.sidebar.MediaList.prototype.resize = function() {
-  goog.style.setHeight(this.getElement(), goog.dom.getViewportSize().height - 40 -
+  goog.style.setHeight(this.getElement(), goog.dom.getViewportSize().height +
+      (IPHONE && SAFARI ? 61 : 0) - (DESKTOP ? 40 : 0) -
       (goog.dom.getAncestorByClass(this.getElement(), 'tabbed') ? 30 : 0));
 };
 

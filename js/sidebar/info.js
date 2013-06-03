@@ -474,18 +474,20 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
     this.setInput(this.lastInput_);
   }
   
-  brkn.Popup.getInstance().hovercard(this.plusButton_.getElement(), brkn.model.Popup.Position.LEFT,
-      brkn.model.Popup.Action.TOOLTIP, {'text': 'Add to Queue'});
-  brkn.Popup.getInstance().hovercard(this.fbButton_.getElement(), brkn.model.Popup.Position.LEFT,
-      brkn.model.Popup.Action.TOOLTIP, {'text': 'Post to Facebook'});
-  brkn.Popup.getInstance().hovercard(this.twitterButton_.getElement(), brkn.model.Popup.Position.LEFT,
-      brkn.model.Popup.Action.TOOLTIP, {'text': 'Tweet'});
-  brkn.Popup.getInstance().hovercard(this.starToggle_.getElement(), brkn.model.Popup.Position.LEFT,
-      brkn.model.Popup.Action.TOOLTIP, {'text': 'Save'});
-  brkn.Popup.getInstance().hovercard(goog.dom.getElementByClass('eye-icon', this.getElement()),
-      brkn.model.Popup.Position.LEFT, brkn.model.Popup.Action.TOOLTIP, {'text': 'Seen by'});
-  brkn.Popup.getInstance().hovercard(goog.dom.getElementByClass('friends-icon', this.getElement()),
-      brkn.model.Popup.Position.RIGHT, brkn.model.Popup.Action.TOOLTIP, {'text': 'Visible by only your Facebook friends'});
+  if (DESKTOP) {
+    brkn.Popup.getInstance().hovercard(this.plusButton_.getElement(), brkn.model.Popup.Position.LEFT,
+        brkn.model.Popup.Action.TOOLTIP, {'text': 'Add to Queue'});
+    brkn.Popup.getInstance().hovercard(this.fbButton_.getElement(), brkn.model.Popup.Position.LEFT,
+        brkn.model.Popup.Action.TOOLTIP, {'text': 'Post to Facebook'});
+    brkn.Popup.getInstance().hovercard(this.twitterButton_.getElement(), brkn.model.Popup.Position.LEFT,
+        brkn.model.Popup.Action.TOOLTIP, {'text': 'Tweet'});
+    brkn.Popup.getInstance().hovercard(this.starToggle_.getElement(), brkn.model.Popup.Position.LEFT,
+        brkn.model.Popup.Action.TOOLTIP, {'text': 'Save'});
+    brkn.Popup.getInstance().hovercard(goog.dom.getElementByClass('eye-icon', this.getElement()),
+        brkn.model.Popup.Position.LEFT, brkn.model.Popup.Action.TOOLTIP, {'text': 'Seen by'});
+    brkn.Popup.getInstance().hovercard(goog.dom.getElementByClass('friends-icon', this.getElement()),
+        brkn.model.Popup.Position.RIGHT, brkn.model.Popup.Action.TOOLTIP, {'text': 'Visible by only your Facebook friends'});
+  }
 
   this.media_.subscribe(brkn.model.Media.Actions.ADD_COMMENT, function(comment) {
     this.addComment_(comment, true);
@@ -496,6 +498,12 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
   }, this);
   this.media_.subscribe(brkn.model.Media.Actions.WATCHING, function(user, channel, offline) {
     this.addViewer_(user, !offline);
+  }, this);
+  brkn.model.Player.getInstance().subscribe(brkn.model.Player.Actions.PLAYING, function() {
+    goog.dom.classes.remove(this.playButton_.getElement(), 'play-loading');
+  }, this);
+  brkn.model.Player.getInstance().subscribe(brkn.model.Player.Actions.NO_MEDIA, function() {
+    goog.dom.classes.remove(this.playButton_.getElement(), 'play-loading');
   }, this);
   brkn.model.Users.getInstance().currentUser.subscribe(
       brkn.model.User.Actions.SET_STARRED, function() {
@@ -935,7 +943,12 @@ brkn.sidebar.Info.prototype.resize = function(opt_extra, opt_scrollComments) {
   this.resizeExtra_ = opt_extra != undefined ? opt_extra : this.resizeExtra_;
   var viewHeight = goog.dom.getViewportSize().height;
 
-  goog.style.setHeight(this.contentsEl_, viewHeight - (this.mini_ ? 183 : 283) -
+  var height = goog.dom.getViewportSize().height + (IPHONE && SAFARI ? 61 : 0) - 41 -
+      this.resizeExtra_ - (goog.dom.getAncestorByClass(this.getElement(), 'tabbed') ? 30 : 0);
+  goog.style.setHeight(this.getElement(), height);
+  
+  goog.style.setHeight(this.contentsEl_, viewHeight - (DESKTOP ? (this.mini_ ? 183 : 283) : 0) -
+      (IPHONE ? (SAFARI ? 230 : 170) : 0) -
       (this.viewers_.length ? 38 : 0));
   if (viewHeight > 640 && this.commentsEl_ && this.commentsEl_.parentElement) {
     goog.style.setStyle(this.commentsEl_, 'max-height', viewHeight -
@@ -1000,6 +1013,7 @@ brkn.sidebar.Info.prototype.onTwitterButton_ = function() {
  * @private
  */
 brkn.sidebar.Info.prototype.onPlayButton_ = function() {
+  goog.dom.classes.add(this.playButton_.getElement(), 'play-loading');
   var program = brkn.model.Program.async((/** @type {brkn.model.Media} */ this.getModel()));
   brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.PLAY_ASYNC, program);
 };

@@ -178,6 +178,11 @@ brkn.sidebar.Profile.prototype.enterDocument = function() {
   brkn.model.Medias.getInstance().subscribe(brkn.model.Medias.Action.STAR, function(media, star) {
     star ? this.starred_.addMedia(media) : this.starred_.removeMedia(media);
   }, this);
+  
+  this.getHandler().listen(window, 'resize',
+      goog.partial(goog.Timer.callOnce, goog.bind(this.resize_, this)));
+  
+  this.resize_();
 };
 
 
@@ -196,8 +201,18 @@ brkn.sidebar.Profile.prototype.navigate_ = function(tabEl) {
 /**
  * @private
  */
+brkn.sidebar.Profile.prototype.resize_ = function() {
+  var height = goog.dom.getViewportSize().height + (IPHONE && SAFARI ? 61 : 0) - 41 -
+      (goog.dom.getAncestorByClass(this.getElement(), 'tabbed') ? 30 : 0);
+  goog.style.setHeight(this.getElement(), height);
+};
+
+
+/**
+ * @private
+ */
 brkn.sidebar.Profile.prototype.resizeInbox_ = function() {
-  var inboxSize = goog.dom.getViewportSize().height - 123;
+  var inboxSize = goog.style.getSize(this.getElement()).height - 80;
   this.notifications_ && goog.style.setHeight(this.notifications_.getElement(), Math.floor(inboxSize/2));
   this.messages_ && goog.style.setHeight(this.messages_.getElement(), Math.ceil(inboxSize/2));
 };

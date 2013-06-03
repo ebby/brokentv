@@ -1618,6 +1618,7 @@ div.channel-names div.name {
   position: relative;
   top: 0;
   left: 0;
+  opacity: .95;
   vertical-align: top;
   background: black;
   margin-right: 1px solid #888;
@@ -3596,7 +3597,7 @@ div#sidebar div.comment-input {
   width: 100%;
   min-height: 40px;
   position: absolute;
-  bottom: 41px;
+  bottom: 0;
   background: #f7f7f7;
   border-top: 1px solid #ccc;
   -webkit-box-shadow: 0 -1px 4px 0 rgba(0, 0, 0, 0.3), inset 4px -2px 6px -3px rgba(0, 0, 0, 0.4);
@@ -3810,11 +3811,11 @@ div#sidebar div.tabbed ul.tabs {
 }
 div#sidebar div.tabbed ul.tabs li.tab {
   height: 100%;
-  border-right: 1px solid #ccc;
+  border-right: 1px solid #aaa;
   margin-left: -2px;
   display: table-cell;
   vertical-align: middle;
-  background: rgba(245, 245, 245, 0.9);
+  background: #dedede;
   cursor: pointer;
 }
 div#sidebar div.tabbed ul.tabs li.tab.admin {
@@ -3875,6 +3876,7 @@ div#sidebar div.tabbed div.inbox-content div.label {
   box-shadow: 0 0 1px 0 rgba(0, 0, 0, 0.5);
   position: relative;
   z-index: 1;
+  background: #fefefe;
 }
 div#sidebar div.tabbed div.inbox-content div.label.messages-label {
   border-top: 1px solid #999;
@@ -4199,13 +4201,6 @@ div#sidebar div.template div.timestamp {
 }
 div#sidebar div.comments-holder {
   position: relative;
-}
-div#sidebar div.comments-holder div.comments {
-  -webkit-transition: max-height 0.5s ease;
-  -moz-transition: max-height 0.5s ease;
-  -o-transition: max-height 0.5s ease;
-  -ms-transition: max-height 0.5s ease;
-  transition: max-height 0.5s ease;
 }
 div#sidebar div.comments-holder.top-grad div.top-grad,
 div#sidebar div.comments-holder.bottom-grad div.bottom-grad {
@@ -5439,6 +5434,22 @@ div#sidebar div.info div.picture div.play .icon {
 }
 div#sidebar div.info div.picture div.play .icon:before {
   content: '\25b6';
+}
+div#sidebar div.info div.picture div.play .loading-icon {
+  display: none;
+  background: url(data:image/gif;base64,R0lGODlhIwAjALMCAP/MZv+ZM5mZmZmZZmaZzGaZmWaZZjOZZgAAAP///wAAAAAAAAAAAAAAAAAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh/wtYTVAgRGF0YVhNUDw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoTWFjaW50b3NoKSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDpEODIxNTlCQjlBRkUxMUUyOERBOUYwQjNDMEE2REI1RCIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDpEODIxNTlCQzlBRkUxMUUyOERBOUYwQjNDMEE2REI1RCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkQ4MjE1OUI5OUFGRTExRTI4REE5RjBCM0MwQTZEQjVEIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOkQ4MjE1OUJBOUFGRTExRTI4REE5RjBCM0MwQTZEQjVEIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+Af/+/fz7+vn49/b19PPy8fDv7u3s6+rp6Ofm5eTj4uHg397d3Nva2djX1tXU09LR0M/OzczLysnIx8bFxMPCwcC/vr28u7q5uLe2tbSzsrGwr66trKuqqainpqWko6KhoJ+enZybmpmYl5aVlJOSkZCPjo2Mi4qJiIeGhYSDgoGAf359fHt6eXh3dnV0c3JxcG9ubWxramloZ2ZlZGNiYWBfXl1cW1pZWFdWVVRTUlFQT05NTEtKSUhHRkVEQ0JBQD8+PTw7Ojk4NzY1NDMyMTAvLi0sKyopKCcmJSQjIiEgHx4dHBsaGRgXFhUUExIREA8ODQwLCgkIBwYFBAMCAQAAIfkEBQAAAgAsAAAAACMAIwAABFpQjECHuDjrzSX9VieOXzmeXPmhLKZSbfsGMTvX6I2T786rPpEuuBkSM8bjJalkHp1EaFDqo+6sOGxNG+PKekokOLwck702cxidUzfdT3hUHpyUQuSLPYDPRwAAIfkEBQAAAgAsCQAFAAcAHgAABBdQDECHpHjizbv/YCiOZGmeaEpq2VUJEQAh+QQFAAACACwSAAoABwAZAAAEFlCYQ42keOLNu/9gKI5kaZ6kll2VEAEAIfkECQAAAgAsAAAAACIAIwAABERQyEmrvTjrzbv/YCiOZGmeaKqubOu+sFYQdMHOdL3m/M7Tvl+wp/oBi8ZhTnlMGQlMKFI4JTqT1WW2iXqucDnbNyyIAAAh+QQJAAACACwAAAAAIwAjAAAEqFDISau9OOvNu/9gKHoDYA6jVppnirGwe8GsbNGmXeHAZBxAQ4on+QGDI6LgyEziJMyjkwaNHqaxpXVSIHgLG6X1Kuh6vxrxVnBup5/aqKR9flPjTTadYM+O53t9NXhSenSCOYRAgIcZanKGbo5wf5F1k3eVe3yYfmubiD2KZKCdg5qBpomojS+Un6mumbCtM6+QpRgrLCgCRkdCZXRgKrwUv8ESZgTEEQAh+QQJAAACACwAAAAAIwAjAAAEcVDISau9OOvNu/9gKI5kaZ5oqorG4Rqr1LpvTN/27eY6j0sFgrBA0u0EQeFwZDxIlFCm8QkVSnuCqlXUpFavPy0BTPNGudOslnwUs53qLxrrnofX9nL8HOrulW9mgHlteH1pdSEzNDBIVUQji41ASpARACH5BAUAAAIALAAAAAAjACMAAAREUMhJq7046827/2AojmRpnmiqrmzrvnBaEHTRznTN5vzO075fsLf6AYvGYU55VBkJTChSOCU6k9Vltpl6snA52zcsiQAAOw==) no-repeat center;
+  background-size: 20px;
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  top: 11px;
+  left: 14px;
+}
+div#sidebar div.info div.picture div.play.play-loading .icon {
+  display: none;
+}
+div#sidebar div.info div.picture div.play.play-loading .loading-icon {
+  display: block;
 }
 div#sidebar div.info div.picture.scrolled div.play {
   display: none;
@@ -7597,14 +7608,33 @@ div.list-media div.duration {
   margin: 5px;
 }
 @media handheld, only screen and (max-width: 480px), only screen and (max-device-width: 480px) {
+  body.iphone {
+    position: relative;
+  }
   body.iphone.login {
     position: static;
   }
+  a:hover {
+    text-decoration: none !important;
+  }
   div.main {
     min-height: 505px;
+    position: static;
   }
   div.main .iphone div#sidebar {
     min-height: 505px;
+  }
+  div.main div.list-media div.list-play,
+  div.main div.list-media div.list-plus {
+    display: none;
+  }
+  div.main div#stage #ytplayer {
+    width: 0;
+  }
+  div.main div#sidebar {
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
   }
   div.main div#sidebar div.list-media div.media div.preview div.thumb {
     opacity: .7;
@@ -7628,9 +7658,28 @@ div.list-media div.duration {
     -o-filter: invert(100%);
     -ms-filter: invert(100%);
   }
+  div.main div#sidebar div.info div.picture {
+    height: 150px;
+  }
+  div.main div#sidebar div.info div.picture div.links div.host {
+    display: none;
+  }
+  div.main div#sidebar div.info div.picture div.scrollable {
+    height: 150px;
+  }
   div.main div#sidebar div.info div.picture div.play {
+    top: 60px;
     opacity: 1;
     visibility: visible;
+  }
+  div.main div#sidebar div.info div.title {
+    font-size: 13px;
+  }
+  div.main div#sidebar div.info div.desc-link {
+    margin-top: 131px;
+  }
+  div.main div#sidebar div.info div.options div.button div.plus {
+    display: none;
   }
   div#login {
     min-height: 505px;

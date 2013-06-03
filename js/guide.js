@@ -520,6 +520,7 @@ brkn.Guide.prototype.addChannel_ = function(c) {
     this.currentChannel_ = channel;
   }
   this.myChannel_ = c.myChannel ? c : this.myChannel_;
+  this.resize_();
 };
 
 

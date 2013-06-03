@@ -386,7 +386,7 @@ div#sidebar {
     width: 100%;
     min-height: 40px;
     position: absolute;
-    bottom: 41px;
+    bottom: 0;
     background: #f7f7f7;
     border-top: 1px solid #ccc;
     .box-shadow(e('0 -1px 4px 0 rgba(0, 0, 0, 0.3), inset 4px -2px 6px -3px rgba(0, 0, 0, 0.4)'));
@@ -549,11 +549,11 @@ div#sidebar {
       border-bottom: 1px solid rgba(112, 108, 108, 0.7);
       li.tab {
         height: 100%;
-        border-right: 1px solid #ccc;
+        border-right: 1px solid #aaa;
         margin-left: -2px;
         display: table-cell;
         vertical-align: middle;
-        background: rgba(245, 245, 245, 0.9);
+        background: #dedede;
         cursor: pointer;
         &.admin {
           display: none;
@@ -614,6 +614,7 @@ div#sidebar {
         .box-shadow(0, 0, 1px, 0, rgba(0, 0, 0, .5));
         position: relative;
         z-index: 1;
+        background: #fefefe;
         &.messages-label {
           border-top: 1px solid #999;
         }
@@ -881,9 +882,6 @@ div#sidebar {
 
   div.comments-holder {
     position: relative;
-    div.comments {
-      .transition(max-height, .5s, ease);
-    }
     &.top-grad div.top-grad, &.bottom-grad div.bottom-grad {
       display: block;
     }

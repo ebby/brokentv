@@ -147,10 +147,10 @@ class InvitePolicy:
 
 def INVITE_POLICY():
   if memcache.get('invite_policy', None) is None:
-    memcache.set('invite_policy', InvitePolicy.NOBODY)
+    memcache.set('invite_policy', InvitePolicy.ANYBODY)
   return memcache.get('invite_policy')
 
 def INVITE_LIMIT():
   if memcache.get('invite_limit', None) is None:
-    memcache.set('invite_limit', 1000)
+    memcache.set('invite_limit', 1000000)
   return memcache.get('invite_limit')

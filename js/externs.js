@@ -10,7 +10,11 @@ var HTML5;
 
 var EMBED;
 
+var SAFARI;
+
 var appengine = {};
+
+window.navigator.standalone;
 
 /** 
   * @param {string} token 

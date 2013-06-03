@@ -285,7 +285,8 @@ brkn.sidebar.Messages.prototype.resize = function(opt_extra) {
     this.dispatchEvent('resize');
   } else {
     this.resizeExtra_ = opt_extra || this.resizeExtra_;
-    goog.style.setHeight(this.getElement(), goog.dom.getViewportSize().height - 82 -
+    goog.style.setHeight(this.getElement(), goog.dom.getViewportSize().height + 
+        (IPHONE && SAFARI ? 61 : 0) - (DESKTOP ? 40 : 0) - 42 -
         this.resizeExtra_ - (goog.dom.getAncestorByClass(this.getElement(), 'tabbed') ? 30 : 0));
   }
 };

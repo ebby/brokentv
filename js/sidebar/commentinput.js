@@ -244,10 +244,12 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
             goog.ui.Component.EventType.ACTION,
             goog.bind(this.onAddComment_, this));
     
-    brkn.Popup.getInstance().hovercard(this.tweetToggle_.getElement(), brkn.model.Popup.Position.TOP,
-        brkn.model.Popup.Action.TOOLTIP, {'text': 'Share on Twitter'});
-    brkn.Popup.getInstance().hovercard(this.fbToggle_.getElement(), brkn.model.Popup.Position.TOP,
-        brkn.model.Popup.Action.TOOLTIP, {'text': 'Share on Facebook'});
+    if (DESKTOP) {
+      brkn.Popup.getInstance().hovercard(this.tweetToggle_.getElement(), brkn.model.Popup.Position.TOP,
+          brkn.model.Popup.Action.TOOLTIP, {'text': 'Share on Twitter'});
+      brkn.Popup.getInstance().hovercard(this.fbToggle_.getElement(), brkn.model.Popup.Position.TOP,
+          brkn.model.Popup.Action.TOOLTIP, {'text': 'Share on Facebook'});
+    }
     brkn.model.Users.getInstance().currentUser.subscribe(brkn.model.User.Actions.TWITTER_AUTH, function() {
       this.tweetToggle_.setChecked(true);
     }, this);

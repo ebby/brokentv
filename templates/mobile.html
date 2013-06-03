@@ -29,6 +29,7 @@
       var DESKTOP = false;
       var HTML5 = '{{ html5 }}' == 'True';
       var EMBED = '{{ embed }}' == 'True';
+      var SAFARI = !window.navigator.standalone && !/(iPhone|iPod|iPad).*AppleWebKit(?!.*Safari)/i.test(navigator.userAgent);
 
       // Re-namespace to avoid closure conflict.
       var appengine = goog.appengine; 

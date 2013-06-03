@@ -87,7 +87,7 @@ class Programming():
     memcache.set('channels', [c.toJson(get_programming=False) for c in self.channels.itervalues()])
       
   @classmethod
-  def set_programming(cls, channel_id, duration=2400, schedule_next=False, fetch_twitter=True,
+  def set_programming(cls, channel_id, duration=3600, schedule_next=False, fetch_twitter=True,
                       queue='programming', target=None, kickoff=False):
     import broadcast
     import constants
@@ -116,6 +116,7 @@ class Programming():
 
     programs = []
     if not programming.get(channel_id) or gap > 60:
+      logging.info('PROGRAOMMING')
       channel = Channel.get_by_key_name(channel_id)
       #channel.update_next_time()
       viewers = (memcache.get('channel_viewers') or {}).get(str(channel_id), [])
@@ -131,25 +132,29 @@ class Programming():
           medias = col.get_medias(limit=limit, offset=offset)
           if not len(medias):
             break
-          backup_medias += medias    
-
-          # Don't repeat the same program within an hour
-          filtered_medias = [c for c in medias if not c.last_programmed or
-                   (datetime.datetime.now() - c.last_programmed).seconds > 3600]
+          backup_medias += medias
+          
+          # Dont reprogram anytihng already scheduled
+          filtered_medias = Programming.no_reprogram(programming.get(channel_id, []), medias)
+          
+          # Don't repeat the same program within two hour
+          filtered_medias = [c for c in filtered_medias if not c.last_programmed or
+                   (datetime.datetime.now() - c.last_programmed).seconds > 7200]
           
           # At most, 30% of the audience has already "witnessed" this program
           # filtered_medias = [m for m in filtered_medias if not len(viewers) or
           #           float(len(Programming.have_seen(m, viewers)))/len(viewers) < .3]
+
           all_medias += filtered_medias
           offset += limit
 
       all_medias = backup_medias if not len(all_medias) else all_medias
 
       # Don't repeat already programmed 
-      all_medias = Programming.no_reprogram(next_programs, all_medias)
+#      all_medias = Programming.no_reprogram(next_programs, all_medias)
 
       # StorySort algorithm
-      all_medias = Programming.story_sort(all_medias)
+      # all_medias = Programming.story_sort(all_medias)
 
       # Only one publisher per story
       all_medias = Programming.unique_publishers(all_medias)
@@ -417,6 +422,8 @@ class Programming():
 
   @classmethod
   def remove_program(cls, channel_id, media):
+    from model import Channel
+    
     cached_programming = memcache.get('programming') or {}
     new_schedule = []
     sched = 0

@@ -1,14 +1,29 @@
 @media handheld, only screen and (max-width: 480px), only screen and (max-device-width: 480px) { 
+  body.iphone {
+    position: relative;
+  }
   body.iphone.login {
     position: static;
   }
+  a:hover {
+    text-decoration: none !important;
+  }
   div.main {
     min-height: 505px;
+    position: static;
     .iphone div#sidebar {
       min-height: 505px;
     }
+    div.list-media div.list-play, div.list-media div.list-plus {
+      display: none;
+    }
+    div#stage {
+      #ytplayer {
+        width: 0;
+      }
+    }
     div#sidebar {
-      
+      .box-shadow(none);
       div.list-media {
         div.media {
           div.preview {
@@ -36,10 +51,27 @@
       }
       div.info {
         div.picture {
+          height: 150px;
+          div.links div.host {
+            display: none;
+          }
+          div.scrollable {
+            height: 150px;
+          }
           div.play {
+            top: 60px;
             opacity: 1;
             visibility: visible;
           }
+        }
+        div.title {
+          font-size: 13px;
+        }
+        div.desc-link {
+          margin-top: 131px;
+        }
+        div.options div.button div.plus {
+          display: none;
         }
       }
     }

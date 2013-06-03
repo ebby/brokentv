@@ -457,10 +457,13 @@ brkn.Channel.prototype.addViewer = function(session) {
           brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.PROFILE, session.user)
         }
       });
-      brkn.Popup.getInstance().hovercard(goog.dom.getElementByClass('pic', lineEl),
-          brkn.model.Popup.Position.TOP, brkn.model.Popup.Action.TOOLTIP,
-          {'text': 'JOIN ' + session.user.firstName().toUpperCase(),
-           'link': '#channel:' + session.channel.id});
+      
+      if (DESKTOP) {
+        brkn.Popup.getInstance().hovercard(goog.dom.getElementByClass('pic', lineEl),
+            brkn.model.Popup.Position.TOP, brkn.model.Popup.Action.TOOLTIP,
+            {'text': 'JOIN ' + session.user.firstName().toUpperCase(),
+          'link': '#channel:' + session.channel.id});
+      }
     }
   }
 };

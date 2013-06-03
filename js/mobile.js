@@ -73,6 +73,11 @@ brkn.Mobile.prototype.decorateInternal = function(element) {
 brkn.Mobile.prototype.enterDocument = function() {
   goog.base(this, 'enterDocument');
 
+  if (!SAFARI) {
+    document.body.style.height = goog.dom.getViewportSize().height + 'px';
+  }
+  
+  
   this.sidebar_.decorate(goog.dom.getElement('sidebar'));
   this.player_.decorate(goog.dom.getElement('stage'));
   this.notify_.decorate(goog.dom.getElement('notify'));
@@ -113,6 +118,9 @@ brkn.Mobile.prototype.enterDocument = function() {
           case 'info':
             var media = brkn.model.Medias.getInstance().get(matches[2]);
             brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.MEDIA_INFO, media);
+            break;
+          case 'friendlist':
+            brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.FRIEND_LIST);
             break;
         }
       }

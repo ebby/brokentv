@@ -58,6 +58,24 @@ div#sidebar div.info {
         margin-top: 7px;
         margin-left: 4px;
       }
+      .loading-icon {
+        display: none;
+        background: @spinner3 no-repeat center;
+        background-size: 20px;
+        width: 20px;
+        height: 20px;
+        position: absolute;
+        top: 11px;
+        left: 14px;
+      }
+      &.play-loading {
+        .icon {
+          display: none;
+        }
+        .loading-icon {
+          display: block;
+        }
+      }
     }
     &.scrolled div.play {
       display: none;

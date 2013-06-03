@@ -135,6 +135,7 @@ brkn.sidebar.Stream.prototype.decorateInternal = function(el) {
   
   if (this.showFriendList_) {
     this.friendlistEl_ = goog.dom.createDom('div', 'friendlist');
+    goog.style.showElement(this.friendlistEl_, false);
     goog.dom.appendChild(this.getElement(), this.friendlistEl_);
     var activitiesLabel = goog.dom.createDom('div', 'label', 'ACTIVITY');
     goog.dom.appendChild(this.getElement(), activitiesLabel);
@@ -147,7 +148,8 @@ brkn.sidebar.Stream.prototype.decorateInternal = function(el) {
   goog.dom.appendChild(this.getElement(), this.spinner_);
   goog.style.showElement(this.spinner_, false);
   
-  this.noActivitiesEl_ = goog.dom.createDom('div', 'no-comments', this.uid_ ?
+  this.noActivitiesEl_ = goog.dom.createDom('div', 'no-comments',
+      this.uid_ == brkn.model.Users.getInstance().currentUser.id ?
       'Your activity will appear here.': 'Friends\' activity will appear here.');
   goog.dom.appendChild(this.getElement(), this.noActivitiesEl_);
 
@@ -405,8 +407,8 @@ brkn.sidebar.Stream.prototype.addActivity_ = function(opt_activity, opt_digest, 
 
 
 brkn.sidebar.Stream.prototype.resize = function() {
-  var height = goog.dom.getViewportSize().height - 40 -
-      (goog.dom.getAncestorByClass(this.getElement(), 'tabbed') ? 40 : 10);
+  var height = goog.dom.getViewportSize().height + (IPHONE && SAFARI ? 61 : 0)
+      - 40 - (goog.dom.getAncestorByClass(this.getElement(), 'tabbed') ? 40 : 10);
   
   goog.style.setHeight(this.getElement(), height);
   if (goog.style.getSize(this.activitiesEl_).height < height) {
