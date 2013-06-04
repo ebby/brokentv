@@ -214,12 +214,14 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
     
     this.addChild(this.tweetToggle_);
     this.tweetToggle_.decorate(goog.dom.getElementByClass('tweet-toggle', this.getElement()));
-    goog.net.XhrIo.send('/_twitter', goog.bind(function(e) {
-      var response = e.target.getResponseJson()
-      this.twitterPublish_ = this.twitterPublish_ && response['auth'];
-      this.twitterAuthUrl_ = response['auth_url'];
-      this.tweetToggle_.setChecked(this.twitterPublish_);
-    }, this));
+    if (!brkn.model.Users.getInstance().currentUser.hasTwitter) {
+      goog.net.XhrIo.send('/_twitter', goog.bind(function(e) {
+        var response = e.target.getResponseJson()
+        this.twitterPublish_ = this.twitterPublish_ && response['auth'];
+        this.twitterAuthUrl_ = response['auth_url'];
+        this.tweetToggle_.setChecked(this.twitterPublish_);
+      }, this));
+    }
     
     this.addChild(this.fbToggle_);
     this.fbToggle_.decorate(goog.dom.getElementByClass('fb-toggle', this.getElement()));
@@ -554,7 +556,8 @@ brkn.sidebar.CommentInput.prototype.onAddComment_ = function(e) {
  * @param {Event} e
  */
 brkn.sidebar.CommentInput.prototype.onFacebookToggle_ = function(e) {
-  if (!this.fbPublish_ && this.fbToggle_.isChecked()) {
+  if (!brkn.model.Users.getInstance().currentUser.hasFacebook && !this.fbPublish_
+      && this.fbToggle_.isChecked()) {
     goog.style.showElement(goog.dom.getElement('overlay'), true);
     FB.login(goog.bind(function(response) {
       goog.style.showElement(goog.dom.getElement('overlay'), false);
@@ -569,10 +572,21 @@ brkn.sidebar.CommentInput.prototype.onFacebookToggle_ = function(e) {
  * @param {Event} e
  */
 brkn.sidebar.CommentInput.prototype.onTwitterToggle_ = function(e) {
-  if (!this.twitterPublish_ && this.tweetToggle_.isChecked()) {
+  if (!brkn.model.Users.getInstance().currentUser.hasTwitter && !this.twitterPublish_ &&
+      this.tweetToggle_.isChecked()) {
       this.tweetToggle_.setChecked(false);
-      var newWindow = window.open(this.twitterAuthUrl_,'Twitter Login','height=300,width=550');
-      newWindow.moveTo(screen.width/2-225, screen.height/2-150);
-      newWindow.focus();
+      if (IPHONE || IPAD) {
+        var a = document.createElement('a');
+        a.setAttribute("href", this.twitterAuthUrl_);
+        a.setAttribute("target", "_blank");
+  
+        var dispatch = document.createEvent("HTMLEvents")
+        dispatch.initEvent("click", true, true);
+        a.dispatchEvent(dispatch);
+      } else {
+        var newWindow = window.open(this.twitterAuthUrl_,'Twitter Login','height=300,width=550');
+        newWindow.moveTo(screen.width/2-225, screen.height/2-150);
+        newWindow.focus(); 
+      }
    }
 };

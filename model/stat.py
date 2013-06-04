@@ -1,5 +1,6 @@
 from common import *
 from media import *
+from collection import *
 
 class Stat(db.Model):
   date = db.DateProperty(auto_now_add=True)
@@ -158,10 +159,13 @@ class Stat(db.Model):
     today.put()
 
   @classmethod
-  def add_comment(cls, user, facebook, twitter):
+  def add_comment(cls, media, user, facebook, twitter):
     user.comment_count += 1
     user.put()
     Stat.add_comment_trans(Stat.get_today().key(), facebook, twitter)
+    if not Stat.get_today().comment_count or \
+        float(media.comment_count)/float(Stat.get_today().comment_count) > .05:
+      Collection.get_popular().add_media(media, approved=True)
 
   @classmethod
   @db.transactional
@@ -191,6 +195,9 @@ class Stat(db.Model):
     media.star_count += 1
     media.put()
     Stat.add_star_trans(Stat.get_today().key())
+    if not Stat.get_today().star_count or \
+        float(media.star_count)/float(Stat.get_today().star_count) > .05:
+      Collection.get_popular().add_media(media, approved=True)
 
   @classmethod
   @db.transactional
@@ -203,6 +210,9 @@ class Stat(db.Model):
   def add_like(cls, media):
     Media.add_like(media.id)
     Stat.add_like_trans(Stat.get_today().key())
+    if not Stat.get_today().like_count or \
+        float(media.like_count)/float(Stat.get_today().like_count) > .05:
+      Collection.get_popular().add_media(media, approved=True)
 
   @classmethod
   @db.transactional

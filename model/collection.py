@@ -32,6 +32,14 @@ class Collection(db.Model):
   @property
   def id(self):
     return self.key().id()
+  
+  @classmethod
+  def get_popular(self):
+    col = Collection.all().filter('name =', 'xylo-popular').get()
+    if not col:
+      col = Collection(name='xylo-popular')
+      col.put()
+    return col
 
   @classmethod
   def add_publisher_media(cls, collection_id, publisher_id, approve_all):

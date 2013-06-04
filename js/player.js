@@ -380,10 +380,6 @@ brkn.Player.prototype.play = function(opt_media, opt_channel, opt_tries) {
       'enablejsapi': 1,
       'rel': 0
     };
-    if (!DESKTOP) {
-      playerVars['start'] = seek;
-      playerVars['autoplay'] = 1;
-    }
     this.player_ = new YT.Player('ytplayer', {
       'height': goog.dom.getViewportSize().height - 40,
       'width': goog.dom.getViewportSize().width,
@@ -398,22 +394,10 @@ brkn.Player.prototype.play = function(opt_media, opt_channel, opt_tries) {
     brkn.model.Player.getInstance().setPlayer(this.player_);
   } else {
     if (opt_media) {
-      if (DESKTOP) {
-        this.player_.cueVideoById(opt_media.hostId);
-      } else {
-        this.player_.loadVideoById(opt_media.hostId, seek);
-      }
+      this.player_.cueVideoById(opt_media.hostId);
     } else if (opt_channel) {
       this.player_.cuePlaylist(opt_channel.asPlaylist(), opt_channel.currentProgramIndex);
     }
-//    goog.Timer.callOnce(goog.bind(function() {
-//      var tries = opt_tries || 0;
-//      if (!this.player_.getPlayerState() && tries < 4) {
-//        this.play(opt_media, opt_channel, ++tries);
-//      } else if (tries >= 4) {
-//        this.updateStagecover_(undefined, undefined, true);
-//      }
-//    }, this), retry);
   }
 };
 
@@ -537,9 +521,10 @@ brkn.Player.prototype.playerStateChange_ = function(event) {
   this.updateStagecover_();
   switch (event.data) {
     case YT.PlayerState.CUED:
-      var seek = brkn.model.Player.getInstance().getCurrentProgram().async ? brkn.model.Player.getInstance().getCurrentProgram().seek :
+      var seek = brkn.model.Player.getInstance().getCurrentProgram().async ?
+          brkn.model.Player.getInstance().getCurrentProgram().seek :
           (goog.now() - brkn.model.Player.getInstance().getCurrentProgram().time.getTime())/1000;
-      this.player_.seekTo(seek);
+      DESKTOP && this.player_.seekTo(seek);
       this.player_.playVideo();
       brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.PLAY, true);
       break;
@@ -564,25 +549,14 @@ brkn.Player.prototype.playerStateChange_ = function(event) {
  * @param {Event} event
  */
 brkn.Player.prototype.onPlayerReady_ = function(event) {
-  // Do a health check
-  //goog.Timer.callOnce(goog.bind(function() {
-//    if (this.player_ && (!this.player_.getPlayerState || !this.player_.getPlayerState())) {
-//      // In case we didn't load
-//      this.playProgram(brkn.model.Player.getInstance().getCurrentProgram());
-//    } else if (this.player_.getPlayerState()) {
-//      // If we did and cued the video
-//      if (DESKTOP) {
-        this.player_.setPlaybackQuality('large');
-        var seek = brkn.model.Player.getInstance().getCurrentProgram().async ?
-            brkn.model.Player.getInstance().getCurrentProgram().seek :
-            (goog.now() - brkn.model.Player.getInstance().getCurrentProgram().time.getTime())/1000;
-        this.player_.seekTo(seek);
-        this.player_.playVideo();
-        brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.MUTE,
-            this.player_.isMuted());
-//      }
-//    }
-  //}, this), 1000);
+    this.player_.setPlaybackQuality('large');
+    var seek = brkn.model.Player.getInstance().getCurrentProgram().async ?
+        brkn.model.Player.getInstance().getCurrentProgram().seek :
+        (goog.now() - brkn.model.Player.getInstance().getCurrentProgram().time.getTime())/1000;
+    this.player_.seekTo(seek);
+    this.player_.playVideo();
+    brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.MUTE,
+        this.player_.isMuted());
 };
 
 

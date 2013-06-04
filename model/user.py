@@ -190,7 +190,6 @@ class User(db.Model):
       json['last_login'] = self.last_login.isoformat() if self.last_login else None
       if admin:
         json['demo'] = self.demo
-        json['last_login'] = self.last_login.isoformat() if self.last_login else None
         json['session_count'] = self.session_count if self.session_count else 0
         json['ave_session_time'] = self.ave_session_time if self.ave_session_time else 0
       if configs:
@@ -200,4 +199,5 @@ class User(db.Model):
         json['post_twitter'] = self.post_twitter
         json['post_facebook'] = self.post_facebook
         json['welcomed'] = self.welcomed
+        json['has_twitter'] = self.twitter_token is not None
       return json

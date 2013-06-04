@@ -3101,6 +3101,14 @@ div#sidebar {
   -moz-box-shadow: inset 4px 0 6px -4px rgba(0, 0, 0, 0.7), 0 0 2px 1px rgba(146, 146, 146, 0.6);
   box-shadow: inset 4px 0 6px -4px rgba(0, 0, 0, 0.7), 0 0 2px 1px rgba(146, 146, 146, 0.6);
 }
+div#sidebar div#log {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100px;
+  background: white;
+}
 div#sidebar div.toggle {
   position: absolute;
   top: 50%;
@@ -5391,6 +5399,10 @@ div#sidebar div.info div.picture img.thumb.show {
   opacity: .5;
   visibility: visible;
 }
+div#sidebar div.info div.picture .ytvideo {
+  position: absolute;
+  opacity: .5;
+}
 div#sidebar div.info div.picture:hover div.play {
   visibility: visible;
   opacity: .9;
@@ -7631,6 +7643,9 @@ div.list-media div.duration {
   div.main div#stage #ytplayer {
     width: 0;
   }
+  div.main div#stage #stagecover {
+    display: none;
+  }
   div.main div#sidebar {
     -webkit-box-shadow: none;
     -moz-box-shadow: none;
@@ -7665,18 +7680,23 @@ div.list-media div.duration {
     display: none;
   }
   div.main div#sidebar div.info div.picture div.scrollable {
+    top: 100px;
     height: 150px;
   }
+  div.main div#sidebar div.info div.picture.scrolled div.scrollable {
+    top: 0;
+  }
+  div.main div#sidebar div.info div.picture div.desc-link {
+    margin-top: 31px;
+  }
+  div.main div#sidebar div.info div.picture.scrolled div.desc-link {
+    margin-top: 131px;
+  }
   div.main div#sidebar div.info div.picture div.play {
-    top: 60px;
-    opacity: 1;
-    visibility: visible;
+    display: none;
   }
   div.main div#sidebar div.info div.title {
     font-size: 13px;
-  }
-  div.main div#sidebar div.info div.desc-link {
-    margin-top: 131px;
   }
   div.main div#sidebar div.info div.options div.button div.plus {
     display: none;

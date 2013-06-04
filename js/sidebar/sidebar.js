@@ -204,7 +204,9 @@ brkn.Sidebar.prototype.enterDocument = function() {
   this.starred_ = new brkn.sidebar.Profile(brkn.model.Users.getInstance().currentUser);
   this.starred_.decorate(goog.dom.getElement('my-profile'));
   
-  if (this.info_ && DESKTOP) {
+  if (this.info_ && (DESKTOP ||
+      (brkn.model.Channels.getInstance().currentChannel.myChannel &&
+          brkn.model.Channels.getInstance().currentChannel.getCurrentProgram()))) {
     this.currentScreen_ = goog.dom.getElement('info');
     this.currentTab_ = 'info';
     this.tabNav_('info', 'info');

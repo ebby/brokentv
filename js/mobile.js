@@ -1,6 +1,5 @@
 goog.provide('brkn.Mobile');
 
-goog.require('brkn.Notify');
 goog.require('brkn.Player');
 goog.require('brkn.Popup');
 goog.require('brkn.Sidebar');
@@ -30,16 +29,7 @@ brkn.Mobile = function() {
    * @type {brkn.Sidebar}
    */
   this.sidebar_ = new brkn.Sidebar();
-  
-  /**
-   * @type {brkn.Player}
-   */
-  this.player_ = new brkn.Player();
 
-  /**
-   * @type {brkn.Notify}
-   */
-  this.notify_ = new brkn.Notify();
 };
 goog.inherits(brkn.Mobile, goog.ui.Component);
 
@@ -79,11 +69,6 @@ brkn.Mobile.prototype.enterDocument = function() {
   
   
   this.sidebar_.decorate(goog.dom.getElement('sidebar'));
-  this.player_.decorate(goog.dom.getElement('stage'));
-  this.notify_.decorate(goog.dom.getElement('notify'));
-  
-  // Hide notification until we have a mobile UI for it
-  goog.style.showElement(this.notify_.getElement(), false);
 
   if (!brkn.model.Users.getInstance().currentUser.welcomed) {
     this.welcome_(brkn.model.Users.getInstance().currentUser);

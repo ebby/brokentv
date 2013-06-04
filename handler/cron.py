@@ -13,7 +13,7 @@ class FetchHandler(webapp2.RequestHandler):
 
     cols = Collection.all().fetch(None)
     for col in cols:
-      col.fetch(constants.APPROVE_ALL)
+      col.fetch(constants.APPROVE_ALL or col.name=='Youtube Popular')
     logging.info('CRON FETCH STARTED')
 
 class SetProgrammingHandler(webapp2.RequestHandler):

@@ -52,6 +52,9 @@ brkn.model.Users.prototype.currentUser;
  */
 brkn.model.Users.prototype.setCurrentUser = function(user) {
 	this.currentUser = this.get_or_add(user);
+	FB.api('/me/permissions', goog.bind(function(response) {
+    this.currentUser.hasFacebook = response['data'][0]['publish_stream'];
+  }, this));
 };
 
 

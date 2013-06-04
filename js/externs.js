@@ -31,7 +31,7 @@ appengine.Channel.prototype.open = function(opt_handler) {};
 var YT = {};
 
 /** 
- * @param {string} id 
+ * @param {string|Element} id 
  * @constructor 
  */
 YT.Player = function(id, params) {};

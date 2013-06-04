@@ -121,8 +121,8 @@ class SessionHandler(BaseHandler):
 
       user_agent = self.request.headers.get('user_agent')
       if self.current_user.id not in constants.SUPER_ADMINS:
-        if 'Mobile' in user_agent and False: # Allow all mobile for now
-          data['error'] = 'Mobile access is not supported yet.'
+        if 'Android' in user_agent:
+          data['error'] = 'Android mobile access is not supported yet.'
         ie = re.search('/MSIE\s([\d]+)/', user_agent)
         ff = re.search('/firefox\/([\d]+)/', user_agent)
         if (ie and ie < 10) or (ff and ff < 6):
@@ -377,7 +377,7 @@ class CommentHandler(BaseHandler):
       current_user.post_twitter = tweet
       current_user.put()
       
-      Stat.add_comment(self.current_user, facebook, tweet)
+      Stat.add_comment(media, self.current_user, facebook, tweet)
       if to_user and to_user.id != self.current_user.id:
         n = Notification.add(to_user, constants.NotificationType.REPLY, comment=c)
         broadcast.broadcastNotification(n)

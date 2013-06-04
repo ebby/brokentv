@@ -21,6 +21,9 @@
       #ytplayer {
         width: 0;
       }
+      #stagecover {
+        display: none;
+      }
     }
     div#sidebar {
       .box-shadow(none);
@@ -56,19 +59,24 @@
             display: none;
           }
           div.scrollable {
+            top: 100px;
             height: 150px;
           }
+          &.scrolled div.scrollable {
+            top: 0;
+          }
+          div.desc-link {
+            margin-top: 31px;
+          }
+          &.scrolled  div.desc-link {
+            margin-top: 131px;
+          }
           div.play {
-            top: 60px;
-            opacity: 1;
-            visibility: visible;
+            display: none;
           }
         }
         div.title {
           font-size: 13px;
-        }
-        div.desc-link {
-          margin-top: 131px;
         }
         div.options div.button div.plus {
           display: none;

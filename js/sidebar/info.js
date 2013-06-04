@@ -269,6 +269,7 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
   
   this.viewersEl_ = goog.dom.getElementByClass('viewers', this.getElement());
   var picEl = goog.dom.getElementByClass('picture', this.getElement());
+  var ytvideo = goog.dom.getElementByClass('ytvideo', this.getElement());
   var scrollable = goog.dom.getElementByClass('scrollable', this.getElement());
   var publisherEl = goog.dom.getElementByClass('publisher', this.getElement());
   var titleEl = goog.dom.getElementByClass('title', this.getElement());
@@ -435,11 +436,15 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
       .listen(scrollable,
               goog.events.EventType.SCROLL,
               goog.bind(function() {
-                var opacity = ((this.mini_ ? 100 : 120)-scrollable.scrollTop)/100;
+                var video = goog.dom.getElementByClass('ytvideo', this.getElement());
+                var opacity = IPHONE && scrollable.scrollTop > 10 ? 0 :
+                    ((this.mini_ ? 100 : 120)-scrollable.scrollTop)/100;
                 goog.style.setOpacity(publisherEl, Math.min(1, Math.max(opacity, 0)));
                 goog.style.setOpacity(titleEl, Math.min(1, Math.max(opacity, 0)));
                 goog.style.setOpacity(linksEl, Math.min(1, Math.max(opacity, 0)));
                 goog.style.setOpacity(img, Math.min(.5, Math.max(opacity, .1)));
+                video && goog.style.setOpacity(video, Math.min(.5, Math.max(opacity, .1)));
+                goog.style.setOpacity(ytvideo, Math.min(.5, Math.max(opacity, .1)));
                 goog.dom.classes.enable(picEl, 'scrolled', scrollable.scrollTop > 10);
               }, this))
       .listen(this.commentsEl_,
@@ -487,6 +492,19 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
         brkn.model.Popup.Position.LEFT, brkn.model.Popup.Action.TOOLTIP, {'text': 'Seen by'});
     brkn.Popup.getInstance().hovercard(goog.dom.getElementByClass('friends-icon', this.getElement()),
         brkn.model.Popup.Position.RIGHT, brkn.model.Popup.Action.TOOLTIP, {'text': 'Visible by only your Facebook friends'});
+  }
+  
+  if (IPHONE) {
+    
+    var player = new YT.Player(ytvideo, {
+      'height': '100%',
+      'width': '100%',
+      'videoId': this.media_.hostId,
+      'playerVars': {
+          'controls': 0,
+          'showinfo': 0
+        }
+      });
   }
 
   this.media_.subscribe(brkn.model.Media.Actions.ADD_COMMENT, function(comment) {
@@ -947,8 +965,7 @@ brkn.sidebar.Info.prototype.resize = function(opt_extra, opt_scrollComments) {
       this.resizeExtra_ - (goog.dom.getAncestorByClass(this.getElement(), 'tabbed') ? 30 : 0);
   goog.style.setHeight(this.getElement(), height);
   
-  goog.style.setHeight(this.contentsEl_, viewHeight - (DESKTOP ? (this.mini_ ? 183 : 283) : 0) -
-      (IPHONE ? (SAFARI ? 230 : 170) : 0) -
+  goog.style.setHeight(this.contentsEl_, height - (this.mini_ ? 143 : 243) + (IPHONE ? 50 : 0) -
       (this.viewers_.length ? 38 : 0));
   if (viewHeight > 640 && this.commentsEl_ && this.commentsEl_.parentElement) {
     goog.style.setStyle(this.commentsEl_, 'max-height', viewHeight -
@@ -1000,12 +1017,22 @@ brkn.sidebar.Info.prototype.onFacebookButton_ = function() {
  */
 brkn.sidebar.Info.prototype.onTwitterButton_ = function() {
   var url = 'https://twitter.com/share?url=' + this.media_.link +
-    '&text=I\'m watching ' + this.media_.name + ' ' + this.media_.link;
-  var newWindow = window.open(url,'Tweet','height=320,width=550');
-  newWindow.moveTo(screen.width/2-225,
-      screen.height/2-150)
-  newWindow.focus();
-  brkn.model.Analytics.getInstance().share(this.media_.id, false, true);
+      '&text=I\'m watching ' + this.media_.name + ' ' + this.media_.link;
+  if (IPHONE || IPAD) {
+    var a = document.createElement('a');
+    a.setAttribute("href", url);
+    a.setAttribute("target", "_blank");
+
+    var dispatch = document.createEvent("HTMLEvents")
+    dispatch.initEvent("click", true, true);
+    a.dispatchEvent(dispatch);
+  } else {
+    var newWindow = window.open(url,'Tweet','height=320,width=550');
+    newWindow.moveTo(screen.width/2-225,
+        screen.height/2-150)
+    newWindow.focus();
+    brkn.model.Analytics.getInstance().share(this.media_.id, false, true);
+  }
 };
 
 

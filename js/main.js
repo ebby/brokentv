@@ -146,7 +146,7 @@ brkn.Main.prototype.decorateInternal = function(element) {
     user: brkn.model.Users.getInstance().currentUser,
     admin: brkn.model.Users.getInstance().currentUser.isAdmin(),
     guide: brkn.model.Users.getInstance().currentUser.showGuide &&
-        !brkn.model.Channels.getInstance().currentChannel.myChannel,
+        !brkn.model.Channels.getInstance().currentChannel.myChannel && !IPAD,
     sidebar: brkn.model.Users.getInstance().currentUser.showSidebar
   });
   goog.dom.insertChildAt(element, mainEl, 0);
@@ -158,7 +158,10 @@ brkn.Main.prototype.enterDocument = function() {
   goog.base(this, 'enterDocument');
   
   this.controller_.decorate(goog.dom.getElement('controller'));
-  this.guide_.decorate(goog.dom.getElement('guide'));
+  
+  if (!IPAD) {
+    this.guide_.decorate(goog.dom.getElement('guide'));
+  }
   this.sidebar_.decorate(goog.dom.getElement('sidebar'));
   this.player_.decorate(goog.dom.getElement('stage'));
   this.notify_.decorate(goog.dom.getElement('notify'));

@@ -200,6 +200,11 @@ brkn.Controller.prototype.enterDocument = function() {
   		.listen(this.guideToggle_,
   				goog.ui.Component.EventType.ACTION,
   				goog.bind(function(e) {
+  				  if (IPAD) {
+  				    e.preventDefault();
+  				    e.stopPropagation();
+  				    alert('The guide is not available yet on iPads.')
+  				  }
   				  guideThrottle.fire();
   				}, this))
   	  .listen(this.sidebarToggle_,
