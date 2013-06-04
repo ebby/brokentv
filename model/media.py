@@ -46,6 +46,12 @@ class Media(db.Model):
       self.path = Link.get_or_add('/?m=' + self.id).path
       self.put()
     return constants.SHARE_URL + self.path
+  
+  def get_path(self): 
+    if not self.path:
+      self.path = Link.get_or_add('/?m=' + self.id).path
+      self.put()
+    return self.path
 
   @property
   def thumb(self): 

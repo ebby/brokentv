@@ -878,9 +878,11 @@ brkn.sidebar.Info.prototype.addViewer_ = function(user, online) {
           .listen(viewerEl, goog.events.EventType.CLICK, function() {
             brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.PROFILE, user);
           });
-      brkn.Popup.getInstance().hovercard(viewerEl, brkn.model.Popup.Position.TOP,
-          brkn.model.Popup.Action.TOOLTIP, {'text': user.firstName() +
-              (online ? ' is watching' : ' saw this')});
+      if (DESKTOP) {
+        brkn.Popup.getInstance().hovercard(viewerEl, brkn.model.Popup.Position.TOP,
+            brkn.model.Popup.Action.TOOLTIP, {'text': user.firstName() +
+                (online ? ' is watching' : ' saw this')});
+      }
     }
 
     goog.style.showElement(this.viewersEl_, true);

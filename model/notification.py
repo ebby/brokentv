@@ -45,7 +45,7 @@ class Notification(db.Model):
     self.put()
     
     user_obj = memcache.get(self.user.id) or {}
-    ns = user_obj.get('notifications')
+    ns = user_obj.get('notifications', [])
     updated = False
     for n in ns:
       if n and n['id'] == self.id:

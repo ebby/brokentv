@@ -12,7 +12,7 @@ class User(db.Model):
     created = db.DateTimeProperty(auto_now_add=True)
     updated = db.DateTimeProperty(auto_now=True)
     last_login = db.DateTimeProperty()
-    name = db.StringProperty(required=True)
+    name = db.StringProperty()
     gender = db.StringProperty()
     profile_url = db.StringProperty()
     email = db.StringProperty()
@@ -26,6 +26,7 @@ class User(db.Model):
     twitter_secret = db.StringProperty()
     twitter_id = db.IntegerProperty()
     twitter_handle = db.StringProperty()
+    temp = db.BooleanProperty(default=False)
     
     # Configs
     show_guide = db.BooleanProperty(default=True)

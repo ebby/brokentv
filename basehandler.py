@@ -34,7 +34,7 @@ class BaseHandler(SessionRequest):
                 user = User.get_by_key_name(cookie["uid"])
                 new_user = False
                 user_number = 0
-                if not user:
+                if not user or user.temp:
                     new_user = True
                     # Not an existing user so get user info
                     profile = graph.get_object("me")

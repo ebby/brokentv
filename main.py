@@ -93,7 +93,7 @@ class MainHandler(BaseHandler):
           qs = urlparse.parse_qs(parsed.query)
           if qs.get('m'):
             media_id = qs['m'][0]
-            logging.info(media_id)
+
       self.session['channel_id'] = channel_id
       self.session['media_id'] = media_id
   
@@ -178,6 +178,15 @@ class PitchHandler(BaseHandler):
         self.response.out.write(template.render(path, {}))
       else:
         self.redirect('/')
+        
+class RedirectHandler(BaseHandler):
+    def get(self, path=None):
+      html = os.path.join(os.path.dirname(__file__), 'templates/redirect.html')
+      self.response.out.write(template.render(html, {'link':'http://www.xylocast.com/' + path}))
+
+    def post(self, path=None):
+      html = os.path.join(os.path.dirname(__file__), 'templates/redirect.html')
+      self.response.out.write(template.render(html, {'link':'http://www.xylocast.com/' + path}))
 
 #--------------------------------------
 # APPLICATION INIT
@@ -279,6 +288,7 @@ def create_handlers_map():
     ('/', MainHandler),
     ('/unsubscribe', UnsubscribeHandler),
     ('/admin', AdminHandler),
+    ('/redirect/(.*)', RedirectHandler),
     ('/stats', StatsHandler),
     ('/deck', PitchHandler),
     ('/namestorm', NameStormHandler),

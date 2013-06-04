@@ -272,9 +272,9 @@ brkn.Controller.prototype.enterDocument = function() {
                   brkn.model.Player.getInstance().getCurrentProgram().media.duration;
               var remaining = brkn.model.Player.getInstance().getCurrentProgram().media.duration -
                   brkn.model.Player.getInstance().getCurrentTime();
-//              if (remaining < 3) {
-//                brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.BEFORE_END);
-//              }
+              if (remaining < 1) {
+                brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.BEFORE_END);
+              }
               if (!goog.dom.classes.has(this.progressEl_, 'drag')) {
                 goog.dom.setTextContent(this.durationEl_,
                     (brkn.model.Player.getInstance().getCurrentTime() ?
@@ -314,7 +314,11 @@ brkn.Controller.prototype.enterDocument = function() {
             goog.dom.classes.remove(this.progressEl_, 'drag');
             goog.dom.classes.add(this.elapsedEl_, 'animate');
           }, this), 1000);
-        }, this))
+        }, this));
+  
+  if (IPAD) {
+    this.guideToggle_.setEnabled(false);
+  }
 
   brkn.model.Player.getInstance().subscribe(brkn.model.Player.Actions.PLAY_ASYNC, function(program) {
     goog.dom.classes.remove(this.elapsedEl_, 'animate');

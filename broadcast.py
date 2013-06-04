@@ -194,13 +194,4 @@ def email_outbox(user_id):
           mention_email.send(user)
     del user_obj['outbox']
     memcache.set(user_id, user_obj)
-          
 
-    ''' FACEBOOK NOTIFICATIONS (REQUIRES SSL AND CANVAS APP)
-    fetch = urlfetch.fetch(url='https://graph.facebook.com/%s/notifications' % to_user.id,
-                        payload='access_token=%s&template=%s&href=%s' %
-                        (constants.facebook_app(host_url)['APP_ACCESS_TOKEN'],
-                         '@[' + to_user.id + ']' + ' replied to your comment',
-                         comment.media.link),
-                        method=urlfetch.POST)
-    '''

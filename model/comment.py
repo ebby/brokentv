@@ -40,9 +40,18 @@ class Comment(db.Model):
     
     for m in c.mentions:
       if not to_user or (to_user and m != to_user.id): 
-        user = User.get_by_key_name(m)
-        n = Notification.add(user, constants.NotificationType.MENTION, c)
-        broadcast.broadcastNotification(n)
+        mentioned_user = User.get_by_key_name(m)
+        if not mentioned_user:
+          # Send them notification on FB
+          fetch = urlfetch.fetch(url='https://graph.facebook.com/%s/notifications' % m,
+                                 payload='access_token=%s&template=%s&href=%s' %
+                                 (constants.facebook_app()['APP_ACCESS_TOKEN'],
+                                 '@[' + user.id + ']' + ' mentioned you in a comment!',
+                                 'redirect/' + media.get_path()),
+                                 method=urlfetch.POST)
+        else:
+          n = Notification.add(mentioned_user, constants.NotificationType.MENTION, c)
+          broadcast.broadcastNotification(n)
 
     if c.is_parent:
       from useractivity import UserActivity

@@ -27,6 +27,11 @@ brkn.model.Users = function() {
    * @type {Array.<brkn.model.User>}
    */
   this.friends = [];
+  
+  /**
+   * @type {Object.<string, string>}
+   */
+  this.facebookFriends = {};
 	
 	/**
    * @type {Array.<brkn.model.User>}
@@ -54,6 +59,16 @@ brkn.model.Users.prototype.setCurrentUser = function(user) {
 	this.currentUser = this.get_or_add(user);
 	FB.api('/me/permissions', goog.bind(function(response) {
     this.currentUser.hasFacebook = response['data'][0]['publish_stream'];
+  }, this));
+	FB.api('/me/friends', goog.bind(function(response) {
+    goog.array.forEach(response['data'], function(f) {
+      if (!this.userMap[f['id']]) {
+        this.userMap[f['id']] = new brkn.model.User({
+          'id' : f['id'],
+          'name' : f['name']
+        });
+      }
+    }, this);
   }, this));
 };
 
@@ -136,6 +151,9 @@ brkn.model.Users.prototype.search = function(query) {
   var users = goog.object.getValues(this.userMap);
   var results = goog.array.filter(users, function(u) {
     return goog.string.caseInsensitiveStartsWith(u.name, query);
+  }, this);
+  var fbFriends = goog.array.filter(goog.object.getValues(this.facebookFriends), function(f) {
+    return goog.string.caseInsensitiveStartsWith(f, query);
   }, this);
   return results;
 }

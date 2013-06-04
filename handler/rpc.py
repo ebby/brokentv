@@ -414,6 +414,18 @@ class MessageHandler(BaseHandler):
     if from_id and to_id and text:
       from_user = User.get_by_key_name(from_id)
       to_user = User.get_by_key_name(to_id)
+      if not to_user:
+        to_user = User(key_name=to_id, id=to_id, temp=True, access_level=1)
+        to_user.put()
+        
+        # Send them notification on FB
+        fetch = urlfetch.fetch(url='https://graph.facebook.com/%s/notifications' % m,
+                               payload='access_token=%s&template=%s&href=%s' %
+                               (constants.facebook_app()['APP_ACCESS_TOKEN'],
+                               '@[' + user.id + ']' + ' sent you a message!',
+                               'redirect'),
+                               method=urlfetch.POST)
+        
       message = Message.add(from_user=from_user, to_user=to_user, text=text)
       broadcast.broadcastNewMessage(message)
       self.response.out.write(simplejson.dumps(message.toJson()))

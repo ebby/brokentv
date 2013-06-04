@@ -153,7 +153,9 @@ brkn.sidebar.Stream.prototype.decorateInternal = function(el) {
       'Your activity will appear here.': 'Friends\' activity will appear here.');
   goog.dom.appendChild(this.getElement(), this.noActivitiesEl_);
 
-  this.digest_(this.activities_);
+  if (this.activities_ && this.activities_.length) {
+    this.digest_(this.activities_);
+  }
 
   if (this.showFriendList_) {
     this.friendList_ = new brkn.sidebar.FriendList(undefined, false);

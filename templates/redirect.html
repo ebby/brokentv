@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:fb="http://ogp.me/ns/fb#">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link rel="apple-touch-icon-precomposed" href="/static/img/apple-touch-icon-precomposed.png"/>
+
+    <meta property="og:image" content="/static/img/apple-touch-icon-precomposed.png"/>
+    <meta property="og:title" content="XYLO"/>
+    <meta property="og:url" content="http://www.xylocast.com"/>
+    <meta property="og:description" content="Your Television Stream" />
+    <meta property="fb:app_id" content="131936020298013" /> 
+
+    <title>XYLO</title>
+
+    <link rel="stylesheet" type="text/css" href="/static/css/main.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/literals.css">
+  </head>
+  <body>
+    <audio id="mp3-1" style="display:none; height:0">
+      <source src="/static/audio/xylo-a.mp3" type='audio/mpeg; codecs="mp3"'>
+      <source src="/static/audio/xylo-a.wav" type="audio/wav">
+    </audio>
+    <audio id="mp3-2" style="display:none; height:0">
+      <source src="/static/audio/xylo-s.mp3" type='audio/mpeg; codecs="mp3"'>
+      <source src="/static/audio/xylo-s.wav" type="audio/wav">
+    </audio>
+    <audio id="mp3-3" style="display:none; height:0">
+      <source src="/static/audio/xylo-d.mp3" type='audio/mpeg; codecs="mp3"'>
+      <source src="/static/audio/xylo-d.wav" type="audio/wav">
+    </audio>
+    <audio id="mp3-4" style="display:none; height:0">
+      <source src="/static/audio/xylo-f.mp3" type='audio/mpeg; codecs="mp3"'>
+      <source src="/static/audio/xylo-f.wav" type="audio/wav">
+    </audio>
+  
+    <div id="login">
+      <div id="homepage">
+        <div id="chord-1" class="chord"></div>
+        <div id="chord-2" class="chord"></div>
+        <div id="chord-3" class="chord"></div>
+        <div id="chord-4" class="chord"></div>
+      </div>
+      <div class="scrollable" id="static-scrollable"></div>
+        <div class="static-content" id="static-content">
+          <div class="header">
+            <div class="title">INTRODUCING
+              <span style="color:#B5762F;">X</span><span style="color:#B49B4B;">Y</span><span style="color:#2F6E53;">L</span><span style="color:#497882;">O</span></div>
+            <div class="subtitle">Your Television Stream</div>
+            <a href="{{link}}" target="_blank">
+	            <div id="fb-login" class="fb-login" style="visibility:visible;opacity:1;">
+	              <div class="power"><div class="bg"></div></div>
+	              <div class="label" style="left:15px">CONTINUE</div>
+	              <div class="with-fb">watch on XYLO</div>
+	              <div id="error"></div>
+	              <div id="message"></div>
+	            </div>
+            </a>
+          </div>          
+        </div>
+      </div>
+  </body>
+</html>
