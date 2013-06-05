@@ -47,7 +47,7 @@ class Comment(db.Model):
                                  payload='access_token=%s&template=%s&href=%s' %
                                  (constants.facebook_app()['APP_ACCESS_TOKEN'],
                                  '@[' + user.id + ']' + ' mentioned you in a comment!',
-                                 'redirect/' + media.get_path()),
+                                 media.get_path()),
                                  method=urlfetch.POST)
         else:
           n = Notification.add(mentioned_user, constants.NotificationType.MENTION, c)

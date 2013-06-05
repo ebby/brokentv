@@ -54,7 +54,7 @@ brkn.model.User = function(user) {
   /**
    * @type {brkn.model.Media}
    */
-  this.currentMedia = user['last_seen'] ? brkn.model.Media.getInstance().getOrAdd(user['last_seen']) : null;
+  this.currentMedia = user['last_seen'] ? brkn.model.Medias.getInstance().getOrAdd(user['last_seen']) : null;
 
   /**
    * @type {Array.<brkn.model.Media>}
@@ -100,7 +100,7 @@ brkn.model.User = function(user) {
    * @type {?goog.date.DateTime}
    */
   this.lastLogin = user['last_login'] ? goog.date.fromIsoString(user['last_login'] + 'Z') : null;
-
+  
   /**
    * @type {number}
    */
@@ -140,7 +140,12 @@ brkn.model.User = function(user) {
    * @type {boolean}
    */
   this.hasFacebook = false;
-  
+
+  /**
+   * @type {boolean}
+   */
+  this.temp = user['temp'];
+
   this.subscribe(brkn.model.User.Actions.TWITTER_AUTH, function() {
     this.postTwitter = true;
   }, this);

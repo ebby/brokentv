@@ -246,7 +246,7 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
             goog.ui.Component.EventType.ACTION,
             goog.bind(this.onAddComment_, this));
     
-    if (DESKTOP) {
+    if (DESKTOP && !IPAD) {
       brkn.Popup.getInstance().hovercard(this.tweetToggle_.getElement(), brkn.model.Popup.Position.TOP,
           brkn.model.Popup.Action.TOOLTIP, {'text': 'Share on Twitter'});
       brkn.Popup.getInstance().hovercard(this.fbToggle_.getElement(), brkn.model.Popup.Position.TOP,
@@ -254,6 +254,7 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
     }
     brkn.model.Users.getInstance().currentUser.subscribe(brkn.model.User.Actions.TWITTER_AUTH, function() {
       this.tweetToggle_.setChecked(true);
+      brkn.model.Users.getInstance().currentUser.hasTwitter = true;
     }, this);
   }
   
@@ -265,13 +266,17 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
       .listen(this.commentInput_.getElement(),
           goog.events.EventType.FOCUS,
           goog.bind(function(e) {
+            if (!brkn.model.Users.getInstance().currentUser.welcomed) {
+              brkn.model.Popup.getInstance().publish(brkn.model.Popup.Action.TOOLTIP, this.commentInput_.getElement(),
+                  brkn.model.Popup.Position.TOP, {'text': 'Mention friends using @'});
+            }
             this.dispatchEvent(goog.events.EventType.FOCUS)
           }, this))
       .listen(keyHandler,
           goog.events.KeyHandler.EventType.KEY,
           goog.bind(function(e) {
             e.stopPropagation();
-            
+            brkn.model.Popup.getInstance().publish(brkn.model.Popup.Action.HIDE);
             if (e.keyCode == '13' || e.keyCode == '32') {
               if (this.suggestions_.length && this.suggestions_.reverse()[this.cursorIndex_]) {
                 e.preventDefault();

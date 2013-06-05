@@ -29,6 +29,7 @@
       var DESKTOP = false;
       var HTML5 = '{{ html5 }}' == 'True';
       var EMBED = '{{ embed }}' == 'True';
+      var FB_APP_ID = '{{ facebook_app_id }}';
       var SAFARI = !window.navigator.standalone && !/(iPhone|iPod|iPad).*AppleWebKit(?!.*Safari)/i.test(navigator.userAgent);
 
       // Re-namespace to avoid closure conflict.
@@ -176,7 +177,7 @@
     <div id="overlay" style="display: none"></div>
     <div id="fb-root"></div>
      
-    <script><!--
+    <script>
       brkn.Mobile.staticInit();
       
       var ytLoaded = false;

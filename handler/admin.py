@@ -73,7 +73,7 @@ class UsersHandler(BaseHandler):
         users = [User.get_by_key_name(id)]
         self.response.out.write(simplejson.dumps(user.toJson()))
       else:
-        users = User.all().order('-created').fetch(100, offset)
+        users = User.all().order('-created').fetch(30, int(offset))
         self.response.out.write(simplejson.dumps([u.toJson(admin=True) for u in users]))
 
 class AccessLevelHandler(BaseHandler):

@@ -3,6 +3,7 @@ from common import *
 from user import User
 from media import Media
 from publisher import Publisher
+from collection import *
 
 
 class Playlist(db.Model):
@@ -15,26 +16,32 @@ class Playlist(db.Model):
   last_fetch = db.DateTimeProperty()
   pending = db.IntegerProperty(default=0)
   
-  def fetch(self, approve_all=False, max=1000):
+  @property
+  def id(self):
+    return self.key().name()
+  
+  def fetch(self, approve_all=False, max=50, collection=None):
     medias = []
-    if not self.last_fetch:
-      yt_service = get_youtube_service()
-      offset = 1
-      while offset <= max:
-        feed = yt_service.GetYouTubePlaylistVideoFeed(
-            uri=Playlist.YT_PLAYLIST % (self.host_id, offset))
-        if not self.name:
-          self.name = feed.title.text
-          self.publisher = Publisher.add('youtube', feed.author[0].name.text)
-          self.put()
-        if len(feed.entry) == 0:
-          break
-        medias = Media.add_from_entry(feed.entry)
-        for media in medias:
-          PlaylistMedia.add(playlist=self, media=media,
-                              approved=(True if approve_all else None))
-        offset += len(medias)
-    
+    logging.info('Fetching playlist')
+    max = 200 if not self.last_fetch else max
+    yt_service = get_youtube_service()
+    offset = 1
+    while offset <= max:
+      feed = yt_service.GetYouTubePlaylistVideoFeed(
+          uri=Playlist.YT_PLAYLIST % (self.host_id, offset))
+      if not self.name:
+        self.name = feed.title.text
+        self.publisher = Publisher.add('youtube', feed.author[0].name.text)
+        self.put()
+      if len(feed.entry) == 0:
+        break
+      medias = Media.add_from_entry(feed.entry, collection=collection, approve=approve_all, fetch_publisher=True)
+      for media in medias:
+        PlaylistMedia.add(playlist=self, media=media,
+                            approved=(True if approve_all else None))
+      offset += len(medias)
+    self.last_fetch = datetime.datetime.now()
+    self.put()
     return medias
   
   @classmethod

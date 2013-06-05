@@ -48,6 +48,12 @@ class Collection(db.Model):
     publisher_medias = publisher.fetch(collection=collection, approve_all=approve_all)
 
   @classmethod
+  def add_playlist_media(cls, collection_id, playlist_id, approve_all):
+    collection = Collection.get_by_id(int(collection_id))
+    playlist = Playlist.get_by_key_name(playlist_id)
+    playlist_medias = playlist.fetch(collection=collection, approve_all=approve_all)
+
+  @classmethod
   def add_channel_media(cls, collection_id, approve_all):
     collection = Collection.get_by_id(int(collection_id))
     logging.info('FETCHING: ' + collection.name)
@@ -108,6 +114,12 @@ class Collection(db.Model):
     for publisher in publishers:
       deferred.defer(Collection.add_publisher_media, self.id, publisher.id, approve_all=approve_all,
                      _name='fetch-' + publisher.id + '-' + str(uuid.uuid1()), _queue='youtube')
+    
+    playlists = self.get_playlists()
+    for playlist in playlists:
+      logging.info('FETCHING PLAYLISTS')
+      deferred.defer(Collection.add_playlist_media, self.id, playlist.id, approve_all=approve_all,
+                     _name='fetch-' + playlist.id + '-' + str(uuid.uuid1()), _queue='youtube')
 
   def add_media(self, media, approved=False):
     CollectionMedia.add(collection=self, media=media, approved=approved)

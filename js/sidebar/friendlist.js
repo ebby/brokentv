@@ -242,8 +242,7 @@ brkn.sidebar.FriendList.prototype.addUser_ = function(user, opt_offlineOnly) {
       goog.dom.appendChild(this.onlineEl_, userEl);
       this.onlineUsers_.push(user);
     }
-  } else if (lastLogin && (this.recentUsers_.length < 3 || opt_offlineOnly)) {
-    goog.style.showElement(this.recentLabel_, true);
+  } else if (lastLogin && (this.recentUsers_.length < 3 || this.showOffline_)) {
     goog.array.forEach(this.recentUsers_, function(u, i) {
       if (u.lastLogin && user.lastLogin && u.lastLogin.getTime() < user.lastLogin.getTime()) {
         goog.dom.insertChildAt(this.recentEl_, userEl, i);
@@ -255,6 +254,8 @@ brkn.sidebar.FriendList.prototype.addUser_ = function(user, opt_offlineOnly) {
       goog.dom.appendChild(this.recentEl_, userEl);
       this.recentUsers_.push(user);
     }
+    goog.style.showElement(this.recentLabel_, true);
+    goog.style.showElement(this.recentEl_, true);
   } else if (this.showOffline_ &&
       !goog.array.find(this.recentUsers_, function(f) {return user.id == f.id}) &&
       !goog.array.find(this.offlineUsers_, function(f) {return user.id == f.id})) {
@@ -273,8 +274,8 @@ brkn.sidebar.FriendList.prototype.addUser_ = function(user, opt_offlineOnly) {
   }
   
   if (!this.showOffline_) {
-    goog.style.showElement(this.recentLabel_, !this.onlineUsers_.length);
-    goog.style.showElement(this.recentEl_, !this.onlineUsers_.length)
+    goog.style.showElement(this.recentLabel_, !this.onlineUsers_.length && this.recentUsers_.length);
+    goog.style.showElement(this.recentEl_, !this.onlineUsers_.length && this.recentUsers_.length)
   };
 
   this.userMap_[user.id] = userEl;
@@ -298,8 +299,6 @@ brkn.sidebar.FriendList.prototype.addUser_ = function(user, opt_offlineOnly) {
  * @param {boolean} online
  */
 brkn.sidebar.FriendList.prototype.updateStatus_ = function(user, online) {
-  var updated = false;
-  
   var userEl = this.userMap_[user.id];
   if (userEl) {
     goog.dom.removeNode(userEl);

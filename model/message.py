@@ -62,7 +62,7 @@ class Message(db.Model):
     self.put()
     
     user_obj = memcache.get(self.to_user.id) or {}
-    ms = user_obj.get('messages')
+    ms = user_obj.get('messages', [])
     updated = False
     for m in ms:
       if m['id'] == self.id:

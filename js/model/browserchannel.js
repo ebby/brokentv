@@ -62,9 +62,6 @@ brkn.model.BrowserChannel.prototype.onMessage_ = function(rawMessage) {
 	switch(message.type) {
 	  case 'viewer_change':
 	    var user = brkn.model.Users.getInstance().get_or_add(message['user']);
-	    if (message['online'] != undefined && message['online'] != null) {
-	      brkn.model.Users.getInstance().publish(brkn.model.Users.Action.ONLINE, user, message['online']);
-	    }
 
 	    var time = message['time'] && goog.date.fromIsoString(message['time'] + 'Z'); 
 	    if (user.currentSession && time) {
@@ -85,14 +82,11 @@ brkn.model.BrowserChannel.prototype.onMessage_ = function(rawMessage) {
 	      var session = new brkn.model.Session(message['session_id'], user, channel, time);
 	      user.currentSession = session;
 	      channel.publish(brkn.model.Channel.Action.ADD_VIEWER, session);
-	      var program = channel.getCurrentProgram();
-	      media = program ? program.media : media;
 	    }
-
 	    if (media) {
 	      media.publish(brkn.model.Media.Actions.WATCHING, user, channel, message['online'] != true);
 	    }
-
+	    brkn.model.Users.getInstance().publish(brkn.model.Users.Action.ONLINE, user, message['online']);
 	    break;
 	  case 'notification':
       var notification = new brkn.model.Notification(message['notification']);
@@ -121,7 +115,8 @@ brkn.model.BrowserChannel.prototype.onMessage_ = function(rawMessage) {
 	  case 'new_activity':
 	    brkn.model.Users.getInstance().publish(brkn.model.Users.Action.NEW_ACTIVITY,
 	        message['activity']);
-	    if (message['activity']['user']['id'] != brkn.model.Users.getInstance().currentUser.id) {
+	    if (message['activity']['user']['id'] != brkn.model.Users.getInstance().currentUser.id &&
+	        message['activity']['type'] != 'session') {
 	      brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NEW_ACTIVITIES, 1);
 	    }
       break;

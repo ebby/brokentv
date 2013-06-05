@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <link rel="apple-touch-icon-precomposed" href="/static/img/apple-touch-icon-precomposed.png"/>
 
-    <meta property="og:image" content="/static/img/apple-touch-icon-precomposed.png"/>
+    <meta property="og:image" content="http://www.xylocast.com/static/img/thumb.png"/>
     <meta property="og:title" content="XYLO"/>
     <meta property="og:url" content="http://www.xylocast.com"/>
     <meta property="og:description" content="Your Television Stream" />
@@ -31,6 +31,7 @@
       var HTML5 = '{{ html5 }}' == 'True';
       var DESKTOP = true;
       var EMBED = '{{ embed }}' == 'True';
+      var FB_APP_ID = '{{ facebook_app_id }}';
 
 			// Re-namespace to avoid closure conflict.
 			var appengine = goog.appengine; 
@@ -164,23 +165,17 @@
                 Currently we're running a few test channels. We have a full structure for anyone to 
                 operate a channel. If you're intested in a custom branded channel, contact
                 <a href="mailto:info@xylocast.com">info@xylocast.com</a>.<br/><br/>
-                <span class="bold">Why can't I skip?!</span><br/>
-                Because we're curious to see how that impacts viewing behavior. This will morph
-                as we learn from our users, stay tuned.<br/><br/>
                 <span class="bold">Does everyone see the same content?</span><br/>
                 Yes, it's always in sync so you can instantly watch along with friends. But you can
-                manually play any video from the sidebar.<br/><br/>
-                <span class="bold">What happens when I pause?</span><br/>
-                Your video pauses, and can be resumed at anytime. The timeline will progress
-                forward and you can hop back in sync by clicking 'GO LIVE'.<br/><br/>
+                manually play any video or search for a channel to watch asynchronously.<br/><br/>
                 <span class="bold">Who can tell that I'm online?</span><br/>
                 Only your Facebook friends.<br/><br/>
                 <span class="bold">Who can see my profile?</span><br/>
                 Your Facebook friends and anyone who links to you from a reply
                 (i.e. a friend of a friend) or a related tweet.<br/><br/>
                 <span class="bold">Where is the content coming from?</span><br/>
-                YouTube publishers that we find interesting. To suggest content, scroll to the
-                end of the timeline and paste a YouTube link.<br/>
+                YouTube publishers that we find interesting. Users also contribute to content by
+                searching for a liking videos<br/>
               </div>
             </div>
 		      </div>

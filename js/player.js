@@ -205,6 +205,10 @@ brkn.Player.prototype.enterDocument = function() {
       function(program) {
         this.playProgram(program);
         this.updateStagecover_();
+        
+        goog.net.XhrIo.send('/_play', goog.functions.NULL(), 'POST',
+            'media_id=' + program.media.id +
+            '&channel_id=' + brkn.model.Channels.getInstance().currentChannel.id);
       }, this);
   brkn.model.Player.getInstance().subscribe(brkn.model.Player.Actions.PLAY_ASYNC,
       this.playAsync_, this);
@@ -214,6 +218,14 @@ brkn.Player.prototype.enterDocument = function() {
       function() {
         // TODO: fade in
         this.updateStagecover_(undefined, true);
+        if (brkn.model.Users.getInstance().currentUser.currentSession &&
+            brkn.model.Player.getInstance().getCurrentProgram()) {
+          brkn.model.Users.getInstance().currentUser.currentSession.seen(
+              brkn.model.Player.getInstance().getCurrentProgram().media);
+        }
+        this.resetLike_();
+        brkn.model.Player.getInstance().getCurrentProgram().ended = true;
+        this.next_();
       }, this);
   
   if (DESKTOP) {
@@ -378,7 +390,8 @@ brkn.Player.prototype.play = function(opt_media, opt_channel, opt_tries) {
       'wmode': 'opaque',
       'origin': HOST_URL,
       'enablejsapi': 1,
-      'rel': 0
+      'rel': 0,
+      'html5': HTML5 ? 1 : 0
     };
     this.player_ = new YT.Player('ytplayer', {
       'height': goog.dom.getViewportSize().height - 40,
@@ -394,7 +407,7 @@ brkn.Player.prototype.play = function(opt_media, opt_channel, opt_tries) {
     brkn.model.Player.getInstance().setPlayer(this.player_);
   } else {
     if (opt_media) {
-      this.player_.cueVideoById(opt_media.hostId);
+      this.player_.cueVideoById(opt_media.hostId, undefined, 'large');
     } else if (opt_channel) {
       this.player_.cuePlaylist(opt_channel.asPlaylist(), opt_channel.currentProgramIndex);
     }
@@ -438,6 +451,10 @@ brkn.Player.prototype.changeChannel = function(channel) {
 	var program = channel.getCurrentProgram();
 	if (program) {
 	  this.playProgram(program);
+	  
+	  goog.net.XhrIo.send('/_play', goog.functions.NULL(), 'POST',
+	      'media_id=' + program.media.id +
+	      '&channel_id=' + brkn.model.Channels.getInstance().currentChannel.id);
 	}
 	this.updateStagecover_();
 };
@@ -499,8 +516,11 @@ brkn.Player.prototype.playAsync_ = function(program) {
   this.playProgram(program);
   this.updateStagecover_();
 
+  goog.net.XhrIo.send('/_play', goog.functions.NULL(), 'POST',
+      'media_id=' + program.media.id +
+      '&channel_id=' + brkn.model.Channels.getInstance().currentChannel.id);
   goog.net.XhrIo.send('/_optin', goog.functions.NULL(), 'POST',
-      'media_id=' + brkn.model.Player.getInstance().getCurrentProgram().media.id);
+      'media_id=' + program.media.id);
 };
 
 
@@ -527,13 +547,15 @@ brkn.Player.prototype.playerStateChange_ = function(event) {
       DESKTOP && this.player_.seekTo(seek);
       this.player_.playVideo();
       brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.PLAY, true);
+      
       break;
     case YT.PlayerState.PLAYING:
       brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.PLAYING,
           brkn.model.Player.getInstance().getCurrentProgram().media);
       break;
     case YT.PlayerState.ENDED:
-      if (brkn.model.Player.getInstance().getCurrentProgram()) {
+      if (brkn.model.Users.getInstance().currentUser.currentSession &&
+          brkn.model.Player.getInstance().getCurrentProgram()) {
         brkn.model.Users.getInstance().currentUser.currentSession.seen(
             brkn.model.Player.getInstance().getCurrentProgram().media);
       }
@@ -605,19 +627,28 @@ brkn.Player.prototype.updateStagecover_ = function(opt_message, opt_beforeEnd, o
     goog.style.showElement(this.restart_, false);
     goog.style.showElement(this.vote_, false);
     goog.dom.classes.add(stagecover, 'covered');
-  } else if ((this.playerState_ != YT.PlayerState.PLAYING &&
-      this.playerState_ != YT.PlayerState.PAUSED) || opt_beforeEnd) {
+  } if (((this.playerState_ == YT.PlayerState.PLAYING && this.player_.getCurrentTime() > 0) ||
+      this.playerState_ == YT.PlayerState.PAUSED && this.player_.getCurrentTime() > 0) && !opt_beforeEnd) {
+    goog.DEBUG && window.console.log('UNCOVERING');
+    goog.DEBUG && window.console.log(this.playerState_);
+    goog.DEBUG && window.console.log(this.player_.getCurrentTime());
+    goog.style.showElement(this.spinner_, false);
+    goog.style.showElement(this.restart_, false);
+    goog.dom.classes.remove(stagecover, 'covered');
+    goog.style.showElement(this.vote_, true);
+  } else {
     goog.dom.setTextContent((/** @type {Element} */ this.message_.firstChild),
         brkn.Player.Messages.LOADING);
     goog.style.showElement(this.spinner_, true);
     goog.style.showElement(this.restart_, false);
     goog.style.showElement(this.vote_, true);
     goog.dom.classes.add(stagecover, 'covered');
-  } else {
-    goog.style.showElement(this.spinner_, false);
-    goog.style.showElement(this.restart_, false);
-    goog.dom.classes.remove(stagecover, 'covered');
-    goog.style.showElement(this.vote_, true);
+    
+    if (this.playerState_ == YT.PlayerState.PLAYING) {
+      goog.Timer.callOnce(goog.bind(function() {
+        this.updateStagecover_();
+      }, this), 500);
+    }
   }
   goog.style.setOpacity(stagecover, this.playerState_ == YT.PlayerState.BUFFERING ? .9 : 1);
   this.resize();

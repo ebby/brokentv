@@ -290,17 +290,10 @@ brkn.Mobile.login = function() {
   var loginPage = goog.dom.getElement('login');
   
   goog.events.listen(fbLogin, goog.events.EventType.CLICK, function() {
-    goog.dom.classes.add(fbLogin, 'disabled');
-    FB.login(function(response) {
-      if (response['authResponse']) {
-        // connected
-        brkn.Mobile.getSessionAndInit(response);
-      } else {
-        // not_authorized
-        //brkn.Mobile.notAuthorized();
-        goog.dom.classes.remove(fbLogin, 'disabled');
-      }
-    }, {scope: 'email'});
+    var permissionUrl = "https://m.facebook.com/dialog/oauth?client_id=" + FB_APP_ID +
+      "&response_type=code&redirect_uri=" + HOST_URL + "&scope=email";
+    window.location.href = permissionUrl;
+    return false;
   });
 };
 

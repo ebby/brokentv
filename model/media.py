@@ -135,15 +135,17 @@ class Media(db.Model):
         
   
   @classmethod
-  def add_from_entry(cls, entries, fetch_publisher=False):
+  def add_from_entry(cls, entries, fetch_publisher=False, approve=False, collection=None):
     from publisher import Publisher
     from publisher import PublisherMedia
+    from collection import CollectionMedia
 
     medias = []
     for entry in [e for e in entries if e.media.player and not e.noembed]:
       content_url = urlparse.urlparse(entry.media.player.url)
       id = urlparse.parse_qs(content_url.query)['v'][0]
       media = Media.get_by_key_name(MediaHost.YOUTUBE + id)
+      publisher = None
       if not media:
         name = entry.media.title.text.decode('utf-8')
         desc = entry.media.description.text
@@ -165,6 +167,11 @@ class Media(db.Model):
         PublisherMedia.add(publisher, media)
         media.put()
       medias.append(media)
+      
+      publisher = publisher or media.publisherMedias.get().publisher if media.publisherMedias.get() else None
+      collection_media = None
+      if collection:
+        collection_media = CollectionMedia.add(collection, media, publisher=publisher, approved=(True if approve else None))
     return medias
 
   @classmethod

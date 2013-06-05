@@ -46,6 +46,7 @@ YOUTUBE_API_SERVICE_NAME = 'youtube'
 YOUTUBE_API_VERSION = 'v3'
 FREEBASE_API_SERVICE_NAME = 'freebase'
 FREEBASE_API_VERSION = 'v1'
+PUBLISHED_AFTER = None
 
 CSS_SOURCE =  '/static/css/main.css'
 STATS_CSS_SOURCE =  '/static/css/stats.css'
@@ -53,6 +54,7 @@ ADMIN_CSS_SOURCE =  '/static/css/admin.css'
 
 PROD_JS = '/static/js/main-min.js'
 PROD_SIMPLE_JS = '/static/js/brkn-simple-min.js'
+DEBUG_JS = '/static/js/main-debug.js'
 MOBILE_PROD_JS = '/static/js/mobile-min.js'
 ADV_JS = '//localhost:9810/compile?id=main&mode=advanced&pretty-print=true'
 SIMPLE_JS = '//localhost:9810/compile?id=main&mode=simple&pretty-print=true'

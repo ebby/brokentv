@@ -192,7 +192,8 @@ brkn.model.Channels.prototype.changeChannel = function(channel, opt_forced) {
     var program = channel.getCurrentProgram();
     var withFriends = program && !goog.object.isEmpty(program.media.onlineViewers);
     goog.net.XhrIo.send('/_changechannel', goog.functions.NULL(), 'POST',
-        'channel=' + channel.id + '&friends=' + withFriends + (opt_forced ? '&forced=true' : ''));
+        'channel=' + channel.id + '&friends=' + withFriends +
+        '&media_id' + program.media.id + (opt_forced ? '&forced=true' : ''));
     brkn.model.Analytics.getInstance().changeChannel(channel, this.lastChannel);
   }
 };
@@ -202,28 +203,28 @@ brkn.model.Channels.prototype.changeChannel = function(channel, opt_forced) {
  * @param {?brkn.model.Program} program
  */
 brkn.model.Channels.prototype.updateOnlineUsers = function(program) {
-  if (this.currentChannel) {
-    if (this.currentProgram_) {
-      // If previous program, remove channel viewers.
-      goog.array.forEach(this.currentChannel.viewerSessions, function(s) {
-        if (!this.currentChannel.offline || s.user.id == brkn.model.Users.getInstance().currentUser.id) {
-          this.currentProgram_.media.addViewer(s.user, this.currentChannel, true);
-        }
-      }, this);
-    }
-    
-    if (program) {
-      // If next program, add channel viewers.
-      this.currentProgram_ = program;
-      var viewers = goog.array.forEach(this.currentChannel.viewerSessions, function(s) {
-        if (!s.tuneOut) {
-          if (!this.currentChannel.offline || s.user.id == brkn.model.Users.getInstance().currentUser.id) {
-            this.currentProgram_.media.addViewer(s.user, this.currentChannel);
-          }
-        }
-      }, this);
-    }
-  }
+//  if (this.currentChannel) {
+//    if (this.currentProgram_) {
+//      // If previous program, remove channel viewers.
+//      goog.array.forEach(this.currentChannel.viewerSessions, function(s) {
+//        if (!this.currentChannel.offline || s.user.id == brkn.model.Users.getInstance().currentUser.id) {
+//          this.currentProgram_.media.addViewer(s.user, this.currentChannel, true);
+//        }
+//      }, this);
+//    }
+//    
+//    if (program) {
+//      // If next program, add channel viewers.
+//      this.currentProgram_ = program;
+//      var viewers = goog.array.forEach(this.currentChannel.viewerSessions, function(s) {
+//        if (!s.tuneOut) {
+//          if (!this.currentChannel.offline || s.user.id == brkn.model.Users.getInstance().currentUser.id) {
+//            this.currentProgram_.media.addViewer(s.user, this.currentChannel);
+//          }
+//        }
+//      }, this);
+//    }
+//  }
 };
 
 

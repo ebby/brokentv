@@ -151,7 +151,9 @@ class User(db.Model):
     @classmethod
     def set_last_media(cls, user, media):
       user_obj = memcache.get(user.id) or {}
-      user_obj['last_seen'] = media.toJson()
+      user_entry = User.get_user_entry(user.id)
+      user_entry['last_seen'] = media.toJson()
+      user_obj['entry'] = user_entry
       memcache.set(user.id, user_obj)
       return user_obj
 
@@ -178,7 +180,6 @@ class User(db.Model):
       if user_entry is not None:
         user_obj = memcache.get(uid) or {}
         user_entry['online'] = user_obj.get('online') or False
-        user_entry['last_seen'] = user_obj.get('last_seen')
       return user_entry
 
     def toJson(self, admin=False, configs=False):

@@ -263,12 +263,13 @@ brkn.model.Media.prototype.removeComment = function(comment) {
 brkn.model.Media.prototype.addViewer = function(user, opt_channel, opt_offline) {
   if (opt_offline) {
     goog.object.remove(this.onlineViewers, user.id);
-    user.currentMedia = null;
     return;
   }
   this.onlineViewers[user.id] = user;
   user.currentMedia = this;
-  if (user.id != brkn.model.Users.getInstance().currentUser.id) {
+  if (user.id != brkn.model.Users.getInstance().currentUser.id &&
+      (!opt_channel || (opt_channel && brkn.model.Channels.getInstance().currentChannel &&
+          opt_channel.id != brkn.model.Channels.getInstance().currentChannel.id))) {
     brkn.model.Notify.getInstance().publish(brkn.model.Notify.Actions.FLASH,
         'is watching ' + (opt_channel ? opt_channel.name : ''), this.name, user,
         this.thumbnail1, '#info:' + this.id);

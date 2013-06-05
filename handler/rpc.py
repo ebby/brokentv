@@ -239,6 +239,17 @@ class SettingsHandler(BaseHandler):
         program.seek = int(self.request.get('current_seek'))
         program.put()
 
+class PlayHandler(BaseHandler):
+  @BaseHandler.logged_in
+  def post(self):
+    media_id = self.request.get('media_id')
+    channel_id = self.request.get('channel_id')
+    media = Media.get_by_key_name(media_id)
+    if media:
+      User.set_last_media(self.current_user, media)
+      broadcast.broadcastViewerChange(self.current_user, None, channel_id,
+                                      None, None, media);
+
 class ProgramHandler(BaseHandler):
   @BaseHandler.logged_in
   def get(self, channel_id):
@@ -268,8 +279,6 @@ class ProgramHandler(BaseHandler):
       program = Program.add_program(channel, media,
                                     time=(datetime.datetime.now() if now else None), 
                                     async=True)
-      broadcast.broadcastViewerChange(self.current_user, None, channel.id,
-                                    None, None, media);
       self.response.out.write(simplejson.dumps(program.toJson(False)))
       
 class InfoHandler(BaseHandler):
@@ -423,7 +432,7 @@ class MessageHandler(BaseHandler):
                                payload='access_token=%s&template=%s&href=%s' %
                                (constants.facebook_app()['APP_ACCESS_TOKEN'],
                                '@[' + user.id + ']' + ' sent you a message!',
-                               'redirect'),
+                               '?fb=1'),
                                method=urlfetch.POST)
         
       message = Message.add(from_user=from_user, to_user=to_user, text=text)
@@ -497,6 +506,7 @@ class ChangeChannelHandler(BaseHandler):
   @BaseHandler.logged_in
   def post(self):
     channel_id = self.request.get('channel')
+    media_id = self.request.get('media_id')
     with_friends = self.request.get('friends') == 'true'
     forced = self.request.get('forced') == 'true' # Forced by the client, don't update opt_in/out
     channel = Channel.get_by_key_name(channel_id)
@@ -546,10 +556,11 @@ class ChangeChannelHandler(BaseHandler):
     current_user = self.current_user
     current_user.current_channel_id = channel_id
     current_user.put()
-
+    
+    media = Media.get_by_key_name(media_id) if media_id else None
     broadcast.broadcastViewerChange(self.current_user, last_channel_id, channel_id,
                                     session.key().id(), session.tune_in.isoformat(),
-                                    (current_program.media if not channel.my_channel and current_program else None));
+                                    media=media);
 
 class CollectionsMediaHandler(BaseHandler):
   @BaseHandler.logged_in

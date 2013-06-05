@@ -458,7 +458,7 @@ brkn.Channel.prototype.addViewer = function(session) {
         }
       });
       
-      if (DESKTOP) {
+      if (DESKTOP && !IPAD) {
         brkn.Popup.getInstance().hovercard(goog.dom.getElementByClass('pic', lineEl),
             brkn.model.Popup.Position.TOP, brkn.model.Popup.Action.TOOLTIP,
             {'text': 'JOIN ' + session.user.firstName().toUpperCase(),

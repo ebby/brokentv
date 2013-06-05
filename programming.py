@@ -138,8 +138,9 @@ class Programming():
           filtered_medias = Programming.no_reprogram(programming.get(channel_id, []), medias)
           
           # Don't repeat the same program within two hour
+          cutoff = 7200 if col.lifespan else 43200
           filtered_medias = [c for c in filtered_medias if not c.last_programmed or
-                   (datetime.datetime.now() - c.last_programmed).seconds > 7200]
+                   (datetime.datetime.now() - c.last_programmed).seconds > cutoff]
           
           # At most, 30% of the audience has already "witnessed" this program
           # filtered_medias = [m for m in filtered_medias if not len(viewers) or

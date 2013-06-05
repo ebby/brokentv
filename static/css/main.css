@@ -439,6 +439,9 @@ div.controller div.controls div.next .icon {
 div.controller div.controls div.next .icon:before {
   content: '\e802';
 }
+div.controller div.controls .goog-custom-button-disabled {
+  color: #999;
+}
 div.controller div.controls div.next.goog-custom-button-disabled .icon {
   color: #999;
 }
@@ -5953,7 +5956,7 @@ div#sidebar div.info div.user-poll div.poll-options div.option div.percent-numbe
 div#sidebar div.info div.viewers {
   position: relative;
   width: 320px;
-  padding: 4px 0 6px 0;
+  padding: 4px 0 4px 0;
   background: rgba(255, 255, 255, 0.5);
   -webkit-box-shadow: inset 0px -4px 0 -3px rgba(255, 255, 255, 1), inset 0 -3px 2px -1px rgba(0, 0, 0, .3);
   -moz-box-shadow: inset 0px -4px 0 -3px rgba(255, 255, 255, 1), inset 0 -3px 2px -1px rgba(0, 0, 0, .3);
@@ -5999,6 +6002,7 @@ div#sidebar div.info div.viewers div.viewer {
   box-shadow: inset 0px 0px 2px 1px rgba(0, 0, 0, 0.6);
   display: inline-block;
   margin-left: 6px;
+  margin-bottom: 2px;
   cursor: pointer;
 }
 div#sidebar div.info div.viewers div.viewer img {
@@ -6884,24 +6888,28 @@ div#welcome {
 div#welcome > div {
   opacity: .8;
 }
-div#welcome div.thanks {
-  background-image: url(/static/img/welcome-sprite.png);
-  background-position: -5px -5px;
-  background-repeat: no-repeat;
-  width: 330px;
-  height: 230px;
-  position: absolute;
-  top: 10px;
-  left: 10px;
-}
 div#welcome div.guide {
-  background-image: url(/static/img/welcome-sprite.png);
-  background-position: -5px -245px;
-  background-repeat: no-repeat;
+  background: url(/static/img/welcome/welcome-guide.png);
   width: 400px;
   height: 73px;
   bottom: 60px;
   left: 10px;
+  position: absolute;
+}
+div#welcome div.thanks {
+  background: url(/static/img/welcome/thanks.png);
+  width: 193px;
+  height: 168px;
+  bottom: 10px;
+  right: 10px;
+  position: absolute;
+}
+div#welcome div.search {
+  background: url(/static/img/welcome/welcome-search.png);
+  width: 400px;
+  height: 73px;
+  top: 30px;
+  left: 140px;
   position: absolute;
 }
 div#welcome div.friends {

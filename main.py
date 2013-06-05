@@ -57,14 +57,16 @@ class MainHandler(BaseHandler):
 
       template_data = {}
       template_data['host_url'] = self.request.host_url
-      if self.request.get('prod') or not constants.DEVELOPMENT:
+      if self.request.get('debug') == '3229':
+        template_data['js_location'] = constants.DEBUG_JS
+      elif self.request.get('prod') or not constants.DEVELOPMENT:
         template_data['js_location'] = constants.MOBILE_PROD_JS if mobile else constants.PROD_JS
       elif self.request.get('adv'):
         template_data['js_location'] = constants.ADV_JS
       else:
         template_data['js_location'] = constants.MOBILE_JS_SOURCE if mobile else constants.SIMPLE_JS
 
-      template_data['html5'] = self.request.get('html5') == 'true'
+      template_data['html5'] = True #self.request.get('html5') == 'true'
       if not constants.DEVELOPMENT or self.request.get('css') or self.request.get('prod'):
         template_data['css_location'] = constants.CSS_SOURCE
 
@@ -221,6 +223,7 @@ def create_handlers_map():
     ('/_message/(.*)', rpc.MessageHandler),
     ('/_notification', rpc.NotificationHandler),
     ('/_optin', rpc.OptInHandler),
+    ('/_play', rpc.PlayHandler),
     ('/_presence', rpc.PresenceHandler),
     ('/_programming/(.*)', rpc.ProgramHandler),
     ('/_publisher/(.*)', rpc.PublisherHandler),

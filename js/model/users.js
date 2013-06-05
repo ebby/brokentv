@@ -61,14 +61,17 @@ brkn.model.Users.prototype.setCurrentUser = function(user) {
     this.currentUser.hasFacebook = response['data'][0]['publish_stream'];
   }, this));
 	FB.api('/me/friends', goog.bind(function(response) {
-    goog.array.forEach(response['data'], function(f) {
-      if (!this.userMap[f['id']]) {
-        this.userMap[f['id']] = new brkn.model.User({
-          'id' : f['id'],
-          'name' : f['name']
-        });
-      }
-    }, this);
+	  if (response && response['data']) {
+      goog.array.forEach(response['data'], function(f) {
+        if (!this.userMap[f['id']]) {
+          this.userMap[f['id']] = new brkn.model.User({
+            'id' : f['id'],
+            'name' : f['name'],
+            'temp' : true
+          });
+        }
+      }, this);
+	  }
   }, this));
 };
 
@@ -128,12 +131,12 @@ brkn.model.Users.prototype.get = function(id) {
  */
 brkn.model.Users.prototype.get_or_add = function(user) {
 	var u = this.get(user.id);
-	if (!u) {
+	if (!u || u.temp) {
 		u = new brkn.model.User(user);
 		this.add(u)
 	}
-	if (user['online'] != undefined && u.online != undefined && user['online'] != u.online) {
-	  u.lastLogin = new goog.date.DateTime()
+	if (user['online'] == false && u.online == true) {
+	  u.lastLogin = new goog.date.DateTime();
 	}
 	u.online = user['online'] || !!goog.array.find(this.onlineFriends, function(user) {
 	  return user.id == u.id;

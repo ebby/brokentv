@@ -479,7 +479,7 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
     this.setInput(this.lastInput_);
   }
   
-  if (DESKTOP) {
+  if (DESKTOP && !IPAD) {
     brkn.Popup.getInstance().hovercard(this.plusButton_.getElement(), brkn.model.Popup.Position.LEFT,
         brkn.model.Popup.Action.TOOLTIP, {'text': 'Add to Queue'});
     brkn.Popup.getInstance().hovercard(this.fbButton_.getElement(), brkn.model.Popup.Position.LEFT,
@@ -878,7 +878,7 @@ brkn.sidebar.Info.prototype.addViewer_ = function(user, online) {
           .listen(viewerEl, goog.events.EventType.CLICK, function() {
             brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.PROFILE, user);
           });
-      if (DESKTOP) {
+      if (DESKTOP && !IPAD) {
         brkn.Popup.getInstance().hovercard(viewerEl, brkn.model.Popup.Position.TOP,
             brkn.model.Popup.Action.TOOLTIP, {'text': user.firstName() +
                 (online ? ' is watching' : ' saw this')});
@@ -963,30 +963,32 @@ brkn.sidebar.Info.prototype.resize = function(opt_extra, opt_scrollComments) {
   this.resizeExtra_ = opt_extra != undefined ? opt_extra : this.resizeExtra_;
   var viewHeight = goog.dom.getViewportSize().height;
 
-  var height = goog.dom.getViewportSize().height + (IPHONE && SAFARI ? 61 : 0) - 41 -
-      this.resizeExtra_ - (goog.dom.getAncestorByClass(this.getElement(), 'tabbed') ? 30 : 0);
-  goog.style.setHeight(this.getElement(), height);
-  
-  goog.style.setHeight(this.contentsEl_, height - (this.mini_ ? 143 : 243) + (IPHONE ? 50 : 0) -
-      (this.viewers_.length ? 38 : 0));
-  if (viewHeight > 640 && this.commentsEl_ && this.commentsEl_.parentElement) {
-    goog.style.setStyle(this.commentsEl_, 'max-height', viewHeight -
-        goog.style.getPosition(this.commentsEl_.parentElement).y - (this.mini_ ? 213 : 313) - 
-        (this.viewers_.length ? 38 : 0) - this.resizeExtra_ + 'px'); 
-    this.scrollGrad_();
-  } else if (viewHeight < 640) {
-    goog.style.setStyle(this.commentsEl_, 'max-height', '');
-    this.scrollGrad_();
-  }
-  
-  if (opt_scrollComments) {
-    // Give the comment div a second/2 to resize, then scroll to bottom.
-    goog.Timer.callOnce(goog.bind(function() {
-      var scrollAnim = new goog.fx.dom.Scroll(this.commentsEl_,
-          [this.commentsEl_.scrollLeft, this.commentsEl_.scrollTop],
-          [this.commentsEl_.scrollLeft, this.commentsEl_.scrollHeight], 400);
-      scrollAnim.play();
-    }, this), 0);
+  if (this.getElement()) {
+    var height = goog.dom.getViewportSize().height + (IPHONE && SAFARI ? 61 : 0) - 41 -
+        this.resizeExtra_ - (goog.dom.getAncestorByClass(this.getElement(), 'tabbed') ? 30 : 0);
+    goog.style.setHeight(this.getElement(), height);
+    
+    goog.style.setHeight(this.contentsEl_, height - (this.mini_ ? 143 : 243) + (IPHONE ? 50 : 0) -
+        (this.viewers_.length ? 38 : 0));
+    if (viewHeight > 640 && this.commentsEl_ && this.commentsEl_.parentElement) {
+      goog.style.setStyle(this.commentsEl_, 'max-height', viewHeight -
+          goog.style.getPosition(this.commentsEl_.parentElement).y - (this.mini_ ? 213 : 313) - 
+          (this.viewers_.length ? 38 : 0) - this.resizeExtra_ + 'px'); 
+      this.scrollGrad_();
+    } else if (viewHeight < 640) {
+      goog.style.setStyle(this.commentsEl_, 'max-height', '');
+      this.scrollGrad_();
+    }
+    
+    if (opt_scrollComments) {
+      // Give the comment div a second/2 to resize, then scroll to bottom.
+      goog.Timer.callOnce(goog.bind(function() {
+        var scrollAnim = new goog.fx.dom.Scroll(this.commentsEl_,
+            [this.commentsEl_.scrollLeft, this.commentsEl_.scrollTop],
+            [this.commentsEl_.scrollLeft, this.commentsEl_.scrollHeight], 400);
+        scrollAnim.play();
+      }, this), 0);
+    }
   }
 };
 

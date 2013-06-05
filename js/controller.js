@@ -272,7 +272,7 @@ brkn.Controller.prototype.enterDocument = function() {
                   brkn.model.Player.getInstance().getCurrentProgram().media.duration;
               var remaining = brkn.model.Player.getInstance().getCurrentProgram().media.duration -
                   brkn.model.Player.getInstance().getCurrentTime();
-              if (remaining < 1) {
+              if (remaining < 2) {
                 brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.BEFORE_END);
               }
               if (!goog.dom.classes.has(this.progressEl_, 'drag')) {

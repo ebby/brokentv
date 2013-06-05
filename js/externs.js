@@ -12,6 +12,8 @@ var EMBED;
 
 var SAFARI;
 
+var FB_APP_ID;
+
 var appengine = {};
 
 window.navigator.standalone;

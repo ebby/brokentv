@@ -205,6 +205,7 @@ brkn.sidebar.Profile.prototype.resize_ = function() {
   var height = goog.dom.getViewportSize().height + (IPHONE && SAFARI ? 61 : 0) - 41 -
       (goog.dom.getAncestorByClass(this.getElement(), 'tabbed') ? 30 : 0);
   goog.style.setHeight(this.getElement(), height);
+  this.resizeInbox_();
 };
 
 

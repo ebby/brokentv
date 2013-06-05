@@ -505,8 +505,11 @@ brkn.Guide.prototype.addChannel_ = function(c) {
     this.channelMap_[c.id] = channel;
 
     c.subscribe(brkn.model.Channel.Action.ONLINE, function(online) {
-      this.resize_();
+      goog.Timer.callOnce(goog.bind(function() {
+        this.resize_();
+      }, this));
     }, this);
+    channel.update();
 
     var programs = goog.dom.getElementsByClass('program', channel.getElement());
     var lastProgram = /** @type {Element} */ goog.array.peek(programs);
@@ -520,7 +523,6 @@ brkn.Guide.prototype.addChannel_ = function(c) {
     this.currentChannel_ = channel;
   }
   this.myChannel_ = c.myChannel ? c : this.myChannel_;
-  this.resize_();
 };
 
 

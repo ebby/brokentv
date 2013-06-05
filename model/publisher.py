@@ -122,34 +122,46 @@ class Publisher(db.Model):
         self.channel_id = re.search('/channel/(.*)', self.link).groups()[0]
         self.put()
 
-      medias = []
+      
       youtube3 = get_youtube3_service()
-      next_page_token = ''
-      while next_page_token is not None:
-        search_response = youtube3.search().list(
-          channelId=self.channel_id,
-          part='id',
-          order='date',
-          pageToken=next_page_token,
-          publishedAfter=self.last_fetch.isoformat('T') + 'Z' if self.last_fetch else '1970-01-01T00:00:00Z',
-          maxResults=10
-        ).execute()
-        search_ids = ''
-        for item in search_response.get('items', []):
-          if item['id']['kind'] == 'youtube#video':
-            search_ids += item['id']['videoId'] + ','
-        videos_response = youtube3.videos().list(
-          id=search_ids,
-          part="id,snippet,topicDetails,contentDetails,statistics"
-        ).execute()
-        medias = Media.add_from_snippet(videos_response.get("items", []),
-                                        collection=collection,
-                                        publisher=self,
-                                        enforce_category=len(collection.categories) > 0,
-                                        approve=approve_all)
-
-        all_medias += medias
-        next_page_token = search_response.get('tokenPagination', {}).get('nextPageToken')
+      
+      
+      publishedAfter = '1970-01-01T00:00:00Z'
+      if constants.PUBLISHED_AFTER:
+        publishedAfter = constants.PUBLISHED_AFTER
+      elif self.last_fetch:
+        publishedAfter = self.last_fetch.isoformat('T') + 'Z'
+      
+      ordering = ['date'] if self.last_fetch else ['date', 'rating', 'viewCount']
+      
+      for order in ordering:
+        medias = []
+        next_page_token = ''
+        while next_page_token is not None:
+          search_response = youtube3.search().list(
+            channelId=self.channel_id,
+            part='id',
+            order=order,
+            pageToken=next_page_token,
+            publishedAfter=publishedAfter,
+            maxResults=20
+          ).execute()
+          search_ids = ''
+          for item in search_response.get('items', []):
+            if item['id']['kind'] == 'youtube#video':
+              search_ids += item['id']['videoId'] + ','
+          videos_response = youtube3.videos().list(
+            id=search_ids,
+            part="id,snippet,topicDetails,contentDetails,statistics"
+          ).execute()
+          medias = Media.add_from_snippet(videos_response.get("items", []),
+                                          collection=collection,
+                                          publisher=self,
+                                          enforce_category=len(collection.categories) > 0,
+                                          approve=approve_all)
+  
+          all_medias += medias
+          next_page_token = search_response.get('tokenPagination', {}).get('nextPageToken')
 
       self.last_fetch = datetime.datetime.now()
       self.put()

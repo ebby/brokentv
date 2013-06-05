@@ -173,7 +173,7 @@ def email_outbox(user_id):
         comment_email = emailer.Email(emailer.Message.COMMENT(first_name),
                                   {'first_name' : first_name,
                                    'name': msg['comment']['user']['name'],
-                                   'link': msg['comment']['media']['link'],
+                                   'link': 'http://' + msg['comment']['media']['link'],
                                    'text': Comment.flattenMentions(msg['comment']['text']),
                                    'title': msg['comment']['media']['name'],
                                    'image': 'http://i.ytimg.com/vi/%s/0.jpg' % msg['comment']['media']['host_id']
@@ -186,7 +186,7 @@ def email_outbox(user_id):
           mention_email = emailer.Email(emailer.Message.MENTION(first_name),
                                     {'first_name' : first_name,
                                      'name': msg['notification']['comment']['user']['name'],
-                                     'link': msg['notification']['comment']['media']['link'],
+                                     'link': 'http://' + msg['notification']['comment']['media']['link'],
                                      'text': Comment.flattenMentions(msg['notification']['comment']['text']),
                                      'title': msg['notification']['comment']['media']['name'],
                                      'image': 'http://i.ytimg.com/vi/%s/0.jpg' % msg['notification']['comment']['media']['host_id']

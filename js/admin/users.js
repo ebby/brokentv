@@ -17,6 +17,7 @@ goog.require('goog.ui.Component');
 brkn.admin.Users = function() {
   goog.base(this);
 
+  this.users = [];
 };
 goog.inherits(brkn.admin.Users, goog.ui.Component);
 
@@ -53,10 +54,24 @@ brkn.admin.Users.prototype.enterDocument = function() {
   goog.net.XhrIo.send('/admin/_users',
       goog.bind(function(e) {
         var users = /** @type {Array.<Object>} */ goog.json.parse(e.target.getResponse());
-        users = goog.array.map(users, function(u) {
+        this.users = goog.array.map(users, function(u) {
           return new brkn.model.User(u);
         });
-        goog.array.forEach(users, this.addUser, this);
+        goog.array.forEach(this.users, this.addUser, this);
+      }, this));
+  
+  this.getHandler().listen(goog.dom.getElementByClass('load-more', this.getElement()),
+      goog.events.EventType.CLICK, goog.bind(function(e) {
+        goog.net.XhrIo.send('/admin/_users?offset=' + this.users.length,
+            goog.bind(function(e) {
+              var users = /** @type {Array.<Object>} */ goog.json.parse(e.target.getResponse());
+              users = goog.array.map(users, function(u) {
+                var user = new brkn.model.User(u)
+                this.users.push(user);
+                return user;
+              }, this);
+              goog.array.forEach(users, this.addUser, this);
+            }, this));
       }, this));
 };
 

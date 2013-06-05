@@ -504,16 +504,23 @@ brkn.Main.login = function() {
   
   goog.events.listen(fbLogin, goog.events.EventType.CLICK, function() {
     goog.dom.classes.add(fbLogin, 'disabled');
-    FB.login(function(response) {
-      if (response['authResponse']) {
-        // connected
-        brkn.Main.getSessionAndInit(response);
-      } else {
-        // not_authorized
-        //brkn.Main.notAuthorized();
-        goog.dom.classes.remove(fbLogin, 'disabled');
-      }
-    }, {scope: 'email'});
+    if (IPAD) {
+      var permissionUrl = "https://m.facebook.com/dialog/oauth?client_id=" + FB_APP_ID +
+          "&response_type=code&redirect_uri=" + HOST_URL + "&scope=email";
+      window.location.href = permissionUrl;
+      return false;
+    } else {
+      FB.login(function(response) {
+        if (response['authResponse']) {
+          // connected
+          brkn.Main.getSessionAndInit(response);
+        } else {
+          // not_authorized
+          //brkn.Main.notAuthorized();
+          goog.dom.classes.remove(fbLogin, 'disabled');
+        }
+      }, {scope: 'email'});
+    }
   });
 };
 
