@@ -1924,7 +1924,7 @@ div.channels div.channel div.programs div.program div.program-plus {
   display: none;
   bottom: 6px;
   position: absolute;
-  opacity: .6;
+  opacity: .9;
   width: 20px;
   height: 20px;
   -webkit-border-radius: 12px;
@@ -1932,6 +1932,9 @@ div.channels div.channel div.programs div.program div.program-plus {
   border-radius: 12px;
   border: 1px solid rgba(0, 0, 0, 0.8);
   background: rgba(0, 0, 0, 0.7);
+  -webkit-box-shadow: 0 0 1px 1px rgba(255, 255, 255, 0.6);
+  -moz-box-shadow: 0 0 1px 1px rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 1px 1px rgba(255, 255, 255, 0.6);
 }
 div.channels div.channel div.programs div.program div.program-play:active,
 div.channels div.channel div.programs div.program div.program-plus:active {
@@ -3578,7 +3581,6 @@ div#sidebar div.comment-input div.suggestions,
 div#sidebar div.reply-input div.suggestions {
   position: absolute;
   bottom: 100%;
-  max-height: 100px;
   overflow: hidden;
   background: rgba(0, 0, 0, 0.7);
   color: #f5f5f5;
@@ -5420,8 +5422,7 @@ div#sidebar div.info div.picture div.play {
   position: absolute;
   left: 115px;
   top: 80px;
-  opacity: 0;
-  visibility: hidden;
+  opacity: .7;
   -webkit-transition: opacity 0.3s ease;
   -moz-transition: opacity 0.3s ease;
   -o-transition: opacity 0.3s ease;
@@ -6894,6 +6895,15 @@ div#welcome div.guide {
   height: 73px;
   bottom: 60px;
   left: 10px;
+  position: absolute;
+}
+div#welcome div.drag {
+  background: url(/static/img/welcome/welcome-drag.png);
+  width: 168px;
+  height: 62px;
+  bottom: 100px;
+  left: 50%;
+  margin-left: -84px;
   position: absolute;
 }
 div#welcome div.thanks {

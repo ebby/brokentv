@@ -13850,7 +13850,7 @@ brkn.sidebar.CommentInput = function $brkn$sidebar$CommentInput$($currentUser_op
 goog.inherits(brkn.sidebar.CommentInput, goog.ui.Component);
 brkn.sidebar.CommentInput.COMMENT_CONTROLS_HEIGHT = 25;
 brkn.sidebar.CommentInput.INPUT_HEIGHT = 41;
-brkn.sidebar.CommentInput.MENTION_REGEX = /@(\w+)/;
+brkn.sidebar.CommentInput.MENTION_REGEX = /@(\w+\s?\w*)/;
 brkn.sidebar.CommentInput.prototype.createDom = function $brkn$sidebar$CommentInput$$createDom$() {
   var $el$$ = soy.renderAsElement(brkn.sidebar.commentInput);
   this.setElementInternal($el$$)
@@ -13888,28 +13888,31 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function $brkn$sidebar$Comme
   }, this)).listen($keyHandler$$, goog.events.KeyHandler.EventType.KEY, goog.bind(function($e$$) {
     $e$$.stopPropagation();
     brkn.model.Popup.getInstance().publish(brkn.model.Popup.Action.HIDE);
-    if("13" == $e$$.keyCode || "32" == $e$$.keyCode) {
+    if("13" == $e$$.keyCode || "32" == $e$$.keyCode && -1 < this.cursorIndex_) {
       if(this.suggestions_.length && this.suggestions_.reverse()[this.cursorIndex_]) {
         $e$$.preventDefault();
-        var $sugEls_suggestionInput$$ = this.commentInput_.getValue().slice(0, this.commentInput_.getElement().selectionStart), $sugEls_suggestionInput$$ = $sugEls_suggestionInput$$.split(" ").pop(), $user$$ = this.suggestions_[this.cursorIndex_];
+        var $fragments_sugEls_suggestionInput$$ = this.commentInput_.getValue().slice(0, this.commentInput_.getElement().selectionStart), $fragments_sugEls_suggestionInput$$ = $fragments_sugEls_suggestionInput$$.split(" "), $fragments_sugEls_suggestionInput$$ = 1 < $fragments_sugEls_suggestionInput$$.length ? $fragments_sugEls_suggestionInput$$[$fragments_sugEls_suggestionInput$$.length - 2] + " " + $fragments_sugEls_suggestionInput$$[$fragments_sugEls_suggestionInput$$.length - 1] : $fragments_sugEls_suggestionInput$$.pop(), 
+        $user$$ = this.suggestions_[this.cursorIndex_];
         this.tokens_[$user$$.id] = $user$$;
-        this.updateTokens_($sugEls_suggestionInput$$.match(brkn.sidebar.CommentInput.MENTION_REGEX)[0]);
+        this.updateTokens_($fragments_sugEls_suggestionInput$$.match(brkn.sidebar.CommentInput.MENTION_REGEX)[0]);
         this.commentInput_.getElement().focus();
         goog.style.showElement(this.suggestionsEl_, !1);
         this.suggestions_ = [];
         this.cursorIndex_ = -1;
-        this.setCaretToPos(this.getValue().length)
+        this.setCaretToPos(this.commentInput_.getValue().length)
       }else {
         "13" == $e$$.keyCode && ($e$$.preventDefault(), this.addCommentButton_.setActive(this.commentInput_.getValue()), this.onAddComment_($e$$))
       }
       this.canMention_ && this.updateTokens_()
     }else {
-      "27" == $e$$.keyCode && this.suggestions_.length ? (goog.style.showElement(this.suggestionsEl_, !1), this.suggestions_ = [], this.setCaretToPos(this.getValue().length), this.cursorIndex_ = -1, this.tokens_ = {}) : ("38" == $e$$.keyCode || "40" == $e$$.keyCode) && this.suggestions_.length ? ($e$$.preventDefault(), $sugEls_suggestionInput$$ = Array.prototype.slice.call(goog.dom.getChildren(this.suggestionsEl_)), $sugEls_suggestionInput$$.reverse()[this.cursorIndex_] && goog.dom.classes.remove($sugEls_suggestionInput$$[this.cursorIndex_], 
-      "selected"), this.cursorIndex_ = "38" == $e$$.keyCode ? Math.min(this.cursorIndex_ + 1, this.suggestions_.length - 1) : Math.max(this.cursorIndex_ - 1, -1), -1 != this.cursorIndex_ && goog.dom.classes.add($sugEls_suggestionInput$$[this.cursorIndex_], "selected")) : goog.Timer.callOnce(goog.bind(function() {
+      "27" == $e$$.keyCode && this.suggestions_.length ? (goog.style.showElement(this.suggestionsEl_, !1), this.suggestions_ = [], this.setCaretToPos(this.commentInput_.getValue().length), this.cursorIndex_ = -1, this.tokens_ = {}) : ("38" == $e$$.keyCode || "40" == $e$$.keyCode) && this.suggestions_.length ? ($e$$.preventDefault(), $fragments_sugEls_suggestionInput$$ = Array.prototype.slice.call(goog.dom.getChildren(this.suggestionsEl_)), $fragments_sugEls_suggestionInput$$.reverse()[this.cursorIndex_] && 
+      goog.dom.classes.remove($fragments_sugEls_suggestionInput$$[this.cursorIndex_], "selected"), this.cursorIndex_ = "38" == $e$$.keyCode ? Math.min(this.cursorIndex_ + 1, this.suggestions_.length - 1) : Math.max(this.cursorIndex_ - 1, -1), -1 != this.cursorIndex_ && goog.dom.classes.add($fragments_sugEls_suggestionInput$$[this.cursorIndex_], "selected")) : goog.Timer.callOnce(goog.bind(function() {
         this.addCommentButton_.setEnabled(!!this.commentInput_.getValue());
-        var $mentionInput_suggestionInput$$ = this.commentInput_.getValue().slice(0, this.commentInput_.getElement().selectionStart), $mentionInput_suggestionInput$$ = $mentionInput_suggestionInput$$.split(" ").pop(), $hasMention$$ = this.canMention_ && brkn.sidebar.CommentInput.MENTION_REGEX.test($mentionInput_suggestionInput$$);
+        var $fragments$$1_mentionInput_suggestionInput$$ = this.commentInput_.getValue().slice(0, this.commentInput_.getElement().selectionStart), $fragments$$1_mentionInput_suggestionInput$$ = $fragments$$1_mentionInput_suggestionInput$$.split(" "), $fragments$$1_mentionInput_suggestionInput$$ = 1 < $fragments$$1_mentionInput_suggestionInput$$.length ? $fragments$$1_mentionInput_suggestionInput$$[$fragments$$1_mentionInput_suggestionInput$$.length - 2] + " " + $fragments$$1_mentionInput_suggestionInput$$[$fragments$$1_mentionInput_suggestionInput$$.length - 
+        1] : $fragments$$1_mentionInput_suggestionInput$$.pop(), $hasMention$$ = this.canMention_ && brkn.sidebar.CommentInput.MENTION_REGEX.test($fragments$$1_mentionInput_suggestionInput$$);
         goog.style.showElement(this.suggestionsEl_, $hasMention$$);
-        "8" == $e$$.keyCode ? this.highlighterEl_.innerHTML.match('<div class="token">.*</div>$') : $hasMention$$ && ($mentionInput_suggestionInput$$ = $mentionInput_suggestionInput$$.match(brkn.sidebar.CommentInput.MENTION_REGEX), this.suggestions_ = brkn.model.Users.getInstance().search($mentionInput_suggestionInput$$[1]), this.suggestions_.length && this.renderSuggestions_(this.suggestions_, $mentionInput_suggestionInput$$[0]));
+        "8" == $e$$.keyCode ? this.highlighterEl_.innerHTML.match('<div class="token">.*</div>$') : $hasMention$$ && ($fragments$$1_mentionInput_suggestionInput$$ = $fragments$$1_mentionInput_suggestionInput$$.match(brkn.sidebar.CommentInput.MENTION_REGEX), this.suggestions_ = brkn.model.Users.getInstance().search($fragments$$1_mentionInput_suggestionInput$$[1]), this.suggestions_.length && this.renderSuggestions_(this.suggestions_, $fragments$$1_mentionInput_suggestionInput$$[0]));
+        this.commentInput_.getValue() || this.commentInput_.resize();
         this.canMention_ && this.updateTokens_()
       }, this))
     }
@@ -13922,14 +13925,14 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function $brkn$sidebar$Comme
 brkn.sidebar.CommentInput.prototype.renderSuggestions_ = function $brkn$sidebar$CommentInput$$renderSuggestions_$($users$$, $input$$) {
   this.suggestionsEl_.innerHTML = "";
   goog.style.showElement(this.suggestionsEl_, !0);
-  goog.array.forEach($users$$.slice(0, 3), function($u$$) {
+  goog.array.forEach($users$$.slice(0, 10), function($u$$) {
     var $suggestionEl$$ = goog.dom.createDom("div", "suggestion", $u$$.name);
     goog.dom.appendChild(this.suggestionsEl_, $suggestionEl$$);
     this.getHandler().listen($suggestionEl$$, goog.events.EventType.CLICK, goog.bind(function() {
       this.tokens_[$u$$.id] = $u$$;
       this.updateTokens_($input$$);
       this.commentInput_.getElement().focus();
-      this.setCaretToPos(this.getValue().length);
+      this.setCaretToPos(this.commentInput_.getValue().length);
       goog.style.showElement(this.suggestionsEl_, !1);
       this.suggestions_ = [];
       this.cursorIndex_ = -1
@@ -13943,7 +13946,8 @@ brkn.sidebar.CommentInput.prototype.updateTokens_ = function $brkn$sidebar$Comme
     $highlighter$$ = $highlighter$$.replace(RegExp($name$$, "g"), '<div class="token">' + $u$$.name + "</div> ");
     this.highlighterEl_.innerHTML = $highlighter$$;
     this.value = $value$$ = $value$$.replace(RegExp($name$$, "g"), "@[" + $u$$.id + ":" + $u$$.name + "]");
-    $opt_input$$ && this.commentInput_.setValue($input$$.replace($name$$, $u$$.name) + " ")
+    $input$$ = $input$$.replace(RegExp($name$$, "g"), $u$$.name) + " ";
+    $opt_input$$ && this.commentInput_.setValue($input$$)
   }, this)
 };
 brkn.sidebar.CommentInput.prototype.reply = function $brkn$sidebar$CommentInput$$reply$($comment$$, $user$$) {
@@ -13956,7 +13960,7 @@ brkn.sidebar.CommentInput.prototype.replyTweet = function $brkn$sidebar$CommentI
   this.setFocused(!0);
   this.tweetToggle_.setEnabled(!0);
   this.setFocused(!0);
-  this.setCaretToPos(this.getValue().length)
+  this.setCaretToPos(this.commentInput_.getValue().length)
 };
 brkn.sidebar.CommentInput.prototype.setSelectionRange = function $brkn$sidebar$CommentInput$$setSelectionRange$($selectionStart$$, $selectionEnd$$) {
   if(this.commentInput_.getElement().setSelectionRange) {
@@ -14345,8 +14349,8 @@ brkn.sidebar.Info.prototype.enterDocument = function $brkn$sidebar$Info$$enterDo
     brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.CONVERSATION, this.media_, this.comments_, this.tweets_, !0)
   }, this)).listen(this.commentInput_, goog.events.EventType.FOCUS, goog.bind(function() {
     this.resize(0, !0)
-  }, this)).listen(this.commentInput_, "resize", goog.bind(function($e$$) {
-    this.resize($e$$.target.height_ - brkn.sidebar.CommentInput.INPUT_HEIGHT)
+  }, this)).listen(this.commentInput_, "resize", goog.bind(function() {
+    this.resize()
   }, this)).listen(this.dotNavEl_, goog.events.EventType.CLICK, goog.bind(function($e$$) {
     goog.dom.classes.has($e$$.target, "dot") && (this.toDot_($e$$.target), this.tweetTimer_.stop())
   }, this)).listen(this.tweetTimer_, goog.Timer.TICK, goog.bind(function() {
@@ -15527,7 +15531,7 @@ brkn.main.main = function $brkn$main$main$($opt_data$$) {
   ($opt_data$$.guide ? " toggled" : " collapsed") + ($opt_data$$.sidebar ? " sidebar-toggled" : "") + '"><div class="channel-scrollable"><div id="channel-names" class="channel-names"></div><div class="channel-h-scrollable"><div id="channels" class="channels"></div></div></div><div class="header" id="header"><div class="times"><div id="schedule-toggle" class="schedule-toggle"><div class="fader"><div class="timeless"></div><div class="switcher"><div class="switch"></div></div><div class="scheduled"></div></div></div><div id="now-left" class="left browse">&#9664;<span> NOW</span></div><div id="now-right" class="right browse"><span>NOW </span>&#x25B6;</div></div><div id="ticker" class="ticker"><div id="go-live" class="go-live">GO LIVE</div></div><div id="my-ticker" class="my-ticker" style="display:none"><div class="me" style="background:' + 
   soy.$$escapeHtml($opt_data$$.user.color) + ";border-color:" + soy.$$escapeHtml($opt_data$$.user.color) + ';"><img src="' + soy.$$escapeHtml($opt_data$$.user.picture) + '"/></div></div></div><div class="pan-handle" id="pan-handle"></div></div><div id="controller" class="controller' + ($opt_data$$.guide ? " guide-toggled" : " collapsed") + ($opt_data$$.sidebar ? " sidebar-toggled" : "") + '"><div class="background"></div><div class="left"><div id="guide-toggle" class="guide-toggle dark button">GUIDE</div><div class="controls"><div class="play dark button"><div class="icon"></div></div><div class="next dark button"><div class="icon"></div></div><div class="volume dark button"><div class="icon"></div></div></div><div class="border"></div></div><div class="right"><div id="info-toggle" class="info-toggle dark button"><div class="icon"></div></div><div id="admin-toggle" class="admin-toggle dark button" style="display: none"><div class="icon"></div><div id="toggle-pending" class="pending" style="display:none"></div></div><div id="sidebar-toggle" class="sidebar-toggle dark button"><div class="icon"></div></div><div class="border"></div></div><div class="progress" style="display: none"><div class="elapsed animate"><div class="seek"></div></div><div class="title"></div><div class="current-time"></div><div class="duration"></div></div></div><div id="sidebar" class="' + 
   ($opt_data$$.sidebar ? "toggled" : "collapsed") + '"><div id="toolbar"><div class="back"><div class="back-button"><div>BACK</div></div><div class="back-title"></div></div><ul class="tabs"><li class="info tab selected"><div class="label">NOW</div></li><li class="stream tab"><div class="label">STREAM<div class="activities-count" style="display:none"></div></div></li><li class="profile tab"><div class="label">HOME<div class="inbox-count" style="display:none"></div></div></li></ul><div class="radial-grad"></div><div class="arrow"></div></div><div id="sidebar-content"><div id="info" class="screen info"><div class="no-info">Pick a channel or play a story.</div></div><div id="stream" class="screen stream"><div class="loading loading-activity"><div class="loading-spinner"></div></div></div><div id="my-profile" class="screen profile"></div><div id="admin" class="screen admin"></div><div id="media-list" class="slide media-list"></div><div id="friendlist" class="slide friendlist"></div><div id="conversation" class="slide"></div>' + 
-  ($opt_data$$.admin ? '<div id="admin-col-list" class="slide admin"></div><div id="admin-list" class="slide admin-list"></div>' : "") + '<div id="media-info" class="slide info"></div><div id="profile" class="slide profile"></div></div></div><div id="hovercard" class="watch-with" style="display: none"></div><div id="welcome" class="welcome" style="display:none"><div class="search"></div><div class="thanks"></div><div class="guide"></div><div class="sidebar"></div><div class="close"></div></div></div>'
+  ($opt_data$$.admin ? '<div id="admin-col-list" class="slide admin"></div><div id="admin-list" class="slide admin-list"></div>' : "") + '<div id="media-info" class="slide info"></div><div id="profile" class="slide profile"></div></div></div><div id="hovercard" class="watch-with" style="display: none"></div><div id="welcome" class="welcome" style="display:none"><div class="search"></div><div class="thanks"></div><div class="guide"></div><div class="sidebar"></div><div class="drag"></div><div class="close"></div></div></div>'
 };
 brkn.model.Analytics = function $brkn$model$Analytics$() {
 };
@@ -16407,7 +16411,7 @@ brkn.Main.getSessionAndInit = function $brkn$Main$getSessionAndInit$($response$$
         }), brkn.Main.init($response$$, $data$$31_e$$.channels, $data$$31_e$$.programs, $data$$31_e$$.current_user))
       }
     }else {
-      500 == $data$$31_e$$.target.getStatus() ? brkn.Main.noLogin("error", "Opps, check back later") : brkn.Main.noLogin("wait"), brkn.Main.playJingle()
+      500 == $data$$31_e$$.target.getStatus() ? brkn.Main.noLogin("error", "Oops, check back later") : brkn.Main.noLogin("wait"), brkn.Main.playJingle()
     }
   }, "POST")
 };

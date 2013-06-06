@@ -562,7 +562,7 @@ brkn.Main.getSessionAndInit = function(response) {
           goog.Timer.callOnce(reveal);
           brkn.Main.init(response, data['channels'], data['programs'], data['current_user']);
         } else if (e.target.getStatus() == 500) {
-          brkn.Main.noLogin('error', 'Opps, check back later');
+          brkn.Main.noLogin('error', 'Oops, check back later');
           brkn.Main.playJingle();
         } else {
           brkn.Main.noLogin('wait');

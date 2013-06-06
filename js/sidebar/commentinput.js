@@ -149,7 +149,7 @@ brkn.sidebar.CommentInput.INPUT_HEIGHT = 41;
  * @type {RegExp}
  * @constant
  */
-brkn.sidebar.CommentInput.MENTION_REGEX = /@(\w+)/;
+brkn.sidebar.CommentInput.MENTION_REGEX = /@(\w+\s?\w*)/;
 
 
 /**
@@ -277,13 +277,16 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
           goog.bind(function(e) {
             e.stopPropagation();
             brkn.model.Popup.getInstance().publish(brkn.model.Popup.Action.HIDE);
-            if (e.keyCode == '13' || e.keyCode == '32') {
+            if (e.keyCode == '13' || (e.keyCode == '32' && this.cursorIndex_ > -1)) {
               if (this.suggestions_.length && this.suggestions_.reverse()[this.cursorIndex_]) {
                 e.preventDefault();
                 // Suggestion input is the last word up to the cursor
                 var suggestionInput = this.commentInput_.getValue().slice(0,
                     this.commentInput_.getElement().selectionStart);
-                suggestionInput = suggestionInput.split(' ').pop()
+                var fragments = suggestionInput.split(' ');
+                suggestionInput = fragments.length > 1 ? 
+                    fragments[fragments.length - 2] + ' ' + fragments[fragments.length - 1] :
+                        fragments.pop();
                 var user = this.suggestions_[this.cursorIndex_];
                 this.tokens_[user.id] = user;
                 this.updateTokens_(suggestionInput.match(brkn.sidebar.CommentInput.MENTION_REGEX)[0]);
@@ -291,7 +294,7 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
                 goog.style.showElement(this.suggestionsEl_, false);
                 this.suggestions_ = [];
                 this.cursorIndex_ = -1;
-                this.setCaretToPos(this.getValue().length);
+                this.setCaretToPos(this.commentInput_.getValue().length);
               } else if (e.keyCode == '13') {  
                 e.preventDefault();
                 this.addCommentButton_.setActive(this.commentInput_.getValue());
@@ -301,7 +304,7 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
             } else if (e.keyCode == '27' && this.suggestions_.length) {
               goog.style.showElement(this.suggestionsEl_, false);
               this.suggestions_ = [];
-              this.setCaretToPos(this.getValue().length);
+              this.setCaretToPos(this.commentInput_.getValue().length);
               this.cursorIndex_ = -1;
               this.tokens_ = {};
             } else if ((e.keyCode == '38' || e.keyCode == '40') && this.suggestions_.length) {
@@ -323,7 +326,10 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
                 // Suggestion input is the last word up to the cursor
                 var suggestionInput = this.commentInput_.getValue().slice(0,
                     this.commentInput_.getElement().selectionStart);
-                suggestionInput = suggestionInput.split(' ').pop()
+                var fragments = suggestionInput.split(' ')
+                suggestionInput = fragments.length > 1 ? 
+                    fragments[fragments.length - 2] + ' ' + fragments[fragments.length - 1] :
+                        fragments.pop()
                 
                 var hasMention = this.canMention_ &&
                     brkn.sidebar.CommentInput.MENTION_REGEX.test(suggestionInput);
@@ -338,6 +344,11 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
                     this.renderSuggestions_(this.suggestions_, mentionInput[0]);
                   }
                 }
+
+                if (!this.commentInput_.getValue()) {
+                  this.commentInput_.resize();
+                };
+
                 this.canMention_ && this.updateTokens_();
               }, this));
             }
@@ -363,14 +374,14 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
 brkn.sidebar.CommentInput.prototype.renderSuggestions_ = function(users, input) {
   this.suggestionsEl_.innerHTML = '';
   goog.style.showElement(this.suggestionsEl_, true);
-  goog.array.forEach(users.slice(0, 3), function(u) {
+  goog.array.forEach(users.slice(0, 10), function(u) {
     var suggestionEl = goog.dom.createDom('div', 'suggestion', u.name);
     goog.dom.appendChild(this.suggestionsEl_, suggestionEl);
     this.getHandler().listen(suggestionEl, goog.events.EventType.CLICK, goog.bind(function() {
       this.tokens_[u.id] = u;
       this.updateTokens_(input);
       this.commentInput_.getElement().focus();
-      this.setCaretToPos(this.getValue().length);
+      this.setCaretToPos(this.commentInput_.getValue().length);
       goog.style.showElement(this.suggestionsEl_, false);
       this.suggestions_ = [];
       this.cursorIndex_ = -1;
@@ -394,7 +405,8 @@ brkn.sidebar.CommentInput.prototype.updateTokens_ = function(opt_input) {
     this.highlighterEl_.innerHTML = highlighter;
     value = value.replace(new RegExp(name, 'g'), '@[' + u.id + ':' + u.name + ']');
     this.value = value;
-    opt_input && this.commentInput_.setValue(input.replace(name, u.name) + ' ');
+    input = input.replace(new RegExp(name, 'g'), u.name) + ' ';
+    opt_input && this.commentInput_.setValue(input);
   }, this);
 };
 
@@ -420,7 +432,7 @@ brkn.sidebar.CommentInput.prototype.replyTweet = function(tweet) {
   this.setFocused(true);
   this.tweetToggle_.setEnabled(true);
   this.setFocused(true);
-  this.setCaretToPos(this.getValue().length);
+  this.setCaretToPos(this.commentInput_.getValue().length);
 };
 
 

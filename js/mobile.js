@@ -337,7 +337,7 @@ brkn.Mobile.getSessionAndInit = function(response) {
 
           goog.Timer.callOnce(reveal);
         } else if (e.target.getStatus() == 500) {
-          brkn.Mobile.noLogin('error', 'Opps, check back later');
+          brkn.Mobile.noLogin('error', 'Oops, check back later');
         } else {
           brkn.Mobile.noLogin('wait');
         }

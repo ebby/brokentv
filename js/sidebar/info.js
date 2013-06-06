@@ -384,7 +384,7 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
       .listen(this.commentInput_,
           'resize',
           goog.bind(function(e) {
-            this.resize(e.target.height_ - brkn.sidebar.CommentInput.INPUT_HEIGHT)
+            this.resize()
           }, this))
       .listen(this.dotNavEl_,
           goog.events.EventType.CLICK,
