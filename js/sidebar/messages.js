@@ -239,6 +239,11 @@ brkn.sidebar.Messages.prototype.addMessage_ = function(message, opt_first) {
         }
         brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.PROFILE, message.fromUser);
       }, this));
+      if (opt_first) {
+        var alert = goog.dom.getElement('mp3-1');
+        alert.load();
+        alert.play();
+      }
     }
   }
   brkn.model.Clock.getInstance().addTimestamp(message.time, timeEl);

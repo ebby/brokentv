@@ -18,9 +18,23 @@
 {template .tooltip}
   {if $link}<a href="{$link}">{/if}
     <div class="tooltip">
-      {$text}
+      {$text|noAutoescape}
     </div>
   {if $link}</a>{/if}
+{/template}
+
+
+/**
+ * Select a program
+ */
+{template .commentOob}
+<div class="comment-oob">
+  Click <div class="fb-icon"></div> and <div class="twitter-icon"></div> for instant sharing
+  <div class="on-off">
+    <div class="off">OFF{sp}<div class="twitter-icon"></div></div> &#8594;
+    {sp}<div class="on">ON{sp}<div class="twitter-icon on"></div></div>
+  </div>
+</div>
 {/template}
 
 

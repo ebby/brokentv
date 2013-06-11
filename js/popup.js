@@ -54,6 +54,8 @@ brkn.Popup = function() {
   this.model_ = brkn.model.Popup.getInstance();
   this.model_.subscribe(brkn.model.Popup.Action.TOOLTIP,
       this.showTooltip_, this);
+  this.model_.subscribe(brkn.model.Popup.Action.OOB,
+      this.showOob_, this);
   this.model_.subscribe(brkn.model.Popup.Action.SELECT_PROGRAM,
       this.showForSelectProgram_, this);
   this.model_.subscribe(brkn.model.Popup.Action.HIDE,
@@ -179,18 +181,52 @@ brkn.Popup.prototype.getContentElement = function() {
  * Show popup for a like object.
  * @param {Element} anchor The like element.
  * @param {brkn.model.Popup.Position} pos
- * @param {Object} args 
+ * @param {Object} args
+ * @param {?boolean=} opt_noAutohide
  * @private
  */
-brkn.Popup.prototype.showTooltip_ = function(anchor, pos, args) {
+brkn.Popup.prototype.showTooltip_ = function(anchor, pos, args, opt_noAutohide) {
   this.setVisible(false);
   this.positionAtAnchor(anchor, pos);
   
   soy.renderElement(this.getContentElement(), brkn.popup.tooltip, {
-    text: args['text'],
+    text: typeof args['text'] == 'function' ? args['text']() : args['text'],
     link: args['link']
   });
+  
+  if (opt_noAutohide) {
+    this.setAutoHide(false);
+  }
   this.setVisible(true);
+}
+
+
+/**
+ * Show popup for a like object.
+ * @param {Element} anchor The like element.
+ * @param {brkn.model.Popup.Position} pos
+ * @param {Object} args
+ * @param {?boolean=} opt_noAutohide
+ * @private
+ */
+brkn.Popup.prototype.showOob_ = function(anchor, pos, args, opt_noAutohide) {
+  this.setVisible(false);
+  this.positionAtAnchor(anchor, pos);
+  var leftMargin = -1 * (goog.style.getSize(this.getElement()).width -
+      goog.style.getSize(anchor).width) / 2;
+  this.setMargin(0, 0, 36, leftMargin);
+  
+  soy.renderElement(this.getContentElement(), brkn.popup.commentOob, {
+    text: args['html'],
+    link: args['link']
+  });
+  
+  this.setAutoHide(false);
+  this.setVisible(true);
+  
+  this.handler_.listen(this.getElement(), goog.events.EventType.CLICK, goog.bind(function() {
+    this.model_.publish(brkn.model.Popup.Action.HIDE);
+  }, this));
 }
 
 

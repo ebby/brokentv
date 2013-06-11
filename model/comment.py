@@ -41,12 +41,12 @@ class Comment(db.Model):
     for m in c.mentions:
       if not to_user or (to_user and m != to_user.id): 
         mentioned_user = User.get_by_key_name(m)
-        if not mentioned_user:
+        if not mentioned_user or True:
           # Send them notification on FB
           fetch = urlfetch.fetch(url='https://graph.facebook.com/%s/notifications' % m,
                                  payload='access_token=%s&template=%s&href=%s' %
                                  (constants.facebook_app()['APP_ACCESS_TOKEN'],
-                                 '@[' + user.id + ']' + ' mentioned you in a comment!',
+                                 '@[' + user.id + ']' + ' mentioned you in a comment on ' + media.name + '!',
                                  media.get_path()),
                                  method=urlfetch.POST)
         else:

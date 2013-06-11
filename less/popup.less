@@ -5,7 +5,7 @@ div.popup {
   padding: 5px;
   white-space: nowrap;
   .border-radius(3px);
-  background: #dedede;
+  background: #fefefe;
   .box-shadow(e('0 0 4px 1px rgba(0, 0, 0, .4), 0px 1px 0 0px rgba(0, 0, 0,.4)'));
   font-size: 11px;
   font-family: MuseoSans700;
@@ -26,7 +26,7 @@ div.popup {
   &.top:after {
     top: 100%;
     border-color: rgba(222, 222, 222, 0);
-    border-top-color: #dedede;
+    border-top-color: #fefefe;
     border-width: 5px;
     left: 50%;
     margin-left: -5px;
@@ -42,7 +42,7 @@ div.popup {
   &.left:after {
     left: 100%;
     border-color: rgba(222, 222, 222, 0);
-    border-left-color: #dedede;
+    border-left-color: #fefefe;
     border-width: 5px;
     top: 50%;
     margin-top: -5px;
@@ -58,7 +58,7 @@ div.popup {
   &.right:after {
     right: 100%;
     border-color: rgba(222, 222, 222, 0);
-    border-right-color: #dedede;
+    border-right-color: #fefefe;
     border-width: 5px;
     top: 50%;
     margin-top: -5px;
@@ -74,6 +74,31 @@ div.popup {
   a {
     color: #181818;
     text-decoration: none;
+  }
+  
+  div.comment-oob {
+    line-height: 16px;
+    div.twitter-icon {
+      display: inline-block;
+      .icon-twitter();
+      font-size: 13px;
+      color: #bbb;
+      &.on {
+        color: #497882;
+      }
+    }
+    div.fb-icon {
+      display: inline-block;
+      .icon-facebook();
+      font-size: 13px;
+      color: #bbb;
+    }
+    div.on-off {
+      > div {
+        display: inline-block;
+      }
+      
+    }
   }
 	
 	div.select-program {

@@ -378,6 +378,11 @@ brkn.Sidebar.prototype.newMessages_ = function(count, opt_reset) {
   this.inboxCount_ += count;
   this.inboxCount_ = Math.max(this.inboxCount_, 0);
   goog.dom.setTextContent(this.inboxCountEl_, this.inboxCount_.toString());
+  if (this.inboxCount_ > 0) {
+    document.title = '(' + this.inboxCount_.toString() + ')' + ' XYLO';
+  } else {
+    document.title = 'XYLO';
+  }
   goog.style.showElement(this.inboxCountEl_, !!this.inboxCount_);
 };
 

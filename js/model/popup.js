@@ -25,6 +25,7 @@ brkn.model.Popup.Action = {
 	SELECT_PROGRAM: 'select-program',
   SHARE: 'share',
   TOOLTIP: 'tooltip',
+  OOB: 'oob',
   HIDE: 'hide'
 };
 

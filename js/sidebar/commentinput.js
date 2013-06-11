@@ -205,6 +205,7 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
       this.reply_ ? 'reply-textarea' : 'comment-textarea', this.getElement()));
   this.commentInput_.setMaxHeight(70);
   var keyHandler = new goog.events.KeyHandler(this.commentInput_.getKeyEventTarget());
+  var popup = goog.dom.getElementByClass('popup', this.getElement());
   
   if (!this.reply_) {
     this.commentControls_ = goog.dom.getElementByClass('comment-controls', this.getElement());
@@ -248,9 +249,13 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
     
     if (DESKTOP && !IPAD) {
       brkn.Popup.getInstance().hovercard(this.tweetToggle_.getElement(), brkn.model.Popup.Position.TOP,
-          brkn.model.Popup.Action.TOOLTIP, {'text': 'Share on Twitter'});
+          brkn.model.Popup.Action.TOOLTIP, {'text': goog.bind(function() {
+            return 'Share on Twitter: ' + (this.tweetToggle_.isChecked() ? 'ON' : 'OFF'); 
+          }, this)});
       brkn.Popup.getInstance().hovercard(this.fbToggle_.getElement(), brkn.model.Popup.Position.TOP,
-          brkn.model.Popup.Action.TOOLTIP, {'text': 'Share on Facebook'});
+          brkn.model.Popup.Action.TOOLTIP, {'text': goog.bind(function() {
+            return 'Share on Facebook: ' + (this.fbToggle_.isChecked() ? 'ON' : 'OFF'); 
+          }, this)});
     }
     brkn.model.Users.getInstance().currentUser.subscribe(brkn.model.User.Actions.TWITTER_AUTH, function() {
       this.tweetToggle_.setChecked(true);
@@ -261,11 +266,15 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
   this.suggestionsEl_ = goog.dom.getElementByClass('suggestions', this.getElement());
   this.highlighterEl_ = goog.dom.getElementByClass('highlighter', this.getElement());
   
+  popup && goog.style.showElement(popup,
+      !brkn.model.Users.getInstance().currentUser.hasFacebook &&
+      !brkn.model.Users.getInstance().currentUser.hasTwitter && this.showControls_);
   
   this.getHandler()
       .listen(this.commentInput_.getElement(),
           goog.events.EventType.FOCUS,
           goog.bind(function(e) {
+            popup && goog.style.showElement(popup, false);
             if (!brkn.model.Users.getInstance().currentUser.welcomed) {
               brkn.model.Popup.getInstance().publish(brkn.model.Popup.Action.TOOLTIP, this.commentInput_.getElement(),
                   brkn.model.Popup.Position.TOP, {'text': 'Mention friends using @'});
@@ -358,6 +367,14 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
           goog.bind(function(e) {
             this.dispatchEvent(e);
           }, this));
+  
+  if (popup) {
+     this.getHandler().listen(popup,
+         goog.events.EventType.CLICK,
+         goog.bind(function(e) {
+           goog.style.showElement(popup, false);
+         }, this));
+  }
 
   brkn.model.Sidebar.getInstance().subscribe(brkn.model.Sidebar.Actions.REPLY_COMMENT,
       this.reply, this);
@@ -573,6 +590,10 @@ brkn.sidebar.CommentInput.prototype.onAddComment_ = function(e) {
  * @param {Event} e
  */
 brkn.sidebar.CommentInput.prototype.onFacebookToggle_ = function(e) {
+  brkn.model.Popup.getInstance().publish(brkn.model.Popup.Action.TOOLTIP, this.fbToggle_.getElement(),
+      brkn.model.Popup.Position.TOP, {'text': goog.bind(function() {
+        return 'Share on Facebook: ' + (this.fbToggle_.isChecked() ? 'ON' : 'OFF'); 
+      }, this)});
   if (!brkn.model.Users.getInstance().currentUser.hasFacebook && !this.fbPublish_
       && this.fbToggle_.isChecked()) {
     goog.style.showElement(goog.dom.getElement('overlay'), true);
@@ -589,6 +610,10 @@ brkn.sidebar.CommentInput.prototype.onFacebookToggle_ = function(e) {
  * @param {Event} e
  */
 brkn.sidebar.CommentInput.prototype.onTwitterToggle_ = function(e) {
+  brkn.model.Popup.getInstance().publish(brkn.model.Popup.Action.TOOLTIP, this.tweetToggle_.getElement(),
+      brkn.model.Popup.Position.TOP, {'text': goog.bind(function() {
+        return 'Share on Twitter: ' + (this.tweetToggle_.isChecked() ? 'ON' : 'OFF'); 
+      }, this)});
   if (!brkn.model.Users.getInstance().currentUser.hasTwitter && !this.twitterPublish_ &&
       this.tweetToggle_.isChecked()) {
       this.tweetToggle_.setChecked(false);

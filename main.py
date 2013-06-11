@@ -74,27 +74,26 @@ class MainHandler(BaseHandler):
       # MAIL UNSUB
       if self.request.get('unsub') == '1':
         self.session['message'] = 'You are unsubscribed'
-
-      # SINGLE CHANNEL
-      self.session['single_channel_id'] = self.request.get('sc')
       
-      # SINGLE YOUTUBE CHANNEL
-      self.session['youtube_channel_id'] = self.request.get('ytc')
-
-      # LINKS
-      channel_id = self.request.get('c')
-      media_id = self.request.get('m')
-      
-      # EMBED
-      template_data['embed'] = self.request.get('embed') == '1'
-
+      qs = {}
       if path:
         link = Link.get_by_path(path)
         if link:
           parsed = urlparse.urlparse(link.url)
           qs = urlparse.parse_qs(parsed.query)
-          if qs.get('m'):
-            media_id = qs['m'][0]
+
+      # SINGLE CHANNEL
+      self.session['single_channel_id'] = qs['sc'][0] if qs.get('sc') else self.request.get('sc')
+      
+      # SINGLE YOUTUBE CHANNEL
+      self.session['youtube_channel_id'] = qs['ytc'][0] if qs.get('ytc') else self.request.get('ytc')
+
+      # LINKS
+      channel_id = qs['c'][0] if qs.get('c') else self.request.get('c')
+      media_id = qs['m'][0] if qs.get('m') else self.request.get('m')
+      
+      # EMBED
+      template_data['embed'] = self.request.get('embed') == '1'
 
       self.session['channel_id'] = channel_id
       self.session['media_id'] = media_id

@@ -4,6 +4,7 @@ goog.require('soy');
 goog.require('brkn.model.Comment');
 goog.require('brkn.model.Notify');
 goog.require('brkn.model.Tweet');
+goog.require('brkn.popup');
 goog.require('brkn.sidebar');
 goog.require('brkn.sidebar.CommentInput');
 
@@ -530,7 +531,9 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
   brkn.model.Channels.getInstance().getMyChannel().subscribe(brkn.model.Channel.Action.ADD_QUEUE,
       function(media, add) {
         this.plusButton_.setChecked(add);
-      }, this); 
+      }, this);
+  
+  this.resize();
 };
 
 
@@ -880,8 +883,9 @@ brkn.sidebar.Info.prototype.addViewer_ = function(user, online) {
           });
       if (DESKTOP && !IPAD) {
         brkn.Popup.getInstance().hovercard(viewerEl, brkn.model.Popup.Position.TOP,
-            brkn.model.Popup.Action.TOOLTIP, {'text': user.firstName() +
-                (online ? ' is watching' : ' saw this')});
+            brkn.model.Popup.Action.TOOLTIP, {'text': goog.bind(function() {
+              return user.firstName() + (goog.dom.classes.has(viewerEl, 'online') ? ' is watching' : ' saw this')
+            }, this)});
       }
     }
 

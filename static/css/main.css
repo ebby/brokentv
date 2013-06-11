@@ -2466,21 +2466,16 @@ div#right-grad {
   -o-transition: width .5s ease, height .5s ease, top .5s ease;
   -ms-transition: width .5s ease, height .5s ease, top .5s ease;
   transition: width .5s ease, height .5s ease, top .5s ease;
-}
-#stage #queue,
-#stage #search,
-#stage #vote {
-  opacity: 0;
-  -webkit-transition: opacity 0.1s ease;
-  -moz-transition: opacity 0.1s ease;
-  -o-transition: opacity 0.1s ease;
-  -ms-transition: opacity 0.1s ease;
-  transition: opacity 0.1s ease;
-}
-#stage:hover #queue,
-#stage:hover #search,
-#stage:hover #vote {
-  opacity: 1;
+  /*
+  #queue, #search, #vote {
+    opacity: 0;
+    .transition(opacity, .1s, ease);
+  }
+  &:hover #queue, &:hover #search, &:hover #vote {
+    opacity: 1;
+  }
+  */
+
 }
 #ytplayer {
   position: absolute;
@@ -2863,7 +2858,7 @@ div.popup {
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
-  background: #dedede;
+  background: #fefefe;
   -webkit-box-shadow: 0 0 4px 1px rgba(0, 0, 0, .4), 0px 1px 0 0px rgba(0, 0, 0,.4);
   -moz-box-shadow: 0 0 4px 1px rgba(0, 0, 0, .4), 0px 1px 0 0px rgba(0, 0, 0,.4);
   box-shadow: 0 0 4px 1px rgba(0, 0, 0, .4), 0px 1px 0 0px rgba(0, 0, 0,.4);
@@ -2888,7 +2883,7 @@ div.popup:before {
 div.popup.top:after {
   top: 100%;
   border-color: rgba(222, 222, 222, 0);
-  border-top-color: #dedede;
+  border-top-color: #fefefe;
   border-width: 5px;
   left: 50%;
   margin-left: -5px;
@@ -2904,7 +2899,7 @@ div.popup.top:before {
 div.popup.left:after {
   left: 100%;
   border-color: rgba(222, 222, 222, 0);
-  border-left-color: #dedede;
+  border-left-color: #fefefe;
   border-width: 5px;
   top: 50%;
   margin-top: -5px;
@@ -2920,7 +2915,7 @@ div.popup.left:before {
 div.popup.right:after {
   right: 100%;
   border-color: rgba(222, 222, 222, 0);
-  border-right-color: #dedede;
+  border-right-color: #fefefe;
   border-width: 5px;
   top: 50%;
   margin-top: -5px;
@@ -2936,6 +2931,59 @@ div.popup.right:before {
 div.popup a {
   color: #181818;
   text-decoration: none;
+}
+div.popup div.comment-oob {
+  line-height: 16px;
+}
+div.popup div.comment-oob div.twitter-icon {
+  display: inline-block;
+  font-family: 'icons';
+  font-style: normal;
+  font-weight: normal;
+  speak: none;
+  text-decoration: inherit;
+  /* opacity .8 */
+
+  font-variant: normal;
+  /* Uncomment for 3D effect */
+
+  /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+
+  /* '' */
+
+  font-size: 13px;
+  color: #bbb;
+}
+div.popup div.comment-oob div.twitter-icon:before {
+  content: '\f309';
+}
+div.popup div.comment-oob div.twitter-icon.on {
+  color: #497882;
+}
+div.popup div.comment-oob div.fb-icon {
+  display: inline-block;
+  font-family: 'icons';
+  font-style: normal;
+  font-weight: normal;
+  speak: none;
+  text-decoration: inherit;
+  /* opacity .8 */
+
+  font-variant: normal;
+  /* Uncomment for 3D effect */
+
+  /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+
+  /* '' */
+
+  font-size: 13px;
+  color: #bbb;
+}
+div.popup div.comment-oob div.fb-icon:before {
+  content: '\f30c';
+}
+div.popup div.comment-oob div.on-off > div {
+  display: inline-block;
 }
 div.popup div.select-program {
   margin-top: 20px;
@@ -3429,6 +3477,10 @@ div#sidebar div#sidebar-content div.screen {
   /*.transition(e('opacity .3s ease, width .3s ease, right .3s ease, left .3s ease'));*/
 
   -webkit-overflow-scroll: touch;
+  transition-property: transform, opacity;
+  -moz-transition-property: -moz-transform, opacity;
+  -webkit-transition-property: -webkit-transform, opacity;
+  -o-transition-property: -p-transform, opacity;
 }
 div#sidebar div#sidebar-content div.screen.current {
   opacity: 1;
@@ -3616,6 +3668,10 @@ div#sidebar div.comment-input {
   -webkit-box-shadow: 0 -1px 4px 0 rgba(0, 0, 0, 0.3), inset 4px -2px 6px -3px rgba(0, 0, 0, 0.4);
   -moz-box-shadow: 0 -1px 4px 0 rgba(0, 0, 0, 0.3), inset 4px -2px 6px -3px rgba(0, 0, 0, 0.4);
   box-shadow: 0 -1px 4px 0 rgba(0, 0, 0, 0.3), inset 4px -2px 6px -3px rgba(0, 0, 0, 0.4);
+}
+div#sidebar div.comment-input div.popup {
+  top: -45px;
+  left: 67px;
 }
 div#sidebar div.comment-input div.comment-controls {
   height: 24px;

@@ -457,7 +457,8 @@ class LinkHandler(BaseHandler):
   @BaseHandler.logged_in
   def post(self):
     url = self.request.get('url')
-    link = Link.get_or_add(url)
+    name = self.request.get('name')
+    link = Link.get_or_add(url, custom=name)
     self.response.out.write(simplejson.dumps({'link': constants.SHARE_URL + link.path}))
 
 class ShareHandler(BaseHandler):

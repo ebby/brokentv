@@ -270,6 +270,10 @@ div#sidebar {
       overflow: hidden;
       /*.transition(e('opacity .3s ease, width .3s ease, right .3s ease, left .3s ease'));*/
       -webkit-overflow-scroll: touch;
+      transition-property: transform, opacity;
+      -moz-transition-property: -moz-transform, opacity;
+      -webkit-transition-property: -webkit-transform, opacity;
+      -o-transition-property: -p-transform, opacity;
       &.current {
         opacity: 1;
         visibility: visible;
@@ -396,6 +400,10 @@ div#sidebar {
     background: #f7f7f7;
     border-top: 1px solid #ccc;
     .box-shadow(e('0 -1px 4px 0 rgba(0, 0, 0, 0.3), inset 4px -2px 6px -3px rgba(0, 0, 0, 0.4)'));
+    div.popup {
+      top: -45px;
+      left: 67px;
+    }
     div.comment-controls {
       height: 24px;
       color: #444;

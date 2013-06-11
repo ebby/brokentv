@@ -144,6 +144,10 @@ brkn.sidebar.Notifications.prototype.addNotification_ = function(notification, o
   brkn.model.Clock.getInstance().addTimestamp(notification.time, timeEl);
   if (!opt_first) {
     this.getElement().scrollTop = this.getElement().scrollHeight; 
+  } else {
+    var alert = goog.dom.getElement('mp3-4');
+    alert.load();
+    alert.play();
   }
 };
 

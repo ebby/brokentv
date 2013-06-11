@@ -9,6 +9,7 @@ class Stat(db.Model):
   user_count = db.IntegerProperty(default=0)
   male_users = db.IntegerProperty(default=0)
   female_users = db.IntegerProperty(default=0)
+  new_users = db.IntegerProperty(default=0)
   monthly_active_users = db.IntegerProperty(default=0)
   weekly_active_users = db.IntegerProperty(default=0)
   daily_active_users = db.StringListProperty(default=[])
@@ -40,6 +41,7 @@ class Stat(db.Model):
     for stat in data:
       timestamp = time.mktime(stat.date.timetuple())
       json.setdefault('user_count', []).append({'x': timestamp, 'y': stat.user_count})
+      json.setdefault('new_users', []).append({'x': timestamp, 'y': stat.new_users})
       json.setdefault('gender_ratio', []).append({'x': timestamp, 'y': round(100 * (stat.female_users / stat.user_count))})
       json.setdefault('daily_active_users', []).append({'x': timestamp, 'y': len(stat.daily_active_users)})
       json.setdefault('session_count', []).append({'x': timestamp, 'y': stat.session_count})
@@ -102,6 +104,7 @@ class Stat(db.Model):
   def add_user_trans(cls, today_key, gender):
     today = db.get(today_key)
     today.user_count += 1
+    today.new_users += 1
     if gender == 'male':
       today.male_users += 1
     if gender == 'female':
