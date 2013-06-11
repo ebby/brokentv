@@ -28,6 +28,7 @@ class Collection(db.Model):
   categories = db.StringListProperty(default=[])
   feed_categories = db.StringListProperty(default=[])
   region = db.StringProperty(default='US')
+  reddit = db.StringProperty()
 
   @property
   def id(self):
@@ -46,6 +47,35 @@ class Collection(db.Model):
     collection = Collection.get_by_id(int(collection_id))
     publisher = Publisher.get_by_key_name(publisher_id)
     publisher_medias = publisher.fetch(collection=collection, approve_all=approve_all)
+    
+  @classmethod
+  def add_reddit_media(cls, collection_id, reddit_id, approve_all):
+    collection = Collection.get_by_id(int(collection_id))
+    response = urlfetch.fetch('http://www.reddit.com/r/%s.json?limit=100' % reddit_id)
+    data = (simplejson.loads(response.content) or {}).get('data') or {}
+    links = data.get('children')
+    ids = []
+    for link in links:
+      link_data = link.get('data') or {}
+      if link_data.get('domain') == 'youtube.com':
+        url = link_data.get('url')
+        parsed_url = urlparse.urlparse(url)
+        host_id = urlparse.parse_qs(parsed_url.query)['v'][0]
+        ids.append(host_id)
+
+    youtube3 = get_youtube3_service()
+    
+    while len(ids) > 0:
+      videos_response = youtube3.videos().list(
+        id=','.join(ids[0:10]),
+        part="id,snippet,topicDetails,contentDetails,statistics"
+      ).execute()
+      medias = Media.add_from_snippet(videos_response.get("items", []),
+                                      collection=collection,
+                                      approve=approve_all)
+      ids = ids[10:]
+    
+    
 
   @classmethod
   def add_playlist_media(cls, collection_id, playlist_id, approve_all):
@@ -95,6 +125,11 @@ class Collection(db.Model):
     return medias
 
   def fetch(self, approve_all=False):
+    if self.reddit:
+      logging.info(self.reddit)
+      deferred.defer(Collection.add_reddit_media, self.id, self.reddit, approve_all=approve_all,
+                     _name='fetch-reddit-' + self.reddit + '-' + str(uuid.uuid1()), _queue='youtube')
+    
     if self.feed_id:
       if 'All' in self.feed_categories:
         job_name = self.name.replace(' ', '') + '-all'
@@ -147,7 +182,10 @@ class Collection(db.Model):
       col_medias = col_medias.filter('approved =', Approval.APPROVED)
     if self.lifespan:
       cutoff = datetime.datetime.now() - datetime.timedelta(days=self.lifespan)
-      col_medias = col_medias.filter('published >', cutoff)
+      if self.reddit:
+        col_medias = col_medias.filter('added >', cutoff)
+      else:
+        col_medias = col_medias.filter('published >', cutoff)
 
     col_medias = col_medias.order('-published').fetch(limit=limit, offset=offset)
     medias = [c_m.media for c_m in col_medias]

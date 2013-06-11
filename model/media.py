@@ -24,6 +24,7 @@ class Media(db.Model):
   thumb_pos = db.IntegerProperty(default=50) # Percent to center of thumbnail
   path = db.StringProperty()
   live = db.BooleanProperty(default=False)
+  added = db.DateTimeProperty(auto_now_add=True)
 
   # Statistics
   started = db.StringListProperty(default=[]) # Users who let the program play
