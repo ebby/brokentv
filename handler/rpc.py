@@ -291,6 +291,8 @@ class InfoHandler(BaseHandler):
       response['seen'] = media.seen_by(self.current_user)
       response['comments'] = [c.toJson() for c in Comment.get_by_media(media, uid=self.current_user.id)]
       response['tweets'] = media.get_tweets()
+      pollMedia = media.polls.get()
+      response['poll'] = pollMedia.poll.to_json(self.current_user.id) if pollMedia else None
       self.response.out.write(simplejson.dumps(response))
 
 class FriendsHandler(BaseHandler):
@@ -397,6 +399,49 @@ class CommentHandler(BaseHandler):
                   'tweet': new_tweet.to_json() if new_tweet else None
                   }
       self.response.out.write(simplejson.dumps(response))
+
+
+class PollHandler(BaseHandler):
+  @BaseHandler.logged_in
+  def get(self, id):
+    media = Media.get_by_id(id)
+    if media:
+      pollMedia = media.polls.get()
+      if pollMedia:
+        self.response.out.write(simplejson.dumps(pollMedia.poll.to_json()))
+        return
+    self.response.out.write(simplejson.dumps(None))
+    
+  @BaseHandler.logged_in
+  def post(self):
+    id = self.request.get('id')
+    media_id = self.request.get('media_id')
+    title = self.request.get('title')
+    options = self.request.get('options')
+    
+    if id:
+      pollOption = PollOption.get_by_id(int(id))
+      pollOption.add_vote(self.current_user.id)
+      return
+    
+    media = Media.get_by_key_name(media_id)
+    if media and title and options:
+      poll = Poll(media=media, title=title)
+      poll.put()
+      json = poll.to_json(self.current_user.id)
+      options = options.split(',')
+      options_json = []
+      for o in options:
+        if o == '':
+          continue
+        option = PollOption(poll=poll, name=o)
+        option.put()
+        options_json.append(option.to_json(self.current_user.id))
+      json['options'] = options_json
+      pm = PollMedias(poll=poll, media=media)
+      pm.put()
+      self.response.out.write(simplejson.dumps(json))
+
 
 class MessageHandler(BaseHandler):
   @BaseHandler.logged_in

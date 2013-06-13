@@ -185,8 +185,8 @@ brkn.Player.prototype.enterDocument = function() {
       .listen(keyHandler,
           goog.events.KeyHandler.EventType.KEY,
           goog.bind(function(e) {
-            if (e.keyCode == '32') {
-               this.togglePlayback_();
+            if (e.keyCode == '32' && e.target.tagName != 'INPUT' && e.target.tagName != 'TEXTAREA') {
+              this.togglePlayback_();
             }
           }, this))
       .listen(this.stagecover_, goog.events.EventType.CLICK, goog.bind(function(e) {
@@ -571,6 +571,7 @@ brkn.Player.prototype.playerStateChange_ = function(event) {
  * @param {Event} event
  */
 brkn.Player.prototype.onPlayerReady_ = function(event) {
+  window.console.log(event)
     this.player_.setPlaybackQuality('large');
     var seek = brkn.model.Player.getInstance().getCurrentProgram().async ?
         brkn.model.Player.getInstance().getCurrentProgram().seek :

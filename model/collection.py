@@ -186,8 +186,10 @@ class Collection(db.Model):
         col_medias = col_medias.filter('added >', cutoff)
       else:
         col_medias = col_medias.filter('published >', cutoff)
-
-    col_medias = col_medias.order('-published').fetch(limit=limit, offset=offset)
+    if self.reddit:
+      col_medias = col_medias.order('-added').fetch(limit=limit, offset=offset)
+    else:
+      col_medias = col_medias.order('-published').fetch(limit=limit, offset=offset)
     medias = [c_m.media for c_m in col_medias]
 
     if deep:
@@ -265,6 +267,7 @@ class CollectionMedia(db.Model):
   media = db.ReferenceProperty(Media, collection_name='collectionMedias')
   publisher = db.ReferenceProperty(Publisher)
   published = db.DateTimeProperty() # For sorted queries
+  added = db.DateTimeProperty(auto_now_add=True)
   approved = db.IntegerProperty(default=Approval.PENDING)
   last_programmed = db.DateTimeProperty()
   
@@ -278,6 +281,9 @@ class CollectionMedia(db.Model):
         collection_media.approved = Approval.APPROVED if approved else Approval.REJECTED
       else:
         Collection.incr_pending(collection.key())
+      collection_media.put()
+    else:
+      collection_media.added = datetime.datetime.now()
       collection_media.put()
     return collection_media
   

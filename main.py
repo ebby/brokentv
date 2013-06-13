@@ -223,6 +223,7 @@ def create_handlers_map():
     ('/_notification', rpc.NotificationHandler),
     ('/_optin', rpc.OptInHandler),
     ('/_play', rpc.PlayHandler),
+    ('/_poll', rpc.PollHandler),
     ('/_presence', rpc.PresenceHandler),
     ('/_programming/(.*)', rpc.ProgramHandler),
     ('/_publisher/(.*)', rpc.PublisherHandler),

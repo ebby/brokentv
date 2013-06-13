@@ -54,7 +54,7 @@
       <div class="scrollable ios-scroll">
         <div class="user-poll" style="display: none">
           <div class="label">
-            <div class="status">VOTE</div>
+            <div class="poll-icon"></div><div class="status">VOTE</div>
           </div>
           <div class="poll-options"></div>
         </div>
@@ -75,6 +75,19 @@
           <div class="comments"></div>
           <div class="top-grad"></div>
           <div class="bottom-grad"></div>
+        </div>
+        <div class="create-poll-button" style="display:none">+ POLL</div>
+        <div class="create-poll popup" style="display:none">
+          <div class="label">CREATE A USER POLL</div>
+          <input type="text" placeholder="Title" class="poll-title"/>
+          <div class="label" style="margin-top: 5px;">OPTIONS</div>
+          <div class="option-inputs">
+            <input type="text" placeholder="Option 1" class="option-input option-input-1"/>
+            <input type="text" placeholder="Option 2" class="option-input option-input-2"/>
+          </div>
+          <div class="add-option button">ADD OPTION</div>
+          <div class="submit-poll button">CREATE</div>
+          <div class="close"></div>
         </div>
       </div>
     </div>

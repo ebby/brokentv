@@ -21,6 +21,7 @@ goog.addSingletonGetter(brkn.model.Popup);
  * @enum {string}
  */
 brkn.model.Popup.Action = {
+  CREATE_POLL: 'create-poll',
 	ON_HIDE: 'on-hide',
 	SELECT_PROGRAM: 'select-program',
   SHARE: 'share',

@@ -5680,6 +5680,7 @@ div#sidebar div.info div.label a {
   cursor: pointer;
 }
 div#sidebar div.info div.label a.prev-link {
+  display: none;
   position: absolute;
   right: 0;
 }
@@ -5727,6 +5728,7 @@ div#sidebar div.info div.label div.friends-icon:before {
 }
 div#sidebar div.info div.label div.status {
   display: inline-block;
+  max-width: 280px;
 }
 div#sidebar div.info div.title {
   position: relative;
@@ -5935,11 +5937,33 @@ div#sidebar div.info div.info-contents {
   position: relative;
   overflow: hidden;
 }
+div#sidebar div.info div.create-poll-button {
+  position: absolute;
+  left: 260px;
+  font-size: 11px;
+  top: 11px;
+  right: 41px;
+  width: 45px;
+  height: 15px;
+  outline: none;
+  border: 1px solid #181818;
+  font-family: MuseoSans700;
+  text-align: center;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  -webkit-box-shadow: 1px 1px 1px 0 rgba(255, 255, 255, 0.8);
+  -moz-box-shadow: 1px 1px 1px 0 rgba(255, 255, 255, 0.8);
+  box-shadow: 1px 1px 1px 0 rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  line-height: 16px;
+}
 div#sidebar div.info div.user-poll {
   margin-top: 10px;
 }
 div#sidebar div.info div.user-poll.voted div.poll-options div.option {
   background: #f5f5f5;
+  cursor: default;
 }
 div#sidebar div.info div.user-poll.voted div.poll-options div.option.selected {
   background: #fefefe;
@@ -5953,6 +5977,28 @@ div#sidebar div.info div.user-poll.voted div.poll-options div.option.selected:ho
 div#sidebar div.info div.user-poll.voted div.poll-options div.option div.percent-number {
   display: block;
 }
+div#sidebar div.info div.user-poll div.poll-icon {
+  font-family: 'icons';
+  font-style: normal;
+  font-weight: normal;
+  speak: none;
+  text-decoration: inherit;
+  /* opacity .8 */
+
+  font-variant: normal;
+  /* Uncomment for 3D effect */
+
+  /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+
+  /* '' */
+
+  display: inline-block;
+  margin-right: 5px;
+  vertical-align: top;
+}
+div#sidebar div.info div.user-poll div.poll-icon:before {
+  content: '\e804';
+}
 div#sidebar div.info div.user-poll div.question {
   font-size: 13px;
   margin-left: 10px;
@@ -5961,7 +6007,7 @@ div#sidebar div.info div.user-poll div.poll-options {
   margin: 10px 10px 0 10px;
 }
 div#sidebar div.info div.user-poll div.poll-options div.option {
-  width: 300px;
+  width: 296px;
   height: 30px;
   position: relative;
   border: 1px solid #aaa;
@@ -5999,9 +6045,9 @@ div#sidebar div.info div.user-poll div.poll-options div.option div.percent {
   -o-transition: width 0.9s ease;
   -ms-transition: width 0.9s ease;
   transition: width 0.9s ease;
-  -webkit-box-shadow: inset -1px 0 1px rgba(0, 0, 0, 0.1), 1px 0 1px 0px white;
-  -moz-box-shadow: inset -1px 0 1px rgba(0, 0, 0, 0.1), 1px 0 1px 0px white;
-  box-shadow: inset -1px 0 1px rgba(0, 0, 0, 0.1), 1px 0 1px 0px white;
+  -webkit-box-shadow: inset -1px 0 1px rgba(0, 0, 0, 0.1);
+  -moz-box-shadow: inset -1px 0 1px rgba(0, 0, 0, 0.1);
+  box-shadow: inset -1px 0 1px rgba(0, 0, 0, 0.1);
 }
 div#sidebar div.info div.user-poll div.poll-options div.option div.percent-number {
   display: none;
@@ -6131,6 +6177,100 @@ div#sidebar div.info div.overlay div.leaving {
 div#sidebar div.info div.overlay div.button {
   margin: 10px 5px;
   background: rgba(0, 0, 0, 0.5);
+}
+div#sidebar div.info div.create-poll {
+  text-align: left;
+  position: relative;
+  width: 286px;
+  left: 11px;
+  top: -28px;
+}
+div#sidebar div.info div.create-poll:after {
+  bottom: 100%;
+  border-color: rgba(222, 222, 222, 0);
+  border-bottom-color: #fefefe;
+  border-width: 5px;
+  right: 18px;
+  margin-left: -5px;
+}
+div#sidebar div.info div.create-poll:before {
+  bottom: 100%;
+  border-color: rgba(204, 204, 204, 0);
+  border-bottom-color: rgba(0, 0, 0, 0.6);
+  border-width: 6px;
+  right: 18px;
+  margin-left: -6px;
+}
+div#sidebar div.info div.create-poll div.button {
+  color: #181818;
+  background: #f5f5f5;
+  font-size: 11px;
+  text-shadow: 1px 1px 1px white;
+  padding: 2px 5px;
+  line-height: 17px;
+  margin-top: 5px;
+}
+div#sidebar div.info div.create-poll div.label {
+  text-align: left;
+  margin-left: 0;
+}
+div#sidebar div.info div.create-poll div.close {
+  font-family: 'icons';
+  font-style: normal;
+  font-weight: normal;
+  speak: none;
+  text-decoration: inherit;
+  /* opacity .8 */
+
+  font-variant: normal;
+  /* Uncomment for 3D effect */
+
+  /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+
+  /* '✕' */
+
+  position: absolute;
+  right: 8px;
+  top: 4px;
+  font-size: 13px;
+  color: #181818;
+  text-shadow: 1px 1px 1px white;
+}
+div#sidebar div.info div.create-poll div.close:before {
+  content: '\2715';
+}
+div#sidebar div.info div.create-poll input {
+  display: block;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  width: 276px;
+  font-size: 13px;
+  min-height: 16px;
+  padding: 4px;
+  outline: none;
+  border: 1px solid #aaa;
+  resize: none;
+  font-family: MuseoSans300;
+  -webkit-touch-callout: text;
+  -webkit-user-select: text;
+  -khtml-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+  background: #f5f5f5;
+}
+div#sidebar div.info div.create-poll div.submit-poll {
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+  width: 50px;
+  color: #497882;
+}
+div#sidebar div.info div.create-poll div.submit-poll.goog-custom-button-disabled {
+  background: #e5e5e5;
+  cursor: normal;
+  color: #bbb;
 }
 div#sidebar div.info.mini div.picture {
   height: 100px;

@@ -5,6 +5,13 @@ indexes:
   - name: collection
   - name: published
     direction: desc
+    
+- kind: CollectionMedia
+  properties:
+  - name: approved
+  - name: collection
+  - name: added
+    direction: desc
 
 - kind: PlaylistMedia
   properties:

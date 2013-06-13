@@ -8,6 +8,7 @@ from collection import *
 from playlist import *
 from comment import *
 from message import *
+from poll import *
 from tweet import *
 from topic import *
 from category import *

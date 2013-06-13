@@ -126,6 +126,11 @@ brkn.model.Media = function(media) {
    * @type {Array.<brkn.model.Tweet>}
    */
   this.tweets = [];
+  
+  /**
+   * @type {Object}
+   */
+  this.poll;
 
   /**
    * @type {number}

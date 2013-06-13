@@ -154,6 +154,11 @@ brkn.sidebar.Info = function(media, opt_noFetch, opt_lastMedia, opt_lastInput, o
   this.plusButton_ = new goog.ui.CustomButton('Plus');
   this.plusButton_.setSupportedState(goog.ui.Component.State.CHECKED,
       true);
+  
+  /**
+   * @type {goog.ui.CustomButton}
+   */
+  this.createPollButton_ = new goog.ui.CustomButton('Create Poll');
 
   /**
    * @type {number}
@@ -235,6 +240,13 @@ brkn.sidebar.Info.prototype.viewersEl_;
 
 
 /**
+ * @type {Element}
+ * @private
+ */
+brkn.sidebar.Info.prototype.createPoll_;
+
+
+/**
  * @type {goog.Timer}
  * @private
  */
@@ -291,14 +303,16 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
   this.twitterButton_.decorate(goog.dom.getElementByClass('twitter', this.getElement()));
   this.playButton_.decorate(goog.dom.getElementByClass('play', this.getElement()));
   this.plusButton_.decorate(goog.dom.getElementByClass('plus', this.getElement()));
+  this.createPollButton_.decorate(goog.dom.getElementByClass('create-poll-button', this.getElement()));
   this.tweetTimer_ = new goog.Timer(5000);
   this.watchWith_ = goog.dom.getElementByClass('watch-with', this.getElement());
+  this.createPoll_ = goog.dom.getElementByClass('create-poll', this.getElement());
   
   goog.dom.classes.enable(this.getElement(), 'mini', this.mini_);
 
   if (!this.fetch_ || this.media_.fetched) {
     this.renderInfo(false, this.media_.description, this.media_.seen, this.media_.tweets,
-        this.media_.comments);
+        this.media_.comments, this.media_.poll);
   } else if (this.fetch_) {
     goog.net.XhrIo.send('/_info/' + this.media_.id, goog.bind(function(e) {
       var response = goog.json.parse(e.target.getResponse());
@@ -306,13 +320,9 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
       var seen = /** @type {Array.<Object>} */ response['seen'];
       var tweets = /** @type {Array.<Object>} */ response['tweets'];
       var comments = /** @type {Array.<Object>} */ response['comments'];
-      this.renderInfo(true, description, seen, tweets, comments);
+      var poll = /** @type {Array.<Object>} */ response['poll'];
+      this.renderInfo(true, description, seen, tweets, comments, poll);
     }, this));
-  }
-
-  if (this.media_.publisher.id == 'youtubeUCAMPco9PqjBbI_MLsDOO4Jw' ||
-      this.media_.publisher.id == 'youtubeAMPco9PqjBbI_MLsDOO4Jw') {
-    this.setupUserPoll_(); 
   }
 
   this.getHandler()
@@ -351,6 +361,9 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
                 true);
             goog.dom.getElementByClass('link-input', this.getElement()).select();
           }, this))
+      .listen(this.createPollButton_,
+          goog.ui.Component.EventType.ACTION,
+          goog.bind(this.setupCreatePoll_, this))
       .listen(this.commentInput_,
           'add',
           goog.bind(this.onAddComment_, this))
@@ -551,8 +564,9 @@ brkn.sidebar.Info.prototype.getMedia = function() {
  * @param {Array.<Object>} seen
  * @param {Array.<Object>} tweets
  * @param {Array.<Object>} comments
+ * @param {?Object=} opt_poll
  */
-brkn.sidebar.Info.prototype.renderInfo = function(fetched, description, seen, tweets, comments) {
+brkn.sidebar.Info.prototype.renderInfo = function(fetched, description, seen, tweets, comments, opt_poll) {
   // Description
   if (description) {
     this.media_.description = description;
@@ -604,6 +618,13 @@ brkn.sidebar.Info.prototype.renderInfo = function(fetched, description, seen, tw
     return c;
   }, this);
   goog.style.showElement(this.spinner_, false);
+  
+  if (opt_poll) {
+    this.setupUserPoll_(opt_poll);
+    this.media_.poll = opt_poll;
+  } else {
+    goog.style.showElement(this.createPollButton_.getElement(), true); 
+  }
   this.resize();
   
   if (fetched) {
@@ -618,40 +639,124 @@ brkn.sidebar.Info.prototype.renderInfo = function(fetched, description, seen, tw
 /**
  * @private 
  */
-brkn.sidebar.Info.prototype.setupUserPoll_ = function() {
+brkn.sidebar.Info.prototype.setupCreatePoll_ = function() {
+  goog.style.showElement(this.createPoll_, true);
+  var submit = new goog.ui.CustomButton('CREATE');
+  submit.decorate(goog.dom.getElementByClass('submit-poll', this.getElement()));
+  submit.setEnabled(false);
+  var title = goog.dom.getElementByClass('poll-title', this.createPoll_);
+  var option1 = goog.dom.getElementByClass('option-input-1', this.createPoll_);
+  var option2 = goog.dom.getElementByClass('option-input-2', this.createPoll_);
+  var options = goog.dom.getElementByClass('option-inputs', this.createPoll_);
+  this.getHandler()
+    .listen(submit,
+        goog.ui.Component.EventType.ACTION, goog.bind(function() {
+          goog.style.showElement(this.createPoll_, false);
+          var optionsStr = goog.array.reduce((/** @type {Array.<Element>} */ options.children), function(prev, el) {
+            var toReturn = prev + (el.value ? el.value + ',' : '');
+            el.value = '';
+            return toReturn;
+          }, '', this);
+          if (title.value && optionsStr) {
+            goog.net.XhrIo.send('/_poll', goog.bind(function(e) {
+                  var pollObj = e.target.getResponseJson();
+                  this.setupUserPoll_(pollObj);
+                }, this), 'POST', 'media_id=' + this.media_.id +
+                '&title=' + title.value + '&options=' + optionsStr);
+            title.value = '';
+            goog.style.showElement(this.createPollButton_.getElement(), false);
+          }
+        }, this))
+    .listen(new goog.events.KeyHandler(title),
+        goog.events.KeyHandler.EventType.KEY, goog.bind(function() {
+          goog.Timer.callOnce(goog.bind(function() {
+            submit.setEnabled(title.value && option1.value && option2.value)
+          }, this));
+        }, this))
+    .listen(new goog.events.KeyHandler(option1),
+        goog.events.KeyHandler.EventType.KEY, goog.bind(function() {
+          goog.Timer.callOnce(goog.bind(function() {
+            submit.setEnabled(title.value && option1.value && option2.value)
+          }, this));
+        }, this))
+    .listen(new goog.events.KeyHandler(option2),
+        goog.events.KeyHandler.EventType.KEY, goog.bind(function() {
+          goog.Timer.callOnce(goog.bind(function() {
+            submit.setEnabled(title.value && option1.value && option2.value)
+          }, this));
+        }, this))
+    .listen(goog.dom.getElementByClass('add-option', this.createPoll_),
+      goog.events.EventType.CLICK, goog.bind(function() {
+        goog.dom.appendChild(options,
+            goog.dom.createDom('input', {
+              'type': 'text',
+              'placeholder': 'Option ' + (options.children.length + 1)
+            }));
+      }, this))
+    .listen(goog.dom.getElementByClass('close', this.createPoll_),
+      goog.events.EventType.CLICK, goog.bind(function() {
+        goog.style.showElement(this.createPoll_, false);
+      }, this));
+};
+
+
+/**
+ * @param {Object} poll
+ * @private 
+ */
+brkn.sidebar.Info.prototype.setupUserPoll_ = function(poll) {
+  
+  goog.style.showElement(this.createPollButton_.getElement(), false);
   var question = goog.dom.getElementByClass('status', this.userPollEl_);
   var options = goog.dom.getElementByClass('poll-options', this.userPollEl_);
+  this.userPollEl_.id = poll['id']
+  goog.dom.setTextContent(question, poll['title'].toUpperCase() + ' (' + poll['vote_count'] + ' VOTES)');
   
-  goog.dom.setTextContent(question, 'WHO\'S YOUR FAVORITE FINALIST?');
-  goog.dom.appendChild(options, soy.renderAsElement(brkn.sidebar.pollOption, {
-    name: 'Kree Harrison',
-    percent: '31%'
-  }));
-  goog.dom.appendChild(options, soy.renderAsElement(brkn.sidebar.pollOption, {
-    name: 'Angie Miller',
-    percent: '52%'
-  }));
-  goog.dom.appendChild(options, soy.renderAsElement(brkn.sidebar.pollOption, {
-    name: 'Candice Glover',
-    percent: '17%'
-  }));
+  
+  goog.array.forEach(poll['options'], function(op) {
+    var optionEl = soy.renderAsElement(brkn.sidebar.pollOption, {
+      name: op['name'],
+      percent: op['percent'] + '%'
+    });
+    goog.dom.appendChild(options, optionEl);
+    if (op['voted']) {
+      this.voteForOption_(poll, op, optionEl);
+    } else {
+      this.getHandler().listen(optionEl, goog.events.EventType.CLICK, goog.bind(function(e) {
+        if (!goog.dom.classes.has(this.userPollEl_, 'voted')) {
+          op['vote_count'] += 1
+          poll['vote_count'] += 1
+          this.voteForOption_(poll, op, optionEl);
+          goog.dom.setTextContent(question, poll['title'].toUpperCase() + ' (' + poll['vote_count'] + ' VOTES)');
+          goog.net.XhrIo.send('/_poll', undefined, 'POST', 'id=' + op['id']);
+          this.commentInput_.setValue('I voted: ' + op['name'] + ' (on ' + poll['title'] + ')', true, true);
+          this.commentInput_.setFocused(true);
+        }
+      }, this)); 
+    }
+  }, this);
   
   goog.style.showElement(this.userPollEl_, true);
-  
-  this.getHandler().listen(options, goog.events.EventType.CLICK, goog.bind(function(e) {
-    if (!goog.dom.classes.has(this.userPollEl_, 'voted')) {
-      goog.dom.classes.add(this.userPollEl_, 'voted');
-      var selected = goog.dom.getAncestorByClass(e.target, 'option');
-      var name = goog.dom.getTextContent(goog.dom.getElementByClass('name', selected));
-      goog.dom.classes.add(selected, 'selected');
-      this.commentInput_.setValue('@americanidol I just voted for ' + name, true, true);
-      this.commentInput_.setFocused(true);
-      goog.array.forEach(goog.dom.getChildren(options), function(op) {
-        var percentage = goog.dom.getTextContent(goog.dom.getElementByClass('percent-number', op));
-        goog.dom.getElementByClass('percent', op).style.width = percentage;
-      }, this);
-    }
-  }, this));
+};
+
+
+/**
+ * @param {Object} poll
+ * @param {Object} op
+ * @param {Element} optionEl
+ * @private 
+ */
+brkn.sidebar.Info.prototype.voteForOption_ = function(poll, op, optionEl) {
+  var question = goog.dom.getElementByClass('status', this.userPollEl_);
+  var options = goog.dom.getElementByClass('poll-options', this.userPollEl_);
+  goog.dom.classes.add(this.userPollEl_, 'voted');
+  var name = goog.dom.getTextContent(goog.dom.getElementByClass('name', optionEl));
+  goog.dom.classes.add(optionEl, 'selected');
+  goog.array.forEach(goog.dom.getChildren(options), function(opEl, i) {
+    var percentage = parseInt(poll['options'][i]['vote_count']/poll['vote_count'] * 100, 10) + '%'
+    goog.dom.setTextContent(goog.dom.getElementByClass('percent-number', opEl), percentage);
+    goog.dom.getElementByClass('percent', opEl).style.width = percentage;
+  }, this);
 };
 
 

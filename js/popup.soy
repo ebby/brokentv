@@ -25,7 +25,7 @@
 
 
 /**
- * Select a program
+ * Show OOB
  */
 {template .commentOob}
 <div class="comment-oob">
@@ -34,6 +34,22 @@
     <div class="off">OFF{sp}<div class="twitter-icon"></div></div> &#8594;
     {sp}<div class="on">ON{sp}<div class="twitter-icon on"></div></div>
   </div>
+</div>
+{/template}
+
+
+/**
+ * Create a user poll
+ */
+{template .createPoll}
+<div class="create-poll">
+  <div class="label">CREATE A USER POLL</div>
+  <input type="text" placeholder="Title" class="poll-title"/>
+  <div class="label">OPTIONS</div>
+  <input type="text" placeholder="Option 1" class="option-input"/>
+  <input type="text" placeholder="Option 2" class="option-input"/>
+  <div class="add-option button">ADD OPTION</div>
+  <div class="submit-poll button">CREATE</div>
 </div>
 {/template}
 

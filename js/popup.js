@@ -46,6 +46,12 @@ brkn.Popup = function() {
    * @private
    */
   this.shouldClose_ = false;
+  
+  /**
+   * @type {boolean}
+   * @private
+   */
+  this.dontClose_ = false;
 
   /**
    * @type {brkn.model.Popup}
@@ -56,6 +62,8 @@ brkn.Popup = function() {
       this.showTooltip_, this);
   this.model_.subscribe(brkn.model.Popup.Action.OOB,
       this.showOob_, this);
+  this.model_.subscribe(brkn.model.Popup.Action.CREATE_POLL,
+      this.showCreatePoll_, this);
   this.model_.subscribe(brkn.model.Popup.Action.SELECT_PROGRAM,
       this.showForSelectProgram_, this);
   this.model_.subscribe(brkn.model.Popup.Action.HIDE,
@@ -164,6 +172,9 @@ brkn.Popup.prototype.positionAtAnchor = function(anchor, pos) {
 
 
 brkn.Popup.prototype.onHideInternal_ = function() {
+  if (this.dontClose_) {
+    return;
+  }
 	this.hide_();
 	this.model_.publish(brkn.model.Popup.Action.ON_HIDE);
 };
@@ -227,6 +238,42 @@ brkn.Popup.prototype.showOob_ = function(anchor, pos, args, opt_noAutohide) {
   this.handler_.listen(this.getElement(), goog.events.EventType.CLICK, goog.bind(function() {
     this.model_.publish(brkn.model.Popup.Action.HIDE);
   }, this));
+};
+
+
+/**
+ * Show popup for a like object.
+ * @param {Element} anchor The like element.
+ * @param {brkn.model.Popup.Position} pos
+ * @param {Object} args
+ * @param {?boolean=} opt_noAutohide
+ * @private
+ */
+brkn.Popup.prototype.showCreatePoll_ = function(anchor, pos, args, opt_noAutohide) {
+  this.setVisible(false);
+  this.setPinnedCorner(goog.positioning.Corner.TOP_RIGHT);
+//  var leftMargin = -1 * (goog.style.getSize(this.getElement()).width -
+//      goog.style.getSize(anchor).width) / 2;
+//  this.setMargin(0, 0, 6, leftMargin);
+  this.setPosition(new goog.positioning.AnchoredViewportPosition(
+      anchor,
+      goog.positioning.Corner.BOTTOM_END));
+  goog.dom.classes.set(this.getElement(), 'popup');
+  goog.dom.classes.add(this.getElement(), 'top');
+  var leftMargin = -1 * (goog.style.getSize(this.getElement()).width -
+      goog.style.getSize(anchor).width) / 2;
+  this.setMargin(0, 0, 36, leftMargin);
+  
+  soy.renderElement(this.getContentElement(), brkn.popup.createPoll, {
+  });
+  
+  this.setAutoHide(false);
+  this.setVisible(true);
+  this.dontClose_ = true;
+  
+//  this.handler_.listen(this.getElement(), goog.events.EventType.CLICK, goog.bind(function() {
+//    this.model_.publish(brkn.model.Popup.Action.HIDE);
+//  }, this));
 }
 
 
