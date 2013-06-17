@@ -88,6 +88,17 @@ class Media(db.Model):
     return Media.add_from_entry([entry])[0]
   
   @classmethod
+  def add_by_id(cls, id):
+    youtube3 = get_youtube3_service()
+    videos_response = youtube3.videos().list(
+      id=id,
+      part="id,snippet,topicDetails,contentDetails,statistics"
+    ).execute()
+    medias = Media.add_from_snippet(videos_response.get("items", []),
+                                    approve=True)
+    return medias[0] if len(medias) else None
+  
+  @classmethod
   def add_from_snippet(cls, items, collection=None, publisher=None, enforce_category=False, approve=False):
     from publisher import Publisher
     from publisher import PublisherMedia
@@ -119,10 +130,18 @@ class Media(db.Model):
           (not enforce_category or (item['snippet'].get('categoryId') in collection.categories)):
         collection_media = CollectionMedia.add(collection, media, publisher=publisher, approved=(True if approve else None))
 
-      if not publisher and item['snippet']['channelId']:
-        publisher = Publisher.get_by_channel_id(item['snippet']['channelId'])
-      if publisher:
-        PublisherMedia.add(publisher=publisher, media=media)
+      logging.info(item['snippet']['channelId'])
+      logging.info(item['snippet']['channelTitle'])
+      if not publisher or publisher.channel_id != item['snippet']['channelId']:
+        publisher = Publisher.get_by_channel_id(item['snippet']['channelId'], item['snippet']['channelTitle'])
+      if publisher and item['snippet']['channelId'] == publisher.channel_id:
+        logging.info('SHOULD ADD PUBLISHER')
+        pm = media.publisherMedias.get()
+        if pm and pm.publisher.channel_id != item['snippet']['channelId']:
+          # Check if there was an incorrect publisher assigned before
+          pm.delete()
+        pm = PublisherMedia.add(publisher=publisher, media=media)
+        logging.info(pm.publisher.name)
 
       if item.get('topicDetails'):
         for topic_id in item['topicDetails']['topicIds']:

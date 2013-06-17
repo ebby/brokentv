@@ -47,7 +47,7 @@ def broadcastNotification(n):
     memcache.set(n.user.id, user_obj)
     deferred.defer(email_outbox, n.user.id,
                    _name='email-outbox-' + n.user.id + '-' + str(uuid.uuid1()),
-                   _countdown=600)
+                   _countdown=120)
     
 
 def broadcastNewComment(comment, tweet, to_user, host_url):
@@ -65,7 +65,7 @@ def broadcastNewComment(comment, tweet, to_user, host_url):
     memcache.set(to_user.id, user_obj)
     deferred.defer(email_outbox, to_user.id,
                    _name='email-outbox-' + to_user.id + '-' + str(uuid.uuid1()),
-                   _countdown=600)
+                   _countdown=120)
 
   for client in channels.iterkeys():
     if (comment.parent_comment and client in comment.user.friends) or (client in comment.acl) or \
@@ -85,7 +85,7 @@ def broadcastNewMessage(message):
     memcache.set(message.to_user.id, user_obj)
     deferred.defer(email_outbox, message.to_user.id,
                    _name='email-outbox-' + message.to_user.id + '-' + str(uuid.uuid1()),
-                   _countdown=600)
+                   _countdown=120)
 
   else:
      webchannel.send_message(message.to_user.id, simplejson.dumps(response))

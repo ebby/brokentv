@@ -501,7 +501,10 @@ brkn.Main.auth = function() {
 brkn.Main.login = function() {
   var fbLogin = goog.dom.getElement('fb-login');
   var loginPage = goog.dom.getElement('login');
-  
+  goog.Timer.callOnce(function() {
+    var message = goog.dom.getElement('message');
+    goog.dom.classes.add(message, 'show');
+  }, 500);
   goog.events.listen(fbLogin, goog.events.EventType.CLICK, function() {
     goog.dom.classes.add(fbLogin, 'disabled');
     if (IPAD) {
@@ -545,6 +548,7 @@ brkn.Main.getSessionAndInit = function(response) {
           if (data['message']) {
             var message = goog.dom.getElement('message');
             goog.dom.setTextContent(message, data['message']);
+            goog.dom.classes.add(message, 'show');
             return;
           }
           var reveal = function() {

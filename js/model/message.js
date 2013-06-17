@@ -32,6 +32,11 @@ brkn.model.Message = function(message) {
   this.text = message['text'];
   
   /**
+   * @type {?brkn.model.Media}
+   */
+  this.media = message['media'] ? brkn.model.Medias.getInstance().getOrAdd(message['media']) : null;
+  
+  /**
    * @type {boolean}
    * @private
    */

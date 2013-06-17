@@ -1,8 +1,12 @@
 @-moz-document url-prefix() {
+	div#sidebar div.info div.viewers {
+	  top: -3px;
+  }
+	div#sidebar div.comments-holder div.comment div.reply-input textarea {
+	  margin-bottom: 0;
+  }
   div#sidebar div.comment-input div.input-holder textarea {
-    height: 24px;
-    margin-bottom: 8px;
-    padding: 2px;
+    height: 21px;
   }
   div#sidebar div.comments-holder div.top-grad {
     top: 21px;

@@ -166,7 +166,7 @@ div#sidebar {
       height: 100%;
       position: absolute;
       top: 0;
-      width: 100%;
+      width: 320px;
       display: table;
       table-layout: fixed;
       border-collapse: collapse;
@@ -538,6 +538,7 @@ div#sidebar {
     .border-radius(3px);
     width: 240px;
     font-size: 13px;
+    margin-bottom: 0;
     min-height: 16px;
     padding: 4px;
     outline: none;
@@ -554,7 +555,7 @@ div#sidebar {
   div.tabbed {
     ul.tabs {
       height: 30px;
-      width: 100%;
+      width: 320px;
       display: table;
       table-layout: fixed;
       border-collapse: collapse;
@@ -614,10 +615,6 @@ div#sidebar {
       }
     }
     div.inbox-content {
-      overflow-x: hidden;
-      overflow-y: scroll;
-      padding-right: 14px;
-      margin-right: -14px;
       div.label {
         font-family: MuseoSans700;
         font-size: 11px;
@@ -927,7 +924,6 @@ div#sidebar {
       position: relative;
       font-size: 11px;
       width: 320px;
-      overflow: hidden;
       .border-radius(3px);
       &:first-child {
         border-top-left-radius: 3px;
@@ -950,18 +946,21 @@ div#sidebar {
         border: 1px solid #aaa;
         .border-radius(3px);
         margin-bottom: 4px;
+        min-height: 21px;
         textarea {
           width: 100%;
           font-family: MuseoSans700;
           font-size: 11px;
           border: none;
           margin-top: 0;
+          margin-bottom: -3px;
           position: relative;
           background: #ddd;
-          margin-bottom: -3px;
           overflow-y: hidden;
           overflow-x: auto;
           box-sizing: border-box;
+          -moz-box-sizing: border-box;
+          height: 21px;
         }
         &.decorated {
           background: #fff;

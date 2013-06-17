@@ -10,14 +10,16 @@ class Message(db.Model):
   acl = db.StringListProperty()
   read = db.BooleanProperty(default=False)
   time = db.DateTimeProperty(auto_now_add=True)
+  media = db.ReferenceProperty(Media)
   
   @property
   def id(self):
     return str(self.key().id())
 
   @classmethod
-  def add(cls, from_user, to_user, text):
-    m = Message(from_user=from_user, to_user=to_user, text=text, acl=[from_user.id, to_user.id])
+  def add(cls, from_user, to_user, text, media=None):
+    m = Message(from_user=from_user, to_user=to_user, text=text, acl=[from_user.id, to_user.id],
+                media=media)
     m.put()
     
     # Update memcache
@@ -80,4 +82,5 @@ class Message(db.Model):
     json['text'] = self.text
     json['read'] = self.read
     json['time'] = self.time.isoformat()
+    json['media'] = self.media.toJson() if self.media else None
     return json

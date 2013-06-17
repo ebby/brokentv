@@ -429,7 +429,7 @@ class PollHandler(BaseHandler):
       poll = Poll(media=media, title=title)
       poll.put()
       json = poll.to_json(self.current_user.id)
-      options = options.split(',')
+      options = options.split('|')
       options_json = []
       for o in options:
         if o == '':

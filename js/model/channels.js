@@ -187,7 +187,6 @@ brkn.model.Channels.prototype.changeChannel = function(channel, opt_forced) {
       (channel && this.currentChannel && this.currentChannel.id != channel.id)) {
     this.lastChannel = this.currentChannel;
     this.currentChannel = channel;
-    channel.offline = channel.myChannel;
     this.updateOnlineUsers(channel.getCurrentProgram());
     var program = channel.getCurrentProgram();
     var withFriends = program && !goog.object.isEmpty(program.media.onlineViewers);

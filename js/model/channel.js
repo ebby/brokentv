@@ -35,7 +35,7 @@ brkn.model.Channel = function(channel) {
   /**
    * @type {boolean}
    */
-  this.offline = this.myChannel;
+  this.offline = true;
 
   /**
    * @type {?brkn.model.Media}
@@ -240,11 +240,9 @@ brkn.model.Channel.prototype.getCurrentProgram = function(opt_offset) {
     return this.programming[this.currentProgramIndex + opt_offset];
   }
 
-  if (this.offline) {
-    if (this.currentProgram) {
-      if (this.currentProgram.ended) {
-        this.currentProgram = this.getNextProgram();
-      }
+  if (this.offline && this.currentProgram) {
+    if (this.currentProgram.ended) {
+      this.currentProgram = this.getNextProgram();
     }
   } else {
     this.currentProgram = this.getScheduledProgram();

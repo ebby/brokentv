@@ -641,6 +641,9 @@ brkn.sidebar.Info.prototype.renderInfo = function(fetched, description, seen, tw
  */
 brkn.sidebar.Info.prototype.setupCreatePoll_ = function() {
   goog.style.showElement(this.createPoll_, true);
+  if (this.pollSetup_) {
+    return;
+  }
   var submit = new goog.ui.CustomButton('CREATE');
   submit.decorate(goog.dom.getElementByClass('submit-poll', this.getElement()));
   submit.setEnabled(false);
@@ -653,7 +656,7 @@ brkn.sidebar.Info.prototype.setupCreatePoll_ = function() {
         goog.ui.Component.EventType.ACTION, goog.bind(function() {
           goog.style.showElement(this.createPoll_, false);
           var optionsStr = goog.array.reduce((/** @type {Array.<Element>} */ options.children), function(prev, el) {
-            var toReturn = prev + (el.value ? el.value + ',' : '');
+            var toReturn = prev + (el.value ? el.value + '|' : '');
             el.value = '';
             return toReturn;
           }, '', this);
@@ -697,6 +700,7 @@ brkn.sidebar.Info.prototype.setupCreatePoll_ = function() {
       goog.events.EventType.CLICK, goog.bind(function() {
         goog.style.showElement(this.createPoll_, false);
       }, this));
+  this.pollSetup_ = true;
 };
 
 

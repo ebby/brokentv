@@ -325,10 +325,12 @@ class Programming():
     publishers = {}
     unique_medias = []
     for media in medias:
-      publisher = media.publisherMedias.get().publisher
-      if not publishers.get(publisher.id):
-        unique_medias.append(media)
-        publishers[publisher.id] = True
+      pm = media.publisherMedias.get()
+      if pm:
+        publisher = pm.publisher
+        if not publishers.get(publisher.id):
+          unique_medias.append(media)
+          publishers[publisher.id] = True
     return unique_medias
   
   '''

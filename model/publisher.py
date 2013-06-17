@@ -19,27 +19,37 @@ class Publisher(db.Model):
   @property
   def id(self):
     return self.key().name()
+  
+  @classmethod
+  def fetch_channel_details(cls, pub_id):
+    publisher = Publisher.get_by_key_name(pub_id)
+    youtube3 = get_youtube3_service()
+    response = youtube3.channels().list(
+        id=publisher.channel_id,
+        part='snippet',
+        fields='items'
+      ).execute()
+    items = response.get('items', [])
+    if len(items):
+      publisher.description=items[0]['snippet']['description']
+      publisher.picture_url=items[0]['snippet']['thumbnails']['default']['url']
+      publisher.put()
 
   @classmethod
-  def get_by_channel_id(self, channel_id):
+  def get_by_channel_id(cls, channel_id, channel_name):
     publisher = Publisher.all().filter('channel_id =', channel_id).get()
     if not publisher:
-      youtube3 = get_youtube3_service()
-      response = youtube3.channels().list(
-          id=channel_id,
-          part='snippet',
-          fields='items'
-        ).execute()
-      items = response.get('items', [])
-      if len(items):
-        publisher = Publisher(key_name=MediaHost.YOUTUBE + channel_id,
-                              name=items[0]['snippet']['title'],
-                              description=items[0]['snippet']['description'],
+      publisher = Publisher(key_name=MediaHost.YOUTUBE + channel_id,
+                              name=channel_name,
                               link='http://www.youtube.com/channel/' + channel_id,
                               channel_id=channel_id,
-                              picture_url=items[0]['snippet']['thumbnails']['default']['url'],
                               host=MediaHost.YOUTUBE)
-        publisher.put()
+      if channel_id.startswith('UC'):
+        publisher.picture_url = 'https://i.ytimg.com/i/%s/1.jpg' % channel_id[2:]
+      publisher.put()
+      deferred.defer(Publisher.fetch_channel_details, publisher.id,
+                     _name='channel-details' + '-' + str(uuid.uuid1()),
+                     _queue='youtube')
     return publisher
   
   def get_medias(self, limit, offset=0):

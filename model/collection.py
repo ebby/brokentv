@@ -52,29 +52,34 @@ class Collection(db.Model):
   def add_reddit_media(cls, collection_id, reddit_id, approve_all):
     collection = Collection.get_by_id(int(collection_id))
     response = urlfetch.fetch('http://www.reddit.com/r/%s.json?limit=100' % reddit_id)
-    data = (simplejson.loads(response.content) or {}).get('data') or {}
-    links = data.get('children')
-    ids = []
-    for link in links:
-      link_data = link.get('data') or {}
-      if link_data.get('domain') == 'youtube.com':
-        url = link_data.get('url')
-        parsed_url = urlparse.urlparse(url)
-        host_id = urlparse.parse_qs(parsed_url.query)['v'][0]
-        ids.append(host_id)
-
-    youtube3 = get_youtube3_service()
-    
-    while len(ids) > 0:
-      videos_response = youtube3.videos().list(
-        id=','.join(ids[0:10]),
-        part="id,snippet,topicDetails,contentDetails,statistics"
-      ).execute()
-      medias = Media.add_from_snippet(videos_response.get("items", []),
-                                      collection=collection,
-                                      approve=approve_all)
-      ids = ids[10:]
-    
+    content = simplejson.loads(response.content) or {}
+    if content.get('error'):
+      logging.error('REDDIT ERROR: ' + str(content.get('error')))
+    data = content.get('data')
+    if data:
+      links = data.get('children')
+      ids = []
+      logging.info('FETCHING %s VIDEOS FROM REDDIT' % str(len(links)))
+      for link in links:
+        link_data = link.get('data') or {}
+        if link_data.get('domain') == 'youtube.com':
+          url = link_data.get('url')
+          parsed_url = urlparse.urlparse(url)
+          host_id = urlparse.parse_qs(parsed_url.query)['v'][0]
+          ids.append(host_id)
+  
+      youtube3 = get_youtube3_service()
+      
+      while len(ids) > 0:
+        videos_response = youtube3.videos().list(
+          id=','.join(ids[0:10]),
+          part="id,snippet,topicDetails,contentDetails,statistics"
+        ).execute()
+        medias = Media.add_from_snippet(videos_response.get("items", []),
+                                        collection=collection,
+                                        approve=approve_all)
+        ids = ids[10:]
+      
     
 
   @classmethod

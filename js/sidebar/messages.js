@@ -214,6 +214,12 @@ brkn.sidebar.Messages.prototype.addMessage_ = function(message, opt_first) {
       message: message
     });
     goog.dom.appendChild(goog.dom.getElementByClass('texts', this.lastMessageEl_), textEl);
+    if (message.media) {
+      var mediaEl = soy.renderAsElement(brkn.sidebar.listMedia, {
+        media: message.media
+      });
+      goog.dom.appendChild(goog.dom.getElementByClass('texts', this.lastMessageEl_), mediaEl);
+    }
     timeEl = goog.dom.getElementByClass('timestamp', textEl);
   } else {
     var messageEl = soy.renderAsElement(brkn.sidebar.messages.message, {
@@ -226,6 +232,12 @@ brkn.sidebar.Messages.prototype.addMessage_ = function(message, opt_first) {
       goog.dom.insertChildAt(this.messagesEl_, messageEl, 3);
     } else {
       goog.dom.appendChild(this.messagesEl_, messageEl); 
+    }
+    if (message.media) {
+      var mediaEl = soy.renderAsElement(brkn.sidebar.listMedia, {
+        media: message.media
+      });
+      goog.dom.appendChild(goog.dom.getElementByClass('texts', messageEl), mediaEl);
     }
     timeEl = goog.dom.getElementByClass('timestamp', messageEl);
     goog.dom.classes.enable(messageEl, 'unread', !message.read)

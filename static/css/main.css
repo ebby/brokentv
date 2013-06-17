@@ -552,6 +552,7 @@ div.friendlist {
   overflow-y: scroll !important;
   /* Hide scrollbars */
 
+  width: 320px;
   padding-right: 14px;
   margin-right: -14px;
 }
@@ -571,11 +572,13 @@ div.friendlist div.label a:hover {
 div.friendlist div.label.show-all {
   position: absolute;
   top: 2px;
-  right: 15px;
+  left: 225px;
+  width: 95px;
 }
 div.friendlist div.user {
   position: relative;
   height: 35px;
+  width: 320px;
   padding: 5px 0;
   border-bottom: 1px solid #FFF;
   -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
@@ -3350,7 +3353,7 @@ div#sidebar div#toolbar ul.tabs {
   height: 100%;
   position: absolute;
   top: 0;
-  width: 100%;
+  width: 320px;
   display: table;
   table-layout: fixed;
   border-collapse: collapse;
@@ -3848,6 +3851,7 @@ div#sidebar textarea {
   border-radius: 3px;
   width: 240px;
   font-size: 13px;
+  margin-bottom: 0;
   min-height: 16px;
   padding: 4px;
   outline: none;
@@ -3868,7 +3872,7 @@ div#sidebar div.conversation div.comment-input {
 }
 div#sidebar div.tabbed ul.tabs {
   height: 30px;
-  width: 100%;
+  width: 320px;
   display: table;
   table-layout: fixed;
   border-collapse: collapse;
@@ -3926,12 +3930,6 @@ div#sidebar div.tabbed.inbox ul.tabs li.inbox div.label {
   color: #dedede;
   text-shadow: 1px 1px 1px #181818;
   position: relative;
-}
-div#sidebar div.tabbed div.inbox-content {
-  overflow-x: hidden;
-  overflow-y: scroll;
-  padding-right: 14px;
-  margin-right: -14px;
 }
 div#sidebar div.tabbed div.inbox-content div.label {
   font-family: MuseoSans700;
@@ -4307,7 +4305,6 @@ div#sidebar div.comments-holder div.comment {
   position: relative;
   font-size: 11px;
   width: 320px;
-  overflow: hidden;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
@@ -4333,6 +4330,7 @@ div#sidebar div.comments-holder div.comment div.reply-input {
   -moz-border-radius: 3px;
   border-radius: 3px;
   margin-bottom: 4px;
+  min-height: 21px;
 }
 div#sidebar div.comments-holder div.comment div.reply-input textarea {
   width: 100%;
@@ -4340,12 +4338,14 @@ div#sidebar div.comments-holder div.comment div.reply-input textarea {
   font-size: 11px;
   border: none;
   margin-top: 0;
+  margin-bottom: -3px;
   position: relative;
   background: #ddd;
-  margin-bottom: -3px;
   overflow-y: hidden;
   overflow-x: auto;
   box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  height: 21px;
 }
 div#sidebar div.comments-holder div.comment div.reply-input.decorated {
   background: #fff;
@@ -4700,6 +4700,17 @@ div#login div#static-content div#message {
   font-family: MuseoSans500;
   width: 230px;
   text-align: center;
+  opacity: 0;
+  visibility: 0;
+  -webkit-transition: opacity 0.5s ease;
+  -moz-transition: opacity 0.5s ease;
+  -o-transition: opacity 0.5s ease;
+  -ms-transition: opacity 0.5s ease;
+  transition: opacity 0.5s ease;
+}
+div#login div#static-content div#message.show {
+  opacity: 1;
+  visibility: visible;
 }
 div#login div#static-content div#error {
   top: 100px;
@@ -5037,6 +5048,7 @@ div#sidebar div.messages {
 
   padding-right: 14px;
   margin-right: -14px;
+  width: 320px;
 }
 div#sidebar div.messages div.comment-input {
   visibility: visible;
@@ -5102,6 +5114,7 @@ div#sidebar div.messages.inbox div.message div.body div.timestamp {
 div#sidebar div.messages div.message {
   margin-top: 10px;
   position: relative;
+  width: 320px;
 }
 div#sidebar div.messages div.message.flip div.body {
   left: 10px;
@@ -5198,6 +5211,7 @@ div#sidebar div.notifications {
 
   padding-right: 14px;
   margin-right: -14px;
+  width: 320px;
 }
 div#sidebar div.notifications div.no-comments {
   margin: 10px;
@@ -5223,6 +5237,7 @@ div#sidebar div.notifications div.spinner.finished {
 }
 div#sidebar div.notifications div.notification {
   margin-top: 10px;
+  width: 320px;
   position: relative;
   border-bottom: 1px solid #999;
   -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
@@ -6137,6 +6152,7 @@ div#sidebar div.info div.comments-holder div.comments {
   overflow-y: scroll !important;
   padding-right: 14px;
   margin-right: -14px;
+  width: 320px;
 }
 div#sidebar div.info div.tweet-holder div.tweets {
   white-space: nowrap;
@@ -6180,10 +6196,10 @@ div#sidebar div.info div.overlay div.button {
 }
 div#sidebar div.info div.create-poll {
   text-align: left;
-  position: relative;
-  width: 286px;
-  left: 11px;
-  top: -28px;
+  position: absolute;
+  width: 290px;
+  left: 9px;
+  top: 33px;
 }
 div#sidebar div.info div.create-poll:after {
   bottom: 100%;
@@ -6230,9 +6246,9 @@ div#sidebar div.info div.create-poll div.close {
   /* '✕' */
 
   position: absolute;
-  right: 8px;
-  top: 4px;
-  font-size: 13px;
+  right: 6px;
+  top: 2px;
+  font-size: 15px;
   color: #181818;
   text-shadow: 1px 1px 1px white;
 }
@@ -6244,7 +6260,7 @@ div#sidebar div.info div.create-poll input {
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
-  width: 276px;
+  width: 280px;
   font-size: 13px;
   min-height: 16px;
   padding: 4px;
@@ -6546,7 +6562,7 @@ div#sidebar div.stream div.activity.digest div.template span {
   font-family: MuseoSans700;
 }
 div#sidebar div.stream div.activity.digest div.users {
-  margin-left: 10px;
+  margin-left: 6px;
 }
 div#sidebar div.stream div.activity.digest div.users div.picture {
   position: relative;

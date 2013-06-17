@@ -543,7 +543,8 @@ brkn.Player.prototype.playerStateChange_ = function(event) {
     case YT.PlayerState.CUED:
       var seek = brkn.model.Player.getInstance().getCurrentProgram().async ?
           brkn.model.Player.getInstance().getCurrentProgram().seek :
-          (goog.now() - brkn.model.Player.getInstance().getCurrentProgram().time.getTime())/1000;
+            brkn.model.Controller.getInstance().timeless ? 0 :
+              (goog.now() - brkn.model.Player.getInstance().getCurrentProgram().time.getTime())/1000;
       DESKTOP && this.player_.seekTo(seek);
       this.player_.playVideo();
       brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.PLAY, true);
@@ -571,15 +572,15 @@ brkn.Player.prototype.playerStateChange_ = function(event) {
  * @param {Event} event
  */
 brkn.Player.prototype.onPlayerReady_ = function(event) {
-  window.console.log(event)
-    this.player_.setPlaybackQuality('large');
-    var seek = brkn.model.Player.getInstance().getCurrentProgram().async ?
-        brkn.model.Player.getInstance().getCurrentProgram().seek :
-        (goog.now() - brkn.model.Player.getInstance().getCurrentProgram().time.getTime())/1000;
-    this.player_.seekTo(seek);
-    this.player_.playVideo();
-    brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.MUTE,
-        this.player_.isMuted());
+  this.player_.setPlaybackQuality('large');
+  var seek = brkn.model.Player.getInstance().getCurrentProgram().async ?
+      brkn.model.Player.getInstance().getCurrentProgram().seek :
+        brkn.model.Controller.getInstance().timeless ? 0 :
+          (goog.now() - brkn.model.Player.getInstance().getCurrentProgram().time.getTime())/1000;
+  this.player_.seekTo(seek);
+  this.player_.playVideo();
+  brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.MUTE,
+      this.player_.isMuted());
 };
 
 
@@ -630,9 +631,6 @@ brkn.Player.prototype.updateStagecover_ = function(opt_message, opt_beforeEnd, o
     goog.dom.classes.add(stagecover, 'covered');
   } if (((this.playerState_ == YT.PlayerState.PLAYING && this.player_.getCurrentTime() > 0) ||
       this.playerState_ == YT.PlayerState.PAUSED && this.player_.getCurrentTime() > 0) && !opt_beforeEnd) {
-    goog.DEBUG && window.console.log('UNCOVERING');
-    goog.DEBUG && window.console.log(this.playerState_);
-    goog.DEBUG && window.console.log(this.player_.getCurrentTime());
     goog.style.showElement(this.spinner_, false);
     goog.style.showElement(this.restart_, false);
     goog.dom.classes.remove(stagecover, 'covered');

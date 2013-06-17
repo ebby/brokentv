@@ -54,6 +54,7 @@ YT.Player.prototype.getPlayerState;
  */
 YT.Player.prototype.getCurrentTime;
 
+YT.Player.prototype.addEventListener;
 YT.Player.prototype.cueVideoById;
 YT.Player.prototype.cuePlaylist;
 YT.Player.prototype.loadVideoById;
