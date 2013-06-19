@@ -80,6 +80,7 @@ brkn.model.Channels.prototype.get = function(id) {
  */
 brkn.model.Channels.prototype.findOnline = function(opt_public) {
   if (this.currentChannel && this.currentChannel.getCurrentProgram() &&
+      !this.currentChannel.getCurrentProgram().ended &&
       ((opt_public && !this.currentChannel.myChannel) || !opt_public)) {
     return this.currentChannel;
   } else if (this.lastChannel && this.lastChannel.getCurrentProgram() &&

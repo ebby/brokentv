@@ -8567,7 +8567,7 @@ brkn.model.Channel.prototype.getCurrentProgram = function $brkn$model$Channel$$g
   if($index$$64_opt_offset$$) {
     return this.programming[this.currentProgramIndex + $index$$64_opt_offset$$]
   }
-  this.offline && this.currentProgram ? this.currentProgram.ended && (this.currentProgram = this.getNextProgram()) : this.currentProgram = this.getScheduledProgram();
+  this.offline && this.currentProgram ? this.currentProgram.ended && (this.currentProgram = this.getNextProgram()) : this.myChannel || (this.currentProgram = this.getScheduledProgram());
   this.currentProgram && (!this.programming[this.currentProgramIndex] || this.programming[this.currentProgramIndex].id != this.currentProgram.id) ? ($index$$64_opt_offset$$ = goog.array.findIndex(this.programming, goog.bind(function($p$$) {
     return $p$$.id == this.currentProgram.id
   }, this)), this.currentProgramIndex = Math.max($index$$64_opt_offset$$, 0)) : this.currentProgram || (this.currentProgramIndex = this.programming.length);
@@ -9214,7 +9214,7 @@ brkn.model.Users.prototype.get_or_add = function $brkn$model$Users$$get_or_add$(
 };
 brkn.model.Users.prototype.search = function $brkn$model$Users$$search$($query$$) {
   var $results_users$$ = goog.object.getValues(this.userMap), $results_users$$ = goog.array.filter($results_users$$, function($u$$) {
-    return goog.string.caseInsensitiveStartsWith($u$$.name, $query$$)
+    return $u$$.name && goog.string.caseInsensitiveStartsWith($u$$.name, $query$$)
   }, this);
   goog.array.filter(goog.object.getValues(this.facebookFriends), function($f$$) {
     return goog.string.caseInsensitiveStartsWith($f$$, $query$$)
@@ -11019,7 +11019,7 @@ brkn.model.Channels.prototype.get = function $brkn$model$Channels$$get$($id$$) {
   return this.channelMap[$id$$]
 };
 brkn.model.Channels.prototype.findOnline = function $brkn$model$Channels$$findOnline$($channel$$) {
-  if(this.currentChannel && this.currentChannel.getCurrentProgram() && ($channel$$ && !this.currentChannel.myChannel || !$channel$$)) {
+  if(this.currentChannel && this.currentChannel.getCurrentProgram() && !this.currentChannel.getCurrentProgram().ended && ($channel$$ && !this.currentChannel.myChannel || !$channel$$)) {
     return this.currentChannel
   }
   if(this.lastChannel && this.lastChannel.getCurrentProgram() && ($channel$$ && !this.lastChannel.myChannel || !$channel$$)) {
@@ -11466,7 +11466,8 @@ goog.fx.easing.inAndOut = function $goog$fx$easing$inAndOut$($t$$) {
   return 3 * $t$$ * $t$$ - 2 * $t$$ * $t$$ * $t$$
 };
 brkn.Player = function $brkn$Player$() {
-  goog.ui.Component.call(this)
+  goog.ui.Component.call(this);
+  this.nexted_ = !1
 };
 goog.inherits(brkn.Player, goog.ui.Component);
 brkn.Player.prototype.enterDocument = function $brkn$Player$$enterDocument$() {
@@ -11658,6 +11659,7 @@ brkn.Player.prototype.playerStateChange_ = function $brkn$Player$$playerStateCha
       brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.PLAY, !0);
       break;
     case YT.PlayerState.PLAYING:
+      this.nexted_ = !1;
       brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.PLAYING, brkn.model.Player.getInstance().getCurrentProgram().media);
       break;
     case YT.PlayerState.ENDED:
@@ -11694,8 +11696,11 @@ brkn.Player.prototype.updateStagecover_ = function $brkn$Player$$updateStagecove
   }
 };
 brkn.Player.prototype.next_ = function $brkn$Player$$next_$() {
-  var $nextProgram$$ = brkn.model.Channels.getInstance().currentChannel.getCurrentProgram();
-  $nextProgram$$ ? brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.NEXT_PROGRAM, $nextProgram$$) : (brkn.model.Player.getInstance().setCurrentProgram(null), brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.CHANGE_CHANNEL, brkn.model.Channels.getInstance().findOnline(), !0))
+  if(!this.nexted) {
+    var $nextProgram$$ = brkn.model.Channels.getInstance().currentChannel.getCurrentProgram();
+    $nextProgram$$ ? brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.NEXT_PROGRAM, $nextProgram$$) : (brkn.model.Player.getInstance().setCurrentProgram(null), brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.CHANGE_CHANNEL, brkn.model.Channels.getInstance().findOnline(), !0));
+    this.nexted_ = !0
+  }
 };
 brkn.Player.Messages = {OFFLINE:"THIS CHANNEL IS CURRENTLY OFFLINE", LOADING:"LOADING STORY"};
 goog.ui.LabelInput = function $goog$ui$LabelInput$($opt_label$$, $opt_domHelper$$) {
@@ -12641,8 +12646,8 @@ brkn.search.channel = function $brkn$search$channel$($opt_data$$) {
 brkn.sidebar = {};
 brkn.sidebar.info = function $brkn$sidebar$info$($opt_data$$) {
   return'<div class="info"><div class="picture"><img src="' + soy.$$escapeHtml($opt_data$$.media.thumbnail) + '" class="thumb"><div class="ytvideo"></div><div class="publisher"><img src="' + soy.$$escapeHtml($opt_data$$.media.publisher.picture) + '"><div class="name">' + soy.$$escapeHtml($opt_data$$.media.publisher.name) + '</div></div><div class="links"><div class="local"></div><a target="_blank" href="' + $opt_data$$.media.hostLink + '"><div class="host"></div></a></div><div class="link-select" style="display:none"><input onClick="this.select();" class="link-input" type="text" value="' + 
-  $opt_data$$.media.link + '" readonly="readonly"/></div><div class="title"><div class="text">' + soy.$$escapeHtml($opt_data$$.media.name) + '</div></div><div class="scrollable ios-scroll" ' + (!$opt_data$$.description ? 'style="display:none"' : "") + '><div class="desc-link"><a href="#">DESCRIPTION</a><div class="published">' + soy.$$escapeHtml($opt_data$$.published) + '</div></div><div class="description">' + $opt_data$$.description + '</div></div><div class="button play"><div class="icon"></div><div class="loading-icon"></div></div><div class="options"><div class="button star"><div class="icon"></div></div><div class="button facebook"><div class="icon"></div></div><div class="button twitter"><div class="icon"></div></div><div class="button plus"><div class="icon"></div></div></div></div><div class="viewers" style="display: none"><div class="label"><div class="eye-icon"></div></div></div><div class="info-contents"><div class="scrollable ios-scroll"><div class="user-poll" style="display: none"><div class="label"><div class="poll-icon"></div><div class="status">VOTE</div></div><div class="poll-options"></div></div><div class="tweet-holder" style="display:none"><div class="label"><div class="globe-icon"></div><a class="tweets-link">LATEST TWEETS</a></div><div class="tweets"></div><div class="dot-nav"></div></div><div class="comments-holder ios-scroll" style="display:none"><div class="label"><div class="friends-icon"></div><a class="conv-link">CONVERSATION</a>' + 
-  ($opt_data$$.lastMediaId ? '<a class="prev-link">&#10218; LAST PROGRAM</a>' : "") + '</div><div class="no-comments" style="display:none">Start the conversation with friends.</div><div class="comments"></div><div class="top-grad"></div><div class="bottom-grad"></div></div><div class="create-poll-button" style="display:none">+ POLL</div><div class="create-poll popup" style="display:none"><div class="label">CREATE A USER POLL</div><input type="text" placeholder="Title" class="poll-title"/><div class="label" style="margin-top: 5px;">OPTIONS</div><div class="option-inputs"><input type="text" placeholder="Option 1" class="option-input option-input-1"/><input type="text" placeholder="Option 2" class="option-input option-input-2"/></div><div class="add-option button">ADD OPTION</div><div class="submit-poll button">CREATE</div><div class="close"></div></div></div></div><div class="loading loading-activity"><div class="loading-spinner"></div></div><div class="overlay" style="display: none"><div class="leaving"><div>This program is over. Carry on?</div><div class="button dark no">Not yet</div><div class="button dark yes">Let\'s go</div></div></div></div>'
+  $opt_data$$.media.link + '" readonly="readonly"/></div><div class="title"><div class="text">' + soy.$$escapeHtml($opt_data$$.media.name) + '</div></div><div class="scrollable ios-scroll" ' + (!$opt_data$$.description ? 'style="display:none"' : "") + '><div class="desc-link"><a href="#">DESCRIPTION</a><div class="published">' + soy.$$escapeHtml($opt_data$$.published) + '</div></div><div class="description">' + $opt_data$$.description + '</div></div><div class="button play"><div class="icon"></div><div class="loading-icon"></div></div><div class="options"><div class="button star"><div class="icon"></div></div><div class="button facebook"><div class="icon"></div></div><div class="button twitter"><div class="icon"></div></div><div class="button send"><div class="icon"></div></div></div></div><div class="viewers" style="display: none"><div class="label"><div class="eye-icon"></div></div></div><div class="info-contents"><div class="scrollable ios-scroll"><div class="user-poll" style="display: none"><div class="label"><div class="poll-icon"></div><div class="status">VOTE</div></div><div class="poll-options"></div></div><div class="tweet-holder" style="display:none"><div class="label"><div class="globe-icon"></div><a class="tweets-link">LATEST TWEETS</a></div><div class="tweets"></div><div class="dot-nav"></div></div><div class="comments-holder ios-scroll" style="display:none"><div class="label"><div class="friends-icon"></div><a class="conv-link">CONVERSATION</a>' + 
+  ($opt_data$$.lastMediaId ? '<a class="prev-link">&#10218; LAST PROGRAM</a>' : "") + '</div><div class="no-comments" style="display:none">Start the conversation with friends.</div><div class="comments"></div><div class="top-grad"></div><div class="bottom-grad"></div></div><div class="create-poll-button" style="display:none">+ POLL</div><div class="create-poll popup" style="display:none"><div class="label">CREATE A USER POLL</div><input type="text" placeholder="Title" class="poll-title"/><div class="label" style="margin-top: 5px;">OPTIONS</div><div class="option-inputs"><input type="text" placeholder="Option 1" class="option-input option-input-1"/><input type="text" placeholder="Option 2" class="option-input option-input-2"/></div><div class="add-option button">ADD OPTION</div><div class="submit-poll button">CREATE</div><div class="close"></div></div></div></div><div class="send-media popup" style="display:none"><div class="label">SEND TO A FRIEND</div><div class="recipients"><textarea placeholder="To"></textarea></div><div class="label">ADD A MESSAGE:</div><div class="send-message"><textarea placeholder="Optional"></textarea><div class="add-comment button">SEND</div></div><div class="close"></div></div><div class="loading loading-activity"><div class="loading-spinner"></div></div><div class="overlay" style="display: none"><div class="leaving"><div>This program is over. Carry on?</div><div class="button dark no">Not yet</div><div class="button dark yes">Let\'s go</div></div></div></div>'
 };
 brkn.sidebar.viewer = function $brkn$sidebar$viewer$($opt_data$$) {
   return'<div class="viewer" name="' + soy.$$escapeHtml($opt_data$$.firstName) + '"><img src="' + soy.$$escapeHtml($opt_data$$.user.picture) + '"></div>'
@@ -13832,9 +13837,11 @@ brkn.sidebar.Admin.prototype.onInput_ = function $brkn$sidebar$Admin$$onInput_$(
 brkn.sidebar.Admin.prototype.resize = function $brkn$sidebar$Admin$$resize$() {
   goog.style.setHeight(this.scrollable_, this.channelsHeight_ + this.topicsHeight_ + this.collectionsHeight_ + 110)
 };
-brkn.sidebar.CommentInput = function $brkn$sidebar$CommentInput$($currentUser_opt_showControls$$, $opt_canMention$$, $opt_reply$$) {
+brkn.sidebar.CommentInput = function $brkn$sidebar$CommentInput$($currentUser_opt_showControls$$, $opt_canMention$$, $opt_reply$$, $opt_toField$$, $opt_inputOptional$$) {
   goog.ui.Component.call(this);
   this.showControls_ = !!$currentUser_opt_showControls$$;
+  this.toField_ = !!$opt_toField$$;
+  this.inputOptional_ = !!$opt_inputOptional$$;
   this.canMention_ = !!$opt_canMention$$;
   this.reply_ = !!$opt_reply$$;
   this.value = "";
@@ -13851,12 +13858,14 @@ brkn.sidebar.CommentInput = function $brkn$sidebar$CommentInput$($currentUser_op
   this.tokens_ = {};
   this.suggestions_ = [];
   this.cursorIndex_ = -1;
+  this.lastTokenIndex_ = 0;
   this.parentComment = this.token_ = null
 };
 goog.inherits(brkn.sidebar.CommentInput, goog.ui.Component);
 brkn.sidebar.CommentInput.COMMENT_CONTROLS_HEIGHT = 25;
 brkn.sidebar.CommentInput.INPUT_HEIGHT = 41;
 brkn.sidebar.CommentInput.MENTION_REGEX = /@(\w+\s?\w*)/;
+brkn.sidebar.CommentInput.TO_REGEX = /(\w+\s?\w*)/;
 brkn.sidebar.CommentInput.prototype.createDom = function $brkn$sidebar$CommentInput$$createDom$() {
   var $el$$ = soy.renderAsElement(brkn.sidebar.commentInput);
   this.setElementInternal($el$$)
@@ -13869,44 +13878,44 @@ brkn.sidebar.CommentInput.prototype.decorateInternal = function $brkn$sidebar$Co
 };
 brkn.sidebar.CommentInput.prototype.enterDocument = function $brkn$sidebar$CommentInput$$enterDocument$() {
   brkn.sidebar.CommentInput.superClass_.enterDocument.call(this);
-  this.commentInput_.decorate(goog.dom.getElementByClass(this.reply_ ? "reply-textarea" : "comment-textarea", this.getElement()));
+  this.commentInput_.decorate(goog.dom.getElementsByTagNameAndClass("textarea", void 0, this.getElement())[0]);
   this.commentInput_.setMaxHeight(70);
   var $keyHandler$$ = new goog.events.KeyHandler(this.commentInput_.getKeyEventTarget()), $popup$$ = goog.dom.getElementByClass("popup", this.getElement());
-  this.reply_ || (this.commentControls_ = goog.dom.getElementByClass("comment-controls", this.getElement()), goog.style.showElement(this.commentControls_, this.showControls_), goog.dom.classes.enable(this.getElement(), "show-controls", this.showControls_), this.inputHolder_ = goog.dom.getElementByClass("input-holder", this.getElement()), this.addChild(this.tweetToggle_), this.tweetToggle_.decorate(goog.dom.getElementByClass("tweet-toggle", this.getElement())), brkn.model.Users.getInstance().currentUser.hasTwitter || 
-  goog.net.XhrIo.send("/_twitter", goog.bind(function($e$$166_response$$) {
-    $e$$166_response$$ = $e$$166_response$$.target.getResponseJson();
-    this.twitterPublish_ = this.twitterPublish_ && $e$$166_response$$.auth;
-    this.twitterAuthUrl_ = $e$$166_response$$.auth_url;
-    this.tweetToggle_.setChecked(this.twitterPublish_)
-  }, this)), this.addChild(this.fbToggle_), this.fbToggle_.decorate(goog.dom.getElementByClass("fb-toggle", this.getElement())), FB.api("/me/permissions", goog.bind(function($response$$) {
-    this.fbPublish_ = this.fbPublish_ && !!$response$$.data[0].publish_stream;
-    this.fbToggle_.setChecked(this.fbPublish_)
-  }, this)), this.addChild(this.addCommentButton_), this.addCommentButton_.decorate(goog.dom.getElementByClass("add-comment", this.getElement())), this.addCommentButton_.setEnabled(!1), this.getHandler().listen(this.fbToggle_, goog.ui.Component.EventType.ACTION, goog.bind(this.onFacebookToggle_, this)).listen(this.tweetToggle_, goog.ui.Component.EventType.ACTION, goog.bind(this.onTwitterToggle_, this)).listen(this.addCommentButton_, goog.ui.Component.EventType.ACTION, goog.bind(this.onAddComment_, 
-  this)), DESKTOP && !IPAD && (brkn.Popup.getInstance().hovercard(this.tweetToggle_.getElement(), brkn.model.Popup.Position.TOP, brkn.model.Popup.Action.TOOLTIP, {text:goog.bind(function() {
-    return"Share on Twitter: " + (this.tweetToggle_.isChecked() ? "ON" : "OFF")
-  }, this)}), brkn.Popup.getInstance().hovercard(this.fbToggle_.getElement(), brkn.model.Popup.Position.TOP, brkn.model.Popup.Action.TOOLTIP, {text:goog.bind(function() {
-    return"Share on Facebook: " + (this.fbToggle_.isChecked() ? "ON" : "OFF")
-  }, this)})), brkn.model.Users.getInstance().currentUser.subscribe(brkn.model.User.Actions.TWITTER_AUTH, function() {
-    this.tweetToggle_.setChecked(!0);
-    brkn.model.Users.getInstance().currentUser.hasTwitter = !0
-  }, this));
+  if(!this.reply_ && !this.toField_ && (this.addChild(this.addCommentButton_), this.addCommentButton_.decorate(goog.dom.getElementByClass("add-comment", this.getElement())), this.addCommentButton_.setEnabled(this.inputOptional_), this.getHandler().listen(this.addCommentButton_, goog.ui.Component.EventType.ACTION, goog.bind(this.onAddComment_, this)), this.commentControls_ = goog.dom.getElementByClass("comment-controls", this.getElement()))) {
+    goog.style.showElement(this.commentControls_, this.showControls_), goog.dom.classes.enable(this.getElement(), "show-controls", this.showControls_), this.inputHolder_ = goog.dom.getElementByClass("input-holder", this.getElement()), this.addChild(this.tweetToggle_), this.tweetToggle_.decorate(goog.dom.getElementByClass("tweet-toggle", this.getElement())), brkn.model.Users.getInstance().currentUser.hasTwitter || goog.net.XhrIo.send("/_twitter", goog.bind(function($e$$166_response$$) {
+      $e$$166_response$$ = $e$$166_response$$.target.getResponseJson();
+      this.twitterPublish_ = this.twitterPublish_ && $e$$166_response$$.auth;
+      this.twitterAuthUrl_ = $e$$166_response$$.auth_url;
+      this.tweetToggle_.setChecked(this.twitterPublish_)
+    }, this)), this.addChild(this.fbToggle_), this.fbToggle_.decorate(goog.dom.getElementByClass("fb-toggle", this.getElement())), FB.api("/me/permissions", goog.bind(function($response$$) {
+      this.fbPublish_ = this.fbPublish_ && !!$response$$.data[0].publish_stream;
+      this.fbToggle_.setChecked(this.fbPublish_)
+    }, this)), this.getHandler().listen(this.fbToggle_, goog.ui.Component.EventType.ACTION, goog.bind(this.onFacebookToggle_, this)).listen(this.tweetToggle_, goog.ui.Component.EventType.ACTION, goog.bind(this.onTwitterToggle_, this)), DESKTOP && !IPAD && (brkn.Popup.getInstance().hovercard(this.tweetToggle_.getElement(), brkn.model.Popup.Position.TOP, brkn.model.Popup.Action.TOOLTIP, {text:goog.bind(function() {
+      return"Share on Twitter: " + (this.tweetToggle_.isChecked() ? "ON" : "OFF")
+    }, this)}), brkn.Popup.getInstance().hovercard(this.fbToggle_.getElement(), brkn.model.Popup.Position.TOP, brkn.model.Popup.Action.TOOLTIP, {text:goog.bind(function() {
+      return"Share on Facebook: " + (this.fbToggle_.isChecked() ? "ON" : "OFF")
+    }, this)})), brkn.model.Users.getInstance().currentUser.subscribe(brkn.model.User.Actions.TWITTER_AUTH, function() {
+      this.tweetToggle_.setChecked(!0);
+      brkn.model.Users.getInstance().currentUser.hasTwitter = !0
+    }, this)
+  }
   this.suggestionsEl_ = goog.dom.getElementByClass("suggestions", this.getElement());
   this.highlighterEl_ = goog.dom.getElementByClass("highlighter", this.getElement());
   $popup$$ && goog.style.showElement($popup$$, !brkn.model.Users.getInstance().currentUser.hasFacebook && !brkn.model.Users.getInstance().currentUser.hasTwitter && this.showControls_);
   this.getHandler().listen(this.commentInput_.getElement(), goog.events.EventType.FOCUS, goog.bind(function() {
     $popup$$ && goog.style.showElement($popup$$, !1);
-    brkn.model.Users.getInstance().currentUser.welcomed || brkn.model.Popup.getInstance().publish(brkn.model.Popup.Action.TOOLTIP, this.commentInput_.getElement(), brkn.model.Popup.Position.TOP, {text:"Mention friends using @"});
+    !brkn.model.Users.getInstance().currentUser.welcomed && !this.toField_ && brkn.model.Popup.getInstance().publish(brkn.model.Popup.Action.TOOLTIP, this.commentInput_.getElement(), brkn.model.Popup.Position.TOP, {text:"Mention friends using @"});
     this.dispatchEvent(goog.events.EventType.FOCUS)
   }, this)).listen($keyHandler$$, goog.events.KeyHandler.EventType.KEY, goog.bind(function($e$$) {
     $e$$.stopPropagation();
     brkn.model.Popup.getInstance().publish(brkn.model.Popup.Action.HIDE);
-    if("13" == $e$$.keyCode || "32" == $e$$.keyCode && -1 < this.cursorIndex_) {
+    if("13" == $e$$.keyCode || ("32" == $e$$.keyCode || "9" == $e$$.keyCode) && -1 < this.cursorIndex_) {
       if(this.suggestions_.length && this.suggestions_.reverse()[this.cursorIndex_]) {
         $e$$.preventDefault();
-        var $fragments_sugEls_suggestionInput$$ = this.commentInput_.getValue().slice(0, this.commentInput_.getElement().selectionStart), $fragments_sugEls_suggestionInput$$ = $fragments_sugEls_suggestionInput$$.split(" "), $fragments_sugEls_suggestionInput$$ = 1 < $fragments_sugEls_suggestionInput$$.length ? $fragments_sugEls_suggestionInput$$[$fragments_sugEls_suggestionInput$$.length - 2] + " " + $fragments_sugEls_suggestionInput$$[$fragments_sugEls_suggestionInput$$.length - 1] : $fragments_sugEls_suggestionInput$$.pop(), 
-        $user$$ = this.suggestions_[this.cursorIndex_];
+        var $fragments_sugEls_suggestionInput$$ = this.commentInput_.getValue().slice(this.toField_ ? this.lastTokenIndex_ : 0, this.commentInput_.getElement().selectionStart), $fragments_sugEls_suggestionInput$$ = $fragments_sugEls_suggestionInput$$.split(" "), $fragments_sugEls_suggestionInput$$ = 1 < $fragments_sugEls_suggestionInput$$.length ? $fragments_sugEls_suggestionInput$$[$fragments_sugEls_suggestionInput$$.length - 2] + " " + $fragments_sugEls_suggestionInput$$[$fragments_sugEls_suggestionInput$$.length - 
+        1] : $fragments_sugEls_suggestionInput$$.pop(), $user$$ = this.suggestions_[this.cursorIndex_];
         this.tokens_[$user$$.id] = $user$$;
-        this.updateTokens_($fragments_sugEls_suggestionInput$$.match(brkn.sidebar.CommentInput.MENTION_REGEX)[0]);
+        this.toField_ ? this.updateTokens_($fragments_sugEls_suggestionInput$$.match(brkn.sidebar.CommentInput.TO_REGEX)[0]) : this.updateTokens_($fragments_sugEls_suggestionInput$$.match(brkn.sidebar.CommentInput.MENTION_REGEX)[0]);
         this.commentInput_.getElement().focus();
         goog.style.showElement(this.suggestionsEl_, !1);
         this.suggestions_ = [];
@@ -13919,12 +13928,13 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function $brkn$sidebar$Comme
     }else {
       "27" == $e$$.keyCode && this.suggestions_.length ? (goog.style.showElement(this.suggestionsEl_, !1), this.suggestions_ = [], this.setCaretToPos(this.commentInput_.getValue().length), this.cursorIndex_ = -1, this.tokens_ = {}) : ("38" == $e$$.keyCode || "40" == $e$$.keyCode) && this.suggestions_.length ? ($e$$.preventDefault(), $fragments_sugEls_suggestionInput$$ = Array.prototype.slice.call(goog.dom.getChildren(this.suggestionsEl_)), $fragments_sugEls_suggestionInput$$.reverse()[this.cursorIndex_] && 
       goog.dom.classes.remove($fragments_sugEls_suggestionInput$$[this.cursorIndex_], "selected"), this.cursorIndex_ = "38" == $e$$.keyCode ? Math.min(this.cursorIndex_ + 1, this.suggestions_.length - 1) : Math.max(this.cursorIndex_ - 1, -1), -1 != this.cursorIndex_ && goog.dom.classes.add($fragments_sugEls_suggestionInput$$[this.cursorIndex_], "selected")) : goog.Timer.callOnce(goog.bind(function() {
-        this.addCommentButton_.setEnabled(!!this.commentInput_.getValue());
-        var $fragments$$1_mentionInput_suggestionInput$$ = this.commentInput_.getValue().slice(0, this.commentInput_.getElement().selectionStart), $fragments$$1_mentionInput_suggestionInput$$ = $fragments$$1_mentionInput_suggestionInput$$.split(" "), $fragments$$1_mentionInput_suggestionInput$$ = 1 < $fragments$$1_mentionInput_suggestionInput$$.length ? $fragments$$1_mentionInput_suggestionInput$$[$fragments$$1_mentionInput_suggestionInput$$.length - 2] + " " + $fragments$$1_mentionInput_suggestionInput$$[$fragments$$1_mentionInput_suggestionInput$$.length - 
-        1] : $fragments$$1_mentionInput_suggestionInput$$.pop(), $hasMention$$ = this.canMention_ && brkn.sidebar.CommentInput.MENTION_REGEX.test($fragments$$1_mentionInput_suggestionInput$$);
+        this.addCommentButton_.setEnabled(this.inputOptional_ || !!this.commentInput_.getValue());
+        var $fragments$$1_mentionInput_suggestionInput$$ = this.commentInput_.getValue().slice(this.toField_ ? this.lastTokenIndex_ : 0, this.commentInput_.getElement().selectionStart), $fragments$$1_mentionInput_suggestionInput$$ = $fragments$$1_mentionInput_suggestionInput$$.split(" "), $fragments$$1_mentionInput_suggestionInput$$ = 1 < $fragments$$1_mentionInput_suggestionInput$$.length ? $fragments$$1_mentionInput_suggestionInput$$[$fragments$$1_mentionInput_suggestionInput$$.length - 2] + " " + 
+        $fragments$$1_mentionInput_suggestionInput$$[$fragments$$1_mentionInput_suggestionInput$$.length - 1] : $fragments$$1_mentionInput_suggestionInput$$.pop(), $hasMention$$ = this.toField_ && brkn.sidebar.CommentInput.TO_REGEX.test($fragments$$1_mentionInput_suggestionInput$$) || this.canMention_ && brkn.sidebar.CommentInput.MENTION_REGEX.test($fragments$$1_mentionInput_suggestionInput$$);
         goog.style.showElement(this.suggestionsEl_, $hasMention$$);
-        "8" == $e$$.keyCode ? this.highlighterEl_.innerHTML.match('<div class="token">.*</div>$') : $hasMention$$ && ($fragments$$1_mentionInput_suggestionInput$$ = $fragments$$1_mentionInput_suggestionInput$$.match(brkn.sidebar.CommentInput.MENTION_REGEX), this.suggestions_ = brkn.model.Users.getInstance().search($fragments$$1_mentionInput_suggestionInput$$[1]), this.suggestions_.length && this.renderSuggestions_(this.suggestions_, $fragments$$1_mentionInput_suggestionInput$$[0]));
-        this.commentInput_.getValue() || this.commentInput_.resize();
+        "8" == $e$$.keyCode ? this.highlighterEl_.innerHTML.match('<div class="token">.*</div>$') : $hasMention$$ && ($fragments$$1_mentionInput_suggestionInput$$ = this.toField_ ? $fragments$$1_mentionInput_suggestionInput$$.match(brkn.sidebar.CommentInput.TO_REGEX) : $fragments$$1_mentionInput_suggestionInput$$.match(brkn.sidebar.CommentInput.MENTION_REGEX), this.suggestions_ = brkn.model.Users.getInstance().search($fragments$$1_mentionInput_suggestionInput$$[1]), this.suggestions_.length && this.renderSuggestions_(this.suggestions_, 
+        $fragments$$1_mentionInput_suggestionInput$$[0]));
+        this.commentInput_.getValue() || this.clear();
         this.canMention_ && this.updateTokens_()
       }, this))
     }
@@ -13940,7 +13950,7 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function $brkn$sidebar$Comme
 brkn.sidebar.CommentInput.prototype.renderSuggestions_ = function $brkn$sidebar$CommentInput$$renderSuggestions_$($users$$, $input$$) {
   this.suggestionsEl_.innerHTML = "";
   goog.style.showElement(this.suggestionsEl_, !0);
-  goog.array.forEach($users$$.slice(0, 10), function($u$$) {
+  goog.array.forEach($users$$.slice(0, 5), function($u$$) {
     var $suggestionEl$$ = goog.dom.createDom("div", "suggestion", $u$$.name);
     goog.dom.appendChild(this.suggestionsEl_, $suggestionEl$$);
     this.getHandler().listen($suggestionEl$$, goog.events.EventType.CLICK, goog.bind(function() {
@@ -13955,14 +13965,19 @@ brkn.sidebar.CommentInput.prototype.renderSuggestions_ = function $brkn$sidebar$
   }, this)
 };
 brkn.sidebar.CommentInput.prototype.updateTokens_ = function $brkn$sidebar$CommentInput$$updateTokens_$($opt_input$$) {
-  var $input$$ = this.commentInput_.getValue(), $highlighter$$ = $input$$, $value$$ = $input$$;
+  var $input$$ = this.commentInput_.getValue(), $highlighter$$ = $input$$, $value$$ = $input$$, $unusedTokens$$ = goog.object.getKeys(this.tokens_);
   goog.array.forEach(goog.object.getValues(this.tokens_), function($u$$) {
-    var $name$$ = $opt_input$$ && goog.string.caseInsensitiveStartsWith("@" + $u$$.name, $opt_input$$) ? $opt_input$$ : $u$$.name;
+    var $name$$ = $opt_input$$ && goog.string.caseInsensitiveStartsWith((this.toField_ ? "" : "@") + $u$$.name, $opt_input$$) ? $opt_input$$ : $u$$.name;
     $highlighter$$ = $highlighter$$.replace(RegExp($name$$, "g"), '<div class="token">' + $u$$.name + "</div> ");
     this.highlighterEl_.innerHTML = $highlighter$$;
     this.value = $value$$ = $value$$.replace(RegExp($name$$, "g"), "@[" + $u$$.id + ":" + $u$$.name + "]");
+    var $match$$ = RegExp($name$$, "g").exec($input$$);
+    $match$$ && (goog.array.remove($unusedTokens$$, $u$$.id), this.lastTokenIndex_ = Math.max($match$$.index + $match$$[0].length, this.lastTokenIndex_));
     $input$$ = $input$$.replace(RegExp($name$$, "g"), $u$$.name) + " ";
     $opt_input$$ && this.commentInput_.setValue($input$$)
+  }, this);
+  goog.array.forEach($unusedTokens$$, function($t$$) {
+    goog.object.remove(this.tokens_, $t$$)
   }, this)
 };
 brkn.sidebar.CommentInput.prototype.reply = function $brkn$sidebar$CommentInput$$reply$($comment$$, $user$$) {
@@ -13997,6 +14012,9 @@ brkn.sidebar.CommentInput.prototype.getValue = function $brkn$sidebar$CommentInp
   this.canMention_ && goog.object.getValues(this.tokens_).length ? this.updateTokens_() : this.value = this.commentInput_.getValue();
   return this.value
 };
+brkn.sidebar.CommentInput.prototype.getTokens = function $brkn$sidebar$CommentInput$$getTokens$() {
+  return goog.object.getValues(this.tokens_)
+};
 brkn.sidebar.CommentInput.prototype.setValue = function $brkn$sidebar$CommentInput$$setValue$($text$$, $opt_facebook$$, $opt_tweet$$) {
   this.fbToggle_.setChecked(!!$opt_facebook$$);
   this.tweetToggle_.setChecked(!!$opt_tweet$$);
@@ -14009,7 +14027,10 @@ brkn.sidebar.CommentInput.prototype.clear = function $brkn$sidebar$CommentInput$
   this.tokens_ = {};
   this.suggestions_ = [];
   this.highlighterEl_.innerHTML = "";
-  goog.style.showElement(this.suggestionsEl_, !1)
+  this.suggestionsEl_.innerHTML = "";
+  goog.style.showElement(this.suggestionsEl_, !1);
+  this.commentInput_.resize();
+  this.lastTokenIndex_ = 0
 };
 brkn.sidebar.CommentInput.prototype.hasReply = function $brkn$sidebar$CommentInput$$hasReply$() {
   return!!this.token_
@@ -14025,15 +14046,17 @@ brkn.sidebar.CommentInput.prototype.setFocused = function $brkn$sidebar$CommentI
   return goog.dom.classes.enable(this.getElement(), "focused", $focus$$)
 };
 brkn.sidebar.CommentInput.prototype.onAddComment_ = function $brkn$sidebar$CommentInput$$onAddComment_$() {
-  this.getValue() && (this.dispatchEvent({type:"add", callback:goog.bind(function($comment$$3_e$$) {
-    var $media$$25_response$$ = $comment$$3_e$$.target.getResponseJson();
-    if($media$$25_response$$.comment) {
-      var $comment$$3_e$$ = new brkn.model.Comment($media$$25_response$$.comment), $tweet$$ = $media$$25_response$$.tweet ? new brkn.model.Tweet($media$$25_response$$.tweet) : null;
-      if($media$$25_response$$ = brkn.model.Medias.getInstance().getOrAdd($media$$25_response$$.comment.media)) {
-        $media$$25_response$$.publish(brkn.model.Media.Actions.ADD_COMMENT, $comment$$3_e$$), $tweet$$ && $media$$25_response$$.publish(brkn.model.Media.Actions.ADD_TWEET, $tweet$$)
+  if(this.getValue() || this.inputOptional_) {
+    this.dispatchEvent({type:"add", callback:goog.bind(function($comment$$3_e$$) {
+      var $media$$25_response$$ = $comment$$3_e$$.target.getResponseJson();
+      if($media$$25_response$$.comment) {
+        var $comment$$3_e$$ = new brkn.model.Comment($media$$25_response$$.comment), $tweet$$ = $media$$25_response$$.tweet ? new brkn.model.Tweet($media$$25_response$$.tweet) : null;
+        if($media$$25_response$$ = brkn.model.Medias.getInstance().getOrAdd($media$$25_response$$.comment.media)) {
+          $media$$25_response$$.publish(brkn.model.Media.Actions.ADD_COMMENT, $comment$$3_e$$), $tweet$$ && $media$$25_response$$.publish(brkn.model.Media.Actions.ADD_TWEET, $tweet$$)
+        }
       }
-    }
-  }, this), facebook:this.fbToggle_.isChecked(), twitter:this.tweetToggle_.isChecked(), text:this.getValue(), parentId:this.parentComment, toUserId:this.replyUser && this.replyUser.id}), this.clear())
+    }, this), facebook:this.fbToggle_.isChecked(), twitter:this.tweetToggle_.isChecked(), text:this.getValue(), parentId:this.parentComment, toUserId:this.replyUser && this.replyUser.id}), this.clear()
+  }
 };
 brkn.sidebar.CommentInput.prototype.onFacebookToggle_ = function $brkn$sidebar$CommentInput$$onFacebookToggle_$() {
   brkn.model.Popup.getInstance().publish(brkn.model.Popup.Action.TOOLTIP, this.fbToggle_.getElement(), brkn.model.Popup.Position.TOP, {text:goog.bind(function() {
@@ -14130,10 +14153,10 @@ brkn.sidebar.CommentList.prototype.decorateInternal = function $brkn$sidebar$Com
   this.twitter_ ? (goog.net.XhrIo.send("/_tweet/" + this.media_.id + "?offset=" + this.tweets_.length, goog.bind(function($e$$) {
     goog.style.showElement(this.spinner_, !1);
     $e$$ = goog.json.parse($e$$.target.getResponse());
-    $e$$ = goog.array.map($e$$, function($t$$4_tweet$$) {
-      $t$$4_tweet$$ = new brkn.model.Tweet($t$$4_tweet$$);
-      this.addTweet_($t$$4_tweet$$);
-      return $t$$4_tweet$$
+    $e$$ = goog.array.map($e$$, function($t$$5_tweet$$) {
+      $t$$5_tweet$$ = new brkn.model.Tweet($t$$5_tweet$$);
+      this.addTweet_($t$$5_tweet$$);
+      return $t$$5_tweet$$
     }, this);
     this.mediasHeight_ = goog.style.getSize(this.commentsEl_).height;
     this.resize()
@@ -14305,8 +14328,8 @@ brkn.sidebar.Info = function $brkn$sidebar$Info$($media$$, $opt_noFetch$$, $opt_
   this.fbButton_ = new goog.ui.CustomButton("Facebook");
   this.twitterButton_ = new goog.ui.CustomButton("Twitter");
   this.playButton_ = new goog.ui.CustomButton("Play");
-  this.plusButton_ = new goog.ui.CustomButton("Plus");
-  this.plusButton_.setSupportedState(goog.ui.Component.State.CHECKED, !0);
+  this.sendButton_ = new goog.ui.CustomButton("Send");
+  this.sendButton_.setSupportedState(goog.ui.Component.State.CHECKED, !0);
   this.createPollButton_ = new goog.ui.CustomButton("Create Poll");
   this.resizeExtra_ = 0
 };
@@ -14339,11 +14362,12 @@ brkn.sidebar.Info.prototype.enterDocument = function $brkn$sidebar$Info$$enterDo
   this.fbButton_.decorate(goog.dom.getElementByClass("facebook", this.getElement()));
   this.twitterButton_.decorate(goog.dom.getElementByClass("twitter", this.getElement()));
   this.playButton_.decorate(goog.dom.getElementByClass("play", this.getElement()));
-  this.plusButton_.decorate(goog.dom.getElementByClass("plus", this.getElement()));
+  this.sendButton_.decorate(goog.dom.getElementByClass("send", this.getElement()));
   this.createPollButton_.decorate(goog.dom.getElementByClass("create-poll-button", this.getElement()));
   this.tweetTimer_ = new goog.Timer(5E3);
   this.watchWith_ = goog.dom.getElementByClass("watch-with", this.getElement());
   this.createPoll_ = goog.dom.getElementByClass("create-poll", this.getElement());
+  this.sendPopup_ = goog.dom.getElementByClass("send-media", this.getElement());
   goog.dom.classes.enable(this.getElement(), "mini", this.mini_);
   !this.fetch_ || this.media_.fetched ? this.renderInfo(!1, this.media_.description, this.media_.seen, this.media_.tweets, this.media_.comments, this.media_.poll) : this.fetch_ && goog.net.XhrIo.send("/_info/" + this.media_.id, goog.bind(function($e$$186_response$$) {
     $e$$186_response$$ = goog.json.parse($e$$186_response$$.target.getResponse());
@@ -14354,7 +14378,7 @@ brkn.sidebar.Info.prototype.enterDocument = function $brkn$sidebar$Info$$enterDo
   }, this)).listen(this.starToggle_, goog.ui.Component.EventType.ACTION, goog.bind(function() {
     brkn.model.Medias.getInstance().publish(brkn.model.Medias.Action.STAR, this.media_, this.starToggle_.isChecked());
     goog.net.XhrIo.send("/_star", void 0, "POST", "media_id=" + this.media_.id + (!this.starToggle_.isChecked() ? "&delete=1" : ""))
-  }, this)).listen(this.fbButton_, goog.ui.Component.EventType.ACTION, goog.bind(this.onFacebookButton_, this)).listen(this.twitterButton_, goog.ui.Component.EventType.ACTION, goog.bind(this.onTwitterButton_, this)).listen(this.playButton_, goog.ui.Component.EventType.ACTION, goog.bind(this.onPlayButton_, this)).listen(this.plusButton_, goog.ui.Component.EventType.ACTION, goog.bind(this.onPlusButton_, this)).listen(goog.dom.getElementByClass("local", this.getElement()), goog.events.EventType.CLICK, 
+  }, this)).listen(this.fbButton_, goog.ui.Component.EventType.ACTION, goog.bind(this.onFacebookButton_, this)).listen(this.twitterButton_, goog.ui.Component.EventType.ACTION, goog.bind(this.onTwitterButton_, this)).listen(this.playButton_, goog.ui.Component.EventType.ACTION, goog.bind(this.onPlayButton_, this)).listen(this.sendButton_, goog.ui.Component.EventType.ACTION, goog.bind(this.onSendButton_, this)).listen(goog.dom.getElementByClass("local", this.getElement()), goog.events.EventType.CLICK, 
   goog.bind(function() {
     goog.style.showElement(goog.dom.getElementByClass("link-select", this.getElement()), !0);
     goog.dom.getElementByClass("link-input", this.getElement()).select()
@@ -14409,7 +14433,7 @@ brkn.sidebar.Info.prototype.enterDocument = function $brkn$sidebar$Info$$enterDo
     brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.MEDIA_INFO, this.lastMedia_, !0, void 0, this.getInput())
   }, this));
   this.lastInput_ && this.setInput(this.lastInput_);
-  DESKTOP && !IPAD && (brkn.Popup.getInstance().hovercard(this.plusButton_.getElement(), brkn.model.Popup.Position.LEFT, brkn.model.Popup.Action.TOOLTIP, {text:"Add to Queue"}), brkn.Popup.getInstance().hovercard(this.fbButton_.getElement(), brkn.model.Popup.Position.LEFT, brkn.model.Popup.Action.TOOLTIP, {text:"Post to Facebook"}), brkn.Popup.getInstance().hovercard(this.twitterButton_.getElement(), brkn.model.Popup.Position.LEFT, brkn.model.Popup.Action.TOOLTIP, {text:"Tweet"}), brkn.Popup.getInstance().hovercard(this.starToggle_.getElement(), 
+  DESKTOP && !IPAD && (brkn.Popup.getInstance().hovercard(this.sendButton_.getElement(), brkn.model.Popup.Position.LEFT, brkn.model.Popup.Action.TOOLTIP, {text:"Send"}), brkn.Popup.getInstance().hovercard(this.fbButton_.getElement(), brkn.model.Popup.Position.LEFT, brkn.model.Popup.Action.TOOLTIP, {text:"Post to Facebook"}), brkn.Popup.getInstance().hovercard(this.twitterButton_.getElement(), brkn.model.Popup.Position.LEFT, brkn.model.Popup.Action.TOOLTIP, {text:"Tweet"}), brkn.Popup.getInstance().hovercard(this.starToggle_.getElement(), 
   brkn.model.Popup.Position.LEFT, brkn.model.Popup.Action.TOOLTIP, {text:"Save"}), brkn.Popup.getInstance().hovercard(goog.dom.getElementByClass("eye-icon", this.getElement()), brkn.model.Popup.Position.LEFT, brkn.model.Popup.Action.TOOLTIP, {text:"Seen by"}), brkn.Popup.getInstance().hovercard(goog.dom.getElementByClass("friends-icon", this.getElement()), brkn.model.Popup.Position.RIGHT, brkn.model.Popup.Action.TOOLTIP, {text:"Visible by only your Facebook friends"}));
   IPHONE && new YT.Player($ytvideo$$, {height:"100%", width:"100%", videoId:this.media_.hostId, playerVars:{controls:0, showinfo:0}});
   this.media_.subscribe(brkn.model.Media.Actions.ADD_COMMENT, function($comment$$) {
@@ -14431,9 +14455,6 @@ brkn.sidebar.Info.prototype.enterDocument = function $brkn$sidebar$Info$$enterDo
   brkn.model.Users.getInstance().currentUser.subscribe(brkn.model.User.Actions.SET_STARRED, function() {
     this.starToggle_.setChecked(brkn.model.Users.getInstance().currentUser.isStarred(this.media_))
   }, this);
-  brkn.model.Channels.getInstance().getMyChannel().subscribe(brkn.model.Channel.Action.ADD_QUEUE, function($media$$, $add$$) {
-    this.plusButton_.setChecked($add$$)
-  }, this);
   this.resize()
 };
 brkn.sidebar.Info.prototype.getMedia = function $brkn$sidebar$Info$$getMedia$() {
@@ -14449,12 +14470,12 @@ brkn.sidebar.Info.prototype.renderInfo = function $brkn$sidebar$Info$$renderInfo
   goog.object.forEach(this.media_.onlineViewers, function($viewer$$) {
     this.addViewer_($viewer$$, !0)
   }, this);
-  this.tweets_ = goog.array.map($tweets$$, function($t$$5_tweet$$) {
-    $t$$5_tweet$$ = $fetched$$ ? new brkn.model.Tweet($t$$5_tweet$$) : $t$$5_tweet$$;
-    this.addTweet_($t$$5_tweet$$);
+  this.tweets_ = goog.array.map($tweets$$, function($t$$6_tweet$$) {
+    $t$$6_tweet$$ = $fetched$$ ? new brkn.model.Tweet($t$$6_tweet$$) : $t$$6_tweet$$;
+    this.addTweet_($t$$6_tweet$$);
     this.currentDotEl_ = this.dotNavEl_.firstChild;
     goog.dom.classes.add(this.currentDotEl_, "selected");
-    return $t$$5_tweet$$
+    return $t$$6_tweet$$
   }, this);
   $tweets$$.length && this.tweetTimer_.start();
   this.commentsEl_ && goog.style.showElement(this.commentsEl_.parentElement, !0);
@@ -14701,8 +14722,28 @@ brkn.sidebar.Info.prototype.onPlayButton_ = function $brkn$sidebar$Info$$onPlayB
   var $program$$ = brkn.model.Program.async(this.getModel());
   brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.PLAY_ASYNC, $program$$)
 };
-brkn.sidebar.Info.prototype.onPlusButton_ = function $brkn$sidebar$Info$$onPlusButton_$() {
-  brkn.model.Channels.getInstance().getMyChannel().publish(brkn.model.Channel.Action.ADD_QUEUE, this.getModel(), this.plusButton_.isChecked())
+brkn.sidebar.Info.prototype.onSendButton_ = function $brkn$sidebar$Info$$onSendButton_$() {
+  if(!goog.dom.classes.has(this.sendPopup_, "decorated")) {
+    var $recipients$$ = new brkn.sidebar.CommentInput(!1, !0, !1, !0);
+    $recipients$$.decorate(goog.dom.getElementByClass("recipients", this.sendPopup_));
+    var $messageInput$$ = new brkn.sidebar.CommentInput(!1, !1, !1, !1, !0);
+    $messageInput$$.decorate(goog.dom.getElementByClass("send-message", this.sendPopup_));
+    this.getHandler().listen($messageInput$$, "add", goog.bind(function($e$$) {
+      var $tokens$$ = $recipients$$.getTokens();
+      $tokens$$.length && (goog.array.forEach($tokens$$, function($r$$) {
+        var $message$$ = new brkn.model.Message({from_user:brkn.model.Users.getInstance().currentUser, to_user:$r$$.id, text:$e$$.text || "Sent you a video!", media:this.model_});
+        $message$$.time = new goog.date.DateTime;
+        $message$$.relativeTime = goog.date.relative.format($message$$.time.getTime());
+        brkn.model.Users.getInstance().publish(brkn.model.Users.Action.NEW_MESSAGE, $message$$);
+        goog.net.XhrIo.send("/_message", $e$$.callback, "POST", "from_id=" + brkn.model.Users.getInstance().currentUser.id + "&to_id=" + $r$$.id + "&text=" + $message$$.text + "&media_id=" + this.model_.id)
+      }, this), $recipients$$.clear(), $messageInput$$.clear(), this.sendButton_.setChecked(!1), goog.style.showElement(this.sendPopup_, !1))
+    }, this)).listen(goog.dom.getElementByClass("close", this.sendPopup_), goog.events.EventType.CLICK, goog.bind(function() {
+      goog.style.showElement(this.sendPopup_, !1);
+      this.sendButton_.setChecked(!1)
+    }, this));
+    goog.dom.classes.add(this.sendPopup_, "decorated")
+  }
+  goog.style.showElement(this.sendPopup_, this.sendButton_.isChecked())
 };
 brkn.sidebar.MediaList = function $brkn$sidebar$MediaList$($opt_mediaList$$, $opt_url$$, $opt_thumb$$, $opt_desc$$, $opt_link$$, $opt_descUrl$$) {
   goog.ui.Component.call(this);
@@ -14735,13 +14776,13 @@ brkn.sidebar.MediaList.prototype.decorateInternal = function $brkn$sidebar$Media
   this.mediasEl_ = goog.dom.createDom("div", "medias");
   goog.dom.appendChild(this.getElement(), this.mediasEl_);
   this.getHandler().listen(window, "resize", goog.partial(goog.Timer.callOnce, goog.bind(this.resize, this)));
-  this.url_ ? (goog.style.showElement(this.spinner_, !0), goog.net.XhrIo.send(this.url_, goog.bind(function($e$$202_medias$$) {
+  this.url_ ? (goog.style.showElement(this.spinner_, !0), goog.net.XhrIo.send(this.url_, goog.bind(function($e$$203_medias$$) {
     goog.style.showElement(this.spinner_, !1);
-    $e$$202_medias$$ = goog.json.parse($e$$202_medias$$.target.getResponse());
-    $e$$202_medias$$ = goog.array.map($e$$202_medias$$, function($m$$) {
+    $e$$203_medias$$ = goog.json.parse($e$$203_medias$$.target.getResponse());
+    $e$$203_medias$$ = goog.array.map($e$$203_medias$$, function($m$$) {
       return new brkn.model.Media($m$$)
     });
-    goog.array.forEach($e$$202_medias$$, this.addMedia, this);
+    goog.array.forEach($e$$203_medias$$, this.addMedia, this);
     this.mediasHeight_ = goog.style.getSize(this.mediasEl_).height;
     this.resize()
   }, this))) : this.mediaList_ && (goog.array.forEach(this.mediaList_, this.addMedia, this), this.mediasHeight_ = goog.style.getSize(this.mediasEl_).height, this.resize())
@@ -14753,11 +14794,11 @@ brkn.sidebar.MediaList.prototype.addMedia = function $brkn$sidebar$MediaList$$ad
   this.isAdmin_ && this.dragDropGroup_.addItem($mediaEl$$);
   this.getHandler().listen($mediaEl$$, goog.events.EventType.CLICK, goog.bind(function() {
     brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.MEDIA_INFO, $media$$)
-  }, this)).listen($previewEl$$, goog.events.EventType.CLICK, goog.bind(function($e$$203_program$$) {
-    $e$$203_program$$.preventDefault();
-    $e$$203_program$$.stopPropagation();
-    $e$$203_program$$ = brkn.model.Program.async($media$$);
-    brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.PLAY_ASYNC, $e$$203_program$$)
+  }, this)).listen($previewEl$$, goog.events.EventType.CLICK, goog.bind(function($e$$204_program$$) {
+    $e$$204_program$$.preventDefault();
+    $e$$204_program$$.stopPropagation();
+    $e$$204_program$$ = brkn.model.Program.async($media$$);
+    brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.PLAY_ASYNC, $e$$204_program$$)
   }, this)).listen($plusEl$$, goog.events.EventType.CLICK, function($e$$) {
     $e$$.preventDefault();
     $e$$.stopPropagation();
@@ -14779,10 +14820,10 @@ brkn.sidebar.MediaList.prototype.setListInfo_ = function $brkn$sidebar$MediaList
   this.resize()
 };
 brkn.sidebar.MediaList.prototype.onAddProgram_ = function $brkn$sidebar$MediaList$$onAddProgram_$($channel$$, $media$$) {
-  goog.net.XhrIo.send("/admin/_addprogram", goog.bind(function($e$$205_newProgram$$3_response$$) {
-    $e$$205_newProgram$$3_response$$ = goog.json.parse($e$$205_newProgram$$3_response$$.target.getResponse());
-    $e$$205_newProgram$$3_response$$ = new brkn.model.Program($e$$205_newProgram$$3_response$$);
-    $channel$$.publish(brkn.model.Channel.Action.ADD_PROGRAM, $e$$205_newProgram$$3_response$$)
+  goog.net.XhrIo.send("/admin/_addprogram", goog.bind(function($e$$206_newProgram$$3_response$$) {
+    $e$$206_newProgram$$3_response$$ = goog.json.parse($e$$206_newProgram$$3_response$$.target.getResponse());
+    $e$$206_newProgram$$3_response$$ = new brkn.model.Program($e$$206_newProgram$$3_response$$);
+    $channel$$.publish(brkn.model.Channel.Action.ADD_PROGRAM, $e$$206_newProgram$$3_response$$)
   }, this), "POST", "channel=" + $channel$$.id + "&media=" + $media$$.id)
 };
 brkn.model.Message = function $brkn$model$Message$($message$$) {
@@ -14790,7 +14831,7 @@ brkn.model.Message = function $brkn$model$Message$($message$$) {
   this.fromUser = brkn.model.Users.getInstance().get_or_add($message$$.from_user);
   this.toUser = brkn.model.Users.getInstance().get_or_add($message$$.to_user);
   this.text = $message$$.text;
-  this.media = $message$$.media ? brkn.model.Medias.getInstance().getOrAdd($message$$.media) : null;
+  this.media = $message$$.media ? "brkn.model.Media" == goog.typeOf($message$$.media) ? $message$$.media : brkn.model.Medias.getInstance().getOrAdd($message$$.media) : null;
   this.read = $message$$.read;
   this.relativeTime = (this.time = $message$$.time ? goog.date.fromIsoString($message$$.time + "Z") : null) ? goog.date.relative.format(this.time.getTime()) : null
 };
@@ -14848,7 +14889,7 @@ brkn.sidebar.Messages.prototype.decorateInternal = function $brkn$sidebar$Messag
     this.addMessage_($m$$)
   }, this);
   brkn.model.Users.getInstance().subscribe(brkn.model.Users.Action.NEW_MESSAGE, function($m$$) {
-    if($m$$.fromUser.id == this.user_.id || $m$$.toUser.id == this.user_.id) {
+    if($m$$.fromUser.id != brkn.model.Users.getInstance().currentUser.id && ($m$$.fromUser.id == this.user_.id || $m$$.toUser.id == this.user_.id)) {
       if(this.inbox_) {
         var $incr$$ = !0, $last$$ = this.messageMap_[$m$$.fromUser.id];
         $last$$ && ($incr$$ = !goog.dom.classes.has($last$$, "unread"), goog.dom.removeNode($last$$));
@@ -14863,52 +14904,65 @@ brkn.sidebar.Messages.prototype.decorateInternal = function $brkn$sidebar$Messag
 brkn.sidebar.Messages.prototype.loadMore_ = function $brkn$sidebar$Messages$$loadMore_$() {
   this.moreMessagesEl_ && goog.style.showElement(this.moreMessagesEl_, !1);
   goog.style.showElement(this.spinner_, !0);
-  goog.net.XhrIo.send("/_message/" + this.user_.id + "?offset=" + this.messages_.length, goog.bind(function($e$$208_response$$) {
-    $e$$208_response$$ = $e$$208_response$$.target.getResponseJson();
-    if($e$$208_response$$.length) {
+  goog.net.XhrIo.send("/_message/" + this.user_.id + "?offset=" + this.messages_.length, goog.bind(function($e$$209_response$$) {
+    $e$$209_response$$ = $e$$209_response$$.target.getResponseJson();
+    if($e$$209_response$$.length) {
       this.lastMessage_ = null;
       var $separator$$ = goog.dom.createDom("div", "separator");
       goog.dom.insertChildAt(this.messagesEl_, $separator$$, 3)
     }
     goog.style.showElement(this.spinner_, !1);
-    this.moreMessagesEl_ && goog.style.showElement(this.moreMessagesEl_, !!$e$$208_response$$.length);
-    goog.array.forEachRight($e$$208_response$$, function($m$$14_message$$) {
+    this.moreMessagesEl_ && goog.style.showElement(this.moreMessagesEl_, !!$e$$209_response$$.length);
+    goog.array.forEachRight($e$$209_response$$, function($m$$14_message$$) {
       $m$$14_message$$ = new brkn.model.Message($m$$14_message$$);
       this.messages_.push($m$$14_message$$);
       this.addMessage_($m$$14_message$$, !0);
       return $m$$14_message$$
     }, this);
-    $e$$208_response$$.length && (this.getElement().scrollTop = 0, this.lastMessage_ = null, this.getElement().scrollTop = $separator$$.offsetHeight)
+    $e$$209_response$$.length && (this.getElement().scrollTop = 0, this.lastMessage_ = null, this.getElement().scrollTop = $separator$$.offsetHeight)
   }, this))
 };
 brkn.sidebar.Messages.prototype.addMessage_ = function $brkn$sidebar$Messages$$addMessage_$($message$$, $opt_first$$) {
   goog.style.showElement(this.noMessagesEl_, !1);
   this.moreMessagesEl_ && goog.style.showElement(this.moreMessagesEl_, !this.inbox_ && 10 <= this.messages_.length);
-  var $textEl_timeEl$$;
+  var $previewEl$$, $mediaEl$$;
   if(!this.inbox_ && this.lastMessage_ && this.lastMessage_.fromUser.id == $message$$.fromUser.id) {
-    $textEl_timeEl$$ = soy.renderAsElement(brkn.sidebar.messages.text, {message:$message$$});
-    goog.dom.appendChild(goog.dom.getElementByClass("texts", this.lastMessageEl_), $textEl_timeEl$$);
-    if($message$$.media) {
-      var $alert$$1_mediaEl$$ = soy.renderAsElement(brkn.sidebar.listMedia, {media:$message$$.media});
-      goog.dom.appendChild(goog.dom.getElementByClass("texts", this.lastMessageEl_), $alert$$1_mediaEl$$)
-    }
-    $textEl_timeEl$$ = goog.dom.getElementByClass("timestamp", $textEl_timeEl$$)
+    $previewEl$$ = soy.renderAsElement(brkn.sidebar.messages.text, {message:$message$$}), goog.dom.appendChild(goog.dom.getElementByClass("texts", this.lastMessageEl_), $previewEl$$), $message$$.media && ($mediaEl$$ = soy.renderAsElement(brkn.sidebar.listMedia, {media:$message$$.media}), goog.dom.appendChild(goog.dom.getElementByClass("texts", this.lastMessageEl_), $mediaEl$$)), $previewEl$$ = goog.dom.getElementByClass("timestamp", $previewEl$$)
   }else {
     var $messageEl$$ = soy.renderAsElement(brkn.sidebar.messages.message, {message:$message$$, flip:$message$$.fromUser.id == brkn.model.Users.getInstance().currentUser.id});
     this.lastMessage_ = $message$$;
     this.lastMessageEl_ = $messageEl$$;
     $opt_first$$ ? goog.dom.insertChildAt(this.messagesEl_, $messageEl$$, 3) : goog.dom.appendChild(this.messagesEl_, $messageEl$$);
-    $message$$.media && ($alert$$1_mediaEl$$ = soy.renderAsElement(brkn.sidebar.listMedia, {media:$message$$.media}), goog.dom.appendChild(goog.dom.getElementByClass("texts", $messageEl$$), $alert$$1_mediaEl$$));
-    $textEl_timeEl$$ = goog.dom.getElementByClass("timestamp", $messageEl$$);
+    $previewEl$$ = goog.dom.getElementByClass("timestamp", $messageEl$$);
     goog.dom.classes.enable($messageEl$$, "unread", !$message$$.read);
-    this.inbox_ && (this.messageMap_[$message$$.fromUser.id] = $messageEl$$, this.getHandler().listen($messageEl$$, goog.events.EventType.CLICK, goog.bind(function() {
-      $message$$.read || ($message$$.setRead(), goog.dom.classes.remove($messageEl$$, "unread"), brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NEW_MESSAGES, -1));
-      brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.PROFILE, $message$$.fromUser)
-    }, this)), $opt_first$$ && ($alert$$1_mediaEl$$ = goog.dom.getElement("mp3-1"), $alert$$1_mediaEl$$.load(), $alert$$1_mediaEl$$.play()))
+    if(this.inbox_) {
+      if(this.messageMap_[$message$$.fromUser.id] = $messageEl$$, this.getHandler().listen($messageEl$$, goog.events.EventType.CLICK, goog.bind(function() {
+        $message$$.read || ($message$$.setRead(), goog.dom.classes.remove($messageEl$$, "unread"), brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NEW_MESSAGES, -1));
+        brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.PROFILE, $message$$.fromUser)
+      }, this)), $opt_first$$) {
+        var $alert$$1_plusEl$$ = goog.dom.getElement("mp3-1");
+        $alert$$1_plusEl$$.load();
+        $alert$$1_plusEl$$.play()
+      }
+    }else {
+      $message$$.media && ($mediaEl$$ = soy.renderAsElement(brkn.sidebar.listMedia, {media:$message$$.media}), goog.dom.appendChild(goog.dom.getElementByClass("texts", $messageEl$$), $mediaEl$$))
+    }
   }
-  brkn.model.Clock.getInstance().addTimestamp($message$$.time, $textEl_timeEl$$);
+  brkn.model.Clock.getInstance().addTimestamp($message$$.time, $previewEl$$);
   $opt_first$$ || (this.getElement().scrollTop = this.getElement().scrollHeight);
-  !this.inbox_ && (!$message$$.read && brkn.model.Sidebar.getInstance().currentProfileId == $message$$.fromUser.id) && $message$$.setRead()
+  !this.inbox_ && (!$message$$.read && $message$$.id && brkn.model.Sidebar.getInstance().currentProfileId == $message$$.fromUser.id) && $message$$.setRead();
+  $mediaEl$$ && ($previewEl$$ = goog.dom.getElementByClass("list-play", $mediaEl$$), $alert$$1_plusEl$$ = goog.dom.getElementByClass("list-plus", $mediaEl$$), this.getHandler().listen($mediaEl$$, goog.events.EventType.CLICK, goog.bind(function() {
+    brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.MEDIA_INFO, $message$$.media)
+  }, this)).listen($previewEl$$, goog.events.EventType.CLICK, goog.bind(function($e$$210_program$$) {
+    $e$$210_program$$.preventDefault();
+    $e$$210_program$$.stopPropagation();
+    $e$$210_program$$ = brkn.model.Program.async($message$$.media);
+    brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.PLAY_ASYNC, $e$$210_program$$)
+  }, this)).listen($alert$$1_plusEl$$, goog.events.EventType.CLICK, function($e$$) {
+    $e$$.preventDefault();
+    $e$$.stopPropagation();
+    brkn.model.Channels.getInstance().getMyChannel().publish(brkn.model.Channel.Action.ADD_QUEUE, $message$$.media, !0)
+  }))
 };
 brkn.sidebar.Messages.prototype.onAddComment_ = function $brkn$sidebar$Messages$$onAddComment_$($e$$) {
   var $message$$ = new brkn.model.Message({from_user:brkn.model.Users.getInstance().currentUser, to_user:brkn.model.Users.getInstance().get_or_add(this.user_), text:$e$$.text});
@@ -15232,11 +15286,11 @@ brkn.sidebar.Stream.prototype.addActivity_ = function $brkn$sidebar$Stream$$addA
       goog.dom.appendChild($mediasEl$$, $m$$17_mediaEl$$);
       this.getHandler().listen($m$$17_mediaEl$$, goog.events.EventType.CLICK, function() {
         brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.MEDIA_INFO, $media$$)
-      }).listen($previewEl$$, goog.events.EventType.CLICK, function($e$$213_program$$) {
-        $e$$213_program$$.preventDefault();
-        $e$$213_program$$.stopPropagation();
-        $e$$213_program$$ = brkn.model.Program.async($media$$);
-        brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.PLAY_ASYNC, $e$$213_program$$)
+      }).listen($previewEl$$, goog.events.EventType.CLICK, function($e$$216_program$$) {
+        $e$$216_program$$.preventDefault();
+        $e$$216_program$$.stopPropagation();
+        $e$$216_program$$ = brkn.model.Program.async($media$$);
+        brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.PLAY_ASYNC, $e$$216_program$$)
       }).listen($plusEl$$, goog.events.EventType.CLICK, function($e$$) {
         $e$$.preventDefault();
         $e$$.stopPropagation();
@@ -15268,37 +15322,37 @@ brkn.sidebar.Profile.prototype.decorateInternal = function $brkn$sidebar$Profile
 };
 brkn.sidebar.Profile.prototype.enterDocument = function $brkn$sidebar$Profile$$enterDocument$() {
   this.tabsEl_ = goog.dom.getElementByClass("tabs", this.getElement());
-  this.myProfile_ && (goog.net.XhrIo.send("/_notification", goog.bind(function($e$$215_notifications$$1_response$$) {
-    var $e$$215_notifications$$1_response$$ = $e$$215_notifications$$1_response$$.target.getResponseJson(), $e$$215_notifications$$1_response$$ = goog.array.filter($e$$215_notifications$$1_response$$, function($n$$) {
+  this.myProfile_ && (goog.net.XhrIo.send("/_notification", goog.bind(function($e$$218_notifications$$1_response$$) {
+    var $e$$218_notifications$$1_response$$ = $e$$218_notifications$$1_response$$.target.getResponseJson(), $e$$218_notifications$$1_response$$ = goog.array.filter($e$$218_notifications$$1_response$$, function($n$$) {
       return!!$n$$
-    }), $unreadCount$$ = 0, $e$$215_notifications$$1_response$$ = goog.array.map($e$$215_notifications$$1_response$$, function($n$$20_notification$$) {
+    }), $unreadCount$$ = 0, $e$$218_notifications$$1_response$$ = goog.array.map($e$$218_notifications$$1_response$$, function($n$$20_notification$$) {
       $n$$20_notification$$ = new brkn.model.Notification($n$$20_notification$$);
       $unreadCount$$ += !$n$$20_notification$$.read ? 1 : 0;
       return $n$$20_notification$$
     }, this);
     brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NEW_MESSAGES, $unreadCount$$);
-    this.notifications_ = new brkn.sidebar.Notifications($e$$215_notifications$$1_response$$);
+    this.notifications_ = new brkn.sidebar.Notifications($e$$218_notifications$$1_response$$);
     this.getHandler().listen(this.notifications_, "resize", goog.partial(goog.Timer.callOnce, goog.bind(this.resizeInbox_, this)));
     this.notifications_.decorate(goog.dom.getElementByClass("notifications-content", this.getElement()))
   }, this)), this.inboxEl_ = goog.dom.getElementByClass("inbox-content", this.getElement()), this.getHandler().listen(window, "resize", goog.partial(goog.Timer.callOnce, goog.bind(this.resizeInbox_, this))));
-  goog.net.XhrIo.send("/_message/" + this.user_.id, goog.bind(function($e$$216_messages_response$$) {
-    var $e$$216_messages_response$$ = $e$$216_messages_response$$.target.getResponseJson(), $unreadCount$$ = 0, $e$$216_messages_response$$ = goog.array.map($e$$216_messages_response$$, function($m$$18_message$$) {
+  goog.net.XhrIo.send("/_message/" + this.user_.id, goog.bind(function($e$$219_messages_response$$) {
+    var $e$$219_messages_response$$ = $e$$219_messages_response$$.target.getResponseJson(), $unreadCount$$ = 0, $e$$219_messages_response$$ = goog.array.map($e$$219_messages_response$$, function($m$$18_message$$) {
       $m$$18_message$$ = new brkn.model.Message($m$$18_message$$);
       $unreadCount$$ += !$m$$18_message$$.read ? 1 : 0;
       return $m$$18_message$$
     }, this);
     this.myProfile_ && brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NEW_MESSAGES, $unreadCount$$);
-    this.messages_ = new brkn.sidebar.Messages(this.user_, $e$$216_messages_response$$);
+    this.messages_ = new brkn.sidebar.Messages(this.user_, $e$$219_messages_response$$);
     this.getHandler().listen(this.messages_, "resize", goog.partial(goog.Timer.callOnce, goog.bind(this.resizeInbox_, this)));
     this.messages_.decorate(goog.dom.getElementByClass("messages-content", this.getElement()))
   }, this));
-  goog.net.XhrIo.send("/_star/" + this.user_.id, goog.bind(function($e$$217_medias$$) {
-    $e$$217_medias$$ = $e$$217_medias$$.target.getResponseJson();
-    $e$$217_medias$$ = goog.array.map($e$$217_medias$$, function($m$$) {
+  goog.net.XhrIo.send("/_star/" + this.user_.id, goog.bind(function($e$$220_medias$$) {
+    $e$$220_medias$$ = $e$$220_medias$$.target.getResponseJson();
+    $e$$220_medias$$ = goog.array.map($e$$220_medias$$, function($m$$) {
       return new brkn.model.Media($m$$)
     });
-    brkn.model.Users.getInstance().currentUser.setStarred($e$$217_medias$$);
-    this.starred_ = new brkn.sidebar.MediaList($e$$217_medias$$);
+    brkn.model.Users.getInstance().currentUser.setStarred($e$$220_medias$$);
+    this.starred_ = new brkn.sidebar.MediaList($e$$220_medias$$);
     this.starred_.decorate(goog.dom.getElementByClass("starred-content", this.getElement()))
   }, this));
   goog.net.XhrIo.send("/_activity/" + this.user_.id, goog.bind(function($activities$$6_e$$) {
@@ -15306,9 +15360,9 @@ brkn.sidebar.Profile.prototype.enterDocument = function $brkn$sidebar$Profile$$e
     this.stream_ = new brkn.sidebar.Stream($activities$$6_e$$, this.user_.id);
     this.stream_.decorate(goog.dom.getElementByClass("activity-content", this.getElement()))
   }, this));
-  this.getHandler().listen(this.tabsEl_, goog.events.EventType.CLICK, goog.bind(function($e$$219_tabEl$$) {
-    $e$$219_tabEl$$ = goog.dom.getAncestorByTagNameAndClass($e$$219_tabEl$$.target, "li");
-    this.navigate_($e$$219_tabEl$$)
+  this.getHandler().listen(this.tabsEl_, goog.events.EventType.CLICK, goog.bind(function($e$$222_tabEl$$) {
+    $e$$222_tabEl$$ = goog.dom.getAncestorByTagNameAndClass($e$$222_tabEl$$.target, "li");
+    this.navigate_($e$$222_tabEl$$)
   }, this));
   brkn.model.Medias.getInstance().subscribe(brkn.model.Medias.Action.STAR, function($media$$, $star$$) {
     $star$$ ? this.starred_.addMedia($media$$) : this.starred_.removeMedia($media$$)
@@ -15393,8 +15447,8 @@ brkn.Sidebar.prototype.enterDocument = function $brkn$Sidebar$$enterDocument$() 
     this.updateArrow_();
     $lastTab$$ != this.currentTab_ && $e$$.stopPropagation();
     "stream" == $tabName$$ && this.newActivities_(0, !0)
-  }, this)).listen(this.toolbar_, goog.events.EventType.CLICK, goog.bind(function($e$$222_tab$$) {
-    (($e$$222_tab$$ = goog.dom.getAncestorByTagNameAndClass($e$$222_tab$$.target, "li")) && goog.dom.classes.get($e$$222_tab$$)[0] == this.currentTab_ || !$e$$222_tab$$) && (new goog.fx.dom.Scroll(this.currentScreen_, [this.currentScreen_.scrollLeft, this.currentScreen_.scrollTop], [this.currentScreen_.scrollLeft, 0], 300)).play()
+  }, this)).listen(this.toolbar_, goog.events.EventType.CLICK, goog.bind(function($e$$225_tab$$) {
+    (($e$$225_tab$$ = goog.dom.getAncestorByTagNameAndClass($e$$225_tab$$.target, "li")) && goog.dom.classes.get($e$$225_tab$$)[0] == this.currentTab_ || !$e$$225_tab$$) && (new goog.fx.dom.Scroll(this.currentScreen_, [this.currentScreen_.scrollLeft, this.currentScreen_.scrollTop], [this.currentScreen_.scrollLeft, 0], 300)).play()
   }, this)).listen($keyHandler$$, goog.events.KeyHandler.EventType.KEY, goog.bind(function($e$$) {
     $e$$.ctrlKey && "68" == $e$$.keyCode && goog.dom.classes.toggle(this.getElement(), "dark")
   }, this));
@@ -15421,11 +15475,11 @@ brkn.Sidebar.prototype.enterDocument = function $brkn$Sidebar$$enterDocument$() 
   }, this)
 };
 brkn.Sidebar.prototype.fetchAndRenderStream_ = function $brkn$Sidebar$$fetchAndRenderStream_$() {
-  goog.net.XhrIo.send("/_activity", goog.bind(function($e$$224_response$$) {
-    $e$$224_response$$ = $e$$224_response$$.target.getResponseJson();
-    this.stream_ = new brkn.sidebar.Stream($e$$224_response$$.activities);
+  goog.net.XhrIo.send("/_activity", goog.bind(function($e$$227_response$$) {
+    $e$$227_response$$ = $e$$227_response$$.target.getResponseJson();
+    this.stream_ = new brkn.sidebar.Stream($e$$227_response$$.activities);
     this.stream_.decorate(goog.dom.getElement("stream"));
-    brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NEW_ACTIVITIES, parseInt($e$$224_response$$.new_count, 10))
+    brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NEW_ACTIVITIES, parseInt($e$$227_response$$.new_count, 10))
   }, this))
 };
 brkn.Sidebar.prototype.newActivities_ = function $brkn$Sidebar$$newActivities_$($count$$, $opt_reset$$) {
@@ -15581,13 +15635,13 @@ brkn.Queue.prototype.addMedia_ = function $brkn$Queue$$addMedia_$($media$$, $add
       $e$$.preventDefault();
       $e$$.stopPropagation();
       brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.MEDIA_INFO, $media$$)
-    }, this)).listen($playEl$$, goog.events.EventType.CLICK, goog.bind(function($e$$229_program$$) {
-      $e$$229_program$$.preventDefault();
-      $e$$229_program$$.stopPropagation();
+    }, this)).listen($playEl$$, goog.events.EventType.CLICK, goog.bind(function($e$$232_program$$) {
+      $e$$232_program$$.preventDefault();
+      $e$$232_program$$.stopPropagation();
       goog.dom.classes.remove(this.getElement(), "show");
       this.toggle_.setChecked(!1);
-      $e$$229_program$$ = brkn.model.Program.async($media$$);
-      brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.PLAY_ASYNC, $e$$229_program$$);
+      $e$$232_program$$ = brkn.model.Program.async($media$$);
+      brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.PLAY_ASYNC, $e$$232_program$$);
       brkn.model.Channels.getInstance().getMyChannel().publish(brkn.model.Channel.Action.ADD_QUEUE, $media$$, !1)
     }, this)).listen($removeEl$$, goog.events.EventType.CLICK, goog.bind(function($e$$) {
       $e$$.preventDefault();
@@ -15673,43 +15727,43 @@ brkn.model.BrowserChannel.prototype.init = function $brkn$model$BrowserChannel$$
   goog.events.listen(window, "onbeforeunload", goog.bind(this.onClose_, this));
   return this
 };
-brkn.model.BrowserChannel.prototype.onMessage_ = function $brkn$model$BrowserChannel$$onMessage_$($lastChannel$$1_m$$20_media$$45_notification$$3_programs$$) {
-  var $message$$ = goog.json.parse($lastChannel$$1_m$$20_media$$45_notification$$3_programs$$.data);
+brkn.model.BrowserChannel.prototype.onMessage_ = function $brkn$model$BrowserChannel$$onMessage_$($lastChannel$$1_m$$20_media$$44_notification$$3_programs$$) {
+  var $message$$ = goog.json.parse($lastChannel$$1_m$$20_media$$44_notification$$3_programs$$.data);
   goog.DEBUG && window.console.log($message$$);
   switch($message$$.type) {
     case "viewer_change":
       var $comment$$23_user$$ = brkn.model.Users.getInstance().get_or_add($message$$.user), $session$$6_time$$23_tweet$$ = $message$$.time && goog.date.fromIsoString($message$$.time + "Z");
       $comment$$23_user$$.currentSession && $session$$6_time$$23_tweet$$ && $comment$$23_user$$.currentSession.end($session$$6_time$$23_tweet$$);
-      ($lastChannel$$1_m$$20_media$$45_notification$$3_programs$$ = $message$$.last_channel_id && brkn.model.Channels.getInstance().get($message$$.last_channel_id)) && $lastChannel$$1_m$$20_media$$45_notification$$3_programs$$.publish(brkn.model.Channel.Action.REMOVE_VIEWER, $comment$$23_user$$);
-      $comment$$23_user$$.currentMedia && $comment$$23_user$$.currentMedia.publish(brkn.model.Media.Actions.WATCHING, $comment$$23_user$$, $lastChannel$$1_m$$20_media$$45_notification$$3_programs$$, !0);
-      var $channel$$ = $message$$.channel_id && brkn.model.Channels.getInstance().get($message$$.channel_id), $lastChannel$$1_m$$20_media$$45_notification$$3_programs$$ = $message$$.media && brkn.model.Medias.getInstance().getOrAdd($message$$.media);
+      ($lastChannel$$1_m$$20_media$$44_notification$$3_programs$$ = $message$$.last_channel_id && brkn.model.Channels.getInstance().get($message$$.last_channel_id)) && $lastChannel$$1_m$$20_media$$44_notification$$3_programs$$.publish(brkn.model.Channel.Action.REMOVE_VIEWER, $comment$$23_user$$);
+      $comment$$23_user$$.currentMedia && $comment$$23_user$$.currentMedia.publish(brkn.model.Media.Actions.WATCHING, $comment$$23_user$$, $lastChannel$$1_m$$20_media$$44_notification$$3_programs$$, !0);
+      var $channel$$ = $message$$.channel_id && brkn.model.Channels.getInstance().get($message$$.channel_id), $lastChannel$$1_m$$20_media$$44_notification$$3_programs$$ = $message$$.media && brkn.model.Medias.getInstance().getOrAdd($message$$.media);
       $channel$$ && ($session$$6_time$$23_tweet$$ = $session$$6_time$$23_tweet$$ || new goog.date.DateTime, $session$$6_time$$23_tweet$$ = new brkn.model.Session($message$$.session_id, $comment$$23_user$$, $channel$$, $session$$6_time$$23_tweet$$), $comment$$23_user$$.currentSession = $session$$6_time$$23_tweet$$, $channel$$.publish(brkn.model.Channel.Action.ADD_VIEWER, $session$$6_time$$23_tweet$$));
-      $lastChannel$$1_m$$20_media$$45_notification$$3_programs$$ && $lastChannel$$1_m$$20_media$$45_notification$$3_programs$$.publish(brkn.model.Media.Actions.WATCHING, $comment$$23_user$$, $channel$$, !0 != $message$$.online);
+      $lastChannel$$1_m$$20_media$$44_notification$$3_programs$$ && $lastChannel$$1_m$$20_media$$44_notification$$3_programs$$.publish(brkn.model.Media.Actions.WATCHING, $comment$$23_user$$, $channel$$, !0 != $message$$.online);
       brkn.model.Users.getInstance().publish(brkn.model.Users.Action.ONLINE, $comment$$23_user$$, $message$$.online);
       break;
     case "notification":
-      $lastChannel$$1_m$$20_media$$45_notification$$3_programs$$ = new brkn.model.Notification($message$$.notification);
-      brkn.model.Users.getInstance().publish(brkn.model.Users.Action.NEW_NOTIFICATION, $lastChannel$$1_m$$20_media$$45_notification$$3_programs$$);
+      $lastChannel$$1_m$$20_media$$44_notification$$3_programs$$ = new brkn.model.Notification($message$$.notification);
+      brkn.model.Users.getInstance().publish(brkn.model.Users.Action.NEW_NOTIFICATION, $lastChannel$$1_m$$20_media$$44_notification$$3_programs$$);
       break;
     case "new_comment":
       $comment$$23_user$$ = new brkn.model.Comment($message$$.comment);
-      if($comment$$23_user$$.user.id != brkn.model.Users.getInstance().currentUser.id && ($session$$6_time$$23_tweet$$ = $message$$.tweet ? new brkn.model.Tweet($message$$.tweet) : null, $lastChannel$$1_m$$20_media$$45_notification$$3_programs$$ = brkn.model.Medias.getInstance().getOrAdd($message$$.comment.media))) {
-        $lastChannel$$1_m$$20_media$$45_notification$$3_programs$$.publish(brkn.model.Media.Actions.ADD_COMMENT, $comment$$23_user$$), $session$$6_time$$23_tweet$$ && $lastChannel$$1_m$$20_media$$45_notification$$3_programs$$.publish(brkn.model.Media.Actions.ADD_TWEET, $session$$6_time$$23_tweet$$)
+      if($comment$$23_user$$.user.id != brkn.model.Users.getInstance().currentUser.id && ($session$$6_time$$23_tweet$$ = $message$$.tweet ? new brkn.model.Tweet($message$$.tweet) : null, $lastChannel$$1_m$$20_media$$44_notification$$3_programs$$ = brkn.model.Medias.getInstance().getOrAdd($message$$.comment.media))) {
+        $lastChannel$$1_m$$20_media$$44_notification$$3_programs$$.publish(brkn.model.Media.Actions.ADD_COMMENT, $comment$$23_user$$), $session$$6_time$$23_tweet$$ && $lastChannel$$1_m$$20_media$$44_notification$$3_programs$$.publish(brkn.model.Media.Actions.ADD_TWEET, $session$$6_time$$23_tweet$$)
       }
       break;
     case "new_message":
-      $lastChannel$$1_m$$20_media$$45_notification$$3_programs$$ = new brkn.model.Message($message$$.message);
-      brkn.model.Users.getInstance().publish(brkn.model.Users.Action.NEW_MESSAGE, $lastChannel$$1_m$$20_media$$45_notification$$3_programs$$);
-      brkn.model.Sidebar.getInstance().currentProfileId != $lastChannel$$1_m$$20_media$$45_notification$$3_programs$$.fromUser.id && brkn.model.Notify.getInstance().publish(brkn.model.Notify.Actions.FLASH, "messaged you", $lastChannel$$1_m$$20_media$$45_notification$$3_programs$$.text, $lastChannel$$1_m$$20_media$$45_notification$$3_programs$$.fromUser, $lastChannel$$1_m$$20_media$$45_notification$$3_programs$$.fromUser.picture, "#user:" + $lastChannel$$1_m$$20_media$$45_notification$$3_programs$$.fromUser.id);
+      $lastChannel$$1_m$$20_media$$44_notification$$3_programs$$ = new brkn.model.Message($message$$.message);
+      brkn.model.Users.getInstance().publish(brkn.model.Users.Action.NEW_MESSAGE, $lastChannel$$1_m$$20_media$$44_notification$$3_programs$$);
+      brkn.model.Sidebar.getInstance().currentProfileId != $lastChannel$$1_m$$20_media$$44_notification$$3_programs$$.fromUser.id && brkn.model.Notify.getInstance().publish(brkn.model.Notify.Actions.FLASH, "messaged you", $lastChannel$$1_m$$20_media$$44_notification$$3_programs$$.text, $lastChannel$$1_m$$20_media$$44_notification$$3_programs$$.fromUser, $lastChannel$$1_m$$20_media$$44_notification$$3_programs$$.fromUser.picture, "#user:" + $lastChannel$$1_m$$20_media$$44_notification$$3_programs$$.fromUser.id);
       break;
     case "new_activity":
       brkn.model.Users.getInstance().publish(brkn.model.Users.Action.NEW_ACTIVITY, $message$$.activity);
       $message$$.activity.user.id != brkn.model.Users.getInstance().currentUser.id && "session" != $message$$.activity.type && brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NEW_ACTIVITIES, 1);
       break;
     case "update_programs":
-      $lastChannel$$1_m$$20_media$$45_notification$$3_programs$$ = $message$$.programs;
+      $lastChannel$$1_m$$20_media$$44_notification$$3_programs$$ = $message$$.programs;
       $channel$$ = brkn.model.Channels.getInstance().get($message$$.channel_id);
-      goog.array.forEach($lastChannel$$1_m$$20_media$$45_notification$$3_programs$$, function($program$$) {
+      goog.array.forEach($lastChannel$$1_m$$20_media$$44_notification$$3_programs$$, function($program$$) {
         $channel$$.publish(brkn.model.Channel.Action.UPDATE_PROGRAM, $program$$)
       }, this);
       break;
@@ -16270,22 +16324,22 @@ brkn.Main.prototype.enterDocument = function $brkn$Main$$enterDocument$() {
   this.getHandler().listen(document.body, "touchmove", function($e$$) {
     goog.dom.getAncestorByTagNameAndClass($e$$.target, "div", "ios-scroll") || $e$$.preventDefault()
   });
-  this.getHandler().listen(window, goog.events.EventType.CLICK, function($channel$$34_e$$233_media$$46_user$$) {
-    var $a$$36_href$$3_matches$$ = goog.dom.getAncestorByTagNameAndClass($channel$$34_e$$233_media$$46_user$$.target, "a");
+  this.getHandler().listen(window, goog.events.EventType.CLICK, function($channel$$34_e$$236_media$$45_user$$) {
+    var $a$$36_href$$3_matches$$ = goog.dom.getAncestorByTagNameAndClass($channel$$34_e$$236_media$$45_user$$.target, "a");
     if($a$$36_href$$3_matches$$ = $a$$36_href$$3_matches$$ ? $a$$36_href$$3_matches$$.href : null) {
       if(($a$$36_href$$3_matches$$ = $a$$36_href$$3_matches$$.match("#(.*):(.*)")) && $a$$36_href$$3_matches$$.length) {
-        switch($channel$$34_e$$233_media$$46_user$$.preventDefault(), $channel$$34_e$$233_media$$46_user$$.stopPropagation(), $a$$36_href$$3_matches$$[1]) {
+        switch($channel$$34_e$$236_media$$45_user$$.preventDefault(), $channel$$34_e$$236_media$$45_user$$.stopPropagation(), $a$$36_href$$3_matches$$[1]) {
           case "user":
-            $channel$$34_e$$233_media$$46_user$$ = brkn.model.Users.getInstance().get($a$$36_href$$3_matches$$[2]);
-            brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.PROFILE, $channel$$34_e$$233_media$$46_user$$);
+            $channel$$34_e$$236_media$$45_user$$ = brkn.model.Users.getInstance().get($a$$36_href$$3_matches$$[2]);
+            brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.PROFILE, $channel$$34_e$$236_media$$45_user$$);
             break;
           case "channel":
-            $channel$$34_e$$233_media$$46_user$$ = brkn.model.Channels.getInstance().get($a$$36_href$$3_matches$$[2]);
-            brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.CHANGE_CHANNEL, $channel$$34_e$$233_media$$46_user$$);
+            $channel$$34_e$$236_media$$45_user$$ = brkn.model.Channels.getInstance().get($a$$36_href$$3_matches$$[2]);
+            brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.CHANGE_CHANNEL, $channel$$34_e$$236_media$$45_user$$);
             break;
           case "info":
-            $channel$$34_e$$233_media$$46_user$$ = brkn.model.Medias.getInstance().get($a$$36_href$$3_matches$$[2]);
-            brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.MEDIA_INFO, $channel$$34_e$$233_media$$46_user$$);
+            $channel$$34_e$$236_media$$45_user$$ = brkn.model.Medias.getInstance().get($a$$36_href$$3_matches$$[2]);
+            brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.MEDIA_INFO, $channel$$34_e$$236_media$$45_user$$);
             break;
           case "friendlist":
             brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.FRIEND_LIST)
@@ -16343,8 +16397,8 @@ brkn.Main.staticInit = function $brkn$Main$staticInit$() {
     goog.style.showElement($fbLogin$$, !0);
     goog.Timer.callOnce(goog.partial(goog.dom.classes.add, $fbLogin$$, "show"), 400)
   }, 100);
-  goog.events.listen($login$$, goog.events.EventType.CLICK, function($app_e$$236_scrollAnim$$) {
-    "static-scrollable" == $app_e$$236_scrollAnim$$.target.id && ($app_e$$236_scrollAnim$$ = goog.dom.classes.has($login$$, "app"), $expand$$ = !1, $app_e$$236_scrollAnim$$ ? brkn.Main.resizeStatic($expand$$) : ($app_e$$236_scrollAnim$$ = new goog.fx.dom.Scroll($login$$, [$login$$.scrollLeft, $login$$.scrollTop], [$login$$.scrollLeft, 0], 300), $app_e$$236_scrollAnim$$.play(), goog.events.listen($app_e$$236_scrollAnim$$, goog.fx.Animation.EventType.END, goog.partial(brkn.Main.resizeStatic, $expand$$))))
+  goog.events.listen($login$$, goog.events.EventType.CLICK, function($app_e$$239_scrollAnim$$) {
+    "static-scrollable" == $app_e$$239_scrollAnim$$.target.id && ($app_e$$239_scrollAnim$$ = goog.dom.classes.has($login$$, "app"), $expand$$ = !1, $app_e$$239_scrollAnim$$ ? brkn.Main.resizeStatic($expand$$) : ($app_e$$239_scrollAnim$$ = new goog.fx.dom.Scroll($login$$, [$login$$.scrollLeft, $login$$.scrollTop], [$login$$.scrollLeft, 0], 300), $app_e$$239_scrollAnim$$.play(), goog.events.listen($app_e$$239_scrollAnim$$, goog.fx.Animation.EventType.END, goog.partial(brkn.Main.resizeStatic, $expand$$))))
   });
   goog.events.listen($login$$, goog.events.EventType.SCROLL, function() {
     !goog.dom.classes.has($login$$, "scrolling") && 1 > $login$$.scrollTop && ($expand$$ = !1, brkn.Main.resizeStatic($expand$$))

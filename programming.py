@@ -451,9 +451,14 @@ class Programming():
   @classmethod
   def fetch_related_tweets(cls, medias):
     import constants
+    import tweepy
     from model import Tweet
     
-    api = tweepy.API()
+    auth_handler = tweepy.OAuthHandler(consumer_key=constants.TWITTER_CONSUMER_KEY,
+                                       consumer_secret=constants.TWITTER_CONSUMER_SECRET)
+    auth_handler.username = 'xyloinc'
+    auth_handler.set_access_token(constants.TWITTER_ACCESS_TOKEN, constants.TWITTER_TOKEN_SECRET)
+    api = tweepy.API(auth_handler)
     total = 0
     for media in medias:
       if media.last_twitter_fetch and \
@@ -465,14 +470,14 @@ class Programming():
                                include_entities=True, lang="en").items()
         for tweet in tweets:
           total += 1
-          if not tweet.from_user.lower() in constants.TWITTER_USER_BLACKLIST and not \
+          if not tweet.user.screen_name.lower() in constants.TWITTER_USER_BLACKLIST and not \
               any(phrase in tweet.text.lower() for phrase in constants.TWITTER_PHRASE_BLACKLIST):
             Tweet.add_from_result(tweet, media)
         media.last_twitter_fetch = datetime.datetime.now()
         media.put()
         logging.info(str(total) + ' TWEETS FETCHED')
       except tweepy.TweepError, e:
-        logging.info('query: ' + media.host_id + '\nreason: ' + e.reason + '\nresponse: ' + e.response)
+        logging.error('query: ' + media.host_id + '\nreason: ' + str(e.reason) + '\nresponse: ' + str(e.response.read()))
 
   @classmethod
   def add_youtube_feeds(cls):

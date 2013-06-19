@@ -157,13 +157,23 @@ def email_outbox(user_id):
           and from_users.get(msg['message']['from_user']['id']) != True:
         split = msg['message']['from_user']['name'].split(' ')
         first_name = split[0] if len(split) else msg['message']['from_user']['name']
-        message_email = emailer.Email(emailer.Message.MESSAGE(first_name),
-                                      {'first_name' : first_name,
-                                       'name': msg['message']['from_user']['name'],
-                                       'text': msg['message']['text'],
-                                       'image': 'https://graph.facebook.com/%s/picture' % msg['message']['from_user']['id'],
-                                       'link': 'http://www.xylocast.com'
-                                      })
+        if msg['message']['media']:
+          message_email = emailer.Email(emailer.Message.VIDEO(first_name),
+                                        {'first_name' : first_name,
+                                         'name': msg['message']['from_user']['name'],
+                                         'text': msg['message']['text'],
+                                         'image': 'http://i.ytimg.com/vi/%s/0.jpg' % msg['message']['media']['host_id'],
+                                         'title': msg['message']['media']['name'],
+                                         'link': 'http://' + msg['message']['media']['link']
+                                        })
+        else:
+          message_email = emailer.Email(emailer.Message.MESSAGE(first_name),
+                                        {'first_name' : first_name,
+                                         'name': msg['message']['from_user']['name'],
+                                         'text': msg['message']['text'],
+                                         'image': 'https://graph.facebook.com/%s/picture' % msg['message']['from_user']['id'],
+                                         'link': 'http://www.xylocast.com'
+                                        })
         message_email.send(user)
         from_users[msg['message']['from_user']['id']] = True
 

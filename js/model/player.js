@@ -93,5 +93,6 @@ brkn.model.Player.Actions = {
   NO_MEDIA: 'no-media',
   PLAY_ASYNC: 'play-async',
   PLAYING: 'playing',
-  SEEK: 'seek'
+  SEEK: 'seek',
+  TEN_SECONDS: 'ten-seconds'
 };

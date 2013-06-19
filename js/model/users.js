@@ -153,7 +153,7 @@ brkn.model.Users.prototype.get_or_add = function(user) {
 brkn.model.Users.prototype.search = function(query) {
   var users = goog.object.getValues(this.userMap);
   var results = goog.array.filter(users, function(u) {
-    return goog.string.caseInsensitiveStartsWith(u.name, query);
+    return u.name && goog.string.caseInsensitiveStartsWith(u.name, query);
   }, this);
   var fbFriends = goog.array.filter(goog.object.getValues(this.facebookFriends), function(f) {
     return goog.string.caseInsensitiveStartsWith(f, query);

@@ -30,11 +30,14 @@ brkn.model.Message = function(message) {
    * @private
    */
   this.text = message['text'];
+ 
   
   /**
    * @type {?brkn.model.Media}
    */
-  this.media = message['media'] ? brkn.model.Medias.getInstance().getOrAdd(message['media']) : null;
+  this.media = message['media'] ?
+      (goog.typeOf(message['media']) == 'brkn.model.Media' ? message['media'] :
+          brkn.model.Medias.getInstance().getOrAdd(message['media'])) : null;
   
   /**
    * @type {boolean}

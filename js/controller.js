@@ -275,6 +275,9 @@ brkn.Controller.prototype.enterDocument = function() {
               if (remaining < 2) {
                 brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.BEFORE_END);
               }
+              if (remaining < 10 && remaining > 9) {
+                brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.TEN_SECONDS);
+              }
               if (!goog.dom.classes.has(this.progressEl_, 'drag')) {
                 goog.dom.setTextContent(this.durationEl_,
                     (brkn.model.Player.getInstance().getCurrentTime() ?

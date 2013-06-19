@@ -113,6 +113,8 @@ class Stat(db.Model):
 
   @classmethod
   def add_session(cls, session):
+    if session.user.id in constants.SUPER_ADMINS:
+      return
     session_time = (session.tune_out - session.tune_in).seconds
     session_medias = len(session.sessionMedias.fetch(None))
     
@@ -163,6 +165,8 @@ class Stat(db.Model):
 
   @classmethod
   def add_comment(cls, media, user, facebook, twitter):
+    if session.user.id in constants.SUPER_ADMINS:
+      return
     user.comment_count += 1
     user.put()
     Stat.add_comment_trans(Stat.get_today().key(), facebook, twitter)
@@ -181,6 +185,8 @@ class Stat(db.Model):
 
   @classmethod
   def add_share(cls, user, facebook, twitter):
+    if session.user.id in constants.SUPER_ADMINS:
+      return
     user.share_count += 1
     user.put()
     Stat.add_share_trans(Stat.get_today().key(), facebook, twitter)
@@ -195,6 +201,8 @@ class Stat(db.Model):
 
   @classmethod
   def add_star(cls, media):
+    if session.user.id in constants.SUPER_ADMINS:
+      return
     media.star_count += 1
     media.put()
     Stat.add_star_trans(Stat.get_today().key())
@@ -211,6 +219,8 @@ class Stat(db.Model):
     
   @classmethod
   def add_like(cls, media):
+    if session.user.id in constants.SUPER_ADMINS:
+      return
     Media.add_like(media.id)
     Stat.add_like_trans(Stat.get_today().key())
     if not Stat.get_today().like_count or \
@@ -226,6 +236,8 @@ class Stat(db.Model):
 
   @classmethod
   def add_dislike(cls, media):
+    if session.user.id in constants.SUPER_ADMINS:
+      return
     Media.add_dislike(media.id)
     Stat.add_like_trans(Stat.get_today().key())
 

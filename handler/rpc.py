@@ -459,6 +459,7 @@ class MessageHandler(BaseHandler):
     from_id = self.request.get('from_id')
     to_id = self.request.get('to_id')
     text = self.request.get('text')
+    media_id = self.request.get('media_id')
     id = self.request.get('id')
     has_read = self.request.get('read')
     if id and has_read:
@@ -473,14 +474,16 @@ class MessageHandler(BaseHandler):
         to_user.put()
         
         # Send them notification on FB
-        fetch = urlfetch.fetch(url='https://graph.facebook.com/%s/notifications' % m,
+        fetch = urlfetch.fetch(url='https://graph.facebook.com/%s/notifications' % to_id,
                                payload='access_token=%s&template=%s&href=%s' %
                                (constants.facebook_app()['APP_ACCESS_TOKEN'],
-                               '@[' + user.id + ']' + ' sent you a message!',
+                               '@[' + user.id + ']' + ('sent you a video!' if media_id else ' sent you a message!'),
                                '?fb=1'),
                                method=urlfetch.POST)
-        
-      message = Message.add(from_user=from_user, to_user=to_user, text=text)
+      media = None
+      if media_id:
+        media = Media.get_by_key_name(media_id)
+      message = Message.add(from_user=from_user, to_user=to_user, text=text, media=media)
       broadcast.broadcastNewMessage(message)
       self.response.out.write(simplejson.dumps(message.toJson()))
       

@@ -17,18 +17,18 @@ class Tweet(db.Model):
   
   @classmethod
   def add_from_result(cls, result, media):
-    user = User.get_by_twitter_id(result.from_user_id)
+    user = User.get_by_twitter_id(result.user.id)
     return Tweet.get_or_insert(result.id_str,
-                               id=int(result.id_str),
+                               id=result.id,
                                media=media,
                                user=user,
                                text=db.Text(result.text),
                                time=result.created_at,
-                               handle=result.from_user,
-                               name=db.Text(result.from_user_name),
-                               user_id=result.from_user_id,
-                               picture_url=result.profile_image_url,
-                               picture_url_https=result.profile_image_url_https)
+                               handle=result.user.screen_name,
+                               name=db.Text(result.user.name),
+                               user_id=result.user.id,
+                               picture_url=result.user.profile_image_url,
+                               picture_url_https=result.user.profile_image_url_https)
     
   @classmethod
   def add_from_response(cls, user, response, media):

@@ -366,7 +366,7 @@ div#sidebar {
       }
     }
   }
-  div.comment-input, div.reply-input {
+  div.comment-input, div.reply-input, div.recipients {
     div.suggestions {
       position: absolute;
       bottom: 100%;
@@ -717,6 +717,7 @@ div#sidebar {
     margin-top: -45px;
     background: rgba(0, 0, 0, .6);
     .border-radius(6px);
+    z-index: 100;
     div.loading-spinner {
       background: @spinner3 no-repeat center;
       width: 90px;

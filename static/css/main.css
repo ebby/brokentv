@@ -2848,6 +2848,93 @@ div.vote div.dislike.checked {
   background: #B49B4B;
   opacity: .9;
 }
+div.send-suggestions {
+  position: absolute;
+  bottom: 13px;
+  left: 10px;
+  width: 150px;
+  border: 1px solid #f5f5f5;
+  background: rgba(0, 0, 0, 0.5);
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  opacity: .8;
+}
+div.send-suggestions div.label {
+  text-align: center;
+  height: 18px;
+  font-family: MuseoSans700;
+  font-size: 11px;
+  color: #181818;
+  background: #f5f5f5;
+  padding-left: 10px;
+  line-height: 18px;
+  -webkit-border-radius: 3px 3px 0 0;
+  -moz-border-radius: 3px 3px 0 0;
+  border-radius: 3px 3px 0 0;
+}
+div.send-suggestions div.label div.icon {
+  font-family: 'icons';
+  font-style: normal;
+  font-weight: normal;
+  speak: none;
+  text-decoration: inherit;
+  /* opacity .8 */
+
+  font-variant: normal;
+  /* Uncomment for 3D effect */
+
+  /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+
+  /* '' */
+
+  display: inline-block;
+  margin-right: 5px;
+  margin-left: -15px;
+}
+div.send-suggestions div.label div.icon:before {
+  content: '\e803';
+}
+div.send-suggestions div.send-suggestion {
+  position: relative;
+  border-bottom: 1px solid #f5f5f5;
+  height: 35px;
+  opacity: .6;
+  cursor: pointer;
+}
+div.send-suggestions div.send-suggestion:hover {
+  opacity: 1;
+}
+div.send-suggestions div.send-suggestion:last-child {
+  border-bottom: none;
+}
+div.send-suggestions div.send-suggestion div.picture img {
+  width: 35px;
+  height: 35px;
+}
+div.send-suggestions div.send-suggestion div.name,
+div.send-suggestions div.send-suggestion div.sent-notice {
+  position: absolute;
+  left: 40px;
+  top: 0;
+  color: #f5f5f5;
+  font-family: MuseoSans700;
+  font-size: 11px;
+  line-height: 37px;
+  width: 100px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+div.send-suggestions div.send-suggestion div.sent-notice {
+  display: none;
+}
+div.send-suggestions div.send-suggestion.sent div.name {
+  display: none;
+}
+div.send-suggestions div.send-suggestion.sent div.sent-notice {
+  display: block;
+}
 div.popup {
   text-align: center;
   -webkit-transition: opacity 0.3s ease;
@@ -3633,7 +3720,8 @@ div#sidebar div#sidebar-content div.media-list div.medias {
   padding-bottom: 5px;
 }
 div#sidebar div.comment-input div.suggestions,
-div#sidebar div.reply-input div.suggestions {
+div#sidebar div.reply-input div.suggestions,
+div#sidebar div.recipients div.suggestions {
   position: absolute;
   bottom: 100%;
   overflow: hidden;
@@ -3645,7 +3733,8 @@ div#sidebar div.reply-input div.suggestions {
   border-top-right-radius: 3px;
 }
 div#sidebar div.comment-input div.suggestions div.suggestion,
-div#sidebar div.reply-input div.suggestions div.suggestion {
+div#sidebar div.reply-input div.suggestions div.suggestion,
+div#sidebar div.recipients div.suggestions div.suggestion {
   height: 15px;
   padding: 5px;
   border-bottom: 1px solid #999;
@@ -3655,8 +3744,10 @@ div#sidebar div.reply-input div.suggestions div.suggestion {
 }
 div#sidebar div.comment-input div.suggestions div.suggestion:hover,
 div#sidebar div.reply-input div.suggestions div.suggestion:hover,
+div#sidebar div.recipients div.suggestions div.suggestion:hover,
 div#sidebar div.comment-input div.suggestions div.suggestion.selected,
-div#sidebar div.reply-input div.suggestions div.suggestion.selected {
+div#sidebar div.reply-input div.suggestions div.suggestion.selected,
+div#sidebar div.recipients div.suggestions div.suggestion.selected {
   background: rgba(110, 179, 194, 0.7);
 }
 div#sidebar div.comment-input {
@@ -4026,6 +4117,7 @@ div#sidebar div.loading {
   -webkit-border-radius: 6px;
   -moz-border-radius: 6px;
   border-radius: 6px;
+  z-index: 100;
 }
 div#sidebar div.loading div.loading-spinner {
   background: url(data:image/gif;base64,R0lGODlhIwAjALMCAP/MZv+ZM5mZmZmZZmaZzGaZmWaZZjOZZgAAAP///wAAAAAAAAAAAAAAAAAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh/wtYTVAgRGF0YVhNUDw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoTWFjaW50b3NoKSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDpEODIxNTlCQjlBRkUxMUUyOERBOUYwQjNDMEE2REI1RCIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDpEODIxNTlCQzlBRkUxMUUyOERBOUYwQjNDMEE2REI1RCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkQ4MjE1OUI5OUFGRTExRTI4REE5RjBCM0MwQTZEQjVEIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOkQ4MjE1OUJBOUFGRTExRTI4REE5RjBCM0MwQTZEQjVEIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+Af/+/fz7+vn49/b19PPy8fDv7u3s6+rp6Ofm5eTj4uHg397d3Nva2djX1tXU09LR0M/OzczLysnIx8bFxMPCwcC/vr28u7q5uLe2tbSzsrGwr66trKuqqainpqWko6KhoJ+enZybmpmYl5aVlJOSkZCPjo2Mi4qJiIeGhYSDgoGAf359fHt6eXh3dnV0c3JxcG9ubWxramloZ2ZlZGNiYWBfXl1cW1pZWFdWVVRTUlFQT05NTEtKSUhHRkVEQ0JBQD8+PTw7Ojk4NzY1NDMyMTAvLi0sKyopKCcmJSQjIiEgHx4dHBsaGRgXFhUUExIREA8ODQwLCgkIBwYFBAMCAQAAIfkEBQAAAgAsAAAAACMAIwAABFpQjECHuDjrzSX9VieOXzmeXPmhLKZSbfsGMTvX6I2T786rPpEuuBkSM8bjJalkHp1EaFDqo+6sOGxNG+PKekokOLwck702cxidUzfdT3hUHpyUQuSLPYDPRwAAIfkEBQAAAgAsCQAFAAcAHgAABBdQDECHpHjizbv/YCiOZGmeaEpq2VUJEQAh+QQFAAACACwSAAoABwAZAAAEFlCYQ42keOLNu/9gKI5kaZ6kll2VEAEAIfkECQAAAgAsAAAAACIAIwAABERQyEmrvTjrzbv/YCiOZGmeaKqubOu+sFYQdMHOdL3m/M7Tvl+wp/oBi8ZhTnlMGQlMKFI4JTqT1WW2iXqucDnbNyyIAAAh+QQJAAACACwAAAAAIwAjAAAEqFDISau9OOvNu/9gKHoDYA6jVppnirGwe8GsbNGmXeHAZBxAQ4on+QGDI6LgyEziJMyjkwaNHqaxpXVSIHgLG6X1Kuh6vxrxVnBup5/aqKR9flPjTTadYM+O53t9NXhSenSCOYRAgIcZanKGbo5wf5F1k3eVe3yYfmubiD2KZKCdg5qBpomojS+Un6mumbCtM6+QpRgrLCgCRkdCZXRgKrwUv8ESZgTEEQAh+QQJAAACACwAAAAAIwAjAAAEcVDISau9OOvNu/9gKI5kaZ5oqorG4Rqr1LpvTN/27eY6j0sFgrBA0u0EQeFwZDxIlFCm8QkVSnuCqlXUpFavPy0BTPNGudOslnwUs53qLxrrnofX9nL8HOrulW9mgHlteH1pdSEzNDBIVUQji41ASpARACH5BAUAAAIALAAAAAAjACMAAAREUMhJq7046827/2AojmRpnmiqrmzrvnBaEHTRznTN5vzO075fsLf6AYvGYU55VBkJTChSOCU6k9Vltpl6snA52zcsiQAAOw==) no-repeat center;
@@ -5119,6 +5211,9 @@ div#sidebar div.messages div.message {
 div#sidebar div.messages div.message.flip div.body {
   left: 10px;
 }
+div#sidebar div.messages div.message.flip div.body div.list-media {
+  margin-left: 0;
+}
 div#sidebar div.messages div.message.flip div.picture {
   right: 10px;
 }
@@ -5140,6 +5235,10 @@ div#sidebar div.messages div.message div.body div.texts {
 }
 div#sidebar div.messages div.message div.body div.texts:hover div.text div.timestamp {
   display: none;
+}
+div#sidebar div.messages div.message div.body div.list-media {
+  margin-top: 5px;
+  margin-left: -40px;
 }
 div#sidebar div.messages div.message div.body div.text {
   background: #f1f1f1;
@@ -5842,7 +5941,7 @@ div#sidebar div.info div.options div.icon {
   top: 50%;
   left: 50%;
 }
-div#sidebar div.info div.options div.plus .icon {
+div#sidebar div.info div.options div.send .icon {
   font-family: 'icons';
   font-style: normal;
   font-weight: normal;
@@ -5855,14 +5954,14 @@ div#sidebar div.info div.options div.plus .icon {
 
   /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
 
-  /* '+' */
+  /* '' */
 
-  font-size: 18px;
-  margin-top: -9px;
-  margin-left: -6px;
+  font-size: 15px;
+  margin-top: -8px;
+  margin-left: -7px;
 }
-div#sidebar div.info div.options div.plus .icon:before {
-  content: '\2b';
+div#sidebar div.info div.options div.send .icon:before {
+  content: '\e803';
 }
 div#sidebar div.info div.options div.star .icon {
   font-family: 'icons';
@@ -6284,6 +6383,137 @@ div#sidebar div.info div.create-poll div.submit-poll {
   color: #497882;
 }
 div#sidebar div.info div.create-poll div.submit-poll.goog-custom-button-disabled {
+  background: #e5e5e5;
+  cursor: normal;
+  color: #bbb;
+}
+div#sidebar div.info div.send-media {
+  text-align: left;
+  position: absolute;
+  width: 255px;
+  right: 50px;
+  top: 111px;
+  padding-bottom: 35px;
+}
+div#sidebar div.info div.send-media:after {
+  left: 100%;
+  border-color: rgba(222, 222, 222, 0);
+  border-left-color: #fefefe;
+  border-width: 5px;
+  top: 50%;
+  margin-top: -5px;
+}
+div#sidebar div.info div.send-media:before {
+  left: 100%;
+  border-color: rgba(204, 204, 204, 0);
+  border-left-color: rgba(0, 0, 0, 0.6);
+  border-width: 6px;
+  top: 50%;
+  margin-top: -6px;
+}
+div#sidebar div.info div.send-media div.button {
+  color: #181818;
+  background: #f5f5f5;
+  font-size: 11px;
+  text-shadow: 1px 1px 1px white;
+  padding: 2px 5px;
+  line-height: 17px;
+  margin-top: 5px;
+}
+div#sidebar div.info div.send-media div.label {
+  text-align: left;
+  margin-left: 0;
+}
+div#sidebar div.info div.send-media div.close {
+  font-family: 'icons';
+  font-style: normal;
+  font-weight: normal;
+  speak: none;
+  text-decoration: inherit;
+  /* opacity .8 */
+
+  font-variant: normal;
+  /* Uncomment for 3D effect */
+
+  /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+
+  /* '✕' */
+
+  position: absolute;
+  right: 6px;
+  top: 2px;
+  font-size: 15px;
+  color: #181818;
+  text-shadow: 1px 1px 1px white;
+}
+div#sidebar div.info div.send-media div.close:before {
+  content: '\2715';
+}
+div#sidebar div.info div.send-media textarea {
+  display: block;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  position: relative;
+  width: 255px;
+  font-size: 11px;
+  min-height: 16px;
+  padding: 4px;
+  outline: none;
+  border: 1px solid #aaa;
+  resize: none;
+  font-family: MuseoSans300;
+  -webkit-touch-callout: text;
+  -webkit-user-select: text;
+  -khtml-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+  background: #f5f5f5;
+}
+div#sidebar div.info div.send-media div.recipients {
+  position: relative;
+  background: #f5f5f5;
+  margin-bottom: 4px;
+}
+div#sidebar div.info div.send-media div.recipients textarea {
+  background: transparent;
+  font-size: 11px;
+  font-family: MuseoSans700;
+}
+div#sidebar div.info div.send-media div.recipients.decorated textarea {
+  z-index: 1;
+}
+div#sidebar div.info div.send-media div.recipients.decorated div.token {
+  font-size: 11px;
+  font-family: MuseoSans700;
+  background: rgba(110, 179, 194, 0.4);
+  text-shadow: 1px 1px 1px white;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  border: 1px solid #666;
+  display: inline;
+  margin-left: -1px;
+}
+div#sidebar div.info div.send-media div.recipients.decorated div.highlighter {
+  color: transparent;
+  text-shadow: none;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  padding: 2px;
+  font-family: MuseoSans700;
+  font-size: 11px;
+}
+div#sidebar div.info div.send-media div.add-comment {
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+  width: 50px;
+  color: #497882;
+}
+div#sidebar div.info div.send-media div.add-comment.goog-custom-button-disabled {
   background: #e5e5e5;
   cursor: normal;
   color: #bbb;

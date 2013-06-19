@@ -148,7 +148,8 @@ brkn.sidebar.Messages.prototype.decorateInternal = function(el) {
   }, this);
 
   brkn.model.Users.getInstance().subscribe(brkn.model.Users.Action.NEW_MESSAGE, function(m) {
-    if (m.fromUser.id == this.user_.id || m.toUser.id == this.user_.id) {
+    if (m.fromUser.id != brkn.model.Users.getInstance().currentUser.id &&
+        (m.fromUser.id == this.user_.id || m.toUser.id == this.user_.id)) {
       if (this.inbox_) {
         // Remove last message by this sender
         var incr = true;
@@ -209,13 +210,14 @@ brkn.sidebar.Messages.prototype.addMessage_ = function(message, opt_first) {
   this.moreMessagesEl_ && goog.style.showElement(this.moreMessagesEl_,
       !this.inbox_ && this.messages_.length >= 10);
   var timeEl;
+  var mediaEl;
   if (!this.inbox_ && this.lastMessage_ && this.lastMessage_.fromUser.id == message.fromUser.id) {
     var textEl = soy.renderAsElement(brkn.sidebar.messages.text, {
       message: message
     });
     goog.dom.appendChild(goog.dom.getElementByClass('texts', this.lastMessageEl_), textEl);
     if (message.media) {
-      var mediaEl = soy.renderAsElement(brkn.sidebar.listMedia, {
+      mediaEl = soy.renderAsElement(brkn.sidebar.listMedia, {
         media: message.media
       });
       goog.dom.appendChild(goog.dom.getElementByClass('texts', this.lastMessageEl_), mediaEl);
@@ -232,12 +234,6 @@ brkn.sidebar.Messages.prototype.addMessage_ = function(message, opt_first) {
       goog.dom.insertChildAt(this.messagesEl_, messageEl, 3);
     } else {
       goog.dom.appendChild(this.messagesEl_, messageEl); 
-    }
-    if (message.media) {
-      var mediaEl = soy.renderAsElement(brkn.sidebar.listMedia, {
-        media: message.media
-      });
-      goog.dom.appendChild(goog.dom.getElementByClass('texts', messageEl), mediaEl);
     }
     timeEl = goog.dom.getElementByClass('timestamp', messageEl);
     goog.dom.classes.enable(messageEl, 'unread', !message.read)
@@ -256,15 +252,44 @@ brkn.sidebar.Messages.prototype.addMessage_ = function(message, opt_first) {
         alert.load();
         alert.play();
       }
+    } else if (message.media) {
+      mediaEl = soy.renderAsElement(brkn.sidebar.listMedia, {
+        media: message.media
+      });
+      goog.dom.appendChild(goog.dom.getElementByClass('texts', messageEl), mediaEl);
     }
-  }
+  } 
   brkn.model.Clock.getInstance().addTimestamp(message.time, timeEl);
   if (!opt_first) {
     this.getElement().scrollTop = this.getElement().scrollHeight; 
   }
-  if (!this.inbox_ && !message.read &&
+  if (!this.inbox_ && !message.read && message.id && 
       brkn.model.Sidebar.getInstance().currentProfileId == message.fromUser.id) {
     message.setRead();
+  }
+  if (mediaEl) {
+    var previewEl = goog.dom.getElementByClass('list-play', mediaEl);
+    var plusEl = goog.dom.getElementByClass('list-plus', mediaEl);
+    this.getHandler()
+        .listen(mediaEl,
+            goog.events.EventType.CLICK,
+            goog.bind(function() {
+              brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.MEDIA_INFO, message.media);
+            }, this))
+        .listen(previewEl,
+            goog.events.EventType.CLICK,
+            goog.bind(function(e) {
+              e.preventDefault();
+              e.stopPropagation();
+              var program = brkn.model.Program.async(message.media);
+              brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.PLAY_ASYNC, program);
+            }, this))
+       .listen(plusEl, goog.events.EventType.CLICK, function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            brkn.model.Channels.getInstance().getMyChannel().publish(brkn.model.Channel.Action.ADD_QUEUE,
+                message.media, true);
+          });  
   }
 };
 

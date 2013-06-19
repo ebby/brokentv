@@ -1,0 +1,19 @@
+{namespace brkn.player}
+
+/**
+ * @param id
+ * @param name
+ */
+{template .sendSuggestion}
+  <div class="send-suggestion">
+    <div class="picture">
+      <img src="https://graph.facebook.com/{$id}/picture">
+    </div>
+    <div class="name">
+      {$name}
+    </div>
+    <div class="sent-notice">
+      Sent!
+    </div>
+  </div>
+{/template}

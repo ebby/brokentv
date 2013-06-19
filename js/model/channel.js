@@ -244,7 +244,7 @@ brkn.model.Channel.prototype.getCurrentProgram = function(opt_offset) {
     if (this.currentProgram.ended) {
       this.currentProgram = this.getNextProgram();
     }
-  } else {
+  } else if (!this.myChannel) {
     this.currentProgram = this.getScheduledProgram();
   }
 

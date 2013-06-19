@@ -3,6 +3,7 @@ goog.provide('brkn.Player');
 goog.require('brkn.model.Channels');
 goog.require('brkn.model.Notify');
 goog.require('brkn.model.Player');
+goog.require('brkn.player');
 
 goog.require('goog.fx.AnimationSerialQueue');
 goog.require('goog.fx.dom');
@@ -18,6 +19,12 @@ goog.require('goog.ui.CustomButton');
  */
 brkn.Player = function() {
 	goog.base(this);
+	
+	/**
+	 * @type {boolean}
+	 * @private
+	 */
+	this.nexted_ = false;
 };
 goog.inherits(brkn.Player, goog.ui.Component);
 
@@ -93,6 +100,13 @@ brkn.Player.prototype.dislikeEl_;
 
 
 /**
+ * @type {Element}
+ * @private
+ */
+brkn.Player.prototype.sendSuggestionsEl_;
+
+
+/**
  * @type {number}
  * @private
  */
@@ -130,6 +144,7 @@ brkn.Player.prototype.enterDocument = function() {
   this.vote_ = goog.dom.getElementByClass('vote', this.getElement());
   this.likeEl_ = goog.dom.getElementByClass('like', this.getElement());
   this.dislikeEl_ = goog.dom.getElementByClass('dislike', this.getElement());
+  this.sendSuggestionsEl_ = goog.dom.getElementByClass('send-suggestions', this.getElement());
   var keyHandler = new goog.events.KeyHandler(document);
   
   this.updateStagecover_();
@@ -214,6 +229,10 @@ brkn.Player.prototype.enterDocument = function() {
       this.playAsync_, this);
   brkn.model.Player.getInstance().subscribe(brkn.model.Player.Actions.SEEK,
       this.seek_, this);
+  brkn.model.Player.getInstance().subscribe(brkn.model.Player.Actions.TEN_SECONDS,
+      function() {
+        this.sendSuggestions_();
+      }, this);
   brkn.model.Player.getInstance().subscribe(brkn.model.Player.Actions.BEFORE_END,
       function() {
         // TODO: fade in
@@ -345,6 +364,7 @@ brkn.Player.prototype.playProgram = function(program) {
   this.play(program.media);
   if (DESKTOP) {
     this.fetchLike_(program.media);
+    goog.style.showElement(this.sendSuggestionsEl_, false);
   }
 };
 
@@ -551,6 +571,7 @@ brkn.Player.prototype.playerStateChange_ = function(event) {
       
       break;
     case YT.PlayerState.PLAYING:
+      this.nexted_ = false;
       brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.PLAYING,
           brkn.model.Player.getInstance().getCurrentProgram().media);
       break;
@@ -655,15 +676,89 @@ brkn.Player.prototype.updateStagecover_ = function(opt_message, opt_beforeEnd, o
 
 
 brkn.Player.prototype.next_ = function() {
-  var nextProgram = brkn.model.Channels.getInstance().currentChannel.getCurrentProgram();
-  if (nextProgram) {
-    brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.NEXT_PROGRAM,
-        nextProgram);
-  } else {
-    brkn.model.Player.getInstance().setCurrentProgram(null);
-    brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.CHANGE_CHANNEL,
-        brkn.model.Channels.getInstance().findOnline(), true);
+  if (!this.nexted_) {
+    var nextProgram = brkn.model.Channels.getInstance().currentChannel.getCurrentProgram();
+    if (nextProgram) {
+      brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.NEXT_PROGRAM,
+          nextProgram);
+    } else {
+      brkn.model.Player.getInstance().setCurrentProgram(null);
+      brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.CHANGE_CHANNEL,
+          brkn.model.Channels.getInstance().findOnline(), true);
+    }
+    this.nexted_ = true;
   }
+};
+
+
+brkn.Player.prototype.sendSuggestions_ = function() {
+  if (goog.style.isElementShown(this.sendSuggestionsEl_)) {
+    return;
+  }
+  var users = goog.object.getKeys(brkn.model.Users.getInstance().userMap);
+  var index1 = Math.floor(Math.random() * (users.length - 1));
+  var index2 = Math.floor(Math.random() * (users.length - 1));
+  var user1 = brkn.model.Users.getInstance().userMap[users[index1]];
+  var user2 = brkn.model.Users.getInstance().userMap[users[index2]];
+
+  var suggestion1 = soy.renderAsElement(brkn.player.sendSuggestion, {
+    id: user1.id,
+    name: user1.name
+  });
+  
+  var suggestion2 = soy.renderAsElement(brkn.player.sendSuggestion, {
+    id: user2.id,
+    name: user2.name
+  });
+  
+  var suggestionsEl = goog.dom.getElement('send-suggestions');
+  suggestionsEl.innerHTML = '';
+  goog.dom.appendChild(suggestionsEl, suggestion1);
+  goog.dom.appendChild(suggestionsEl, suggestion2);
+  goog.style.showElement(this.sendSuggestionsEl_, true);
+  
+  this.getHandler()
+      .listen(suggestion1, goog.events.EventType.CLICK, goog.bind(function() {
+        goog.dom.classes.add(suggestion1, 'sent');
+
+        var message = new brkn.model.Message({
+          'from_user': brkn.model.Users.getInstance().currentUser,
+          'to_user': user1,
+          'text': 'Sent you a video!',
+          'media': brkn.model.Player.getInstance().getCurrentProgram().media
+        });
+        message.time = new goog.date.DateTime();
+        message.relativeTime = goog.date.relative.format(message.time.getTime()) 
+        brkn.model.Users.getInstance().publish(brkn.model.Users.Action.NEW_MESSAGE, message);
+        
+        goog.net.XhrIo.send(
+            '/_message',
+            goog.functions.NULL(),
+            'POST',
+            'from_id=' + brkn.model.Users.getInstance().currentUser.id + 
+            '&to_id=' + message.toUser.id + '&text=' + message.text +
+            '&media_id=' + message.media.id);
+      }, this))
+      .listen(suggestion2, goog.events.EventType.CLICK, goog.bind(function() {
+        goog.dom.classes.add(suggestion2, 'sent');
+        var message = new brkn.model.Message({
+          'from_user': brkn.model.Users.getInstance().currentUser,
+          'to_user': user2,
+          'text': 'Sent you a video!',
+          'media': brkn.model.Player.getInstance().getCurrentProgram().media
+        });
+        message.time = new goog.date.DateTime();
+        message.relativeTime = goog.date.relative.format(message.time.getTime()) 
+        brkn.model.Users.getInstance().publish(brkn.model.Users.Action.NEW_MESSAGE, message);
+        
+        goog.net.XhrIo.send(
+            '/_message',
+            goog.functions.NULL(),
+            'POST',
+            'from_id=' + brkn.model.Users.getInstance().currentUser.id + 
+            '&to_id=' + message.toUser.id + '&text=' + message.text +
+            '&media_id=' + message.media.id);
+      }, this))
 };
 
 

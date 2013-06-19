@@ -151,8 +151,8 @@ brkn.sidebar.Info = function(media, opt_noFetch, opt_lastMedia, opt_lastInput, o
   /**
    * @type {goog.ui.CustomButton}
    */
-  this.plusButton_ = new goog.ui.CustomButton('Plus');
-  this.plusButton_.setSupportedState(goog.ui.Component.State.CHECKED,
+  this.sendButton_ = new goog.ui.CustomButton('Send');
+  this.sendButton_.setSupportedState(goog.ui.Component.State.CHECKED,
       true);
   
   /**
@@ -247,6 +247,13 @@ brkn.sidebar.Info.prototype.createPoll_;
 
 
 /**
+ * @type {Element}
+ * @private
+ */
+brkn.sidebar.Info.prototype.sendPopup_;
+
+
+/**
  * @type {goog.Timer}
  * @private
  */
@@ -302,11 +309,12 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
   this.fbButton_.decorate(goog.dom.getElementByClass('facebook', this.getElement()));
   this.twitterButton_.decorate(goog.dom.getElementByClass('twitter', this.getElement()));
   this.playButton_.decorate(goog.dom.getElementByClass('play', this.getElement()));
-  this.plusButton_.decorate(goog.dom.getElementByClass('plus', this.getElement()));
+  this.sendButton_.decorate(goog.dom.getElementByClass('send', this.getElement()));
   this.createPollButton_.decorate(goog.dom.getElementByClass('create-poll-button', this.getElement()));
   this.tweetTimer_ = new goog.Timer(5000);
   this.watchWith_ = goog.dom.getElementByClass('watch-with', this.getElement());
   this.createPoll_ = goog.dom.getElementByClass('create-poll', this.getElement());
+  this.sendPopup_ = goog.dom.getElementByClass('send-media', this.getElement());
   
   goog.dom.classes.enable(this.getElement(), 'mini', this.mini_);
 
@@ -352,8 +360,8 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
           goog.bind(this.onTwitterButton_, this))
       .listen(this.playButton_, goog.ui.Component.EventType.ACTION,
           goog.bind(this.onPlayButton_, this))
-      .listen(this.plusButton_, goog.ui.Component.EventType.ACTION,
-          goog.bind(this.onPlusButton_, this))
+      .listen(this.sendButton_, goog.ui.Component.EventType.ACTION,
+          goog.bind(this.onSendButton_, this))
       .listen(goog.dom.getElementByClass('local', this.getElement()),
           goog.events.EventType.CLICK,
           goog.bind(function(e) {
@@ -494,8 +502,8 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
   }
   
   if (DESKTOP && !IPAD) {
-    brkn.Popup.getInstance().hovercard(this.plusButton_.getElement(), brkn.model.Popup.Position.LEFT,
-        brkn.model.Popup.Action.TOOLTIP, {'text': 'Add to Queue'});
+    brkn.Popup.getInstance().hovercard(this.sendButton_.getElement(), brkn.model.Popup.Position.LEFT,
+        brkn.model.Popup.Action.TOOLTIP, {'text': 'Send'});
     brkn.Popup.getInstance().hovercard(this.fbButton_.getElement(), brkn.model.Popup.Position.LEFT,
         brkn.model.Popup.Action.TOOLTIP, {'text': 'Post to Facebook'});
     brkn.Popup.getInstance().hovercard(this.twitterButton_.getElement(), brkn.model.Popup.Position.LEFT,
@@ -540,10 +548,6 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
   brkn.model.Users.getInstance().currentUser.subscribe(
       brkn.model.User.Actions.SET_STARRED, function() {
         this.starToggle_.setChecked(brkn.model.Users.getInstance().currentUser.isStarred(this.media_));
-      }, this);
-  brkn.model.Channels.getInstance().getMyChannel().subscribe(brkn.model.Channel.Action.ADD_QUEUE,
-      function(media, add) {
-        this.plusButton_.setChecked(add);
       }, this);
   
   this.resize();
@@ -957,6 +961,7 @@ brkn.sidebar.Info.prototype.activateComment_ = function(comment, commentEl) {
     var replyTextarea = goog.dom.getElementByClass('reply-textarea', commentEl);
     this.getHandler().listen(replyTextarea, goog.events.EventType.CLICK, goog.bind(function() {
       if (!goog.dom.classes.has(replyInput, 'decorated')) {
+//        brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.PLAY, false);
         var commentInput = new brkn.sidebar.CommentInput(false, true, true);
         commentInput.decorate(replyInput);
         commentInput.reply(comment, comment.user);
@@ -1166,7 +1171,48 @@ brkn.sidebar.Info.prototype.onPlayButton_ = function() {
 /**
  * @private
  */
-brkn.sidebar.Info.prototype.onPlusButton_ = function() {
-  brkn.model.Channels.getInstance().getMyChannel().publish(brkn.model.Channel.Action.ADD_QUEUE,
-      (/** @type {brkn.model.Media} */ this.getModel()), this.plusButton_.isChecked());
+brkn.sidebar.Info.prototype.onSendButton_ = function() {
+  if (!goog.dom.classes.has(this.sendPopup_, 'decorated')) {
+    var recipients = new brkn.sidebar.CommentInput(false, true, false, true);
+    recipients.decorate(goog.dom.getElementByClass('recipients', this.sendPopup_));
+    var messageInput = new brkn.sidebar.CommentInput(false, false, false, false, true);
+    messageInput.decorate(goog.dom.getElementByClass('send-message', this.sendPopup_));
+    
+    this.getHandler()
+        .listen(messageInput, 'add', goog.bind(function(e) {
+          var tokens = recipients.getTokens();
+          if (tokens.length) {
+            goog.array.forEach(tokens, function(r) {
+              var message = new brkn.model.Message({
+                'from_user': brkn.model.Users.getInstance().currentUser,
+                'to_user': r.id,
+                'text': e.text || 'Sent you a video!',
+                'media': this.model_
+              });
+              message.time = new goog.date.DateTime();
+              message.relativeTime = goog.date.relative.format(message.time.getTime()) 
+              brkn.model.Users.getInstance().publish(brkn.model.Users.Action.NEW_MESSAGE, message);
+              
+              goog.net.XhrIo.send(
+                  '/_message',
+                  e.callback,
+                  'POST',
+                  'from_id=' + brkn.model.Users.getInstance().currentUser.id + 
+                  '&to_id=' + r.id + '&text=' + message.text +
+                  '&media_id=' + this.model_.id);
+            }, this);
+            recipients.clear();
+            messageInput.clear();
+            this.sendButton_.setChecked(false);
+            goog.style.showElement(this.sendPopup_, false);
+          }
+      }, this))
+      .listen(goog.dom.getElementByClass('close', this.sendPopup_),
+          goog.events.EventType.CLICK, goog.bind(function() {
+            goog.style.showElement(this.sendPopup_, false);
+            this.sendButton_.setChecked(false);
+          }, this));
+      goog.dom.classes.add(this.sendPopup_, 'decorated');
+  }
+  goog.style.showElement(this.sendPopup_, this.sendButton_.isChecked());
 };

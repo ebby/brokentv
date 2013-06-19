@@ -68,6 +68,13 @@ class Message():
             'subject' : name + ' sent you a message!',
             'template': 'message.html'
            }
+    
+  @staticmethod
+  def VIDEO(name):
+    return {
+            'subject' : name + ' sent you a video!',
+            'template': 'video.html'
+           }
   
   @staticmethod
   def WELCOME_FRIEND(name):
