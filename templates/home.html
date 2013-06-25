@@ -32,6 +32,8 @@
       var DESKTOP = true;
       var EMBED = '{{ embed }}' == 'True';
       var FB_APP_ID = '{{ facebook_app_id }}';
+      var LOGIN_REQUIRED = '{{ login_required }}' == 'True'
+      var POWER_ON = '{{ power_on }}' == 'True'
 
 			// Re-namespace to avoid closure conflict.
 			var appengine = goog.appengine; 
@@ -77,8 +79,8 @@
 	          <div class="subtitle">Your Television Stream</div>
 		        <div id="fb-login" class="fb-login" style="display: none">
 		          <div class="power"><div class="bg"></div></div>
-		          <div class="label">LOGIN</div>
-		          <div class="with-fb">with facebook</div>
+		          <div class="label">POWER</div>
+		          <div class="with-fb">turn it on</div>
 		          <div class="waitlist">You're on the waitlist</div>
 		          <div class="loading">LOADING</div>
 		          <div id="error"></div>

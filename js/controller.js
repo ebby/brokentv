@@ -167,14 +167,17 @@ brkn.Controller.prototype.enterDocument = function() {
   this.volumeButton_.decorate(goog.dom.getElementByClass('volume', this.getElement()));
   
   this.addChild(this.infoToggle_);
+  
+  var currentUser = brkn.model.Users.getInstance().currentUser;
+  
   this.infoToggle_.decorate(goog.dom.getElement('info-toggle'));
-  goog.style.showElement(this.infoToggle_.getElement(),
-      brkn.model.Users.getInstance().currentUser.accessLevel != brkn.model.User.AccessLevel.ADMIN);
+  goog.style.showElement(this.infoToggle_.getElement(), !currentUser ||
+      currentUser.accessLevel != brkn.model.User.AccessLevel.ADMIN);
   
   this.addChild(this.adminToggle_);
   this.adminToggle_.decorate(goog.dom.getElement('admin-toggle'));
-  goog.style.showElement(this.adminToggle_.getElement(),
-      brkn.model.Users.getInstance().currentUser.accessLevel == brkn.model.User.AccessLevel.ADMIN);
+  goog.style.showElement(this.adminToggle_.getElement(), currentUser &&
+      currentUser.accessLevel == brkn.model.User.AccessLevel.ADMIN);
 
   var guideThrottle = new goog.Throttle(this.throttledGuide_, 1000, this);
 

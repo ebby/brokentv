@@ -65,12 +65,13 @@ class Channel(db.Model):
     return channel
   
   @classmethod
-  def youtube_channel(cls, user, name, yt_channel_id=None, yt_playlist_id=None):
-    channel = Channel(key_name= user.id + '-' + (yt_channel_id or yt_playlist_id),
+  def youtube_channel(cls, name, user=None, token=None, yt_channel_id=None, yt_playlist_id=None):
+    logging.info(user)
+    channel = Channel(key_name=((user.id if user else str(token)) + '-' + (yt_channel_id or yt_playlist_id)),
                       name=name, privacy=Privacy.FRIENDS, online=True, user=user)
     channel_id = (yt_channel_id or yt_playlist_id)
     medias = []
-
+    all = True
     youtube3 = get_youtube3_service()
     search_response = {}
     if yt_channel_id:
@@ -86,7 +87,7 @@ class Channel(db.Model):
             topicId=topic_id,
             part='id,snippet',
             order='date',
-            maxResults=1,
+            maxResults=(20 if all else 1),
             type='video'
           ).execute()
       else:   
@@ -94,7 +95,7 @@ class Channel(db.Model):
             channelId=yt_channel_id,
             part='id,snippet',
             order='date',
-            maxResults=1,
+            maxResults=(20 if all else 1),
             fields='items',
             type='video'
           ).execute()
@@ -102,7 +103,7 @@ class Channel(db.Model):
       search_response = youtube3.playlistItems().list(
           playlistId=yt_playlist_id,
           part='id,snippet',
-          maxResults=1,
+          maxResults=(20 if all else 1),
           fields='items'
         ).execute()
 
@@ -119,19 +120,35 @@ class Channel(db.Model):
       ).execute()
 
       medias = Media.add_from_snippet(videos_response.get("items", []), approve=True)
-        
-      deferred.defer(util.schedule_youtube_channel, user.id, name, channel_id, yt_channel_id=yt_channel_id,
-                     yt_playlist_id=yt_playlist_id,
-                     _name='youtube-channel-' + channel_id + '-' + str(uuid.uuid1()), _queue='youtube')
+      
+      if not all:
+        deferred.defer(util.schedule_youtube_channel,
+                       name=name,
+                       user_id=user.id if user else None,
+                       token=token,
+                       channel_id=channel_id,
+                       yt_channel_id=yt_channel_id,
+                       yt_playlist_id=yt_playlist_id,
+                       _name='youtube-channel-' + channel_id + '-' + str(uuid.uuid1()),
+                       _queue='youtube')
 
-    programs = programming.Programming.set_user_channel_programs(user.id, channel, medias,
-                                                    time=datetime.datetime.now(), reset=True)
-
-    broadcast.broadcastNewPrograms(channel, programs, new_channel=True, to_owner=False)
+    programs = []
+    if user:
+      programs = programming.Programming.set_user_channel_programs(user.id, channel, medias,
+                                                      time=datetime.datetime.now(), reset=True)
+    else:
+      next_time = datetime.datetime.now()
+      for media in medias:
+        program = Program.add_program(channel, media, time=next_time)
+        if program:
+          programs.append(program)
+          next_time = next_time + datetime.timedelta(seconds=media.duration)
+    if not all:
+      broadcast.broadcastNewPrograms(channel, programs, new_channel=True, to_owner=False, token=token)
     
     data_json = {
       'channel': channel.toJson(),
-      'program': programs[0].toJson() if len(programs) else None
+      'programs': [p.toJson() for p in programs]
     }
     return data_json
   

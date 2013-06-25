@@ -34,7 +34,6 @@ brkn.model.Channels = function() {
   this.myChannel;
 	
 	this.subscribe(brkn.model.Channels.Actions.CHANGE_CHANNEL, this.changeChannel, this);
-	this.subscribe(brkn.model.Channels.Actions.NEXT_PROGRAM, this.updateOnlineUsers, this);
 };
 goog.inherits(brkn.model.Channels, goog.pubsub.PubSub);
 goog.addSingletonGetter(brkn.model.Channels);
@@ -142,9 +141,6 @@ brkn.model.Channels.prototype.setCurrentChannel = function(currentChannelId) {
   var channel = this.channelMap[currentChannelId] || this.channels[0];
   this.currentChannel = channel;
   this.currentChannel = this.findOnline() || this.currentChannel;
-  if (this.currentChannel) {
-    this.updateOnlineUsers(this.currentChannel.getCurrentProgram());
-  }
 };
 
 
@@ -188,43 +184,15 @@ brkn.model.Channels.prototype.changeChannel = function(channel, opt_forced) {
       (channel && this.currentChannel && this.currentChannel.id != channel.id)) {
     this.lastChannel = this.currentChannel;
     this.currentChannel = channel;
-    this.updateOnlineUsers(channel.getCurrentProgram());
-    var program = channel.getCurrentProgram();
-    var withFriends = program && !goog.object.isEmpty(program.media.onlineViewers);
-    goog.net.XhrIo.send('/_changechannel', goog.functions.NULL(), 'POST',
-        'channel=' + channel.id + '&friends=' + withFriends +
-        '&media_id' + program.media.id + (opt_forced ? '&forced=true' : ''));
-    brkn.model.Analytics.getInstance().changeChannel(channel, this.lastChannel);
+    if (brkn.model.Users.getInstance().currentUser.loggedIn) {
+      var program = channel.getCurrentProgram();
+      var withFriends = program && !goog.object.isEmpty(program.media.onlineViewers);
+      goog.net.XhrIo.send('/_changechannel', goog.functions.NULL(), 'POST',
+          'channel=' + channel.id + '&friends=' + withFriends +
+          '&media_id' + program.media.id + (opt_forced ? '&forced=true' : ''));
+      brkn.model.Analytics.getInstance().changeChannel(channel, this.lastChannel);
+    }
   }
-};
-
-
-/**
- * @param {?brkn.model.Program} program
- */
-brkn.model.Channels.prototype.updateOnlineUsers = function(program) {
-//  if (this.currentChannel) {
-//    if (this.currentProgram_) {
-//      // If previous program, remove channel viewers.
-//      goog.array.forEach(this.currentChannel.viewerSessions, function(s) {
-//        if (!this.currentChannel.offline || s.user.id == brkn.model.Users.getInstance().currentUser.id) {
-//          this.currentProgram_.media.addViewer(s.user, this.currentChannel, true);
-//        }
-//      }, this);
-//    }
-//    
-//    if (program) {
-//      // If next program, add channel viewers.
-//      this.currentProgram_ = program;
-//      var viewers = goog.array.forEach(this.currentChannel.viewerSessions, function(s) {
-//        if (!s.tuneOut) {
-//          if (!this.currentChannel.offline || s.user.id == brkn.model.Users.getInstance().currentUser.id) {
-//            this.currentProgram_.media.addViewer(s.user, this.currentChannel);
-//          }
-//        }
-//      }, this);
-//    }
-//  }
 };
 
 
@@ -236,9 +204,9 @@ brkn.model.Channels.prototype.getMyChannel = function() {
     // Create a private channel
     var user = brkn.model.Users.getInstance().currentUser;
     this.myChannel = new brkn.model.Channel({
-      id: user.id,
-      name: user.name.split(' ')[0] + '\'s Channel',
-      myChannel: true
+      id: user.id || 'temp',
+      name: user.name ? user.name.split(' ')[0] + '\'s Channel' : 'My Channel',
+      my_channel: true
     });
   }
   return this.myChannel;

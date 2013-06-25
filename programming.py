@@ -128,8 +128,9 @@ class Programming():
         medias = []
         filtered_medias = []
         offset = 0
-        while True:
+        while offset <= 400:
           medias = col.get_medias(limit=limit, offset=offset)
+          logging.info('fetched medias: ' + str(len(medias)))
           if not len(medias):
             break
           backup_medias += medias
@@ -147,6 +148,7 @@ class Programming():
           #           float(len(Programming.have_seen(m, viewers)))/len(viewers) < .3]
 
           all_medias += filtered_medias
+          logging.info('all medias: ' + str(len(all_medias)))
           offset += limit
 
       all_medias = backup_medias if not len(all_medias) else all_medias
@@ -587,6 +589,8 @@ class Programming():
       
 class StartHandler(webapp2.RequestHandler):
   def get(self):
+    logging.info('STARTING PROGRAMMING BACKEND')
+    
     self.queue = taskqueue.Queue(name='programming')
     self.queue.purge()
     self.queue = taskqueue.Queue(name='twitter')

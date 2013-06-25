@@ -466,5 +466,6 @@ class LiveHandler(BaseHandler):
       live_media = Media.add_live(id, start_time, end_time)
       channel = Channel.get_by_key_name(channel_id)
       programming.Programming.add_program(channel, live_media, start_time)
+
       
       

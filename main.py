@@ -66,7 +66,9 @@ class MainHandler(BaseHandler):
       else:
         template_data['js_location'] = constants.MOBILE_JS_SOURCE if mobile else constants.SIMPLE_JS
 
-      template_data['html5'] = True #self.request.get('html5') == 'true'
+      template_data['html5'] = True
+      template_data['login_required'] = constants.LOGIN_REQUIRED
+
       if not constants.DEVELOPMENT or self.request.get('css') or self.request.get('prod'):
         template_data['css_location'] = constants.CSS_SOURCE
 
@@ -97,6 +99,8 @@ class MainHandler(BaseHandler):
 
       self.session['channel_id'] = channel_id
       self.session['media_id'] = media_id
+      
+      template_data['power_on'] = False
   
       template_data['facebook_app_id'] = constants.facebook_app(self.request.host_url)['FACEBOOK_APP_ID']
       
@@ -134,17 +138,21 @@ class StatsHandler(BaseHandler):
       self.response.out.write(template.render(path, template_data))
       
 class UnsubscribeHandler(BaseHandler):
-  @BaseHandler.logged_in
   def get(self):
     type = self.request.get('type')
+    id = self.request.get('id')
+    user = User.get_by_key_name(id) if id else self.current_user
+    if not user:
+      self.redirect('/')
     if type == 'reply':
-      current_user = self.current_user
-      current_user.email_reply = False
-      current_user.put()
+      user.email_reply = False
+      user.put()
     if type == 'message':
-      current_user = self.current_user
-      current_user.email_message = False
-      current_user.put()
+      user.email_message = False
+      user.put()
+    if type == 'newsletter':
+      user.email_newsletter = False
+      user.put()
     self.redirect('/?unsub=1')
 
 class NameStormHandler(BaseHandler):
@@ -188,6 +196,58 @@ class RedirectHandler(BaseHandler):
     def post(self, path=None):
       html = os.path.join(os.path.dirname(__file__), 'templates/redirect.html')
       self.response.out.write(template.render(html, {'link':'http://www.xylocast.com/' + path}))
+      
+class NewsletterHandler(BaseHandler):
+    def get(self):
+      news_medias_json = memcache.get('news_medias')
+      if not news_medias_json:      
+        news = Channel.get_by_key_name('broken-news')
+        news_collection = news.get_collections()[0]
+        for col in news.get_collections():
+          if col.name == 'Top News Stories':
+            news_collection = col
+            break
+        news_medias = news_collection.get_medias(20, by_popularity=True, never_emailed=True)[:3]
+        news_medias_json = [m.toJson() for m in news_medias]
+        memcache.add('news_medias', news_medias_json, 21600)
+
+      culture_medias_json = memcache.get('culture_medias')
+      if not culture_medias_json:  
+        culture = Channel.get_by_key_name('gotham-style')
+        culture_collection = culture.get_collections()[0]
+        for col in culture.get_collections():
+          if col.name == 'News':
+            culture_collection = col
+            break
+        culture_medias = culture_collection.get_medias(20, by_popularity=True, never_emailed=True)[:3]
+        culture_medias_json = [m.toJson() for m in culture_medias]
+        memcache.add('culture_medias', culture_medias_json, 21600)
+
+      sports_medias_json = memcache.get('sports_medias')
+      if not sports_medias_json: 
+        sports = Channel.get_by_key_name('Sports')
+        sports_collection = Collection.all().filter('name =', 'ESPN').get() or sports.get_collections()[0]
+        sports_medias = sports_collection.get_medias(20, by_popularity=True, never_emailed=True)[:3]
+        sports_medias_json = [m.toJson() for m in sports_medias]
+        memcache.add('sports_medias', sports_medias_json, 21600)
+      
+      reddit_medias_json = memcache.get('reddit_medias')
+      if not reddit_medias_json: 
+        reddit = Channel.get_by_key_name('reddit')
+        reddit_collection = reddit.get_collections()[0]
+        reddit_medias = reddit_collection.get_medias(20, by_popularity=True, never_emailed=True)[:3]
+        reddit_medias_json = [m.toJson() for m in reddit_medias]
+        memcache.add('reddit_medias', reddit_medias_json, 21600)
+
+      data = {
+              'news_medias': news_medias_json,
+              'culture_medias': culture_medias_json,
+              'sports_medias': sports_medias_json,
+              'reddit_medias': reddit_medias_json,
+              }
+
+      path = os.path.join(os.path.dirname(__file__), 'templates/newsletter.html')
+      self.response.out.write(template.render(path, data))
 
 #--------------------------------------
 # APPLICATION INIT
@@ -218,6 +278,7 @@ def create_handlers_map():
     ('/_like', rpc.LikeHandler),
     ('/_like/(.*)', rpc.LikeHandler),
     ('/_link', rpc.LinkHandler),
+    ('/_login', rpc.LoginHandler),
     ('/_message', rpc.MessageHandler),
     ('/_message/(.*)', rpc.MessageHandler),
     ('/_notification', rpc.NotificationHandler),
@@ -236,6 +297,7 @@ def create_handlers_map():
     ('/_share', rpc.ShareHandler),
     ('/_star', rpc.StarHandler),
     ('/_star/(.*)', rpc.StarHandler),
+    ('/_token', rpc.TokenHandler),
     ('/_tweet/(.*)', rpc.TweetHandler),
     ('/_twitter', rpc.TwitterHandler),
     ('/_twitter/callback', rpc.TwitterCallbackHandler),
@@ -286,6 +348,7 @@ def create_handlers_map():
     # Cron
     ('/cron/fetch', cron.FetchHandler),
     ('/cron/program', cron.SetProgrammingHandler),
+    ('/cron/newsletter', cron.NewsletterHandler),
     
     # Pages
     ('/', MainHandler),
@@ -297,6 +360,7 @@ def create_handlers_map():
     ('/namestorm', NameStormHandler),
     ('/namestorm/(syl)', NameStormHandler),
     ('/namestorm/(sug)', NameStormHandler),
+    ('/newsletter', NewsletterHandler),
     ('/(.*)', MainHandler),
   ]
 

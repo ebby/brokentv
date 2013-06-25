@@ -32,7 +32,7 @@ goog.addSingletonGetter(brkn.model.BrowserChannel);
  * @type {string}
  * @private
  */
-brkn.model.BrowserChannel.prototype.token_;
+brkn.model.BrowserChannel.prototype.token;
 
 
 /**
@@ -40,7 +40,7 @@ brkn.model.BrowserChannel.prototype.token_;
  * @private
  */
 brkn.model.BrowserChannel.prototype.init = function(token) {
-	this.token_ = token;
+	this.token = token;
 
 	// Register browser channel
 	var channel = new appengine.Channel(unescape(token));

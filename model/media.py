@@ -36,6 +36,7 @@ class Media(db.Model):
   like_count = db.IntegerProperty(default=0)
   dislike_count = db.IntegerProperty(default=0)
   programmed_count = db.IntegerProperty(default=0)
+  reddit_id = db.StringProperty()
 
   @property
   def id(self):
@@ -128,14 +129,12 @@ class Media(db.Model):
       collection_media = None
       if collection and \
           (not enforce_category or (item['snippet'].get('categoryId') in collection.categories)):
-        collection_media = CollectionMedia.add(collection, media, publisher=publisher, approved=(True if approve else None))
+        collection_media = CollectionMedia.add(collection, media, publisher=publisher,
+                                               approved=(True if approve else None))
 
-      logging.info(item['snippet']['channelId'])
-      logging.info(item['snippet']['channelTitle'])
       if not publisher or publisher.channel_id != item['snippet']['channelId']:
         publisher = Publisher.get_by_channel_id(item['snippet']['channelId'], item['snippet']['channelTitle'])
       if publisher and item['snippet']['channelId'] == publisher.channel_id:
-        logging.info('SHOULD ADD PUBLISHER')
         pm = media.publisherMedias.get()
         if pm and pm.publisher.channel_id != item['snippet']['channelId']:
           # Check if there was an incorrect publisher assigned before
@@ -308,6 +307,7 @@ class Media(db.Model):
     json['host'] = self.host
     json['duration'] = self.duration
     json['published'] = self.published.isoformat()
+    json['thumb'] = self.thumb
     if get_desc:
       json['description'] = self.description
     json['link'] = self.link
@@ -316,6 +316,8 @@ class Media(db.Model):
     json['like_count'] = self.like_count
     json['dislike_count'] = self.dislike_count
     json['comment_count'] = self.comment_count
+    if self.reddit_id:
+      json['reddit_id'] = self.reddit_id
     if self.live:
       json['live'] = self.live
     return json

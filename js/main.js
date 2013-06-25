@@ -142,12 +142,13 @@ brkn.Main.prototype.browserChannel_;
 brkn.Main.prototype.decorateInternal = function(element) {
   goog.base(this, 'decorateInternal', element);
   
+  var currentUser = brkn.model.Users.getInstance().currentUser;
   var mainEl = soy.renderAsElement(brkn.main.main, {
-    user: brkn.model.Users.getInstance().currentUser,
-    admin: brkn.model.Users.getInstance().currentUser.isAdmin(),
-    guide: brkn.model.Users.getInstance().currentUser.showGuide &&
-        !brkn.model.Channels.getInstance().currentChannel.myChannel && !IPAD,
-    sidebar: brkn.model.Users.getInstance().currentUser.showSidebar
+    user: currentUser,
+    admin: currentUser ? currentUser.isAdmin() : false,
+    guide: currentUser ? currentUser.showGuide &&
+        !brkn.model.Channels.getInstance().currentChannel.myChannel && !IPAD : true,
+    sidebar: currentUser ? currentUser.showSidebar : true
   });
   goog.dom.insertChildAt(element, mainEl, 0);
 };
@@ -169,7 +170,8 @@ brkn.Main.prototype.enterDocument = function() {
   this.search_.decorate(goog.dom.getElement('search'));
   this.popup_ = new brkn.Popup();
 
-  if (!brkn.model.Users.getInstance().currentUser.welcomed) {
+  if (brkn.model.Users.getInstance().currentUser.loggedIn &&
+      !brkn.model.Users.getInstance().currentUser.welcomed) {
     this.welcome_(brkn.model.Users.getInstance().currentUser);
   }
   
@@ -212,17 +214,35 @@ brkn.Main.prototype.enterDocument = function() {
         }
       });
   
-  window.onload = function() {
+  if (brkn.model.Users.getInstance().currentUser.loggedIn) {
+    goog.net.XhrIo.send('/_presence', goog.bind(function(e) {
+      var data = e.target.getResponseJson();
+      this.browserChannel_ = brkn.model.BrowserChannel.getInstance().init(data['token']);
+      brkn.model.Channels.getInstance().loadViewersFromJson(data['viewer_sessions']);
+    }, this));
+  } else {
+    goog.net.XhrIo.send('/_token', goog.bind(function(e) {
+      var data = e.target.getResponseJson();
+      this.browserChannel_ = brkn.model.BrowserChannel.getInstance().init(data['token']);
+    }, this));
+  }
+  
+  brkn.model.Users.getInstance().subscribe(brkn.model.Users.Action.LOGGED_IN, function() {
+    goog.net.XhrIo.send('/_presence', goog.bind(function(e) {
+      var data = e.target.getResponseJson();
+      goog.dispose(this.browserChannel_);
+      this.browserChannel_ = brkn.model.BrowserChannel.getInstance().init(data['token']);
+      brkn.model.Channels.getInstance().loadViewersFromJson(data['viewer_sessions']);
+
+      if (!brkn.model.Users.getInstance().currentUser.welcomed) {
+        this.welcome_(brkn.model.Users.getInstance().currentUser);
+      }
+    }, this));
+    
     window.onbeforeunload = function(e) {
       return 'Leaving so soon?'
     };
-  };
-  
-  goog.net.XhrIo.send('/_presence', goog.bind(function(e) {
-    var data = e.target.getResponseJson();
-    this.browserChannel_ = brkn.model.BrowserChannel.getInstance().init(data['token']);
-    brkn.model.Channels.getInstance().loadViewersFromJson(data['viewer_sessions']);
-  }, this));
+  }, this);
   
   brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_INFO, function() {
     var login = goog.dom.getElement('login');
@@ -244,42 +264,39 @@ brkn.Main.prototype.enterDocument = function() {
 brkn.Main.prototype.welcome_ = function(user) {
   var welcome = goog.dom.getElement('welcome');
   goog.style.showElement(welcome, true);
+  if (!brkn.model.Users.getInstance().currentUser.loggedIn) {
+    goog.Timer.callOnce(function() {
+      goog.dom.classes.add(welcome, 'fade');
+    }, 3000);
+  }
   this.getHandler().listen(welcome, goog.events.EventType.CLICK, function() {
     goog.style.showElement(welcome, false);
-    goog.net.XhrIo.send('/_welcomed', goog.functions.NULL(), 'POST');
+    if (brkn.model.Users.getInstance().currentUser.loggedIn) {
+      goog.net.XhrIo.send('/_welcomed', goog.functions.NULL(), 'POST');
+    }
   })
 };
 
 
 /**
- * @param {Object} response Facebook response data.
  * @param {Object} channels Channels json object.
  * @param {Object} programs Programs json object.
- * @param {Object} currentUser The curernt user json object.
+ * @param {?Object=} opt_currentUser The curernt user json object.
+ * @param {?string=} opt_currentChannel
+ * @suppress {checkTypes}
  */
-brkn.Main.init = function(response, channels, programs, currentUser) {
-
-	if (!goog.object.isEmpty(currentUser)) {
-	  brkn.model.Users.getInstance().setCurrentUser(currentUser);
-	}
-
+brkn.Main.init = function(channels, programs, opt_currentUser, opt_currentChannel) {
+	brkn.model.Users.getInstance().setCurrentUser(opt_currentUser || null);
 	brkn.model.Channels.getInstance().loadFromJson(channels);
 	brkn.model.Programs.getInstance().loadFromJson(programs);
-	brkn.model.Channels.getInstance().setCurrentChannel(currentUser['current_channel']);
+	brkn.model.Channels.getInstance().setCurrentChannel(opt_currentChannel ||
+	    brkn.model.Channels.getInstance().findOnline());
 	brkn.model.Clock.getInstance().init();
 	
 	var main = new brkn.Main();
 	main.decorate(document.body);
 	
 	brkn.model.Analytics.getInstance().login();
-	
-	// UserVoice
-	//  var uvOptions = {};
-	//  (function() {
-	//    var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
-	//    uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/WGHjF5nSR8jL1GxXyQNxWA.js';
-	//    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
-	//  })();
 };
 
 brkn.Main.staticInit = function() {
@@ -291,6 +308,16 @@ brkn.Main.staticInit = function() {
   var pages = goog.dom.getElement('pages');
   var footer = goog.dom.getElement('footer');
   var expand = false;
+  
+  if (LOGIN_REQUIRED) {
+    goog.dom.setTextContent(goog.dom.getElementByClass('with-fb', fbLogin), 'with facebook');
+    goog.dom.setTextContent(goog.dom.getElementByClass('label', fbLogin), 'LOGIN');
+  }
+  
+  if (!POWER_ON && !LOGIN_REQUIRED) {
+    goog.dom.classes.add(fbLogin, 'disabled');
+    goog.dom.classes.add(fbLogin, 'spin');
+  }
   
   // Hide in JS so background shows if JS doesn't load.
   goog.dom.classes.add(homepage, 'hide');
@@ -489,10 +516,12 @@ brkn.Main.resizeStatic = function(expand) {
 brkn.Main.auth = function() {  
   FB.getLoginStatus(function(response) {
     if (response['status'] === 'connected') {
-      brkn.Main.getSessionAndInit(response);
-    } else {
+      brkn.Main.getSessionAndInit();
+    } else if (POWER_ON) {
       // not_logged_in
       brkn.Main.login();
+    } else {
+      brkn.Main.getSessionAndInit();
     }
   });
 };
@@ -501,38 +530,39 @@ brkn.Main.auth = function() {
 brkn.Main.login = function() {
   var fbLogin = goog.dom.getElement('fb-login');
   var loginPage = goog.dom.getElement('login');
-  goog.Timer.callOnce(function() {
-    var message = goog.dom.getElement('message');
-    goog.dom.classes.add(message, 'show');
-  }, 500);
+
   goog.events.listen(fbLogin, goog.events.EventType.CLICK, function() {
     goog.dom.classes.add(fbLogin, 'disabled');
-    if (IPAD) {
-      var permissionUrl = "https://m.facebook.com/dialog/oauth?client_id=" + FB_APP_ID +
-          "&response_type=code&redirect_uri=" + HOST_URL + "&scope=email";
-      window.location.href = permissionUrl;
-      return false;
+    if (LOGIN_REQUIRED) {
+      if (IPAD) {
+        var permissionUrl = "https://m.facebook.com/dialog/oauth?client_id=" + FB_APP_ID +
+            "&response_type=code&redirect_uri=" + HOST_URL + "&scope=email";
+        window.location.href = permissionUrl;
+        return false;
+      } else {
+        FB.login(function(response) {
+          if (response['authResponse']) {
+            // connected
+            brkn.Main.getSessionAndInit();
+          } else {
+            // not_authorized
+            //brkn.Main.notAuthorized();
+            goog.dom.classes.remove(fbLogin, 'disabled');
+          }
+        }, {scope: 'email'});
+      }
     } else {
-      FB.login(function(response) {
-        if (response['authResponse']) {
-          // connected
-          brkn.Main.getSessionAndInit(response);
-        } else {
-          // not_authorized
-          //brkn.Main.notAuthorized();
-          goog.dom.classes.remove(fbLogin, 'disabled');
-        }
-      }, {scope: 'email'});
+      brkn.Main.getSessionAndInit();
     }
   });
 };
 
 
-brkn.Main.getSessionAndInit = function(response) {
+brkn.Main.getSessionAndInit = function() {
   var fbLogin = goog.dom.getElement('fb-login');
   var staticContent = goog.dom.getElement('static-content');
   var login = goog.dom.getElement('login');
-  
+
   goog.dom.classes.add(fbLogin, 'disabled');
   goog.dom.classes.add(fbLogin, 'spin');
   goog.net.XhrIo.send('/_session',
@@ -564,7 +594,8 @@ brkn.Main.getSessionAndInit = function(response) {
           
           goog.dom.classes.remove(document.body, 'login');
           goog.Timer.callOnce(reveal);
-          brkn.Main.init(response, data['channels'], data['programs'], data['current_user']);
+          brkn.Main.init(data['channels'], data['programs'], data['current_user'],
+              data['current_channel']);
         } else if (e.target.getStatus() == 500) {
           brkn.Main.noLogin('error', 'Oops, check back later');
           brkn.Main.playJingle();

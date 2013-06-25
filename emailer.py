@@ -47,6 +47,10 @@ class Message():
            'subject' : 'You\'re on the list for XYLO!',
            'template': 'waitlist.html'
           }
+  NEWSLETTER = {
+           'subject' : 'This Week\'s Top Stories',
+           'template': 'newsletter.html'
+          }
 
   @staticmethod
   def COMMENT(name):

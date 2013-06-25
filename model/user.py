@@ -38,6 +38,7 @@ class User(db.Model):
     email_reply = db.BooleanProperty(default=True)
     email_message = db.BooleanProperty(default=True)
     email_mention = db.BooleanProperty(default=True)
+    email_newsletter = db.BooleanProperty(default=True)
     current_channel_id = db.StringProperty()
     
     # Stats

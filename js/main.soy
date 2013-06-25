@@ -2,10 +2,10 @@
 
 /**
  * Tucked away here for security 
- * @param user
  * @param admin
  * @param guide
  * @param sidebar
+ * @param? user
  */
 {template .main}
 <div class="main">
@@ -24,6 +24,12 @@
     </div>
     <div id="vote" class="vote" style="display:none">
       <div class="like"></div>
+      <div class="reddit" style="display:none">
+        <a class="reddit-link" target="_blank">
+          <div class="reddit-logo"></div>
+        </a>
+        <div class="score"></div>
+      </div>
       <div class="dislike"></div>
     </div>
     <div id="logo"></div>
@@ -89,9 +95,11 @@
         <div id="go-live" class="go-live">GO LIVE</div>
       </div>
       <div id="my-ticker" class="my-ticker" style="display:none">
-        <div class="me" style="background:{$user.color};border-color:{$user.color};">
-          <img src="{$user.picture}"/>
-        </div>
+        {if $user}
+          <div class="me" style="background:{$user.color};border-color:{$user.color};">
+            <img src="{$user.picture}"/>
+          </div>
+        {/if}
       </div>
     </div>
     <div class="pan-handle" id="pan-handle"></div>
@@ -145,6 +153,9 @@
         <li class="profile tab">
           <div class="label">HOME<div class="inbox-count" style="display:none"></div></div>
         </li>
+        <li class="login tab" style="display:none">
+          <div class="label">LOGIN</div>
+        </li>
       </ul>
       <div class="radial-grad"></div>
       <div class="arrow"></div>
@@ -158,6 +169,7 @@
       </div>
       <div id="my-profile" class="screen profile"></div>
       <div id="admin" class="screen admin"></div>
+      <div class="screen login"></div>
       <div id="media-list" class="slide media-list"></div>
       <div id="friendlist" class="slide friendlist"></div>
       <div id="conversation" class="slide"></div>

@@ -111,7 +111,7 @@ def broadcastProgramChanges(channel_id, programs=None, cached_programs=None):
   for client in channels.iterkeys():
     webchannel.send_message(client, simplejson.dumps(response))
     
-def broadcastNewPrograms(channel, programs, new_channel=False, to_owner=True):
+def broadcastNewPrograms(channel, programs, new_channel=False, to_owner=True, token=None):
   programs = programs if isinstance(programs, types.ListType) else [programs]
 
   response = {}
@@ -122,13 +122,16 @@ def broadcastNewPrograms(channel, programs, new_channel=False, to_owner=True):
   channels = memcache.get('web_channels') or {}
   
   if channel.privacy != constants.Privacy.PUBLIC and to_owner:
-    if channel.user.id in channels.iterkeys():
+    if channel.user and channel.user.id in channels.iterkeys():
       webchannel.send_message(channels.get(channel.user.id), simplejson.dumps(response))
+    elif token:
+      webchannel.send_message(channels.get(token), simplejson.dumps(response))
   
   if channel.privacy == constants.Privacy.FRIENDS:
-    for fid in channel.user.friends:
-      if fid in channels.iterkeys():
-        webchannel.send_message(channels.get(fid), simplejson.dumps(response))
+    if channel.user:
+      for fid in channel.user.friends:
+        if fid in channels.iterkeys():
+          webchannel.send_message(channels.get(fid), simplejson.dumps(response))
   
   if channel.privacy == constants.Privacy.PUBLIC:
     for client in channels.iterkeys():

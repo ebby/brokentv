@@ -1,18 +1,13 @@
 var HOST_URL;
-
 var IPHONE;
-
 var IPAD;
-
 var DESKTOP;
-
 var HTML5;
-
 var EMBED;
-
 var SAFARI;
-
 var FB_APP_ID;
+var LOGIN_REQUIRED;
+var POWER_ON;
 
 var appengine = {};
 

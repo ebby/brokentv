@@ -42,6 +42,11 @@ brkn.model.Media = function(media) {
    */
   this.hostLink = 'http://www.youtube.com/watch?v=' + media['host_id'];
 
+  /**
+   * @type {string}
+   */
+  this.redditId = media['reddit_id'];
+
 	/**
 	 * @type {number}
 	 */

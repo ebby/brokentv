@@ -53,26 +53,28 @@ brkn.model.Users.prototype.currentUser;
 
 
 /**
- *  @param {Object} user The user object
+ *  @param {?Object=} opt_user The user object
  */
-brkn.model.Users.prototype.setCurrentUser = function(user) {
-	this.currentUser = this.get_or_add(user);
-	FB.api('/me/permissions', goog.bind(function(response) {
-    this.currentUser.hasFacebook = response['data'][0]['publish_stream'];
-  }, this));
-	FB.api('/me/friends', goog.bind(function(response) {
-	  if (response && response['data']) {
-      goog.array.forEach(response['data'], function(f) {
-        if (!this.userMap[f['id']]) {
-          this.userMap[f['id']] = new brkn.model.User({
-            'id' : f['id'],
-            'name' : f['name'],
-            'temp' : true
-          });
-        }
-      }, this);
-	  }
-  }, this));
+brkn.model.Users.prototype.setCurrentUser = function(opt_user) {
+	this.currentUser = opt_user ? this.get_or_add(opt_user) : new brkn.model.User(undefined, true);
+	if (this.currentUser.loggedIn) {
+  	FB.api('/me/permissions', goog.bind(function(response) {
+      this.currentUser.hasFacebook = response['data'][0]['publish_stream'];
+    }, this));
+  	FB.api('/me/friends', goog.bind(function(response) {
+  	  if (response && response['data']) {
+        goog.array.forEach(response['data'], function(f) {
+          if (!this.userMap[f['id']]) {
+            this.userMap[f['id']] = new brkn.model.User({
+              'id' : f['id'],
+              'name' : f['name'],
+              'temp' : true
+            });
+          }
+        }, this);
+  	  }
+    }, this));
+	}
 };
 
 
@@ -159,13 +161,14 @@ brkn.model.Users.prototype.search = function(query) {
     return goog.string.caseInsensitiveStartsWith(f, query);
   }, this);
   return results;
-}
+};
 
 
 /**
  * @enum {string}
  */
 brkn.model.Users.Action = {
+  LOGGED_IN: 'logged-in',
   NEW_ACTIVITY: 'new-activity',
   NEW_MESSAGE: 'new-message',
   NEW_NOTIFICATION: 'new-notification',

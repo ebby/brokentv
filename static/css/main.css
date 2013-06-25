@@ -2752,6 +2752,8 @@ div.vote {
   top: 50%;
   right: 0;
   margin-top: -50px;
+  opacity: .6;
+  color: #f5f5f5;
 }
 div.vote div.like {
   width: 40px;
@@ -2759,7 +2761,6 @@ div.vote div.like {
   -webkit-border-radius: 22px;
   -moz-border-radius: 22px;
   border-radius: 22px;
-  color: #f5f5f5;
   font-family: 'icons';
   font-style: normal;
   font-weight: normal;
@@ -2774,7 +2775,6 @@ div.vote div.like {
 
   /* '\1f44d' */
 
-  opacity: .6;
   line-height: 38px;
   text-align: center;
   margin-bottom: 10px;
@@ -2809,7 +2809,6 @@ div.vote div.dislike {
   -webkit-border-radius: 22px;
   -moz-border-radius: 22px;
   border-radius: 22px;
-  color: #f5f5f5;
   font-family: 'icons';
   font-style: normal;
   font-weight: normal;
@@ -2824,7 +2823,6 @@ div.vote div.dislike {
 
   /* '\1f44e' */
 
-  opacity: .6;
   line-height: 42px;
   text-align: center;
   -webkit-transition: opacity 0.1s ease;
@@ -2847,6 +2845,43 @@ div.vote div.dislike:hover {
 div.vote div.dislike.checked {
   background: #B49B4B;
   opacity: .9;
+}
+div.vote div.reddit {
+  width: 40px;
+  margin-bottom: 10px;
+}
+div.vote div.reddit a {
+  text-decoration: none;
+  color: #f5f5f5;
+}
+div.vote div.reddit div.reddit-logo {
+  font-family: 'icons';
+  font-style: normal;
+  font-weight: normal;
+  speak: none;
+  text-decoration: inherit;
+  /* opacity .8 */
+
+  font-variant: normal;
+  /* Uncomment for 3D effect */
+
+  /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+
+  /* '' */
+
+  font-size: 25px;
+  text-align: center;
+  text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.3);
+}
+div.vote div.reddit div.reddit-logo:before {
+  content: '\e805';
+}
+div.vote div.reddit div.score {
+  font-size: 13px;
+  font-family: MuseoSans700;
+  margin-top: 3px;
+  text-align: center;
+  text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.3);
 }
 div.send-suggestions {
   position: absolute;
@@ -3758,7 +3793,7 @@ div#sidebar div.comment-input {
   position: absolute;
   bottom: 0;
   background: #f7f7f7;
-  border-top: 1px solid #ccc;
+  border-top: 1px solid #aaa;
   -webkit-box-shadow: 0 -1px 4px 0 rgba(0, 0, 0, 0.3), inset 4px -2px 6px -3px rgba(0, 0, 0, 0.4);
   -moz-box-shadow: 0 -1px 4px 0 rgba(0, 0, 0, 0.3), inset 4px -2px 6px -3px rgba(0, 0, 0, 0.4);
   box-shadow: 0 -1px 4px 0 rgba(0, 0, 0, 0.3), inset 4px -2px 6px -3px rgba(0, 0, 0, 0.4);
@@ -4896,27 +4931,28 @@ div#login div#static-content div.fb-login div.loading {
   display: inline-block;
   vertical-align: top;
   text-align: center;
-  position: relative;
-  left: 37px;
+  position: absolute;
+  left: 70px;
   top: 15px;
   font-size: 24px;
+  width: 160px;
 }
 div#login div#static-content div.fb-login div.loading {
   display: none;
   top: 24px;
-  left: 25px;
   font-size: 22px;
 }
 div#login div#static-content div.fb-login div.with-fb {
   font-family: MuseoSans300;
   position: absolute;
-  width: 80px;
+  width: 160px;
   font-size: 11px;
   top: 40px;
   margin: auto;
   vertical-align: top;
-  left: 113px;
+  left: 70px;
   display: inline-block;
+  text-align: center;
 }
 div#login div#static-content div.fb-login.spin div.loading {
   display: inline-block;
@@ -5537,6 +5573,13 @@ div#sidebar div.info {
 div#sidebar div.info div.no-info {
   margin-top: 20px;
   cursor: default;
+}
+div#sidebar div.info.logged-out div.picture div.star,
+div#sidebar div.info.logged-out div.picture div.send {
+  display: none;
+}
+div#sidebar div.info.logged-out div.picture div.options div.button {
+  height: 93px;
 }
 div#sidebar div.info div.picture {
   display: inline-block;
@@ -6594,6 +6637,283 @@ div#sidebar div.info.mini div.picture div.options div.button {
 div#sidebar div.info.mini div.picture div.options div.button div.icon {
   color: white;
 }
+div#sidebar div.info div.login-promo {
+  margin-top: 10px;
+  position: absolute;
+  top: 200px;
+  background: url(/static/img/promo.png) no-repeat;
+  background-size: contain;
+  background-position: center top;
+  width: 320px;
+  opacity: 0;
+  -webkit-transition: opacity 0.5s ease;
+  -moz-transition: opacity 0.5s ease;
+  -o-transition: opacity 0.5s ease;
+  -ms-transition: opacity 0.5s ease;
+  transition: opacity 0.5s ease;
+}
+div#sidebar div.info div.login-promo.show {
+  opacity: 1;
+}
+div#sidebar div.info div.login-promo div.promo {
+  width: 280px;
+  height: 130px;
+  position: relative;
+  margin: 0 20px;
+  margin-top: -30px;
+}
+div#sidebar div.info div.login-promo div.promo:first-child {
+  margin-top: 50px;
+}
+div#sidebar div.info div.login-promo div.promo div.promo-pic {
+  -webkit-border-radius: 60px;
+  -moz-border-radius: 60px;
+  border-radius: 60px;
+  -webkit-box-shadow: 0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px rgb(230, 230, 230), 0 0 0 3px rgba(121, 121, 121, .5);
+  -moz-box-shadow: 0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px rgb(230, 230, 230), 0 0 0 3px rgba(121, 121, 121, .5);
+  box-shadow: 0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px rgb(230, 230, 230), 0 0 0 3px rgba(121, 121, 121, .5);
+  background: #666;
+  width: 120px;
+  height: 120px;
+}
+div#sidebar div.info div.login-promo div.promo div.promo-pic img {
+  width: 120px;
+  height: 120px;
+  -webkit-border-radius: 60px;
+  -moz-border-radius: 60px;
+  border-radius: 60px;
+}
+div#sidebar div.info div.login-promo div.promo.promo-1 div.promo-pic {
+  -webkit-box-shadow: 0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px yellow, 0 0 0 3px rgba(121, 121, 121, .5);
+  -moz-box-shadow: 0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px yellow, 0 0 0 3px rgba(121, 121, 121, .5);
+  box-shadow: 0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px yellow, 0 0 0 3px rgba(121, 121, 121, .5);
+}
+div#sidebar div.info div.login-promo div.promo.promo-2 div.promo-pic {
+  -webkit-box-shadow: 0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px red, 0 0 0 3px rgba(121, 121, 121, .5);
+  -moz-box-shadow: 0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px red, 0 0 0 3px rgba(121, 121, 121, .5);
+  box-shadow: 0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px red, 0 0 0 3px rgba(121, 121, 121, .5);
+}
+div#sidebar div.info div.login-promo div.promo.promo-3 div.promo-pic {
+  -webkit-box-shadow: 0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px blue, 0 0 0 3px rgba(121, 121, 121, .5);
+  -moz-box-shadow: 0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px blue, 0 0 0 3px rgba(121, 121, 121, .5);
+  box-shadow: 0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px blue, 0 0 0 3px rgba(121, 121, 121, .5);
+}
+div#sidebar div.info div.login-promo div.promo div.promo-text {
+  position: absolute;
+  left: 130px;
+  top: 0;
+  font-size: 13px;
+  font-family: MuseoSans700;
+  width: 150px;
+  margin-top: 40px;
+  line-height: 22px;
+  color: #333;
+}
+div#sidebar div.info div.login-promo div.promo.flip div.promo-pic {
+  position: absolute;
+  right: 0;
+}
+div#sidebar div.info div.login-promo div.promo.flip div.promo-text {
+  left: 0;
+  text-align: right;
+}
+div#sidebar div.info .login-faces {
+  position: absolute;
+  top: 50px;
+  left: 0;
+  z-index: -1;
+}
+div#sidebar div.info .login-faces.hide {
+  visibility: hidden;
+  opacity: 0;
+}
+div#sidebar div.info div.fb-login {
+  background: #f5f5f5;
+  width: 230px;
+  height: 70px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  -webkit-box-shadow: 0 0 5px 2px rgba(9, 9, 9, 0.5), 0 0 0 3px rgb(230, 230, 230), 0 0 0 4px rgba(121, 121, 121, .5);
+  -moz-box-shadow: 0 0 5px 2px rgba(9, 9, 9, 0.5), 0 0 0 3px rgb(230, 230, 230), 0 0 0 4px rgba(121, 121, 121, .5);
+  box-shadow: 0 0 5px 2px rgba(9, 9, 9, 0.5), 0 0 0 3px rgb(230, 230, 230), 0 0 0 4px rgba(121, 121, 121, .5);
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  margin-left: -115px;
+  color: #4d4d4d;
+  text-shadow: 1px 1px 1px white;
+  cursor: pointer;
+  visibility: hidden;
+  opacity: 0;
+}
+div#sidebar div.info div.fb-login div.power {
+  width: 70px;
+  height: 70px;
+  display: inline-block;
+  border-right: 1px solid #aaa;
+  -webkit-border-radius: 3px 0 0 3px;
+  -moz-border-radius: 3px 0 0 3px;
+  border-radius: 3px 0 0 3px;
+}
+div#sidebar div.info div.fb-login div.power div.bg {
+  font-family: 'icons';
+  font-style: normal;
+  font-weight: normal;
+  speak: none;
+  text-decoration: inherit;
+  /* opacity .8 */
+
+  font-variant: normal;
+  /* Uncomment for 3D effect */
+
+  /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+
+  /* '' */
+
+  font-size: 41px;
+  font-size: 35px;
+  color: #7d7d7d;
+  width: 38px;
+  height: 39px;
+  left: 16px;
+  top: 16px;
+  position: relative;
+  text-align: center;
+}
+div#sidebar div.info div.fb-login div.power div.bg:before {
+  content: '\e78e';
+}
+div#sidebar div.info div.fb-login div.power.error {
+  background-color: #B7432E;
+}
+div#sidebar div.info div.fb-login div.power.error div.bg {
+  color: #dedede;
+  text-shadow: 1px 1px 1px #7d7d7d;
+}
+div#sidebar div.info div.fb-login div.power.wait {
+  background-color: #B49B4B;
+}
+div#sidebar div.info div.fb-login div.power.wait div.bg {
+  color: #dedede;
+  text-shadow: 1px 1px 1px #7d7d7d;
+}
+div#sidebar div.info div.fb-login.spin div.power div.bg {
+  animation: spin 3s infinite linear;
+  -moz-animation: spin 3s infinite linear;
+  /* Firefox */
+
+  -webkit-animation: spin 3s infinite linear;
+  /* Safari and Chrome */
+
+  -o-animation: spin 3s infinite linear;
+  /* Opera */
+
+}
+div#sidebar div.info div.fb-login div.login-label,
+div#sidebar div.info div.fb-login div.login-loading {
+  font-family: MuseoSans500;
+  display: inline-block;
+  vertical-align: top;
+  text-align: center;
+  position: relative;
+  left: 37px;
+  top: 15px;
+  font-size: 24px;
+}
+div#sidebar div.info div.fb-login div.login-loading {
+  display: none;
+  top: 24px;
+  left: 25px;
+  font-size: 22px;
+}
+div#sidebar div.info div.fb-login div.with-fb {
+  font-family: MuseoSans300;
+  position: absolute;
+  width: 80px;
+  font-size: 11px;
+  top: 40px;
+  margin: auto;
+  vertical-align: top;
+  left: 113px;
+  display: inline-block;
+}
+div#sidebar div.info div.fb-login.spin div.login-loading {
+  display: inline-block;
+}
+div#sidebar div.info div.fb-login.spin div.login-label,
+div#sidebar div.info div.fb-login.spin div.with-fb {
+  display: none;
+}
+div#sidebar div.info div.fb-login div.waitlist {
+  display: none;
+  font-family: MuseoSans300;
+  vertical-align: top;
+  text-align: center;
+  position: relative;
+  left: 3px;
+  top: 28px;
+  font-size: 14px;
+  width: 146px;
+}
+div#sidebar div.info div.fb-login.waitlist div.waitlist {
+  display: inline-block;
+}
+div#sidebar div.info div.fb-login.waitlist div.login-label,
+div#sidebar div.info div.fb-login.waitlist div.with-fb {
+  display: none;
+}
+div#sidebar div.info div.fb-login.show {
+  visibility: visible;
+  opacity: 1;
+  -webkit-transition: opacity 0.3s ease-in-out;
+  -moz-transition: opacity 0.3s ease-in-out;
+  -o-transition: opacity 0.3s ease-in-out;
+  -ms-transition: opacity 0.3s ease-in-out;
+  transition: opacity 0.3s ease-in-out;
+}
+div#sidebar div.info div.fb-login:active,
+div#sidebar div.info div.fb-login:disabled,
+div#sidebar div.info div.fb-login.disabled {
+  background-color: #dedede;
+  -webkit-box-shadow: 0 0 5px 2px rgba(0, 0, 0, 0.7), 0 0 0 3px #f5f5f5, 0 0 0 4px rgba(121, 121, 121, .5);
+  -moz-box-shadow: 0 0 5px 2px rgba(0, 0, 0, 0.7), 0 0 0 3px #f5f5f5, 0 0 0 4px rgba(121, 121, 121, .5);
+  box-shadow: 0 0 5px 2px rgba(0, 0, 0, 0.7), 0 0 0 3px #f5f5f5, 0 0 0 4px rgba(121, 121, 121, .5);
+  color: #2D2D2D;
+}
+div#sidebar div.info div.fb-login.disabled {
+  cursor: default;
+  pointer-events: none;
+}
+div#sidebar div.info div.fb-login div.message {
+  position: absolute;
+  top: 80px;
+  left: 0;
+  font-size: 12px;
+  text-shadow: none;
+  font-family: MuseoSans500;
+  width: 230px;
+  text-align: center;
+  opacity: 0;
+  visibility: 0;
+  -webkit-transition: opacity 0.5s ease;
+  -moz-transition: opacity 0.5s ease;
+  -o-transition: opacity 0.5s ease;
+  -ms-transition: opacity 0.5s ease;
+  transition: opacity 0.5s ease;
+  pointer-events: all;
+}
+div#sidebar div.info div.fb-login div.message.show {
+  opacity: 1;
+  visibility: visible;
+}
+div#sidebar div.info div.fb-login div.message a {
+  color: #333;
+}
+div#sidebar div.info div.fb-login div.error {
+  top: 100px;
+  color: #B7432E;
+}
 div#notify {
   position: absolute;
   z-index: 200;
@@ -7327,6 +7647,15 @@ div#welcome {
   z-index: 9000;
   background: rgba(0, 0, 0, 0.8);
   cursor: pointer;
+}
+div#welcome.fade {
+  -webkit-transition: opacity 3s ease;
+  -moz-transition: opacity 3s ease;
+  -o-transition: opacity 3s ease;
+  -ms-transition: opacity 3s ease;
+  transition: opacity 3s ease;
+  opacity: 0;
+  visibility: 0;
 }
 div#welcome > div {
   opacity: .8;

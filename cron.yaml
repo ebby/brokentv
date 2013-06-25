@@ -8,3 +8,9 @@ cron:
   url: /cron/program
   schedule: every 2 minutes
   target: programming
+
+- description: newsletter
+  url: /cron/newsletter
+  schedule: every wed 9:00
+  timezone: America/Los_Angeles
+  target: youtube

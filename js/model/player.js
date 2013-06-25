@@ -28,17 +28,21 @@ brkn.model.Player = function() {
   this.subscribe(brkn.model.Player.Actions.PLAY_ASYNC, function(program) {
     brkn.model.Channels.getInstance().getMyChannel().publish(
         brkn.model.Channel.Action.ADD_PROGRAM, program);
-
-    goog.net.XhrIo.send('/_addprogram', goog.functions.NULL(), 'POST',
-        'channel_id=' + brkn.model.Channels.getInstance().myChannel.id +
-        '&media_id=' + program.media.id +
-        '&async=' + true);
-    brkn.model.Analytics.getInstance().playAsync(program.media);
+    if (brkn.model.Users.getInstance().currentUser.loggedIn) {
+      goog.net.XhrIo.send('/_addprogram', goog.functions.NULL(), 'POST',
+          'channel_id=' + brkn.model.Channels.getInstance().myChannel.id +
+          '&media_id=' + program.media.id +
+          '&async=' + true);
+      
+      brkn.model.Analytics.getInstance().playAsync(program.media);
+    }
   }, this);
 
   this.subscribe(brkn.model.Player.Actions.PLAYING, function(media) {
-    goog.net.XhrIo.send('/_started', goog.functions.NULL(), 'POST',
-        'media_id=' + media.id);
+    if (brkn.model.Users.getInstance().currentUser.loggedIn) {
+      goog.net.XhrIo.send('/_started', goog.functions.NULL(), 'POST',
+          'media_id=' + media.id);
+    }
   }, this);
 };
 goog.inherits(brkn.model.Player, goog.pubsub.PubSub);

@@ -198,13 +198,19 @@ brkn.Sidebar.prototype.enterDocument = function() {
     this.tabNames_.push(tabName);
   }, this);
 
+  if (!brkn.model.Users.getInstance().currentUser.loggedIn) {
+    goog.style.showElement(this.tabs_['stream'], false);
+    goog.style.showElement(this.tabs_['profile'], false);
+    goog.style.showElement(this.tabs_['login'], true);
+  } else {
+    this.fetchAndRenderStream_();
+    this.starred_ = new brkn.sidebar.Profile(brkn.model.Users.getInstance().currentUser);
+    this.starred_.decorate(goog.dom.getElement('my-profile'));
+  }
+  
   this.onNextProgram_();
-  this.fetchAndRenderStream_();
-  
-  this.starred_ = new brkn.sidebar.Profile(brkn.model.Users.getInstance().currentUser);
-  this.starred_.decorate(goog.dom.getElement('my-profile'));
-  
-  if (this.info_ && (DESKTOP ||
+
+  if (this.info_ && (DESKTOP || !brkn.model.Users.getInstance().currentUser.loggedIn ||
       (brkn.model.Channels.getInstance().currentChannel.myChannel &&
           brkn.model.Channels.getInstance().currentChannel.getCurrentProgram()))) {
     this.currentScreen_ = goog.dom.getElement('info');
@@ -254,6 +260,14 @@ brkn.Sidebar.prototype.enterDocument = function() {
             var lastTab = this.currentTab_;
             var tab = goog.dom.getAncestorByTagNameAndClass(e.target, 'li');
             var tabName = goog.dom.classes.get(tab)[0];   
+            
+            if (tabName == 'login') {
+              if (this.info_) {
+                this.info_.login();
+              }
+              return;
+            }
+            
             this.tabNav_(this.currentTab_, tabName); 
             goog.dom.classes.add(tab, 'selected');
             this.updateArrow_();
@@ -315,6 +329,15 @@ brkn.Sidebar.prototype.enterDocument = function() {
       this.onNextProgram_, this);
   brkn.model.Channels.getInstance().subscribe(brkn.model.Channels.Actions.CHANGE_CHANNEL,
       this.onChangeChannel_, this);
+  brkn.model.Users.getInstance().subscribe(brkn.model.Users.Action.LOGGED_IN, function() {
+    goog.style.showElement(this.tabs_['stream'], true);
+    goog.style.showElement(this.tabs_['profile'], true);
+    goog.style.showElement(this.tabs_['login'], false);
+    this.fetchAndRenderStream_();
+    this.starred_ = new brkn.sidebar.Profile(brkn.model.Users.getInstance().currentUser);
+    this.starred_.decorate(goog.dom.getElement('my-profile'));
+    this.updateArrow_(); 
+  }, this);
   
   if (DESKTOP) {
     brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_ADMIN,

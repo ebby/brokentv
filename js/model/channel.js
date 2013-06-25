@@ -171,16 +171,19 @@ brkn.model.Channel.prototype.addQueue = function(media, add) {
         'Added to queue', media.name, undefined, media.thumbnail1,
         '#info:' + media.id);
     
-    brkn.model.Analytics.getInstance().playAsync(media);
-    
-    goog.net.XhrIo.send('/_queue', goog.functions.NULL(), 'POST',
-        'media_id=' + media.id);
+    if (brkn.model.Users.getInstance().currentUser.loggedIn) {
+      goog.net.XhrIo.send('/_queue', goog.functions.NULL(), 'POST',
+          'media_id=' + media.id);
+    }
   } else {
     goog.array.removeIf(this.queue, function(m) {
       return m.id == media.id;
     }, this);
-    goog.net.XhrIo.send('/_queue', goog.functions.NULL(), 'POST',
-        'media_id=' + media.id + '&delete=1');
+    
+    if (brkn.model.Users.getInstance().currentUser.loggedIn) {
+      goog.net.XhrIo.send('/_queue', goog.functions.NULL(), 'POST',
+          'media_id=' + media.id + '&delete=1');
+    }
   }
 };
 
@@ -368,10 +371,12 @@ brkn.model.Channel.prototype.getNextQueue = function() {
     brkn.model.Channels.getInstance().getMyChannel().publish(
         brkn.model.Channel.Action.ADD_PROGRAM, program);
 
-    goog.net.XhrIo.send('/_addprogram', goog.functions.NULL(), 'POST',
-        'channel_id=' + brkn.model.Channels.getInstance().myChannel.id +
-        '&media_id=' + media.id +
-        '&now=' + true);
+    if (brkn.model.Users.getInstance().currentUser.loggedIn) {
+      goog.net.XhrIo.send('/_addprogram', goog.functions.NULL(), 'POST',
+          'channel_id=' + brkn.model.Channels.getInstance().myChannel.id +
+          '&media_id=' + media.id +
+          '&now=' + true);
+    }
     return program;
   }
   return null;

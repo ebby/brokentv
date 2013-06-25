@@ -28,18 +28,22 @@ def update_waitlist(cls, user_id, channel_id):
       if friend and friend.access_level == constants.AccessLevel.WAITLIST:
         friend.grant_access(user, channel_id)
 
-def schedule_youtube_channel(user_id, name, channel_id, yt_channel_id=None, yt_playlist_id=None):
+def schedule_youtube_channel(name, user_id=None, token=None, channel_id=None, yt_channel_id=None, yt_playlist_id=None):
   import broadcast
   import constants
+  import datetime
   import programming
   
   from model import Media
   from model import Channel
   from model import User
   from model import common
+  from model import Program
   
-  user = User.get_by_key_name(user_id)
-  channel = Channel(key_name=user_id + '-' + (yt_channel_id or yt_playlist_id),
+  user = None
+  if user_id:
+    user = User.get_by_key_name(user_id)
+  channel = Channel(key_name=(user_id or token) + '-' + (yt_channel_id or yt_playlist_id),
                     name=name, privacy=constants.Privacy.FRIENDS, online=True, user=user)
   medias = []
   youtube3 = common.get_youtube3_service()
@@ -90,5 +94,14 @@ def schedule_youtube_channel(user_id, name, channel_id, yt_channel_id=None, yt_p
   ).execute()
   for item in videos_response.get("items", []):
     medias = Media.add_from_snippet([item], approve=True)
-    programs = programming.Programming.set_user_channel_programs(user_id, channel, medias)
-    broadcast.broadcastNewPrograms(channel, programs)
+    programs = []
+    if user_id:
+      programs = programming.Programming.set_user_channel_programs(user_id, channel, medias)
+    else:
+      next_time = datetime.datetime.now()
+      for media in medias:
+        program = Program.add_program(channel, media, time=next_time)
+        if program:
+          programs.append(program)
+          next_time = next_time + datetime.timedelta(seconds=media.duration)
+    broadcast.broadcastNewPrograms(channel, programs, token=token)

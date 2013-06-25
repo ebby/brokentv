@@ -181,13 +181,13 @@ div.vote {
   top: 50%;
   right: 0;
   margin-top: -50px;
+  opacity:.6;
+  color: #f5f5f5;
   div.like {
     width: 40px;
     height: 40px;
     .border-radius(22px);
-    color: #f5f5f5;
     .icon-like();
-    opacity:.6;
     line-height: 38px;
     text-align: center;
     margin-bottom: 10px;
@@ -211,9 +211,7 @@ div.vote {
     border: 2px solid rgba(0, 0, 0, .7);
     background: rgba(0, 0, 0, .5);
     .border-radius(22px);
-    color: #f5f5f5;
     .icon-dislike();
-    opacity:.6;
     line-height: 42px;
     text-align: center;
     .transition(opacity, .1s, ease);
@@ -226,6 +224,27 @@ div.vote {
      &.checked {
       background: #B49B4B;
       opacity: .9;
+    }
+  }
+  div.reddit {
+    width: 40px;
+    margin-bottom: 10px;
+    a {
+      text-decoration: none;
+      color: #f5f5f5;
+    }
+    div.reddit-logo {
+      .icon-reddit();
+      font-size: 25px;
+      text-align: center;
+       text-shadow: 1px 1px 1px rgba(255,255,255,0.3);
+    }
+    div.score {
+      font-size: 13px;
+      font-family: MuseoSans700;
+      margin-top: 3px;
+      text-align: center;
+      text-shadow: 1px 1px 1px rgba(255,255,255,0.3);
     }
   }
 }

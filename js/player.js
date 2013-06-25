@@ -8,6 +8,7 @@ goog.require('brkn.player');
 goog.require('goog.fx.AnimationSerialQueue');
 goog.require('goog.fx.dom');
 goog.require('goog.fx.easing');
+goog.require('goog.net.Jsonp');
 goog.require('goog.ui.Component');
 goog.require('goog.ui.Component.EventType');
 goog.require('goog.ui.CustomButton');
@@ -126,6 +127,19 @@ brkn.Player.prototype.height_;
 brkn.Player.prototype.lastNote_;
 
 
+/**
+ * @type {?string}
+ * @private
+ */
+brkn.Player.prototype.redditId_;
+
+/**
+ * @type {string}
+ * @private
+ */
+brkn.Player.prototype.redditModhash_;
+
+
 /** @inheritDoc */
 brkn.Player.prototype.enterDocument = function() {
   goog.base(this, 'enterDocument');
@@ -221,9 +235,11 @@ brkn.Player.prototype.enterDocument = function() {
         this.playProgram(program);
         this.updateStagecover_();
         
-        goog.net.XhrIo.send('/_play', goog.functions.NULL(), 'POST',
-            'media_id=' + program.media.id +
-            '&channel_id=' + brkn.model.Channels.getInstance().currentChannel.id);
+        if (brkn.model.Users.getInstance().currentUser.loggedIn) {
+          goog.net.XhrIo.send('/_play', goog.functions.NULL(), 'POST',
+              'media_id=' + program.media.id +
+              '&channel_id=' + brkn.model.Channels.getInstance().currentChannel.id);
+        }
       }, this);
   brkn.model.Player.getInstance().subscribe(brkn.model.Player.Actions.PLAY_ASYNC,
       this.playAsync_, this);
@@ -231,13 +247,16 @@ brkn.Player.prototype.enterDocument = function() {
       this.seek_, this);
   brkn.model.Player.getInstance().subscribe(brkn.model.Player.Actions.TEN_SECONDS,
       function() {
-        this.sendSuggestions_();
+        if (brkn.model.Users.getInstance().currentUser.loggedIn) {
+          this.sendSuggestions_();
+        }
       }, this);
   brkn.model.Player.getInstance().subscribe(brkn.model.Player.Actions.BEFORE_END,
       function() {
         // TODO: fade in
         this.updateStagecover_(undefined, true);
-        if (brkn.model.Users.getInstance().currentUser.currentSession &&
+        if (brkn.model.Users.getInstance().currentUser.loggedIn &&
+            brkn.model.Users.getInstance().currentUser.currentSession &&
             brkn.model.Player.getInstance().getCurrentProgram()) {
           brkn.model.Users.getInstance().currentUser.currentSession.seen(
               brkn.model.Player.getInstance().getCurrentProgram().media);
@@ -246,6 +265,9 @@ brkn.Player.prototype.enterDocument = function() {
         brkn.model.Player.getInstance().getCurrentProgram().ended = true;
         this.next_();
       }, this);
+  brkn.model.Users.getInstance().subscribe(brkn.model.Users.Action.LOGGED_IN, function() {
+    this.fetchLike_(brkn.model.Player.getInstance().getCurrentProgram().media);
+  }, this);
   
   if (DESKTOP) {
     this.getHandler()
@@ -362,10 +384,44 @@ brkn.Player.prototype.playProgram = function(program) {
     this.lastNote_ = program.id;
   }
   this.play(program.media);
-  if (DESKTOP) {
+  if (DESKTOP && brkn.model.Users.getInstance().currentUser.loggedIn) {
     this.fetchLike_(program.media);
     goog.style.showElement(this.sendSuggestionsEl_, false);
+  } else {
+    goog.style.showElement(this.likeEl_, false);
+    goog.style.showElement(this.dislikeEl_, false);
   }
+  
+  if (brkn.model.Channels.getInstance().currentChannel.id == 'reddit' ||
+      program.media.redditId) {
+    this.fetchReddit_(program);
+  } else {
+    this.redditId_ = null;
+    goog.style.showElement(goog.dom.getElementByClass('reddit', this.vote_), false);
+  }
+};
+
+
+/**
+ * @param {brkn.model.Program} program
+ * @private
+ */
+brkn.Player.prototype.fetchReddit_ = function(program) {
+  goog.style.showElement(goog.dom.getElementByClass('reddit', this.vote_), false);
+  var jsonp = new goog.net.Jsonp('http://www.reddit.com/api/info.json', 'jsonp');
+  jsonp.send((program.media.redditId ? {'id': program.media.redditId} :
+      {'url' : 'www.youtube.com/watch?v=' + program.media.hostId}), goog.bind(function(response) {
+    if (response['data'] && response['data']['children'].length) {
+      goog.style.showElement(goog.dom.getElementByClass('reddit', this.vote_), true);
+      this.redditId_ = response['data']['children'][0]['kind'] + '_' + response['data']['children'][0]['data']['id'];
+      this.redditModhash = response['data']['modhash'];
+      var score = response['data']['children'][0]['data']['score'];
+      goog.dom.setTextContent(goog.dom.getElementByClass('score', this.vote_), score);
+      goog.dom.getElementByClass('reddit-link', this.vote_).href =
+          'http://www.reddit.com' + response['data']['children'][0]['data']['permalink'];
+      
+    }
+  }, this));
 };
 
 
@@ -472,9 +528,11 @@ brkn.Player.prototype.changeChannel = function(channel) {
 	if (program) {
 	  this.playProgram(program);
 	  
-	  goog.net.XhrIo.send('/_play', goog.functions.NULL(), 'POST',
-	      'media_id=' + program.media.id +
-	      '&channel_id=' + brkn.model.Channels.getInstance().currentChannel.id);
+	  if (brkn.model.Users.getInstance().currentUser.loggedIn) {
+  	  goog.net.XhrIo.send('/_play', goog.functions.NULL(), 'POST',
+  	      'media_id=' + program.media.id +
+  	      '&channel_id=' + brkn.model.Channels.getInstance().currentChannel.id);
+	  }
 	}
 	this.updateStagecover_();
 };
@@ -495,6 +553,8 @@ brkn.Player.prototype.resetLike_ = function() {
  * @private
  */
 brkn.Player.prototype.fetchLike_ = function(media) {
+  goog.style.showElement(this.likeEl_, true);
+  goog.style.showElement(this.dislikeEl_, true);
   goog.net.XhrIo.send('/_like/' + media.id, goog.bind(function(e) {
     var response = e.target.getResponseJson();
     goog.dom.classes.enable(this.likeEl_, 'checked', response['liked'] ||
@@ -522,8 +582,18 @@ brkn.Player.prototype.onLike_ = function(el, like, e) {
       goog.dom.classes.remove((like ? this.dislikeEl_ : this.likeEl_), 'checked');
     }
     goog.net.XhrIo.send((like ? '/_like' : '/_dislike'), undefined, 'POST',
-        'media_id=' + brkn.model.Player.getInstance().getCurrentProgram().media.id + (!checked ? '&delete=1' : '') +
-        (flip ? '&flip=1' : ''));
+        'media_id=' + brkn.model.Player.getInstance().getCurrentProgram().media.id +
+        (!checked ? '&delete=1' : '') +
+        (flip ? '&flip=1' : '') +
+        (this.redditId_ ? '&reddit_id=' + this.redditId_ + '&modhash=' + this.redditModhash_ : ''));
+    
+//    var scoreEl = goog.dom.getElementByClass('score', this.vote_);
+//    if (goog.dom.getTextContent(scoreEl)) {
+//      var weight = flip ? 2 : 1;
+//      weight = checked ? weight : -weight;
+//      var score = parseInt(goog.dom.getTextContent(scoreEl)) + (like ? weight : -weight);
+//      goog.dom.setTextContent(scoreEl, score);
+//    }
   }
 };
 
@@ -536,11 +606,13 @@ brkn.Player.prototype.playAsync_ = function(program) {
   this.playProgram(program);
   this.updateStagecover_();
 
-  goog.net.XhrIo.send('/_play', goog.functions.NULL(), 'POST',
-      'media_id=' + program.media.id +
-      '&channel_id=' + brkn.model.Channels.getInstance().currentChannel.id);
-  goog.net.XhrIo.send('/_optin', goog.functions.NULL(), 'POST',
-      'media_id=' + program.media.id);
+  if (brkn.model.Users.getInstance().currentUser.loggedIn) {
+    goog.net.XhrIo.send('/_play', goog.functions.NULL(), 'POST',
+        'media_id=' + program.media.id +
+        '&channel_id=' + brkn.model.Channels.getInstance().currentChannel.id);
+    goog.net.XhrIo.send('/_optin', goog.functions.NULL(), 'POST',
+        'media_id=' + program.media.id);
+  }
 };
 
 
@@ -576,7 +648,8 @@ brkn.Player.prototype.playerStateChange_ = function(event) {
           brkn.model.Player.getInstance().getCurrentProgram().media);
       break;
     case YT.PlayerState.ENDED:
-      if (brkn.model.Users.getInstance().currentUser.currentSession &&
+      if (brkn.model.Users.getInstance().currentUser.loggedIn &&
+          brkn.model.Users.getInstance().currentUser.currentSession &&
           brkn.model.Player.getInstance().getCurrentProgram()) {
         brkn.model.Users.getInstance().currentUser.currentSession.seen(
             brkn.model.Player.getInstance().getCurrentProgram().media);
@@ -650,18 +723,22 @@ brkn.Player.prototype.updateStagecover_ = function(opt_message, opt_beforeEnd, o
     goog.style.showElement(this.restart_, false);
     goog.style.showElement(this.vote_, false);
     goog.dom.classes.add(stagecover, 'covered');
-  } if (((this.playerState_ == YT.PlayerState.PLAYING && this.player_.getCurrentTime() > 0) ||
+  } else if (((this.playerState_ == YT.PlayerState.PLAYING && this.player_.getCurrentTime() > 0) ||
       this.playerState_ == YT.PlayerState.PAUSED && this.player_.getCurrentTime() > 0) && !opt_beforeEnd) {
     goog.style.showElement(this.spinner_, false);
     goog.style.showElement(this.restart_, false);
     goog.dom.classes.remove(stagecover, 'covered');
-    goog.style.showElement(this.vote_, true);
+    goog.style.showElement(this.vote_, brkn.model.Users.getInstance().currentUser.loggedIn ||
+        brkn.model.Channels.getInstance().currentChannel.id == 'reddit' ||
+        brkn.model.Player.getInstance().getCurrentProgram().media.redditId);
   } else {
     goog.dom.setTextContent((/** @type {Element} */ this.message_.firstChild),
         brkn.Player.Messages.LOADING);
     goog.style.showElement(this.spinner_, true);
     goog.style.showElement(this.restart_, false);
-    goog.style.showElement(this.vote_, true);
+    goog.style.showElement(this.vote_, brkn.model.Users.getInstance().currentUser.loggedIn ||
+        brkn.model.Channels.getInstance().currentChannel.id == 'reddit' ||
+        brkn.model.Player.getInstance().getCurrentProgram().media.redditId);
     goog.dom.classes.add(stagecover, 'covered');
     
     if (this.playerState_ == YT.PlayerState.PLAYING) {

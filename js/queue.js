@@ -85,11 +85,13 @@ brkn.Queue.prototype.decorateInternal = function(el) {
   brkn.model.Channels.getInstance().getMyChannel().subscribe(brkn.model.Channel.Action.ADD_QUEUE,
       this.addMedia_, this); 
   
-  brkn.model.Channels.getInstance().getMyChannel().fetchQueue(goog.bind(function(medias) {
-    goog.array.forEach(medias, function(media) {
-      this.addMedia_(media, true)
-    }, this);
-  }, this));
+  if (brkn.model.Users.getInstance().currentUser.loggedIn) {
+    brkn.model.Channels.getInstance().getMyChannel().fetchQueue(goog.bind(function(medias) {
+      goog.array.forEach(medias, function(media) {
+        this.addMedia_(media, true)
+      }, this);
+    }, this));
+  }
 };
 
 

@@ -4,6 +4,16 @@ div#sidebar div.info {
     margin-top: 20px;
     cursor:default;
   }
+  &.logged-out {
+    div.picture {
+      div.star, div.send {
+        display: none;
+      }
+      div.options div.button {
+        height: 93px;
+      }
+    }
+  }
   div.picture {
     display: inline-block;
     width: 320px;
@@ -758,6 +768,226 @@ div#sidebar div.info {
           }
         } 
       }
+    }
+  }
+  
+  div.login-promo {
+    margin-top: 10px;
+    position: absolute;
+    top: 200px;
+    background: url(/static/img/promo.png) no-repeat;
+    background-size: contain;
+    background-position: center top;
+    width: 320px;
+    opacity: 0;
+    .transition(opacity, .5s, ease);
+    &.show {
+      opacity: 1;
+    }
+    
+    div.promo {
+      width: 280px;
+      height: 130px;
+      position: relative;
+      margin: 0 20px;
+      margin-top: -30px;
+      &:first-child {
+        margin-top: 50px;
+      }
+      div.promo-pic {
+        .border-radius(60px);
+        .box-shadow(e('0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px rgb(230, 230, 230), 0 0 0 3px rgba(121, 121, 121, .5)'));
+        background: #666;
+        width: 120px;
+        height: 120px;
+        img {
+          width: 120px;
+          height: 120px;
+          .border-radius(60px);
+        }
+      }
+      &.promo-1 div.promo-pic {
+        .box-shadow(e('0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px yellow, 0 0 0 3px rgba(121, 121, 121, .5)'));
+      }
+      &.promo-2 div.promo-pic {
+        .box-shadow(e('0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px red, 0 0 0 3px rgba(121, 121, 121, .5)'));
+      }
+      &.promo-3 div.promo-pic {
+        .box-shadow(e('0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px blue, 0 0 0 3px rgba(121, 121, 121, .5)'));
+      }
+      
+      div.promo-text {
+        position: absolute;
+        left: 130px;
+        top: 0;
+        font-size: 13px;
+        font-family: MuseoSans700;
+        width: 150px;
+        margin-top: 40px;
+        line-height: 22px;
+        color: #333;
+      }
+      &.flip {
+        div.promo-pic {
+          position: absolute;
+          right: 0;
+        }
+        div.promo-text {
+          left: 0;
+          text-align: right;
+        }
+      }
+    }
+  }
+  .login-faces {
+    position: absolute;
+    top: 50px;
+    left: 0;
+    z-index: -1;
+    &.hide {
+      visibility: hidden;
+      opacity: 0;
+    }
+  }
+  div.fb-login {
+    background: #f5f5f5;
+    width: 230px;
+    height: 70px;
+    .border-radius(3px);
+    .box-shadow(e('0 0 5px 2px rgba(9, 9, 9, 0.5), 0 0 0 3px rgb(230, 230, 230), 0 0 0 4px rgba(121, 121, 121, .5)'));
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    margin-left: -115px;
+    color: #4d4d4d;
+    text-shadow: 1px 1px 1px white;
+    cursor: pointer;
+    visibility: hidden;
+    opacity: 0;
+    div.power {
+      width: 70px;
+      height: 70px;
+      display: inline-block;
+      border-right: 1px solid #aaa;
+      .border-radius(3px, 0, 0, 3px);
+      div.bg {
+        .icon-power();
+        font-size: 41px;
+        font-size: 35px;
+        color: #7d7d7d;
+        width: 38px;
+        height: 39px;
+        left: 16px;
+        top: 16px;
+        position: relative;
+        text-align: center;
+      }
+      &.error {
+        background-color: #B7432E;
+        div.bg {
+          color: #dedede;
+          text-shadow: 1px 1px 1px #7d7d7d;
+        }
+      }
+      &.wait {
+        background-color: #B49B4B;
+        div.bg {
+          color: #dedede;
+          text-shadow: 1px 1px 1px #7d7d7d;
+        }
+      }
+    }
+    &.spin div.power div.bg {
+      .animation(spin, 3s, infinite, linear);
+    }
+    div.login-label, div.login-loading {
+      font-family: MuseoSans500;
+      display: inline-block;
+      vertical-align: top;
+      text-align: center;
+      position: relative;
+      left: 37px;
+      top: 15px;
+      font-size: 24px;
+    }
+    div.login-loading {
+      display: none;
+      top: 24px;
+      left: 25px;
+      font-size: 22px;
+    }
+    div.with-fb {
+      font-family: MuseoSans300;
+      position: absolute;
+      width: 80px;
+      font-size: 11px;
+      top: 40px;
+      margin: auto;
+      vertical-align: top;
+      left: 113px;
+      display: inline-block;
+    }
+    &.spin div.login-loading {
+      display: inline-block;
+    }
+    &.spin div.login-label, &.spin div.with-fb {
+      display: none;
+    }
+    div.waitlist {
+      display: none;
+      font-family: MuseoSans300;
+      vertical-align: top;
+      text-align: center;
+      position: relative;
+      left: 3px;
+      top: 28px;
+      font-size: 14px;
+      width: 146px;
+    }
+    &.waitlist div.waitlist {
+      display: inline-block;
+    }
+    &.waitlist div.login-label, &.waitlist div.with-fb {
+      display: none;
+    }
+    &.show {
+      visibility: visible;
+      opacity: 1;
+      .transition(opacity, .3s, ease-in-out);
+    }
+    &:active, &:disabled, &.disabled {
+      background-color: #dedede;
+      .box-shadow(e('0 0 5px 2px rgba(0, 0, 0, 0.7), 0 0 0 3px #f5f5f5, 0 0 0 4px rgba(121, 121, 121, .5)'));
+      color: #2D2D2D;
+    }
+    &.disabled {
+      cursor: default;
+      pointer-events: none;
+    }
+    div.message {
+      position: absolute;
+      top: 80px;
+      left: 0;
+      font-size: 12px;
+      text-shadow: none;
+      font-family: MuseoSans500;
+      width: 230px;
+      text-align: center;
+      opacity: 0;
+      visibility: 0;
+      .transition(opacity, .5s, ease);
+      pointer-events: all;
+      &.show {
+        opacity: 1;
+        visibility: visible;
+      }
+      a {
+        color: #333;
+      }
+    }
+    div.error {
+      top: 100px;
+      color: #B7432E;
     }
   }
 }

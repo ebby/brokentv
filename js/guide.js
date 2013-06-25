@@ -56,7 +56,7 @@ brkn.Guide = function() {
    * @type {boolean}
    * @private
    */
-  this.isAdmin_ = brkn.model.Users.getInstance().currentUser.isAdmin();
+  this.isAdmin_ = !!brkn.model.Users.getInstance().currentUser && brkn.model.Users.getInstance().currentUser.isAdmin();
   
   /**
    * @type {number}

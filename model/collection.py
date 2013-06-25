@@ -59,13 +59,15 @@ class Collection(db.Model):
     if data:
       links = data.get('children')
       ids = []
+      reddit_ids = {}
       logging.info('FETCHING %s VIDEOS FROM REDDIT' % str(len(links)))
       for link in links:
         link_data = link.get('data') or {}
-        if link_data.get('domain') == 'youtube.com':
+        if link_data.get('domain') == 'youtube.com' and not link_data.get('over_18'):
           url = link_data.get('url')
           parsed_url = urlparse.urlparse(url)
           host_id = urlparse.parse_qs(parsed_url.query)['v'][0]
+          reddit_ids[host_id] = link.get('kind') + '_' + link_data.get('id')
           ids.append(host_id)
   
       youtube3 = get_youtube3_service()
@@ -78,6 +80,10 @@ class Collection(db.Model):
         medias = Media.add_from_snippet(videos_response.get("items", []),
                                         collection=collection,
                                         approve=approve_all)
+        for media in medias:
+          if reddit_ids[media.host_id]:
+            media.reddit_id = reddit_ids[media.host_id]
+            media.put()
         ids = ids[10:]
       
     
@@ -179,7 +185,7 @@ class Collection(db.Model):
     return CollectionChannel.get_channels(self)
   
   def get_medias(self, limit, offset=0, deep=True, pending=False,
-                 last_programmed=None, lifespan=None):
+                 last_programmed=None, lifespan=None, by_popularity=False, never_emailed=False):
     col_medias = self.collectionMedias
     if pending:
       col_medias = col_medias.filter('approved =', Approval.PENDING)
@@ -191,6 +197,7 @@ class Collection(db.Model):
         col_medias = col_medias.filter('added >', cutoff)
       else:
         col_medias = col_medias.filter('published >', cutoff)
+
     if self.reddit:
       col_medias = col_medias.order('-added').fetch(limit=limit, offset=offset)
     else:
@@ -203,6 +210,9 @@ class Collection(db.Model):
 
       for col_col in self.collections.fetch(None):
         medias += col_col.child_col.get_medias(limit, offset)
+    
+    if by_popularity:
+      medias = sorted(medias, key=lambda x:x.host_views)
 
     return medias
   
@@ -275,6 +285,7 @@ class CollectionMedia(db.Model):
   added = db.DateTimeProperty(auto_now_add=True)
   approved = db.IntegerProperty(default=Approval.PENDING)
   last_programmed = db.DateTimeProperty()
+  emailed = db.BooleanProperty(default=False)
   
   @classmethod
   def add(cls, collection, media, publisher=None, approved=None):

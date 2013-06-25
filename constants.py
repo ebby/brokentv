@@ -20,6 +20,8 @@ APPROVE_ALL = True
 
 SENDGRID = False
 
+LOGIN_REQUIRED = False
+
 # Make prod app
 
 

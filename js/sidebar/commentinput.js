@@ -19,11 +19,12 @@ goog.require('goog.ui.Textarea.EventType');
  * @param {?boolean=} opt_reply
  * @param {?boolean=} opt_toField
  * @param {?boolean=} opt_inputOptional
+ * @param {?boolean=} opt_pause
  * @constructor
  * @extends {goog.ui.Component}
  */
 brkn.sidebar.CommentInput = function(opt_showControls, opt_canMention, opt_reply, opt_toField,
-    opt_inputOptional) {
+    opt_inputOptional, opt_pause) {
   goog.base(this);
   
   /**
@@ -49,6 +50,12 @@ brkn.sidebar.CommentInput = function(opt_showControls, opt_canMention, opt_reply
    * @private
    */
   this.canMention_ = !!opt_canMention;
+  
+  /**
+   * @type {boolean}
+   * @private
+   */
+  this.pause_ = !!opt_pause;
   
   /**
    * @type {boolean}
@@ -253,7 +260,8 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
       
       this.addChild(this.tweetToggle_);
       this.tweetToggle_.decorate(goog.dom.getElementByClass('tweet-toggle', this.getElement()));
-      if (!brkn.model.Users.getInstance().currentUser.hasTwitter) {
+      if (brkn.model.Users.getInstance().currentUser.loggedIn &&
+          !brkn.model.Users.getInstance().currentUser.hasTwitter) {
         goog.net.XhrIo.send('/_twitter', goog.bind(function(e) {
           var response = e.target.getResponseJson()
           this.twitterPublish_ = this.twitterPublish_ && response['auth'];
@@ -264,10 +272,13 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
       
       this.addChild(this.fbToggle_);
       this.fbToggle_.decorate(goog.dom.getElementByClass('fb-toggle', this.getElement()));
-      FB.api('/me/permissions', goog.bind(function(response) {
-        this.fbPublish_ = this.fbPublish_ && !!response.data[0]['publish_stream'];
-        this.fbToggle_.setChecked(this.fbPublish_);
-      }, this));
+      
+      if (brkn.model.Users.getInstance().currentUser.loggedIn) {
+        FB.api('/me/permissions', goog.bind(function(response) {
+          this.fbPublish_ = this.fbPublish_ && !!response.data[0]['publish_stream'];
+          this.fbToggle_.setChecked(this.fbPublish_);
+        }, this));
+      }
       
       this.getHandler()
           .listen(this.fbToggle_,
@@ -305,7 +316,9 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
       .listen(this.commentInput_.getElement(),
           goog.events.EventType.FOCUS,
           goog.bind(function(e) {
-            brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.PLAY, false);
+            if (this.pause) {
+              brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.PLAY, false);
+            }
             popup && goog.style.showElement(popup, false);
             if (!brkn.model.Users.getInstance().currentUser.welcomed && !this.toField_) {
               brkn.model.Popup.getInstance().publish(brkn.model.Popup.Action.TOOLTIP, this.commentInput_.getElement(),

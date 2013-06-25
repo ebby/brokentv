@@ -36,7 +36,7 @@ brkn.Search = function() {
   /**
    * @type {goog.ui.LabelInput}
    */
-  this.input_ = new goog.ui.LabelInput('Search');
+  this.input_ = new goog.ui.LabelInput('Search YouTube');
   
   /**
    * @type {goog.ui.CustomButton}
@@ -228,14 +228,18 @@ brkn.Search.prototype.addChannel_ = function(channel) {
         goog.net.XhrIo.send('/_ytchannel', goog.bind(function(e) {
           var response = e.target.getResponseJson();
           channel = brkn.model.Channels.getInstance().addChannel(response['channel']);
-          var p = new brkn.model.Program(response['program']);
-          channel.publish(brkn.model.Channel.Action.ADD_PROGRAM, p);
+          goog.array.forEach(response['programs'], function(program) {
+            var p = new brkn.model.Program(program);
+            channel.publish(brkn.model.Channel.Action.ADD_PROGRAM, p);
+          }, this);
           brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.CHANGE_CHANNEL,
               channel);
           goog.dom.classes.remove(channelEl, 'loading');
         }, this),
         'POST',
         '&name=' + channel['name'] +
+        (!brkn.model.Users.getInstance().currentUser.loggedIn ?
+            '&token=' + brkn.model.BrowserChannel.getInstance().token : '') +
         (channel['channel_id'] ? '&channel_id=' + channel['channel_id'] : '') +
         (channel['playlist_id'] ? '&playlist_id=' + channel['playlist_id'] : ''));
       }, this));

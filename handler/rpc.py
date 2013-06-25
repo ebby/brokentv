@@ -1,6 +1,6 @@
 from common import *
 
-def get_session(current_user, media_id=None, channel_id=None, single_channel_id=None,
+def get_session(current_user=None, media_id=None, channel_id=None, single_channel_id=None,
                 youtube_channel_id=None, set_programming=True):
   data = {}
 
@@ -12,18 +12,19 @@ def get_session(current_user, media_id=None, channel_id=None, single_channel_id=
     channels = Channel.get_public()
     cached_channels = [c.toJson() for c in channels]
     memcache.set('channels', cached_channels)
+  
+  cached_programming = memcache.get('programming') or {}
 
   if single_channel_id:
     single_channel = filter(lambda c: c['id'] == single_channel_id, cached_channels)
     if len(single_channel):
-      channels = single_channel
+      cached_channels = single_channel
       
   if youtube_channel_id:
-    user_json = memcache.get(current_user.id) or {}
     youtube_channel_name = youtube_channel_id.split(',')[0]
     youtube_channel_id = youtube_channel_id.split(',')[1]
-    cid = current_user.id + '-' + youtube_channel_id
-    cached_channel = memcache.get(cid)
+    cid = current_user.id + '-' + youtube_channel_id if current_user else None
+    cached_channel = memcache.get(cid) if cid else None
     already_programmed = False
     if cached_channel and len(cached_channel.get('programs', [])):
         last_program_time = iso8601.parse_date(
@@ -33,12 +34,11 @@ def get_session(current_user, media_id=None, channel_id=None, single_channel_id=
           already_programmed = True
 
     if not already_programmed:
-      data_json = Channel.youtube_channel(current_user, youtube_channel_name,
+      data_json = Channel.youtube_channel(youtube_channel_name, user=current_user,
                                           yt_channel_id=youtube_channel_id)
       youtube_channel = data_json['channel']
-    channels = [youtube_channel]
-
-  cached_programming = memcache.get('programming') or {}
+      cached_programming = dict(cached_programming.items() + {youtube_channel['id']:data_json['programs']}.items())
+    cached_channels = [youtube_channel]
 
   if not len(cached_programming):
     if constants.SAVE_PROGRAMS:
@@ -54,14 +54,15 @@ def get_session(current_user, media_id=None, channel_id=None, single_channel_id=
   
 
   # Tack on the user's private channel if it exists, and programming
-  user_channel = current_user.channel.get()
+  user_channel = current_user.channel.get() or Channel.get_my_channel(current_user) if current_user \
+      else None
   
   media = None
   current_channel = None
   if media_id:
     media = Media.get_by_key_name(media_id)
-    if media:
-      current_channel = user_channel or Channel.get_my_channel(current_user)
+    if media and user_channel:
+      current_channel = user_channel
       program = Program.add_program(current_channel, media, time=datetime.datetime.now(), async=True)
 
   if user_channel:
@@ -69,9 +70,15 @@ def get_session(current_user, media_id=None, channel_id=None, single_channel_id=
     if user_programs:
       cached_channels.append(user_channel.toJson())
       cached_programming = dict(cached_programming.items() + user_programs.items())
+  elif media:
+    current_channel = Channel(key_name='temp', name='My Channel', privacy=constants.Privacy.PRIVATE)
+    program = Program.add_program(current_channel, media, time=datetime.datetime.now())
+    program.async = True
+    cached_channels.append(current_channel.toJson())
+    cached_programming = dict(cached_programming.items() + {'temp':[program.toJson()]}.items())
   
-  user_json = memcache.get(current_user.id) or {}
-  if 'channels' in user_json:
+  user_json = memcache.get(current_user.id) or {} if current_user else None
+  if user_json and 'channels' in user_json:
     for cid in user_json['channels']:
       c = memcache.get(cid) 
       if c and len(c.get('programs', [])):
@@ -83,44 +90,47 @@ def get_session(current_user, media_id=None, channel_id=None, single_channel_id=
           user_json['channels'].remove(cid)
           memcache.delete(cid)
 
-  data['channels'] = channels or cached_channels
+  data['channels'] = cached_channels
   data['programs'] = cached_programming
     
   # MAKE SURE WE HAVE CHANNELS
   channels = channels or Channel.get_public()
   assert len(channels) > 0, 'NO CHANNELS IN DATABASE'
 
-  # ME
-  user_obj = current_user.toJson(configs=True)
-  user_obj['current_channel'] = current_channel.id if current_channel else current_user.current_channel_id \
-      if current_user.current_channel_id else channels[0].id
-  data['current_user'] = user_obj
+  data['current_channel'] = channel_id or \
+        (current_channel.id if current_channel else current_user.current_channel_id \
+        if current_user and current_user.current_channel_id else cached_channels[0]['id'])
 
-  # Update login
-  current_user.last_login = datetime.datetime.now()
-  current_user.put()
+  # ME
+  if current_user:
+    user_obj = current_user.toJson(configs=True)
+    data['current_user'] = user_obj
+
+    # Update login
+    current_user.last_login = datetime.datetime.now()
+    current_user.put()
   
-  #clear outbox
-  memcached_user_obj = memcache.get(current_user.id) or {}
-  if memcached_user_obj.get('outbox'):
-    del memcached_user_obj['outbox']
-    memcache.set(current_user.id, memcached_user_obj)
+    #clear outbox
+    memcached_user_obj = memcache.get(current_user.id) or {}
+    if memcached_user_obj.get('outbox'):
+      del memcached_user_obj['outbox']
+      memcache.set(current_user.id, memcached_user_obj)
 
   return data
 
 class SessionHandler(BaseHandler):
   def post(self):
-    if self.current_user.access_level < AccessLevel.USER and \
+    if self.current_user and self.current_user.access_level < AccessLevel.USER and \
         constants.INVITE_POLICY() == constants.InvitePolicy.ANYBODY:
       self.current_user.grant_access()
-
-    if self.current_user.access_level < AccessLevel.USER:
+    
+    if constants.LOGIN_REQUIRED and self.current_user.access_level < AccessLevel.USER:
       self.error(401)
     else:
       data = {}
 
       user_agent = self.request.headers.get('user_agent')
-      if self.current_user.id not in constants.SUPER_ADMINS:
+      if not self.current_user or self.current_user.id not in constants.SUPER_ADMINS:
         if 'Android' in user_agent:
           data['error'] = 'Android mobile access is not supported yet.'
         ie = re.search('/MSIE\s([\d]+)/', user_agent)
@@ -140,6 +150,26 @@ class SessionHandler(BaseHandler):
       if self.session.get('message'):
         data['message'] = self.session['message']
       self.response.out.write(simplejson.dumps(data))
+
+class LoginHandler(BaseHandler):
+  @BaseHandler.logged_in
+  def post(self):
+    data = {}
+    current_user = self.current_user
+    user_obj = current_user.toJson(configs=True)
+    data['current_user'] = user_obj
+
+    # Update login
+    current_user.last_login = datetime.datetime.now()
+    current_user.put()
+
+    #clear outbox
+    memcached_user_obj = memcache.get(current_user.id) or {}
+    if memcached_user_obj.get('outbox'):
+      del memcached_user_obj['outbox']
+      memcache.set(current_user.id, memcached_user_obj)
+
+    self.response.out.write(simplejson.dumps(data))
 
 class PresenceHandler(BaseHandler):
   @BaseHandler.logged_in
@@ -218,6 +248,19 @@ class PresenceHandler(BaseHandler):
                                     session_json['id'], session_json['tune_in'], media);
 
     self.response.out.write(simplejson.dumps(data))
+    
+class TokenHandler(BaseHandler):
+  def get(self):
+    data = {}
+    token_id = str(uuid.uuid1())
+    # CREATE BROWSER CHANNEL
+    token = browserchannel.create_channel(token_id)
+    def add_client(web_channels, client_id, token):
+      web_channels[client_id] = token
+      return web_channels
+    memcache_cas('web_channels', add_client, token_id, token)
+    data['token'] = token
+    self.response.out.write(simplejson.dumps(data))
 
 def update_waitlist(*args, **kwargs):
   User.update_waitlist(*args, **kwargs)
@@ -282,17 +325,17 @@ class ProgramHandler(BaseHandler):
       self.response.out.write(simplejson.dumps(program.toJson(False)))
       
 class InfoHandler(BaseHandler):
-  @BaseHandler.logged_in
   def get(self, id):
     media = Media.get(id, fetch_publisher=True)
     if media:
       response = {}
       response['description'] = media.description
-      response['seen'] = media.seen_by(self.current_user)
-      response['comments'] = [c.toJson() for c in Comment.get_by_media(media, uid=self.current_user.id)]
-      response['tweets'] = media.get_tweets()
-      pollMedia = media.polls.get()
-      response['poll'] = pollMedia.poll.to_json(self.current_user.id) if pollMedia else None
+      if self.current_user:
+        response['tweets'] = media.get_tweets()
+        response['seen'] = media.seen_by(self.current_user)
+        response['comments'] = [c.toJson() for c in Comment.get_by_media(media, uid=self.current_user.id)]
+        pollMedia = media.polls.get()
+        response['poll'] = pollMedia.poll.to_json(self.current_user.id) if pollMedia else None
       self.response.out.write(simplejson.dumps(response))
 
 class FriendsHandler(BaseHandler):
@@ -668,43 +711,70 @@ class LikeHandler(BaseHandler):
                                                 'disliked': 1 if disliked else 0
                                                 }))
 
-  @BaseHandler.logged_in
+
   def post(self):
-    media = Media.get_by_key_name(self.request.get('media_id'))
-    collection = Collection.get_or_insert(self.current_user.id + '-liked',
-                                          user=self.current_user,
-                                          name='Liked')
+    reddit_id = self.request.get('reddit_id')
+    modhash = self.request.get('modhash')
     
-    if self.request.get('flip'):
-      dislikes = Collection.get_by_key_name(self.current_user.id + '-disliked')
-      if dislikes:
-        dislikes.remove_media(media)
-    
-    if self.request.get('delete'):
-      collection.remove_media(media)
-    else:
-      collection.add_media(media, True)
-      Stat.add_like(media)
-      broadcast.broadcastNewActivity(UserActivity.add_like(self.current_user, media))
+    if reddit_id and modhash:
+      dir = '0' if self.request.get('delete') else '1'
+      fetch = urlfetch.fetch('http://www.reddit.com/api/vote',
+                     payload=urllib.urlencode({
+                               'dir': dir,
+                               'id': reddit_id,
+                               'modhash': modhash
+                              }),
+                     method=urlfetch.POST)
+      logging.info(fetch.content)
+    if self.current_user:
+      media = Media.get_by_key_name(self.request.get('media_id'))
+      collection = Collection.get_or_insert(self.current_user.id + '-liked',
+                                            user=self.current_user,
+                                            name='Liked')
+      
+      if self.request.get('flip'):
+        dislikes = Collection.get_by_key_name(self.current_user.id + '-disliked')
+        if dislikes:
+          dislikes.remove_media(media)
+      
+      if self.request.get('delete'):
+        collection.remove_media(media)
+      else:
+        collection.add_media(media, True)
+        Stat.add_like(media)
+        broadcast.broadcastNewActivity(UserActivity.add_like(self.current_user, media))
 
 class DislikeHandler(BaseHandler):
-  @BaseHandler.logged_in
   def post(self):
-    media = Media.get_by_key_name(self.request.get('media_id'))
-    collection = Collection.get_or_insert(self.current_user.id + '-disliked',
-                                          user=self.current_user,
-                                          name='Disliked')
-
-    if self.request.get('flip'):
-      likes = Collection.get_by_key_name(self.current_user.id + '-liked')
-      if likes:
-        likes.remove_media(media)
-
-    if self.request.get('delete'):
-      collection.remove_media(media)
-    else:
-      collection.add_media(media, True)
-      Stat.add_like(media)
+    reddit_id = self.request.get('reddit_id')
+    modhash = self.request.get('modhash')
+    
+    if reddit_id and modhash:
+      dir = '0' if self.request.get('delete') else '-1'
+      urlfetch.fetch('http://www.reddit.com/api/vote',
+                     payload=urllib.urlencode({
+                               'dir': dir,
+                               'id': reddit_id,
+                               'modhash': modhash
+                              }),
+                     method=urlfetch.POST)
+    
+    if self.current_user:
+      media = Media.get_by_key_name(self.request.get('media_id'))
+      collection = Collection.get_or_insert(self.current_user.id + '-disliked',
+                                            user=self.current_user,
+                                            name='Disliked')
+  
+      if self.request.get('flip'):
+        likes = Collection.get_by_key_name(self.current_user.id + '-liked')
+        if likes:
+          likes.remove_media(media)
+  
+      if self.request.get('delete'):
+        collection.remove_media(media)
+      else:
+        collection.add_media(media, True)
+        Stat.add_like(media)
 
 class QueueHandler(BaseHandler):
   @BaseHandler.logged_in
@@ -769,12 +839,12 @@ class WelcomedHandler(BaseHandler):
     current_user.put()
     
 class YoutubeChannelHandler(BaseHandler):
-  @BaseHandler.logged_in
   def post(self):
     response = {}
+    token = self.request.get('token')
     name = self.request.get('name')
     yt_channel_id = self.request.get('channel_id')
     yt_playlist_id = self.request.get('playlist_id')
-    data_json = Channel.youtube_channel(self.current_user, name, yt_channel_id=yt_channel_id,
+    data_json = Channel.youtube_channel(name, user=self.current_user, token=token, yt_channel_id=yt_channel_id,
                                         yt_playlist_id=yt_playlist_id)
     self.response.out.write(simplejson.dumps(data_json))

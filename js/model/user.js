@@ -9,27 +9,35 @@ goog.require('goog.pubsub.PubSub');
 
 
 /**
- * @param {Object} user User object
+ * @param {?Object=} opt_user User object
+ * @param {?boolean=} opt_loggedOut
  * @constructor
  * @extends {goog.pubsub.PubSub}
  */
-brkn.model.User = function(user) {
+brkn.model.User = function(opt_user, opt_loggedOut) {
 	goog.base(this);
+	
+	var user = opt_user || {};
+	
+	/**
+   * @type {boolean}
+   */
+  this.loggedIn = !opt_loggedOut;
 
 	/**
 	 * @type {string}
 	 */
-	this.id = user['id'];
+	this.id = user['id'] || '';
 	
 	/**
 	 * @type {string}
 	 */
-	this.name = user['name'];
+	this.name = user['name'] || '';
 	
 	/**
    * @type {string}
    */
-  this.url = user['profile_url'];
+  this.url = user['profile_url'] || '';
   
   /**
    * @type {string}
@@ -39,17 +47,17 @@ brkn.model.User = function(user) {
   /**
    * @type {boolean}
    */
-  this.welcomed = user['welcomed'];
+  this.welcomed = !!user['welcomed'];
 
   /**
    * @type {boolean}
    */
-  this.online = user['online'];
+  this.online = !!user['online'];
   
   /**
    * @type {boolean}
    */
-  this.demo = user['demo'];
+  this.demo = !!user['demo'];
   
   /**
    * @type {brkn.model.Media}
@@ -74,7 +82,7 @@ brkn.model.User = function(user) {
 	/**
 	 * @type {string}
 	 */
-	this.picture = goog.string.subs('https://graph.facebook.com/%s/picture', this.id);
+	this.picture = this.id ? goog.string.subs('https://graph.facebook.com/%s/picture', this.id) : '';
 	
 	/**
 	 * Path color
@@ -88,7 +96,7 @@ brkn.model.User = function(user) {
 	/**
    * @type {number}
    */
-  this.accessLevel = user['access_level'];	
+  this.accessLevel = user['access_level'] || 0;	
   
   /**
    * @type {Array.<Object>}
@@ -104,7 +112,7 @@ brkn.model.User = function(user) {
   /**
    * @type {number}
    */
-  this.sessionCount = user['session_count'];
+  this.sessionCount = user['session_count'] || 0;
   
   /**
    * @type {number}
@@ -134,7 +142,7 @@ brkn.model.User = function(user) {
   /**
    * @type {boolean}
    */
-  this.hasTwitter = user['has_twitter'];
+  this.hasTwitter = !!user['has_twitter'];
   
   /**
    * @type {boolean}
