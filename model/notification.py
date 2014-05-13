@@ -30,7 +30,7 @@ class Notification(db.Model):
     return n
   
   @classmethod
-  def get(cls, user, limit=10, offset=10):
+  def get(cls, user, limit=10, offset=0):
     user_obj = memcache.get(user.id) or {}
     ns = user_obj.get('notifications')
     if not ns:

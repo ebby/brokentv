@@ -63,11 +63,15 @@ div#logo {
     position: absolute;
     left: 50%;
     top: 50%;
+    > span {
+      opacity: 0;
+    }
     div.spinner {
       position: absolute;
       left: 50%;
       margin-left: -100px;
-      bottom: -150px;
+      top: 50%;
+      margin-top: -110px;
       background: @spinner2 no-repeat center;
       background-position: 50% 60%;
       background-size: 70px;
@@ -321,4 +325,3 @@ div.send-suggestions {
     }
   }
 }
-

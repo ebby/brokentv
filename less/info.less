@@ -213,7 +213,7 @@ div#sidebar div.info {
       margin-right: 5px;
     }
     div.friends-icon {
-      .icon-users();
+      .icon-globe();
       display: inline-block;
       margin-right: 5px;
     }
@@ -430,13 +430,14 @@ div#sidebar div.info {
           font-size: 11px;
         }
       }
-      
+
     }
   }
   div.viewers {
     position: relative;
     width: 320px;
     padding: 4px 0 4px 0;
+    margin-top: -4px;
     background: rgba(255, 255, 255, .5);
     .box-shadow(e('inset 0px -4px 0 -3px rgba(255, 255, 255, 1), inset 0 -3px 2px -1px rgba(0, 0, 0, .3)'));
     div.label {
@@ -530,7 +531,7 @@ div#sidebar div.info {
       background: rgba(0, 0, 0, .5);
     }
   }
-  
+
   div.create-poll {
     text-align: left;
     position: absolute;
@@ -602,7 +603,7 @@ div#sidebar div.info {
       }
     }
   }
-  
+
   div.send-media {
     text-align: left;
     position: absolute;
@@ -711,7 +712,7 @@ div#sidebar div.info {
       }
     }
   }
-  
+
   &.mini {
     div.picture {
       height: 100px;
@@ -766,37 +767,50 @@ div#sidebar div.info {
           div.icon {
             color: white;
           }
-        } 
+        }
       }
     }
+    div.login-promo {
+      top: 101px;
+    }
+    &.logged-out div.picture div.options div.button {
+      height: 46px;
+    }
   }
-  
+
   div.login-promo {
-    margin-top: 10px;
     position: absolute;
-    top: 200px;
-    background: url(/static/img/promo.png) no-repeat;
+    width: 100%;
+    height: 100%;
+    background: rgba(230, 230, 230, .9);
     background-size: contain;
     background-position: center top;
     width: 320px;
     opacity: 0;
+    top: 200px;
     .transition(opacity, .5s, ease);
     &.show {
       opacity: 1;
     }
-    
+    div.title {
+      font-family: MuseoSans300;
+      font-size: 26px;
+      text-align: center;
+      text-shadow: 0 0 1px white;
+      color: #797575;
+      width: 100%;
+      position: static;
+      margin-top: 7px;
+    }
     div.promo {
       width: 280px;
       height: 130px;
       position: relative;
       margin: 0 20px;
       margin-top: -30px;
-      &:first-child {
-        margin-top: 50px;
-      }
       div.promo-pic {
         .border-radius(60px);
-        .box-shadow(e('0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px rgb(230, 230, 230), 0 0 0 3px rgba(121, 121, 121, .5)'));
+        .box-shadow(e('0 0 0 1px #888'));
         background: #666;
         width: 120px;
         height: 120px;
@@ -806,16 +820,7 @@ div#sidebar div.info {
           .border-radius(60px);
         }
       }
-      &.promo-1 div.promo-pic {
-        .box-shadow(e('0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px yellow, 0 0 0 3px rgba(121, 121, 121, .5)'));
-      }
-      &.promo-2 div.promo-pic {
-        .box-shadow(e('0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px red, 0 0 0 3px rgba(121, 121, 121, .5)'));
-      }
-      &.promo-3 div.promo-pic {
-        .box-shadow(e('0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px blue, 0 0 0 3px rgba(121, 121, 121, .5)'));
-      }
-      
+
       div.promo-text {
         position: absolute;
         left: 130px;
@@ -839,30 +844,21 @@ div#sidebar div.info {
       }
     }
   }
-  .login-faces {
-    position: absolute;
-    top: 50px;
-    left: 0;
-    z-index: -1;
-    &.hide {
-      visibility: hidden;
-      opacity: 0;
-    }
-  }
+
   div.fb-login {
     background: #f5f5f5;
     width: 230px;
     height: 70px;
     .border-radius(3px);
-    .box-shadow(e('0 0 5px 2px rgba(9, 9, 9, 0.5), 0 0 0 3px rgb(230, 230, 230), 0 0 0 4px rgba(121, 121, 121, .5)'));
+    .box-shadow(e('0 0 5px 0px rgba(9, 9, 9, 0.5), 0 0 0 3px rgb(230, 230, 230), 0 0 0 4px rgba(121, 121, 121, .5)'));
     position: absolute;
-    bottom: 0;
+    bottom: 30px;
     left: 50%;
     margin-left: -115px;
     color: #4d4d4d;
-    text-shadow: 1px 1px 1px white;
     cursor: pointer;
     visibility: hidden;
+    text-shadow: none;
     opacity: 0;
     div.power {
       width: 70px;
@@ -901,27 +897,26 @@ div#sidebar div.info {
       .animation(spin, 3s, infinite, linear);
     }
     div.login-label, div.login-loading {
-      font-family: MuseoSans500;
+      font-family: MuseoSans300;
       display: inline-block;
       vertical-align: top;
       text-align: center;
       position: relative;
       left: 37px;
-      top: 15px;
-      font-size: 24px;
+      top: 13px;
+      font-size: 31px;
     }
     div.login-loading {
       display: none;
-      top: 24px;
-      left: 25px;
-      font-size: 22px;
+      top: 23px;
+      font-size: 24px;
     }
     div.with-fb {
       font-family: MuseoSans300;
       position: absolute;
       width: 80px;
       font-size: 11px;
-      top: 40px;
+      top: 45px;
       margin: auto;
       vertical-align: top;
       left: 113px;
@@ -957,8 +952,11 @@ div#sidebar div.info {
     }
     &:active, &:disabled, &.disabled {
       background-color: #dedede;
-      .box-shadow(e('0 0 5px 2px rgba(0, 0, 0, 0.7), 0 0 0 3px #f5f5f5, 0 0 0 4px rgba(121, 121, 121, .5)'));
+      .box-shadow(e('0 0 5px 0px rgba(9, 9, 9, 0.5), 0 0 0 3px rgb(230, 230, 230), 0 0 0 4px rgba(121, 121, 121, .5)'));
       color: #2D2D2D;
+    }
+    &.spin {
+      .box-shadow(e('0 0 0 1px #f5f5f5, 0 0 0 2px rgba(121, 121, 121, .5)'));
     }
     &.disabled {
       cursor: default;

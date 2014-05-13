@@ -31,6 +31,7 @@
       var EMBED = '{{ embed }}' == 'True';
       var FB_APP_ID = '{{ facebook_app_id }}';
       var SAFARI = !window.navigator.standalone && !/(iPhone|iPod|iPad).*AppleWebKit(?!.*Safari)/i.test(navigator.userAgent);
+      var LOADED = false;
 
       // Re-namespace to avoid closure conflict.
       var appengine = goog.appengine; 

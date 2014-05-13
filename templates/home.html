@@ -10,7 +10,7 @@
     <meta property="og:title" content="XYLO"/>
     <meta property="og:url" content="http://www.xylocast.com"/>
     <meta property="og:description" content="Your Television Stream" />
-    <meta property="fb:app_id" content="131936020298013" /> 
+    <meta property="fb:app_id" content="131936020298013" />
 
     <title>XYLO</title>
 
@@ -33,10 +33,12 @@
       var EMBED = '{{ embed }}' == 'True';
       var FB_APP_ID = '{{ facebook_app_id }}';
       var LOGIN_REQUIRED = '{{ login_required }}' == 'True'
-      var POWER_ON = '{{ power_on }}' == 'True'
+      var POWER_ON = '{{ power_on }}' == 'True';
+      var LOADED = false;
+      var CHECKED_LOGIN = false;
 
 			// Re-namespace to avoid closure conflict.
-			var appengine = goog.appengine; 
+			var appengine = goog.appengine;
 		</script>
 		<script src="{{ js_location }}"></script>
 		<script>
@@ -63,8 +65,32 @@
       <source src="/static/audio/xylo-f.mp3" type='audio/mpeg; codecs="mp3"'>
       <source src="/static/audio/xylo-f.wav" type="audio/wav">
     </audio>
-  
-    <div id="login">
+
+    <div id="embed-spinner" {% if not embed %}style="display:none"{% endif %}>
+      <div></div>
+    </div>
+
+    <div id="login" {% if embed %}class="hide"{% endif %}>
+      <div id="login-promo" class="login-promo" style="display:none">
+         <div class="promo promo-1">
+           <div class="promo-pic">
+             <img src="/static/img/promo1.jpg">
+           </div>
+           <div class="promo-text">WATCH AND CHAT LIVE WITH FRIENDS</div>
+         </div>
+         <div class="promo promo-2">
+           <div class="promo-pic">
+             <img src="/static/img/promo2.jpg">
+           </div>
+           <div class="promo-text">SEE LATEST TWEETS AND VOTE ON STORIES</div>
+         </div>
+         <div class="promo promo-3">
+           <div class="promo-pic">
+             <img src="/static/img/promo3.jpg">
+           </div>
+           <div class="promo-text">DISCUSS, SHARE, AND SAVE FAVORITES</div>
+         </div>
+       </div>
       <div id="homepage">
         <div id="chord-1" class="chord"></div>
         <div id="chord-2" class="chord"></div>
@@ -76,13 +102,14 @@
 	        <div class="header">
 	          <div class="title">INTRODUCING
 	            <span style="color:#B5762F;">X</span><span style="color:#B49B4B;">Y</span><span style="color:#2F6E53;">L</span><span style="color:#497882;">O</span></div>
-	          <div class="subtitle">Your Television Stream</div>
+	          <div class="subtitle">Watch an eyeful</div>
 		        <div id="fb-login" class="fb-login" style="display: none">
+		          <fb:facepile app_id="131936020298013" class="login-faces" action="og_runkeeper:run" width="350" max_rows="1"></fb:facepile>
 		          <div class="power"><div class="bg"></div></div>
-		          <div class="label">POWER</div>
-		          <div class="with-fb">turn it on</div>
+		          <div class="label">LOGIN</div>
+		          <div class="with-fb">with facebook</div>
 		          <div class="waitlist">You're on the waitlist</div>
-		          <div class="loading">LOADING</div>
+		          <div class="loading">Loading</div>
 		          <div id="error"></div>
 		          <div id="message">We can't post on your behalf!</div>
 		        </div>
@@ -164,7 +191,7 @@
                 <span class="bold">What's up with that logo?</span><br/>
                 It's a xylophone, get it?<br/><br/>
                 <span class="bold">What's the deal with these channels?</span><br/>
-                Currently we're running a few test channels. We have a full structure for anyone to 
+                Currently we're running a few test channels. We have a full structure for anyone to
                 operate a channel. If you're intested in a custom branded channel, contact
                 <a href="mailto:info@xylocast.com">info@xylocast.com</a>.<br/><br/>
                 <span class="bold">Does everyone see the same content?</span><br/>
@@ -185,12 +212,12 @@
 		        <a class="section" id="about" href='#'>ABOUT</a> &middot;
 		        <a class="section" id="jobs" href='#'>JOBS</a> &middot;
 		        <a class="section" id="faq" href='#'>FAQ</a> <span class="faq" style="margin-left: 4px">&middot;</span>
-		        <!-- 
+		        <!--
 		          <a class="section" id="tos" href='#'>TERMS OF USE</a> &middot;
 		          <a class="section" id="privacy" href='#'>PRIVACY POLICY</a> &middot;
 		         -->
 		        <a href='http://blog.xylovision.com' target="_blank">BLOG</a> &middot;
-		        <div class="copyright">COPYRIGHT &copy; 2013 XYLO MEDIA INC. ALL RIGHTS RESERVED. &middot;</div>
+		        <div class="copyright">COPYRIGHT &copy; 2014 XYLO MEDIA INC. ALL RIGHTS RESERVED. &middot;</div>
 		        <a href='http://facebook.com/xyloinc' class="icon" target="_blank"><div class="home-facebook"></div></a> &middot;
             <a href='http://twitter.com/xyloinc'  class="icon" target="_blank"><div class="home-twitter"></div></a>
 		      </div>
@@ -198,11 +225,11 @@
 	    </div>
     <div id="overlay" style="display: none"></div>
     <div id="fb-root"></div>
-		 
+
 	  <script>
-	  
+
       brkn.Main.staticInit();
- 	    
+
 		  var ytLoaded = false;
 		  var fbLoaded = false;
 		  function onYouTubePlayerAPIReady() {
@@ -219,7 +246,7 @@
 	      });
 	      fbLoaded = true;
 	      ytLoaded && brkn.Main.auth();
-	      
+
 	    };
 	 		// Load the SDK Asynchronously
 	    (function(d){

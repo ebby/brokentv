@@ -447,10 +447,6 @@ brkn.Guide.prototype.enterDocument = function() {
           this.align_(true, undefined, false);
         }, this));
 
-  window.onbeforeunload = function(e) {
-    return 'Leaving so soon?'
-  };
-
   brkn.model.Channels.getInstance().subscribe(brkn.model.Channels.Actions.RESIZE,
       this.resize_, this);
   

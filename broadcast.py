@@ -69,7 +69,7 @@ def broadcastNewComment(comment, tweet, to_user, host_url):
 
   for client in channels.iterkeys():
     if (comment.parent_comment and client in comment.user.friends) or (client in comment.acl) or \
-        (to_user and client == to_user.id):
+        (to_user and client == to_user.id) or not constants.PRIVATE_COMMENTS:
       webchannel.send_message(client, simplejson.dumps(response))
 
 def broadcastNewMessage(message):

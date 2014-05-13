@@ -16,7 +16,7 @@ class Comment(db.Model):
   @classmethod
   def get_by_media(cls, media, uid=None, limit=20, offset=0):
     query = Comment.all().filter('media =', media)
-    if uid:
+    if uid and PRIVATE_COMMENTS:
       query = query.filter('acl =', uid)
     return query.order('time').fetch(limit, offset)
 
@@ -30,7 +30,7 @@ class Comment(db.Model):
     if parent_id:
       c.parent_comment = Comment.get_by_id(int(parent_id))
       c.is_parent = False
-    else:
+    elif PRIVATE_COMMENTS:
       # ACL only needed on parent. Replies don't need ACLs.
       c.acl = acl
     c.put()

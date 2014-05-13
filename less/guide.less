@@ -30,11 +30,11 @@ div#guide {
       .transition(left, .3s, linear);
     }
   }
-  
+
   &.tick-along.animate.toggled div.channels div.channel div.programs div.program.playing div.title {
     .transition(left, 1s, linear);
   }
-  
+
   &.drag, &.drag div.channel div.name {
     .transition(e('none !important'));
     .grabbing();
@@ -286,7 +286,7 @@ div#guide {
       height: 18px;
       position: fixed;
       left: 50%;
-      margin-left: -40px; 
+      margin-left: -40px;
       background: #7E7E7E @grad-flat;
       .transition(margin-left, .5s, ease);
       div.fader {
@@ -520,7 +520,7 @@ div#guide {
 					height: 100%;
 					color: #aaa;
 					text-shadow: 1px 1px 1px #181818;
-					background: #222;
+					background: #121212;
 					z-index: 0;
           border-left: 1px solid rgba(0, 0, 0, .8);
           border-right: 1px solid rgba(0, 0, 0, .8);
@@ -577,7 +577,7 @@ div#guide {
 					div.thumb {
 					  width: 100%;
 					  height: 100%;
-					  opacity: .1;
+					  opacity: .3;
 					  background-size: 110% auto;
 					  background-position: 50% 37%;
 					  &.fix-height {
@@ -648,7 +648,7 @@ div#guide {
             display: none;
             bottom: 6px;
             position: absolute;
-            opacity: .9;         
+            opacity: .9;
             width: 20px;
             height: 20px;
             .border-radius(12px);
@@ -1051,4 +1051,3 @@ div#guide {
   &.sidebar-toggled div#right-grad {
     right: 320px;
   }
-}

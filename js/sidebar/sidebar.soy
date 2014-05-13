@@ -78,7 +78,7 @@
               <a class="prev-link">&#10218; LAST PROGRAM</a>
             {/if}
           </div>
-          <div class="no-comments" style="display:none">Start the conversation with friends.</div>
+          <div class="no-comments" style="display:none">Start the conversation.</div>
           <div class="comments"></div>
           <div class="top-grad"></div>
           <div class="bottom-grad"></div>
@@ -120,31 +120,31 @@
     </div>
     {if $loggedOut}
       <div class="login-promo">
-        <div class="promo promo-1">
+        <div class="title">login to xylo</div>
+        <div class="promo promo-1" style="margin-top: 10px;">
           <div class="promo-pic">
             <img src="/static/img/promo1.jpg">
           </div>
-          <div class="promo-text">WATCH AND CHAT LIVE WITH FRIENDS</div>
+          <div class="promo-text">Watch and chat live with friends.</div>
         </div>
         <div class="promo flip promo-2">
           <div class="promo-pic">
             <img src="/static/img/promo2.jpg">
           </div>
-          <div class="promo-text">SEE LATEST TWEETS AND VOTE ON STORIES</div>
+          <div class="promo-text">See latest tweets and vote on stories.</div>
         </div>
         <div class="promo promo-3">
           <div class="promo-pic">
             <img src="/static/img/promo3.jpg">
           </div>
-          <div class="promo-text">DISCUSS, SHARE, AND SAVE FAVORITES</div>
+          <div class="promo-text">Discuss, share, and save favorites.</div>
         </div>
         <div class="fb-login">
-          <fb:login-button class="login-faces" show-faces="true" width="260" max-rows="1"></fb:login-button>
           <div class="power"><div class="bg"></div></div>
-          <div class="login-label">LOGIN</div>
+          <div class="login-label">Login</div>
           <div class="with-fb">with facebook</div>
           <div class="waitlist">You're on the waitlist</div>
-          <div class="login-loading">LOADING</div>
+          <div class="login-loading">Loading</div>
           <div class="error"></div>
           <div class="message">We can't post on your behalf!</div>
         </div>
@@ -671,7 +671,7 @@
         </div>
       </div>
     </div>
-    
+
     <div class="publisher">
       {if $media.publisher}
         <img src="{$media.publisher.picture}">

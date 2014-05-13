@@ -1747,7 +1747,7 @@ div.channels div.channel div.programs div.program {
   height: 100%;
   color: #aaa;
   text-shadow: 1px 1px 1px #181818;
-  background: #222;
+  background: #121212;
   z-index: 0;
   border-left: 1px solid rgba(0, 0, 0, 0.8);
   border-right: 1px solid rgba(0, 0, 0, 0.8);
@@ -1819,7 +1819,7 @@ div.channels div.channel div.programs div.program.playing div.thumb {
 div.channels div.channel div.programs div.program div.thumb {
   width: 100%;
   height: 100%;
-  opacity: .1;
+  opacity: .3;
   background-size: 110% auto;
   background-position: 50% 37%;
 }
@@ -2532,11 +2532,15 @@ div#logo {
   left: 50%;
   top: 50%;
 }
+#stagecover div.message > span {
+  opacity: 0;
+}
 #stagecover div.message div.spinner {
   position: absolute;
   left: 50%;
   margin-left: -100px;
-  bottom: -150px;
+  top: 50%;
+  margin-top: -110px;
   background: url(data:image/gif;base64,R0lGODlhUABRAMQPAP/MZv+ZM8yZZsyZM8xmM5lmM2aZzGZmmWZmMzOZZjNmZjMzZjMzMzMzADMAAAAAAP///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh/wtYTVAgRGF0YVhNUDw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoTWFjaW50b3NoKSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDo1MTg5Q0FBQjlBRkIxMUUyOERBOUYwQjNDMEE2REI1RCIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDo1MTg5Q0FBQzlBRkIxMUUyOERBOUYwQjNDMEE2REI1RCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOjUxODlDQUE5OUFGQjExRTI4REE5RjBCM0MwQTZEQjVEIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjUxODlDQUFBOUFGQjExRTI4REE5RjBCM0MwQTZEQjVEIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBt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) no-repeat center;
   background-position: 50% 60%;
   background-size: 70px;
@@ -3252,7 +3256,7 @@ div#sidebar {
   top: 0;
   width: 320px;
   height: 100%;
-  background: #dadada url(/static/img/content-texture.png);
+  background: #dadada;
   z-index: 100;
   font-family: MuseoSans300;
   color: #181818;
@@ -4582,9 +4586,6 @@ div#sidebar div.no-info {
   background: rgba(255, 255, 255, 0.2);
   width: 276px;
   border: 1px solid #919191;
-  -webkit-box-shadow: inset 0 0 2px 0px rgba(0, 0, 0, 0.2);
-  -moz-box-shadow: inset 0 0 2px 0px rgba(0, 0, 0, 0.2);
-  box-shadow: inset 0 0 2px 0px rgba(0, 0, 0, 0.2);
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
@@ -4609,6 +4610,20 @@ div#login {
 div#login.expanded div#homepage {
   top: 50px;
   background-position: top center;
+}
+div#login.fade {
+  background: rgba(0, 0, 0, 0.85);
+  -webkit-transition: background 0.3s ease;
+  -moz-transition: background 0.3s ease;
+  -o-transition: background 0.3s ease;
+  -ms-transition: background 0.3s ease;
+  transition: background 0.3s ease;
+}
+div#login.fade div#homepage.show {
+  opacity: 0;
+}
+div#login.fade div#homepage div.chord {
+  display: none;
 }
 div#login.hide {
   background: transparent;
@@ -4712,10 +4727,6 @@ div#login div#homepage {
   top: 0;
   left: 0;
   margin-top: -1%;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.8);
-  -webkit-box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.59), inset 0 -3px 1px 0px rgba(255, 255, 255, 0.5), 0 0 2px 1px rgba(0, 0,0,.5);
-  -moz-box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.59), inset 0 -3px 1px 0px rgba(255, 255, 255, 0.5), 0 0 2px 1px rgba(0, 0,0,.5);
-  box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.59), inset 0 -3px 1px 0px rgba(255, 255, 255, 0.5), 0 0 2px 1px rgba(0, 0,0,.5);
   -webkit-transition: top 0.3s ease-in;
   -moz-transition: top 0.3s ease-in;
   -o-transition: top 0.3s ease-in;
@@ -4782,11 +4793,10 @@ div#login div#static-content {
   position: absolute;
   bottom: 0;
   left: 0;
-  background: #dedede url(/static/img/content-texture.png);
-  border-top: 1px solid rgba(0, 0, 0, 0.8);
-  -webkit-box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.59), inset 0 3px 1px 0px rgba(255, 255, 255, 0.5), 0 0 2px 1px rgba(0, 0,0,.5);
-  -moz-box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.59), inset 0 3px 1px 0px rgba(255, 255, 255, 0.5), 0 0 2px 1px rgba(0, 0,0,.5);
-  box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.59), inset 0 3px 1px 0px rgba(255, 255, 255, 0.5), 0 0 2px 1px rgba(0, 0,0,.5);
+  background: #dedede;
+  -webkit-box-shadow: 0 0 1px 1px rgba(0, 0,0,.4);
+  -moz-box-shadow: 0 0 1px 1px rgba(0, 0,0,.4);
+  box-shadow: 0 0 1px 1px rgba(0, 0,0,.4);
   cursor: default;
 }
 div#login div#static-content div.header {
@@ -4801,13 +4811,13 @@ div#login div#static-content div.title {
   left: -1px;
   top: 20px;
   padding: 30px 0;
-  border-right: 1px solid rgba(0, 0, 0, 0.4);
+  border-right: 1px solid #aaa;
   -webkit-box-shadow: 2px 0px 0 -1px rgba(255, 255, 255, 0.5);
   -moz-box-shadow: 2px 0px 0 -1px rgba(255, 255, 255, 0.5);
   box-shadow: 2px 0px 0 -1px rgba(255, 255, 255, 0.5);
-  font-family: MuseoSans700;
+  font-family: MuseoSans500;
+  text-shadow: none;
   color: #3d3d3d;
-  text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.9);
 }
 div#login div#static-content div.subtitle {
   font-size: 19px;
@@ -4843,6 +4853,14 @@ div#login div#static-content div#error {
   top: 100px;
   color: #B7432E;
 }
+div#login div#static-content .login-faces {
+  position: absolute;
+  bottom: -57px;
+}
+div#login div#static-content .login-faces.hide {
+  visibility: hidden;
+  opacity: 0;
+}
 div#login div#static-content div.fb-login {
   background: #f5f5f5;
   width: 230px;
@@ -4850,16 +4868,16 @@ div#login div#static-content div.fb-login {
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
-  -webkit-box-shadow: 0 0 5px 2px rgba(9, 9, 9, 0.5), 0 0 0 3px rgb(230, 230, 230), 0 0 0 4px rgba(121, 121, 121, .5);
-  -moz-box-shadow: 0 0 5px 2px rgba(9, 9, 9, 0.5), 0 0 0 3px rgb(230, 230, 230), 0 0 0 4px rgba(121, 121, 121, .5);
-  box-shadow: 0 0 5px 2px rgba(9, 9, 9, 0.5), 0 0 0 3px rgb(230, 230, 230), 0 0 0 4px rgba(121, 121, 121, .5);
+  -webkit-box-shadow: 0 0 5px 0px rgba(9, 9, 9, 0.5), 0 0 0 3px rgb(230, 230, 230), 0 0 0 4px rgba(121, 121, 121, .5);
+  -moz-box-shadow: 0 0 5px 0px rgba(9, 9, 9, 0.5), 0 0 0 3px rgb(230, 230, 230), 0 0 0 4px rgba(121, 121, 121, .5);
+  box-shadow: 0 0 5px 0px rgba(9, 9, 9, 0.5), 0 0 0 3px rgb(230, 230, 230), 0 0 0 4px rgba(121, 121, 121, .5);
   position: absolute;
   right: 3px;
   top: 40px;
   color: #4d4d4d;
-  text-shadow: 1px 1px 1px white;
   cursor: pointer;
   visibility: hidden;
+  text-shadow: none;
   opacity: 0;
 }
 div#login div#static-content div.fb-login div.power {
@@ -4927,32 +4945,37 @@ div#login div#static-content div.fb-login.spin div.power div.bg {
 }
 div#login div#static-content div.fb-login div.label,
 div#login div#static-content div.fb-login div.loading {
-  font-family: MuseoSans500;
+  font-family: MuseoSans300;
   display: inline-block;
   vertical-align: top;
   text-align: center;
   position: absolute;
   left: 70px;
-  top: 15px;
-  font-size: 24px;
+  top: 12px;
+  font-size: 31px;
   width: 160px;
 }
 div#login div#static-content div.fb-login div.loading {
   display: none;
-  top: 24px;
-  font-size: 22px;
+  top: 23px;
+  font-size: 24px;
 }
 div#login div#static-content div.fb-login div.with-fb {
   font-family: MuseoSans300;
   position: absolute;
   width: 160px;
   font-size: 11px;
-  top: 40px;
+  top: 45px;
   margin: auto;
   vertical-align: top;
   left: 70px;
   display: inline-block;
   text-align: center;
+}
+div#login div#static-content div.fb-login.spin {
+  -webkit-box-shadow: 0 0 0 1px #f5f5f5, 0 0 0 2px rgba(121, 121, 121, .5);
+  -moz-box-shadow: 0 0 0 1px #f5f5f5, 0 0 0 2px rgba(121, 121, 121, .5);
+  box-shadow: 0 0 0 1px #f5f5f5, 0 0 0 2px rgba(121, 121, 121, .5);
 }
 div#login div#static-content div.fb-login.spin div.loading {
   display: inline-block;
@@ -4992,9 +5015,9 @@ div#login div#static-content div.fb-login:active,
 div#login div#static-content div.fb-login:disabled,
 div#login div#static-content div.fb-login.disabled {
   background-color: #dedede;
-  -webkit-box-shadow: 0 0 5px 2px rgba(0, 0, 0, 0.7), 0 0 0 3px #f5f5f5, 0 0 0 4px rgba(121, 121, 121, .5);
-  -moz-box-shadow: 0 0 5px 2px rgba(0, 0, 0, 0.7), 0 0 0 3px #f5f5f5, 0 0 0 4px rgba(121, 121, 121, .5);
-  box-shadow: 0 0 5px 2px rgba(0, 0, 0, 0.7), 0 0 0 3px #f5f5f5, 0 0 0 4px rgba(121, 121, 121, .5);
+  -webkit-box-shadow: 0 0 0 1px #f5f5f5, 0 0 0 2px rgba(121, 121, 121, .5);
+  -moz-box-shadow: 0 0 0 1px #f5f5f5, 0 0 0 2px rgba(121, 121, 121, .5);
+  box-shadow: 0 0 0 1px #f5f5f5, 0 0 0 2px rgba(121, 121, 121, .5);
   color: #2D2D2D;
 }
 div#login div#static-content div.fb-login.disabled {
@@ -5067,7 +5090,7 @@ div#login div#static-content div#pages div.page-content {
 }
 div#login div#static-content div.footer {
   position: absolute;
-  bottom: 0;
+  bottom: -5px;
   width: 900px;
   font-size: 11px;
   text-align: center;
@@ -5138,6 +5161,91 @@ div#login div#static-content div.footer div.home-twitter:before {
 div#login div#static-content div.footer div.copyright {
   display: inline-block;
 }
+div#login > div.login-promo {
+  margin-top: -200px;
+  margin-left: -485px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background: url(/static/img/loginto.png) no-repeat;
+  background-position: left top;
+  width: 970px;
+  text-align: center;
+  opacity: 0;
+  padding-top: 20px;
+  -webkit-transition: opacity 0.5s ease;
+  -moz-transition: opacity 0.5s ease;
+  -o-transition: opacity 0.5s ease;
+  -ms-transition: opacity 0.5s ease;
+  transition: opacity 0.5s ease;
+}
+div#login > div.login-promo.show {
+  opacity: 1;
+}
+div#login > div.login-promo div.promo {
+  width: 280px;
+  height: 130px;
+  position: relative;
+  margin: 0 20px;
+  margin-top: -30px;
+  display: inline-block;
+}
+div#login > div.login-promo div.promo:first-child {
+  margin-top: 50px;
+}
+div#login > div.login-promo div.promo div.promo-pic {
+  -webkit-border-radius: 60px;
+  -moz-border-radius: 60px;
+  border-radius: 60px;
+  -webkit-box-shadow: 0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px rgb(230, 230, 230), 0 0 0 3px rgba(121, 121, 121, .5);
+  -moz-box-shadow: 0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px rgb(230, 230, 230), 0 0 0 3px rgba(121, 121, 121, .5);
+  box-shadow: 0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px rgb(230, 230, 230), 0 0 0 3px rgba(121, 121, 121, .5);
+  background: #666;
+  width: 120px;
+  height: 120px;
+}
+div#login > div.login-promo div.promo div.promo-pic img {
+  width: 120px;
+  height: 120px;
+  -webkit-border-radius: 60px;
+  -moz-border-radius: 60px;
+  border-radius: 60px;
+}
+div#login > div.login-promo div.promo.promo-1 div.promo-pic {
+  -webkit-box-shadow: 0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px yellow, 0 0 0 3px rgba(121, 121, 121, .5);
+  -moz-box-shadow: 0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px yellow, 0 0 0 3px rgba(121, 121, 121, .5);
+  box-shadow: 0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px yellow, 0 0 0 3px rgba(121, 121, 121, .5);
+}
+div#login > div.login-promo div.promo.promo-2 div.promo-pic {
+  -webkit-box-shadow: 0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px red, 0 0 0 3px rgba(121, 121, 121, .5);
+  -moz-box-shadow: 0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px red, 0 0 0 3px rgba(121, 121, 121, .5);
+  box-shadow: 0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px red, 0 0 0 3px rgba(121, 121, 121, .5);
+}
+div#login > div.login-promo div.promo.promo-3 div.promo-pic {
+  -webkit-box-shadow: 0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px blue, 0 0 0 3px rgba(121, 121, 121, .5);
+  -moz-box-shadow: 0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px blue, 0 0 0 3px rgba(121, 121, 121, .5);
+  box-shadow: 0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px blue, 0 0 0 3px rgba(121, 121, 121, .5);
+}
+div#login > div.login-promo div.promo div.promo-text {
+  position: absolute;
+  left: 130px;
+  top: 0;
+  font-size: 13px;
+  font-family: MuseoSans100;
+  width: 150px;
+  margin-top: 40px;
+  line-height: 22px;
+  color: #f5f5f5;
+  text-align: left;
+}
+div#login > div.login-promo div.promo.flip div.promo-pic {
+  position: absolute;
+  right: 0;
+}
+div#login > div.login-promo div.promo.flip div.promo-text {
+  left: 0;
+  text-align: right;
+}
 #uvTab {
   display: none !important;
   opacity: .8;
@@ -5152,6 +5260,26 @@ div#login div#static-content div.footer div.copyright {
 }
 #uvTab.show {
   display: block !important;
+}
+div#embed-spinner {
+  background: #181818;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+div#embed-spinner > div {
+  position: absolute;
+  left: 50%;
+  margin-left: -100px;
+  top: 50%;
+  margin-top: -110px;
+  background: url(data:image/gif;base64,R0lGODlhUABRAMQPAP/MZv+ZM8yZZsyZM8xmM5lmM2aZzGZmmWZmMzOZZjNmZjMzZjMzMzMzADMAAAAAAP///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh/wtYTVAgRGF0YVhNUDw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoTWFjaW50b3NoKSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDo1MTg5Q0FBQjlBRkIxMUUyOERBOUYwQjNDMEE2REI1RCIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDo1MTg5Q0FBQzlBRkIxMUUyOERBOUYwQjNDMEE2REI1RCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOjUxODlDQUE5OUFGQjExRTI4REE5RjBCM0MwQTZEQjVEIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjUxODlDQUFBOUFGQjExRTI4REE5RjBCM0MwQTZEQjVEIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBt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) no-repeat center;
+  background-position: 50% 60%;
+  background-size: 70px;
+  width: 200px;
+  height: 220px;
 }
 @keyframes spin {
   from {
@@ -5875,13 +6003,13 @@ div#sidebar div.info div.label div.friends-icon {
 
   /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
 
-  /* '\1f465' */
+  /* '\1f30e' */
 
   display: inline-block;
   margin-right: 5px;
 }
 div#sidebar div.info div.label div.friends-icon:before {
-  content: '👥';
+  content: '🌎';
 }
 div#sidebar div.info div.label div.status {
   display: inline-block;
@@ -6217,6 +6345,7 @@ div#sidebar div.info div.viewers {
   position: relative;
   width: 320px;
   padding: 4px 0 4px 0;
+  margin-top: -4px;
   background: rgba(255, 255, 255, 0.5);
   -webkit-box-shadow: inset 0px -4px 0 -3px rgba(255, 255, 255, 1), inset 0 -3px 2px -1px rgba(0, 0, 0, .3);
   -moz-box-shadow: inset 0px -4px 0 -3px rgba(255, 255, 255, 1), inset 0 -3px 2px -1px rgba(0, 0, 0, .3);
@@ -6637,15 +6766,22 @@ div#sidebar div.info.mini div.picture div.options div.button {
 div#sidebar div.info.mini div.picture div.options div.button div.icon {
   color: white;
 }
+div#sidebar div.info.mini div.login-promo {
+  top: 101px;
+}
+div#sidebar div.info.mini.logged-out div.picture div.options div.button {
+  height: 46px;
+}
 div#sidebar div.info div.login-promo {
-  margin-top: 10px;
   position: absolute;
-  top: 200px;
-  background: url(/static/img/promo.png) no-repeat;
+  width: 100%;
+  height: 100%;
+  background: rgba(230, 230, 230, 0.9);
   background-size: contain;
   background-position: center top;
   width: 320px;
   opacity: 0;
+  top: 200px;
   -webkit-transition: opacity 0.5s ease;
   -moz-transition: opacity 0.5s ease;
   -o-transition: opacity 0.5s ease;
@@ -6655,6 +6791,16 @@ div#sidebar div.info div.login-promo {
 div#sidebar div.info div.login-promo.show {
   opacity: 1;
 }
+div#sidebar div.info div.login-promo div.title {
+  font-family: MuseoSans300;
+  font-size: 26px;
+  text-align: center;
+  text-shadow: 0 0 1px white;
+  color: #797575;
+  width: 100%;
+  position: static;
+  margin-top: 7px;
+}
 div#sidebar div.info div.login-promo div.promo {
   width: 280px;
   height: 130px;
@@ -6662,16 +6808,13 @@ div#sidebar div.info div.login-promo div.promo {
   margin: 0 20px;
   margin-top: -30px;
 }
-div#sidebar div.info div.login-promo div.promo:first-child {
-  margin-top: 50px;
-}
 div#sidebar div.info div.login-promo div.promo div.promo-pic {
   -webkit-border-radius: 60px;
   -moz-border-radius: 60px;
   border-radius: 60px;
-  -webkit-box-shadow: 0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px rgb(230, 230, 230), 0 0 0 3px rgba(121, 121, 121, .5);
-  -moz-box-shadow: 0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px rgb(230, 230, 230), 0 0 0 3px rgba(121, 121, 121, .5);
-  box-shadow: 0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px rgb(230, 230, 230), 0 0 0 3px rgba(121, 121, 121, .5);
+  -webkit-box-shadow: 0 0 0 1px #888;
+  -moz-box-shadow: 0 0 0 1px #888;
+  box-shadow: 0 0 0 1px #888;
   background: #666;
   width: 120px;
   height: 120px;
@@ -6682,21 +6825,6 @@ div#sidebar div.info div.login-promo div.promo div.promo-pic img {
   -webkit-border-radius: 60px;
   -moz-border-radius: 60px;
   border-radius: 60px;
-}
-div#sidebar div.info div.login-promo div.promo.promo-1 div.promo-pic {
-  -webkit-box-shadow: 0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px yellow, 0 0 0 3px rgba(121, 121, 121, .5);
-  -moz-box-shadow: 0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px yellow, 0 0 0 3px rgba(121, 121, 121, .5);
-  box-shadow: 0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px yellow, 0 0 0 3px rgba(121, 121, 121, .5);
-}
-div#sidebar div.info div.login-promo div.promo.promo-2 div.promo-pic {
-  -webkit-box-shadow: 0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px red, 0 0 0 3px rgba(121, 121, 121, .5);
-  -moz-box-shadow: 0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px red, 0 0 0 3px rgba(121, 121, 121, .5);
-  box-shadow: 0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px red, 0 0 0 3px rgba(121, 121, 121, .5);
-}
-div#sidebar div.info div.login-promo div.promo.promo-3 div.promo-pic {
-  -webkit-box-shadow: 0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px blue, 0 0 0 3px rgba(121, 121, 121, .5);
-  -moz-box-shadow: 0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px blue, 0 0 0 3px rgba(121, 121, 121, .5);
-  box-shadow: 0 0 5px 1px rgba(9, 9, 9, 0.5), 0 0 0 2px blue, 0 0 0 3px rgba(121, 121, 121, .5);
 }
 div#sidebar div.info div.login-promo div.promo div.promo-text {
   position: absolute;
@@ -6717,16 +6845,6 @@ div#sidebar div.info div.login-promo div.promo.flip div.promo-text {
   left: 0;
   text-align: right;
 }
-div#sidebar div.info .login-faces {
-  position: absolute;
-  top: 50px;
-  left: 0;
-  z-index: -1;
-}
-div#sidebar div.info .login-faces.hide {
-  visibility: hidden;
-  opacity: 0;
-}
 div#sidebar div.info div.fb-login {
   background: #f5f5f5;
   width: 230px;
@@ -6734,17 +6852,17 @@ div#sidebar div.info div.fb-login {
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
-  -webkit-box-shadow: 0 0 5px 2px rgba(9, 9, 9, 0.5), 0 0 0 3px rgb(230, 230, 230), 0 0 0 4px rgba(121, 121, 121, .5);
-  -moz-box-shadow: 0 0 5px 2px rgba(9, 9, 9, 0.5), 0 0 0 3px rgb(230, 230, 230), 0 0 0 4px rgba(121, 121, 121, .5);
-  box-shadow: 0 0 5px 2px rgba(9, 9, 9, 0.5), 0 0 0 3px rgb(230, 230, 230), 0 0 0 4px rgba(121, 121, 121, .5);
+  -webkit-box-shadow: 0 0 5px 0px rgba(9, 9, 9, 0.5), 0 0 0 3px rgb(230, 230, 230), 0 0 0 4px rgba(121, 121, 121, .5);
+  -moz-box-shadow: 0 0 5px 0px rgba(9, 9, 9, 0.5), 0 0 0 3px rgb(230, 230, 230), 0 0 0 4px rgba(121, 121, 121, .5);
+  box-shadow: 0 0 5px 0px rgba(9, 9, 9, 0.5), 0 0 0 3px rgb(230, 230, 230), 0 0 0 4px rgba(121, 121, 121, .5);
   position: absolute;
-  bottom: 0;
+  bottom: 30px;
   left: 50%;
   margin-left: -115px;
   color: #4d4d4d;
-  text-shadow: 1px 1px 1px white;
   cursor: pointer;
   visibility: hidden;
+  text-shadow: none;
   opacity: 0;
 }
 div#sidebar div.info div.fb-login div.power {
@@ -6812,27 +6930,26 @@ div#sidebar div.info div.fb-login.spin div.power div.bg {
 }
 div#sidebar div.info div.fb-login div.login-label,
 div#sidebar div.info div.fb-login div.login-loading {
-  font-family: MuseoSans500;
+  font-family: MuseoSans300;
   display: inline-block;
   vertical-align: top;
   text-align: center;
   position: relative;
   left: 37px;
-  top: 15px;
-  font-size: 24px;
+  top: 13px;
+  font-size: 31px;
 }
 div#sidebar div.info div.fb-login div.login-loading {
   display: none;
-  top: 24px;
-  left: 25px;
-  font-size: 22px;
+  top: 23px;
+  font-size: 24px;
 }
 div#sidebar div.info div.fb-login div.with-fb {
   font-family: MuseoSans300;
   position: absolute;
   width: 80px;
   font-size: 11px;
-  top: 40px;
+  top: 45px;
   margin: auto;
   vertical-align: top;
   left: 113px;
@@ -6876,10 +6993,15 @@ div#sidebar div.info div.fb-login:active,
 div#sidebar div.info div.fb-login:disabled,
 div#sidebar div.info div.fb-login.disabled {
   background-color: #dedede;
-  -webkit-box-shadow: 0 0 5px 2px rgba(0, 0, 0, 0.7), 0 0 0 3px #f5f5f5, 0 0 0 4px rgba(121, 121, 121, .5);
-  -moz-box-shadow: 0 0 5px 2px rgba(0, 0, 0, 0.7), 0 0 0 3px #f5f5f5, 0 0 0 4px rgba(121, 121, 121, .5);
-  box-shadow: 0 0 5px 2px rgba(0, 0, 0, 0.7), 0 0 0 3px #f5f5f5, 0 0 0 4px rgba(121, 121, 121, .5);
+  -webkit-box-shadow: 0 0 5px 0px rgba(9, 9, 9, 0.5), 0 0 0 3px rgb(230, 230, 230), 0 0 0 4px rgba(121, 121, 121, .5);
+  -moz-box-shadow: 0 0 5px 0px rgba(9, 9, 9, 0.5), 0 0 0 3px rgb(230, 230, 230), 0 0 0 4px rgba(121, 121, 121, .5);
+  box-shadow: 0 0 5px 0px rgba(9, 9, 9, 0.5), 0 0 0 3px rgb(230, 230, 230), 0 0 0 4px rgba(121, 121, 121, .5);
   color: #2D2D2D;
+}
+div#sidebar div.info div.fb-login.spin {
+  -webkit-box-shadow: 0 0 0 1px #f5f5f5, 0 0 0 2px rgba(121, 121, 121, .5);
+  -moz-box-shadow: 0 0 0 1px #f5f5f5, 0 0 0 2px rgba(121, 121, 121, .5);
+  box-shadow: 0 0 0 1px #f5f5f5, 0 0 0 2px rgba(121, 121, 121, .5);
 }
 div#sidebar div.info div.fb-login.disabled {
   cursor: default;
@@ -8036,7 +8158,6 @@ div#hovercard {
   font-size: 11px;
   font-family: MuseoSans700;
   color: #181818;
-  text-shadow: 1px 1px 1px white;
   border: 1px solid rgba(0, 0, 0, 0.6);
   pointer-events: all;
   cursor: pointer;

@@ -51,7 +51,7 @@ class Collection(db.Model):
   @classmethod
   def add_reddit_media(cls, collection_id, reddit_id, approve_all):
     collection = Collection.get_by_id(int(collection_id))
-    response = urlfetch.fetch('http://www.reddit.com/r/%s.json?limit=100' % reddit_id)
+    response = urlfetch.fetch('http://www.reddit.com/r/%s.json?limit=50' % reddit_id)
     content = simplejson.loads(response.content) or {}
     if content.get('error'):
       logging.error('REDDIT ERROR: ' + str(content.get('error')))
@@ -63,7 +63,7 @@ class Collection(db.Model):
       logging.info('FETCHING %s VIDEOS FROM REDDIT' % str(len(links)))
       for link in links:
         link_data = link.get('data') or {}
-        if link_data.get('domain') == 'youtube.com' and not link_data.get('over_18'):
+        if link_data.get('domain') == 'youtube.com' and not link_data.get('over_18') and link_data.get('score') > 100:
           url = link_data.get('url')
           parsed_url = urlparse.urlparse(url)
           host_id = urlparse.parse_qs(parsed_url.query)['v'][0]
@@ -77,6 +77,9 @@ class Collection(db.Model):
           id=','.join(ids[0:10]),
           part="id,snippet,topicDetails,contentDetails,statistics"
         ).execute()
+        if videos_response.get('error'):
+          logging.error(videos_response.get('error').get('error')[0]['reason'])
+          return
         medias = Media.add_from_snippet(videos_response.get("items", []),
                                         collection=collection,
                                         approve=approve_all)

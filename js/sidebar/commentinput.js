@@ -316,9 +316,9 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
       .listen(this.commentInput_.getElement(),
           goog.events.EventType.FOCUS,
           goog.bind(function(e) {
-            if (this.pause) {
-              brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.PLAY, false);
-            }
+//            if (this.pause_) {
+//              brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.PLAY, false);
+//            }
             popup && goog.style.showElement(popup, false);
             if (!brkn.model.Users.getInstance().currentUser.welcomed && !this.toField_) {
               brkn.model.Popup.getInstance().publish(brkn.model.Popup.Action.TOOLTIP, this.commentInput_.getElement(),

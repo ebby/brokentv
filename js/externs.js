@@ -8,33 +8,35 @@ var SAFARI;
 var FB_APP_ID;
 var LOGIN_REQUIRED;
 var POWER_ON;
+var LOADED;
+var CHECKED_LOGIN;
 
 var appengine = {};
 
 window.navigator.standalone;
 
-/** 
-  * @param {string} token 
-  * @constructor 
+/**
+  * @param {string} token
+  * @constructor
   */
 appengine.Channel = function(token) {};
 
-/** 
- * @param {Object=} opt_handler 
- */ 
+/**
+ * @param {Object=} opt_handler
+ */
 appengine.Channel.prototype.open = function(opt_handler) {};
 
 
 var YT = {};
 
-/** 
- * @param {string|Element} id 
- * @constructor 
+/**
+ * @param {string|Element} id
+ * @constructor
  */
 YT.Player = function(id, params) {};
 
-/** 
- * @param {string} id 
+/**
+ * @param {string} id
  * @param {?number=} opt_seek
  */
 YT.Player.prototype.loadVideoById = function(id, opt_seek) {};
@@ -62,8 +64,8 @@ YT.Player.prototype.mute;
 YT.Player.prototype.unMute;
 YT.Player.prototype.isMuted;
 
-/** 
- * enum {string} 
+/**
+ * enum {string}
  */
 YT.PlayerState = {};
 

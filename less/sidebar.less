@@ -4,7 +4,7 @@ div#sidebar {
   top: 0;
   width: 320px;
   height: 100%;
-  background: #dadada url(/static/img/content-texture.png);
+  background: #dadada;
   z-index: 100;
   font-family: MuseoSans300;
   color: #181818;
@@ -41,17 +41,17 @@ div#sidebar {
       left: -43px;
     }
   }
-  
+
   div.scrollable {
     width: 320px;
   }
-  
+
   &.dark {
     background: #aaa url(/static/img/linen-black-70.png);
     div.stream div.activity div.text, div.stream div.activity div.text,
         div.stream div.activity div.text a, div.info div.label {
       color: #f5f5f5;
-      text-shadow: 1px 1px 1px #181818; 
+      text-shadow: 1px 1px 1px #181818;
     }
     div.tabbed.activity ul.tabs li.activity {
       background: rgba(245, 245, 245, .8);
@@ -69,7 +69,7 @@ div#sidebar {
       .box-shadow(0, 0, 2px, 0px, rgba(0, 0, 0, 0.8));
     }
   }
-  
+
   &.toggled {
     /*right: 0px;*/
     .transform(e('translate3d(-320px,0,0)'));
@@ -80,7 +80,7 @@ div#sidebar {
     border: none;
     .box-shadow(none);
   }
-  
+
   &.admin {
     div.admin {
       display: block !important;
@@ -185,9 +185,9 @@ div#sidebar {
         &:last-child {
           border-right: none;
         }
-        
+
         div.icon {
-        
+
         }
         div.label {
           text-align: center;
@@ -326,7 +326,7 @@ div#sidebar {
         table-layout: fixed;
         border-collapse: collapse;
         width: 280px;
-      
+
         > div {
           display: none;
           vertical-align: top;
@@ -551,7 +551,7 @@ div#sidebar {
     visibility: visible;
     opacity: 1;
   }
-  
+
   div.tabbed {
     ul.tabs {
       height: 30px;
@@ -739,7 +739,7 @@ div#sidebar {
       background: #f1f1f1;
       .border-radius(3px);
       .box-shadow(inset, 0, 0, 2px, 1px, rgba(0, 0, 0, 0.4));
-      
+
       img {
         width: 28px;
         height: 28px;
@@ -1033,7 +1033,6 @@ div#sidebar {
     background: rgba(255,255,255,.2);
     width: 276px;
     border: 1px solid #919191;
-    .box-shadow(inset, 0, 0, 2px, 0px, rgba(0, 0, 0, 0.2));
     .border-radius(3px);
     font-size: 12px;
     text-align: center;

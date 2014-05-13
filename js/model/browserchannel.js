@@ -140,7 +140,7 @@ brkn.model.BrowserChannel.prototype.onMessage_ = function(rawMessage) {
   	          channel.publish(brkn.model.Channel.Action.ADD_PROGRAM, p);
   	          var currentProgram = brkn.model.Channels.getInstance().currentChannel &&
   	              brkn.model.Channels.getInstance().currentChannel.getCurrentProgram();
-  	          if (!brkn.model.Player.getInstance().getCurrentProgram()) {
+  	          if (!brkn.model.Player.getInstance().getCurrentProgram() && DESKTOP) {
   	            // If no current programming, change to this channel and play.
   	            brkn.model.Channels.getInstance().publish(
   	                brkn.model.Channels.Actions.CHANGE_CHANNEL, channel);

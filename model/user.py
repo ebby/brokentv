@@ -27,7 +27,7 @@ class User(db.Model):
     twitter_id = db.IntegerProperty()
     twitter_handle = db.StringProperty()
     temp = db.BooleanProperty(default=False)
-    
+
     # Configs
     show_guide = db.BooleanProperty(default=True)
     show_sidebar = db.BooleanProperty(default=True)
@@ -40,7 +40,7 @@ class User(db.Model):
     email_mention = db.BooleanProperty(default=True)
     email_newsletter = db.BooleanProperty(default=True)
     current_channel_id = db.StringProperty()
-    
+
     # Stats
     session_count = db.IntegerProperty(default=0)
     ave_session_time = db.FloatProperty(default=0.0)
@@ -79,7 +79,7 @@ class User(db.Model):
         if User.get_by_key_name(friend):
           return True
       return False
-    
+
     def get_following(self):
       following_ids = []
       following = []
@@ -104,7 +104,7 @@ class User(db.Model):
         if user and user.gender == 'female':
           return True
       return False
-    
+
     def send_invite(self):
       if self.access_level == 0:
         welcome_email = emailer.Email(emailer.Message.WELCOME,
@@ -112,7 +112,7 @@ class User(db.Model):
         welcome_email.send(self)
       self.access_level = AccessLevel.USER
       self.put()
-      
+
     def send_friendly_invite(self, friend, channel_id=None):
       welcome_email = emailer.Email(emailer.Message.WELCOME_FRIEND(friend.first_name),
                                     {'name' : self.first_name,
@@ -148,7 +148,7 @@ class User(db.Model):
       user_obj['online'] = online
       memcache.set(uid, user_obj)
       return user_obj
-    
+
     @classmethod
     def set_last_media(cls, user, media):
       user_obj = memcache.get(user.id) or {}
