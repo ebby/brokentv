@@ -14,7 +14,7 @@
 {/template}
 
 
-/** 
+/**
  * @param name
  */
 {template .name}
@@ -29,6 +29,7 @@
  * @param media
  * @param repeat
  * @param admin
+ * @param? embed
  */
 {template .program}
   <div class="info">
@@ -41,7 +42,7 @@
       <div class="like-count"><div class="icon"></div>{$media.starCount}</div>
     </div>
     <div class="program-play"><div class="icon"></div></div>
-    <div class="program-plus"><div class="icon"></div></div>
+    <div class="program-plus" {if $embed}style="display:none"{/if}><div class="icon"></div></div>
     <div class="viewers"></div>
 	  {if $admin}
 	    <div class="remove"></div>

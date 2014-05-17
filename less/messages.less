@@ -10,7 +10,7 @@ div#sidebar div.messages {
     visibility: visible;
     opacity: 1;
   }
-  
+
   div.no-comments {
     margin-top: 10px;
   }
@@ -106,12 +106,13 @@ div#sidebar div.messages {
         margin-left: -40px;
       }
       div.text {
-        background: #f1f1f1;
+        background: #2ecc71;
         margin-top: 4px;
         padding: 5px;
         font-family: MuseoSans700;
         .border-radius(3px);
-        .box-shadow(inset, 0, 0, 2px, 1px, rgba(0, 0, 0, 0.4));
+        color: white;
+        .box-shadow(inset, 0, 0, 1px, 0, rgba(0, 0, 0, 0.4));
         .select-text();
         &:last-child {
           div.timestamp {
@@ -128,6 +129,7 @@ div#sidebar div.messages {
         display: none;
         font-size: 10px;
         font-family: MuseoSans300;
+        color: #181818;
         position: absolute;
         top: -17px;
         right: 0;
@@ -139,16 +141,13 @@ div#sidebar div.messages {
       width: 34px;
       height: 34px;
       .border-radius(18px);
-      .box-shadow(inset, 0px, 0px, 2px, 1px, rgba(0, 0, 0, 0.6));
+      .box-shadow(0px, 0px, 1px, 0, rgba(0, 0, 0, 0.6));
       display: inline-block;
       margin-left: 9px;
       img {
-        width: 26px;
-        height: 26px;
-        margin-left: 4px;
-        margin-top: 4px;
-        .border-radius(15px);
-        .box-shadow(0, 0, 2px, 1px, rgba(0, 0, 0, .4));
+        width: 34px;
+        height: 34px;
+        .border-radius(17px);
       }
       &:active {
         img {

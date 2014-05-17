@@ -5,7 +5,6 @@ div#sidebar div.stream {
   padding-top: 10px;
   width: 100%;
   color: #181818;
-  text-shadow: 1px 1px 1px #f5f5f5;
   div.spinner {
     width: 100%;
     height: 50px;
@@ -71,7 +70,7 @@ div#sidebar div.stream {
         }
       }
       div.medias {
-        margin-top: 5px; 
+        margin-top: 5px;
       }
     }
     div.picture {
@@ -80,21 +79,13 @@ div#sidebar div.stream {
       width: 34px;
       height: 34px;
       .border-radius(18px);
-      .box-shadow(inset, 0px, 0px, 2px, 1px, rgba(0, 0, 0, 0.6));
+      .box-shadow(0px, 0px, 1px, 0, rgba(0, 0, 0, 0.6));
       display: inline-block;
       margin-left: 9px;
       img {
-        width: 26px;
-        height: 26px;
-        margin-left: 4px;
-        margin-top: 4px;
-        .border-radius(15px);
-        .box-shadow(0, 0, 2px, 1px, rgba(0, 0, 0, .4));
-      }
-      &:active {
-        img {
-          .box-shadow(0, 0, 1px, 1px, rgba(0, 0, 0, .1));
-        }
+        width: 34px;
+        height: 34px;
+        .border-radius(17px);
       }
     }
     div.comment {
@@ -112,23 +103,6 @@ div#sidebar div.stream {
       margin-bottom: 25px;
       width: 260px;
       font-family: MuseoSans500;
-      a {
-        color: #181818;
-        font-family: MuseoSans700;
-      }
-      div.text {
-        background: #f1f1f1;
-        margin-top: 4px;
-        padding: 5px;
-        font-family: MuseoSans700;
-        font-size: 11px;
-        .border-radius(3px);
-        .box-shadow(inset, 0, 0, 1px, 1px, rgba(0, 0, 0, 0.3));
-        .select-text();
-        a {
-          color: #497882;
-        }
-      }
       div.timestamp {
         font-size: 10px;
         font-family: MuseoSans300;
@@ -139,7 +113,7 @@ div#sidebar div.stream {
     }
   }
   div.medias {
-    margin: 10px; 
+    margin: 10px;
   }
   div.no-comments {
     margin-top: 10px;

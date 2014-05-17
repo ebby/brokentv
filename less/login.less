@@ -6,6 +6,7 @@ div#login {
   overflow-x: hidden;
   overflow-y: scroll;
   background: #181818;
+  text-shadow: none;
   &.expanded {
     div#homepage {
       top: 50px;
@@ -187,8 +188,8 @@ div#login {
       border-right: 1px solid #aaa;
       .box-shadow(2px, 0px, 0, -1px, rgba(255, 255, 255, 0.5));
       font-family: MuseoSans500;
-      text-shadow: none;
       color: #3d3d3d;
+      text-shadow: none;
     }
     div.subtitle {
       font-size: 19px;
@@ -197,14 +198,13 @@ div#login {
       padding: 30px 0;
       font-family: MuseoSans300;
       color: #3d3d3d;
-      text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.9);
+      text-shadow: none;
     }
     div#message {
       position: absolute;
       top: 80px;
       left: 0;
       font-size: 14px;
-      text-shadow: none;
       font-family: MuseoSans500;
       width: 230px;
       text-align: center;
@@ -240,13 +240,13 @@ div#login {
       color: #4d4d4d;
       cursor: pointer;
       visibility: hidden;
-      text-shadow: none;
       div.power {
         width: 70px;
         height: 70px;
         display: inline-block;
         border-right: 1px solid #aaa;
         .border-radius(3px, 0, 0, 3px);
+        text-shadow: none;
         div.bg {
           .icon-power();
           font-size: 41px;
@@ -256,6 +256,7 @@ div#login {
           height: 39px;
           left: 16px;
           top: 16px;
+          text-shadow: none;
           position: relative;
           text-align: center;
         }
@@ -263,14 +264,12 @@ div#login {
           background-color: #B7432E;
           div.bg {
             color: #dedede;
-            text-shadow: 1px 1px 1px #7d7d7d;
           }
         }
         &.wait {
           background-color: #B49B4B;
           div.bg {
             color: #dedede;
-            text-shadow: 1px 1px 1px #7d7d7d;
           }
         }
       }
@@ -287,6 +286,7 @@ div#login {
         top: 12px;
         font-size: 31px;
         width: 160px;
+        text-shadow: none;
       }
       div.loading {
         display: none;
@@ -364,7 +364,6 @@ div#login {
       margin-top: 170px;
       position: relative;
       color: #3d3d3d;
-      text-shadow: 1px 1px 1px white;
       a {
         color: #3d3d3d;
       }

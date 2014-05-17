@@ -23,10 +23,10 @@ class Comment(db.Model):
   @classmethod
   def add(cls, media, user, text, acl, parent_id=None, to_user=None):
     from notification import Notification
-    
+
     c = Comment(media=media, user=user, text=text)
     c.mentions = [x[0] for x in re.findall(r"@\[(\d+):([a-zA-z\s]+)\]", text)]
-    
+
     if parent_id:
       c.parent_comment = Comment.get_by_id(int(parent_id))
       c.is_parent = False
@@ -37,9 +37,9 @@ class Comment(db.Model):
 
     media.comment_count += 1
     media.put()
-    
+
     for m in c.mentions:
-      if not to_user or (to_user and m != to_user.id): 
+      if not to_user or (to_user and m != to_user.id):
         mentioned_user = User.get_by_key_name(m)
         if not mentioned_user or True:
           # Send them notification on FB
@@ -57,7 +57,7 @@ class Comment(db.Model):
       from useractivity import UserActivity
       broadcast.broadcastNewActivity(UserActivity.add_comment(c.user, c))
     return c
-  
+
   @classmethod
   def flattenMentions(cls, text):
     return re.sub(r"@\[(\d+):([a-zA-z\s]+)\]", r"\2", text)
@@ -70,6 +70,5 @@ class Comment(db.Model):
     json['user'] = self.user.toJson()
     json['text'] = self.text
     json['time'] = self.time.isoformat()
-    json['replies'] = [r.toJson() for r in self.replies.fetch(None)]
+    json['replies'] = [r.toJson() for r in self.replies.filter('time').fetch(None)]
     return json
-  

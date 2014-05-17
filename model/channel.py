@@ -30,7 +30,7 @@ class Channel(db.Model):
   @property
   def id(self):
     return str(self.key().name())
-  
+
   @property
   def my_channel(self):
     return self.privacy == Privacy.PRIVATE
@@ -44,7 +44,7 @@ class Channel(db.Model):
     channel = Channel.get_or_insert(Channel.make_key(name), name=name)
     channel.put()
     return channel
-    
+
 
   @classmethod
   def get_public(cls):
@@ -53,7 +53,7 @@ class Channel(db.Model):
   @classmethod
   def get_all(cls):
     return Channel.all().fetch(None)
-  
+
   @classmethod
   def get_my_channel(cls, user):
     channel = Channel.get_by_key_name(user.id)
@@ -63,10 +63,9 @@ class Channel(db.Model):
       channel = Channel(key_name=user.id, name=name, privacy=Privacy.PRIVATE, user=user)
       channel.put()
     return channel
-  
+
   @classmethod
   def youtube_channel(cls, name, user=None, token=None, yt_channel_id=None, yt_playlist_id=None):
-    logging.info(user)
     channel = Channel(key_name=((user.id if user else str(token)) + '-' + (yt_channel_id or yt_playlist_id)),
                       name=name, privacy=Privacy.FRIENDS, online=True, user=user)
     channel_id = (yt_channel_id or yt_playlist_id)
@@ -90,7 +89,7 @@ class Channel(db.Model):
             maxResults=(20 if all else 1),
             type='video'
           ).execute()
-      else:   
+      else:
         search_response = youtube3.search().list(
             channelId=yt_channel_id,
             part='id,snippet',
@@ -120,7 +119,7 @@ class Channel(db.Model):
       ).execute()
 
       medias = Media.add_from_snippet(videos_response.get("items", []), approve=True)
-      
+
       if not all:
         deferred.defer(util.schedule_youtube_channel,
                        name=name,
@@ -133,7 +132,7 @@ class Channel(db.Model):
                        _queue='youtube')
 
     programs = []
-    if user:
+    if user and False:
       programs = programming.Programming.set_user_channel_programs(user.id, channel, medias,
                                                       time=datetime.datetime.now(), reset=True)
     else:
@@ -145,17 +144,17 @@ class Channel(db.Model):
           next_time = next_time + datetime.timedelta(seconds=media.duration)
     if not all:
       broadcast.broadcastNewPrograms(channel, programs, new_channel=True, to_owner=False, token=token)
-    
+
     data_json = {
       'channel': channel.toJson(),
       'programs': [p.toJson() for p in programs]
     }
     return data_json
-  
+
   def get_programming(self):
     channel_programs = ChannelProgram.all().filter('channel =', self).order('-time').fetch(limit=100)
     return [c_p.program for c_p in channel_programs]
-  
+
   def get_current_program(self):
     # MEMCACHE THIS!!
     current_program = Program.get_by_id(self.current_program) if self.current_program else None
@@ -173,7 +172,7 @@ class Channel(db.Model):
         self.current_program = c_p.program.key().id()
         return c_p.program
     return None
-  
+
   def update_next_time(self):
     last_program = self.programs.order('-time').get()
     next_time = datetime.datetime.now()
@@ -188,7 +187,7 @@ class Channel(db.Model):
 
   def get_next_time(self):
     #next_time = self.next_time if self.next_time else datetime.datetime.now()
-    
+
     last_program = self.programs.order('-time').get()
     next_time = datetime.datetime.now()
     if last_program:
@@ -214,11 +213,11 @@ class Channel(db.Model):
     if not col.channels.get():
       ChannelCollection.add(self, col)
     return col
-    
+
 
   def toJson(self, get_programming=False):
     current_program = self.get_current_program() if self.privacy == Privacy.PRIVATE else None
-    
+
     json = {}
     json['id'] = self.key().name()
     json['name'] = self.name
@@ -235,15 +234,15 @@ class Channel(db.Model):
 from program import *
 # Collections that may play into this collection
 class ChannelCollection(db.Model):
-  
+
   collection = db.ReferenceProperty(Collection, collection_name='channels')
   channel = db.ReferenceProperty(Channel, collection_name='collections')
-  
+
   @classmethod
   def get_channels(cls, collection):
     collection_channels = ChannelCollection.all().filter('collection =', collection).fetch(100);
     return [c_c.channel for c_c in collection_channels]
-  
+
   @classmethod
   def get_collections(cls, channel):
     cols = {}
@@ -251,7 +250,7 @@ class ChannelCollection(db.Model):
     for c_c in collection_channels:
       cols[c_c.collection.key().id()] = c_c.collection
     return [x for x in cols.itervalues()]
-  
+
   @classmethod
   def add(cls, channel, collection):
     collection_channel = ChannelCollection.all().filter('channel =', channel).filter('collection =', collection).get()
@@ -263,5 +262,3 @@ class ChannelCollection(db.Model):
 class ChannelAdmins(db.Model):
   channel = db.ReferenceProperty(Channel, collection_name='admins')
   admin = db.ReferenceProperty(User, collection_name='channels')
-
-

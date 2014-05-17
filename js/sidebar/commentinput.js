@@ -26,62 +26,62 @@ goog.require('goog.ui.Textarea.EventType');
 brkn.sidebar.CommentInput = function(opt_showControls, opt_canMention, opt_reply, opt_toField,
     opt_inputOptional, opt_pause) {
   goog.base(this);
-  
+
   /**
    * @type {boolean}
    * @private
    */
   this.showControls_ = !!opt_showControls;
-  
+
   /**
    * @type {boolean}
    * @private
    */
   this.toField_ = !!opt_toField;
-  
+
   /**
    * @type {boolean}
    * @private
    */
   this.inputOptional_ = !!opt_inputOptional;
-  
+
   /**
    * @type {boolean}
    * @private
    */
   this.canMention_ = !!opt_canMention;
-  
+
   /**
    * @type {boolean}
    * @private
    */
   this.pause_ = !!opt_pause;
-  
+
   /**
    * @type {boolean}
    * @private
    */
   this.reply_ = !!opt_reply;
-  
+
   /**
    * @type {string}
    * @private
    */
   this.value = '';
-  
+
   /**
    * @type {goog.ui.Textarea}
    * @private
    */
   this.commentInput_ = new goog.ui.Textarea(this.reply_ ? 'reply...' : 'Add to the conversation.');
-  
+
   /**
    * @type {goog.ui.CustomButton}
    * @private
    */
   this.tweetToggle_ = new goog.ui.CustomButton('tweet');
   this.tweetToggle_.setSupportedState(goog.ui.Component.State.CHECKED, true);
-  
+
   /**
    * @type {goog.ui.CustomButton}
    * @private
@@ -90,19 +90,19 @@ brkn.sidebar.CommentInput = function(opt_showControls, opt_canMention, opt_reply
   this.fbToggle_.setSupportedState(goog.ui.Component.State.CHECKED, true);
 
   var currentUser = brkn.model.Users.getInstance().currentUser;
-  
+
   /**
    * @type {boolean}
    * @private
    */
   this.fbPublish_ = currentUser.postFacebook;
-  
+
   /**
    * @type {boolean}
    * @private
    */
   this.twitterPublish_ = currentUser.postTwitter;
-  
+
   /**
    * @type {boolean}
    * @private
@@ -120,31 +120,31 @@ brkn.sidebar.CommentInput = function(opt_showControls, opt_canMention, opt_reply
    * @private
    */
   this.replyUser = null;
-  
+
   /**
    * @type {Object.<string, brkn.model.User>}
    * @private
    */
   this.tokens_ = {};
-  
+
   /**
    * @type {Array.<brkn.model.User>}
    * @private
    */
   this.suggestions_ = [];
-  
+
   /**
    * @type {number}
    * @private
    */
   this.cursorIndex_ = -1;
-  
+
   /**
    * @type {number}
    * @private
    */
   this.lastTokenIndex_ = 0;
-  
+
   /**
    * @type {?Element}
    * @private
@@ -235,29 +235,29 @@ brkn.sidebar.CommentInput.prototype.decorateInternal = function(el) {
 /** @inheritDoc */
 brkn.sidebar.CommentInput.prototype.enterDocument = function() {
   goog.base(this, 'enterDocument');
-  
+
   this.commentInput_.decorate(
       goog.dom.getElementsByTagNameAndClass('textarea', undefined, this.getElement())[0]);
   this.commentInput_.setMaxHeight(70);
   var keyHandler = new goog.events.KeyHandler(this.commentInput_.getKeyEventTarget());
   var popup = goog.dom.getElementByClass('popup', this.getElement());
-  
+
   if (!this.reply_ && !this.toField_) {
     this.addChild(this.addCommentButton_);
     this.addCommentButton_.decorate(goog.dom.getElementByClass('add-comment', this.getElement()));
     this.addCommentButton_.setEnabled(this.inputOptional_);
-    
+
     this.getHandler()
         .listen(this.addCommentButton_,
             goog.ui.Component.EventType.ACTION,
             goog.bind(this.onAddComment_, this));
-    
+
     this.commentControls_ = goog.dom.getElementByClass('comment-controls', this.getElement());
     if (this.commentControls_) {
       goog.style.showElement(this.commentControls_, this.showControls_);
       goog.dom.classes.enable(this.getElement(), 'show-controls', this.showControls_);
       this.inputHolder_ = goog.dom.getElementByClass('input-holder', this.getElement());
-      
+
       this.addChild(this.tweetToggle_);
       this.tweetToggle_.decorate(goog.dom.getElementByClass('tweet-toggle', this.getElement()));
       if (brkn.model.Users.getInstance().currentUser.loggedIn &&
@@ -269,17 +269,17 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
           this.tweetToggle_.setChecked(this.twitterPublish_);
         }, this));
       }
-      
+
       this.addChild(this.fbToggle_);
       this.fbToggle_.decorate(goog.dom.getElementByClass('fb-toggle', this.getElement()));
-      
+
       if (brkn.model.Users.getInstance().currentUser.loggedIn) {
         FB.api('/me/permissions', goog.bind(function(response) {
           this.fbPublish_ = this.fbPublish_ && !!response.data[0]['publish_stream'];
           this.fbToggle_.setChecked(this.fbPublish_);
         }, this));
       }
-      
+
       this.getHandler()
           .listen(this.fbToggle_,
               goog.ui.Component.EventType.ACTION,
@@ -287,15 +287,15 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
           .listen(this.tweetToggle_,
               goog.ui.Component.EventType.ACTION,
               goog.bind(this.onTwitterToggle_, this));
-      
+
       if (DESKTOP && !IPAD) {
         brkn.Popup.getInstance().hovercard(this.tweetToggle_.getElement(), brkn.model.Popup.Position.TOP,
             brkn.model.Popup.Action.TOOLTIP, {'text': goog.bind(function() {
-              return 'Share on Twitter: ' + (this.tweetToggle_.isChecked() ? 'ON' : 'OFF'); 
+              return 'Share on Twitter: ' + (this.tweetToggle_.isChecked() ? 'ON' : 'OFF');
             }, this)});
         brkn.Popup.getInstance().hovercard(this.fbToggle_.getElement(), brkn.model.Popup.Position.TOP,
             brkn.model.Popup.Action.TOOLTIP, {'text': goog.bind(function() {
-              return 'Share on Facebook: ' + (this.fbToggle_.isChecked() ? 'ON' : 'OFF'); 
+              return 'Share on Facebook: ' + (this.fbToggle_.isChecked() ? 'ON' : 'OFF');
             }, this)});
       }
       brkn.model.Users.getInstance().currentUser.subscribe(brkn.model.User.Actions.TWITTER_AUTH, function() {
@@ -304,14 +304,14 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
       }, this);
     }
   }
-  
+
   this.suggestionsEl_ = goog.dom.getElementByClass('suggestions', this.getElement());
   this.highlighterEl_ = goog.dom.getElementByClass('highlighter', this.getElement());
-  
-  popup && goog.style.showElement(popup,
+
+  popup && brkn.model.Users.getInstance().currentUser && brkn.model.Users.getInstance().currentUser.loggedIn && goog.style.showElement(popup,
       !brkn.model.Users.getInstance().currentUser.hasFacebook &&
       !brkn.model.Users.getInstance().currentUser.hasTwitter && this.showControls_);
-  
+
   this.getHandler()
       .listen(this.commentInput_.getElement(),
           goog.events.EventType.FOCUS,
@@ -320,10 +320,11 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
 //              brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.PLAY, false);
 //            }
             popup && goog.style.showElement(popup, false);
-            if (!brkn.model.Users.getInstance().currentUser.welcomed && !this.toField_) {
-              brkn.model.Popup.getInstance().publish(brkn.model.Popup.Action.TOOLTIP, this.commentInput_.getElement(),
-                  brkn.model.Popup.Position.TOP, {'text': 'Mention friends using @'});
-            }
+            // if (!brkn.model.Users.getInstance().currentUser.welcomed && !this.toField_) {
+            //   brkn.model.Popup.getInstance().publish(brkn.model.Popup.Action.TOOLTIP, this.commentInput_.getElement(),
+            //       brkn.model.Popup.Position.TOP, {'text': 'Mention friends using @'});
+            // }
+
             this.dispatchEvent(goog.events.EventType.FOCUS)
           }, this))
       .listen(keyHandler,
@@ -339,7 +340,7 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
                     (this.toField_ ? this.lastTokenIndex_ : 0),
                     this.commentInput_.getElement().selectionStart);
                 var fragments = suggestionInput.split(' ');
-                suggestionInput = fragments.length > 1 ? 
+                suggestionInput = fragments.length > 1 ?
                     fragments[fragments.length - 2] + ' ' + fragments[fragments.length - 1] :
                         fragments.pop();
                 var user = this.suggestions_[this.cursorIndex_];
@@ -347,14 +348,14 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
                 if (this.toField_) {
                   this.updateTokens_(suggestionInput.match(brkn.sidebar.CommentInput.TO_REGEX)[0]);
                 } else {
-                  this.updateTokens_(suggestionInput.match(brkn.sidebar.CommentInput.MENTION_REGEX)[0]); 
+                  this.updateTokens_(suggestionInput.match(brkn.sidebar.CommentInput.MENTION_REGEX)[0]);
                 }
                 this.commentInput_.getElement().focus();
                 goog.style.showElement(this.suggestionsEl_, false);
                 this.suggestions_ = [];
                 this.cursorIndex_ = -1;
                 this.setCaretToPos(this.commentInput_.getValue().length);
-              } else if (e.keyCode == '13') {  
+              } else if (e.keyCode == '13') {
                 e.preventDefault();
                 this.addCommentButton_.setActive(this.commentInput_.getValue());
                 this.onAddComment_(e);
@@ -372,7 +373,7 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
               if (sugEls.reverse()[this.cursorIndex_]) {
                 goog.dom.classes.remove(sugEls[this.cursorIndex_], 'selected');
               }
-              this.cursorIndex_ = e.keyCode == '38' ? 
+              this.cursorIndex_ = e.keyCode == '38' ?
                   Math.min(this.cursorIndex_ + 1, this.suggestions_.length - 1) :
                   Math.max(this.cursorIndex_ - 1, -1);
               if (this.cursorIndex_ != -1) {
@@ -381,20 +382,20 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
             } else {
               goog.Timer.callOnce(goog.bind(function() {
                 this.addCommentButton_.setEnabled(this.inputOptional_ || !!this.commentInput_.getValue());
-                
+
                 // Suggestion input is the last word up to the cursor
                 var suggestionInput = this.commentInput_.getValue().slice(
                     (this.toField_ ? this.lastTokenIndex_ : 0),
                     this.commentInput_.getElement().selectionStart);
                 var fragments = suggestionInput.split(' ')
-                suggestionInput = fragments.length > 1 ? 
+                suggestionInput = fragments.length > 1 ?
                     fragments[fragments.length - 2] + ' ' + fragments[fragments.length - 1] :
                         fragments.pop()
-                
+
                 var hasMention = (this.toField_ && brkn.sidebar.CommentInput.TO_REGEX.test(suggestionInput)) ||
                     this.canMention_ && brkn.sidebar.CommentInput.MENTION_REGEX.test(suggestionInput);
                 goog.style.showElement(this.suggestionsEl_, hasMention);
-                
+
                 if (e.keyCode == '8') {
                   this.highlighterEl_.innerHTML.match('<div class="token">.*</div>$');
                 } else if (hasMention) {
@@ -419,7 +420,7 @@ brkn.sidebar.CommentInput.prototype.enterDocument = function() {
           goog.bind(function(e) {
             this.dispatchEvent(e);
           }, this));
-  
+
   if (popup) {
      this.getHandler().listen(popup,
          goog.events.EventType.CLICK,
@@ -515,7 +516,7 @@ brkn.sidebar.CommentInput.prototype.replyTweet = function(tweet) {
 
 
 /**
- * @param {number} selectionStart 
+ * @param {number} selectionStart
  * @param {number} selectionEnd
  */
 brkn.sidebar.CommentInput.prototype.setSelectionRange = function(selectionStart, selectionEnd) {
@@ -664,7 +665,7 @@ brkn.sidebar.CommentInput.prototype.onAddComment_ = function(e) {
 brkn.sidebar.CommentInput.prototype.onFacebookToggle_ = function(e) {
   brkn.model.Popup.getInstance().publish(brkn.model.Popup.Action.TOOLTIP, this.fbToggle_.getElement(),
       brkn.model.Popup.Position.TOP, {'text': goog.bind(function() {
-        return 'Share on Facebook: ' + (this.fbToggle_.isChecked() ? 'ON' : 'OFF'); 
+        return 'Share on Facebook: ' + (this.fbToggle_.isChecked() ? 'ON' : 'OFF');
       }, this)});
   if (!brkn.model.Users.getInstance().currentUser.hasFacebook && !this.fbPublish_
       && this.fbToggle_.isChecked()) {
@@ -684,7 +685,7 @@ brkn.sidebar.CommentInput.prototype.onFacebookToggle_ = function(e) {
 brkn.sidebar.CommentInput.prototype.onTwitterToggle_ = function(e) {
   brkn.model.Popup.getInstance().publish(brkn.model.Popup.Action.TOOLTIP, this.tweetToggle_.getElement(),
       brkn.model.Popup.Position.TOP, {'text': goog.bind(function() {
-        return 'Share on Twitter: ' + (this.tweetToggle_.isChecked() ? 'ON' : 'OFF'); 
+        return 'Share on Twitter: ' + (this.tweetToggle_.isChecked() ? 'ON' : 'OFF');
       }, this)});
   if (!brkn.model.Users.getInstance().currentUser.hasTwitter && !this.twitterPublish_ &&
       this.tweetToggle_.isChecked()) {
@@ -693,14 +694,14 @@ brkn.sidebar.CommentInput.prototype.onTwitterToggle_ = function(e) {
         var a = document.createElement('a');
         a.setAttribute("href", this.twitterAuthUrl_);
         a.setAttribute("target", "_blank");
-  
+
         var dispatch = document.createEvent("HTMLEvents")
         dispatch.initEvent("click", true, true);
         a.dispatchEvent(dispatch);
       } else {
         var newWindow = window.open(this.twitterAuthUrl_,'Twitter Login','height=300,width=550');
         newWindow.moveTo(screen.width/2-225, screen.height/2-150);
-        newWindow.focus(); 
+        newWindow.focus();
       }
    }
 };

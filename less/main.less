@@ -54,6 +54,7 @@ body {
   position: fixed;
   width: 100%;
   height: 100%;
+  -webkit-font-smoothing: subpixel-antialiased;
   /* for iphone only
   -webkit-user-select: none; */
 }
@@ -132,12 +133,11 @@ div.list-media {
   margin-bottom: 10px;
   .border-radius(3px);
   position: relative;
-  background: #EBEBEB;
-  border: 1px solid white;
-  .box-shadow(0, 0, 2px, 1px, rgba(0, 0, 0, 0.3));
+  background: #f5f5f5;
+  border: 1px solid #bdc3c7;
+  .box-shadow(0, 0, 2px, 0, rgba(0, 0, 0, 0.1));
   cursor: pointer;
   color: #f5f5f5;
-  text-shadow: 1px 1px 1px #181818;
   opacity: 0;
   .transition(opacity, .3s, ease-in);
   &.show {
@@ -179,7 +179,6 @@ div.list-media {
     vertical-align: middle;
     height: 48px;
     color: #999;
-    text-shadow: 1px 1px 1px white;
     margin-top: -1px;
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
@@ -208,7 +207,6 @@ div.list-media {
         left: 5px;
         top: 5px;
         color: #dedede;
-        text-shadow: 1px 1px 1px #181818;
         height: 100%;
         font-size: 13px;
         line-height: 20px;
@@ -271,7 +269,6 @@ div.list-media {
     }
     &:hover div.title {
       color: #f5f5f5;
-      text-shadow: 0px 0px 4px black;
     }
   }
   div.publisher {
@@ -282,7 +279,6 @@ div.list-media {
     width: 290px;
     padding: 3px;
     color: #181818;
-    text-shadow: 1px 1px 1px white;
     font-family: MuseoSans500;
     img {
       width: 22px;
@@ -293,7 +289,7 @@ div.list-media {
     }
     div.name {
       font-size: 11px;
-      line-height: 3px;
+      line-height: 22px;
       margin: 2px 0px -2px 5px;
       display: inline-block;
     }
@@ -345,7 +341,6 @@ div.list-media {
     right: 3px;
     bottom: 7px;
     color: #f5f5f5;
-    text-shadow: 1px 1px 1px #181818;
     div.comment-count {
       div.icon {
         .icon-comment();

@@ -48,7 +48,7 @@
 			firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 		</script>
   </head>
-  <body>
+  <body {% if embed %}class="embed"{% endif %}>
     <audio id="mp3-1" style="display:none; height:0">
       <source src="/static/audio/xylo-a.mp3" type='audio/mpeg; codecs="mp3"'>
       <source src="/static/audio/xylo-a.wav" type="audio/wav">
@@ -70,7 +70,7 @@
       <div></div>
     </div>
 
-    <div id="login" {% if embed %}class="hide"{% endif %}>
+    <div id="login" {% if embed %}class="hide"{% endif %} {% if embed %}style="display:none"{% endif %}>
       <div id="login-promo" class="login-promo" style="display:none">
          <div class="promo promo-1">
            <div class="promo-pic">

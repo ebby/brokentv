@@ -20,7 +20,7 @@ goog.require('goog.ui.CustomButton');
  */
 brkn.Player = function() {
 	goog.base(this);
-	
+
 	/**
 	 * @type {boolean}
 	 * @private
@@ -150,7 +150,7 @@ brkn.Player.prototype.enterDocument = function() {
       (goog.now() - brkn.model.Player.getInstance().getCurrentProgram().time.getTime())/1000 : 0;
   this.fullscreenEl_ = goog.dom.getElementByClass('fullscreen', this.getElement());
   var expandEl = goog.dom.getElementByClass('expand', this.getElement());
-  goog.style.showElement(this.fullscreenEl_, this.supportsFullScreen_());
+  //goog.style.showElement(this.fullscreenEl_, this.supportsFullScreen_());
   this.stagecover_ = goog.dom.getElement('stagecover');
   this.message_ = goog.dom.getElementByClass('message', this.stagecover_);
   this.spinner_ = goog.dom.getElementByClass('spinner', this.stagecover_);
@@ -160,7 +160,7 @@ brkn.Player.prototype.enterDocument = function() {
   this.dislikeEl_ = goog.dom.getElementByClass('dislike', this.getElement());
   this.sendSuggestionsEl_ = goog.dom.getElementByClass('send-suggestions', this.getElement());
   var keyHandler = new goog.events.KeyHandler(document);
-  
+
   this.updateStagecover_();
 
   if (brkn.model.Player.getInstance().getCurrentProgram()) {
@@ -170,7 +170,7 @@ brkn.Player.prototype.enterDocument = function() {
   } else  {
     brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.NO_MEDIA);
   }
-  
+
   this.getHandler()
       .listen(window, 'resize', goog.bind(this.resize, this))
       .listen(document, 'webkitfullscreenchange', goog.bind(function(e) {
@@ -227,14 +227,14 @@ brkn.Player.prototype.enterDocument = function() {
         }
         this.togglePlayback_();
       }, this));
-  
+
   brkn.model.Channels.getInstance().subscribe(brkn.model.Channels.Actions.CHANGE_CHANNEL,
 			this.changeChannel, this);
   brkn.model.Channels.getInstance().subscribe(brkn.model.Channels.Actions.NEXT_PROGRAM,
       function(program) {
         this.playProgram(program);
         this.updateStagecover_();
-        
+
         if (brkn.model.Users.getInstance().currentUser.loggedIn) {
           goog.net.XhrIo.send('/_play', goog.functions.NULL(), 'POST',
               'media_id=' + program.media.id +
@@ -268,7 +268,7 @@ brkn.Player.prototype.enterDocument = function() {
   brkn.model.Users.getInstance().subscribe(brkn.model.Users.Action.LOGGED_IN, function() {
     this.fetchLike_(brkn.model.Player.getInstance().getCurrentProgram().media);
   }, this);
-  
+
   if (DESKTOP) {
     this.getHandler()
         .listen(this.restart_, goog.events.EventType.CLICK, goog.bind(function(e) {
@@ -282,7 +282,7 @@ brkn.Player.prototype.enterDocument = function() {
             goog.bind(this.onLike_, this, this.likeEl_, true))
         .listen(this.dislikeEl_, goog.events.EventType.CLICK,
             goog.bind(this.onLike_, this, this.dislikeEl_, false));
-    
+
     brkn.model.Controller.getInstance().subscribe(brkn.model.Controller.Actions.TOGGLE_SIDEBAR,
         function(show) {
           this.resize(show);
@@ -309,7 +309,7 @@ brkn.Player.prototype.enterDocument = function() {
           this.player_.seekTo(0);
         }, this);
   }
-  
+
   this.resize();
 };
 
@@ -391,7 +391,7 @@ brkn.Player.prototype.playProgram = function(program) {
     goog.style.showElement(this.likeEl_, false);
     goog.style.showElement(this.dislikeEl_, false);
   }
-  
+
   if (brkn.model.Channels.getInstance().currentChannel.id == 'reddit' ||
       program.media.redditId) {
     this.fetchReddit_(program);
@@ -419,7 +419,7 @@ brkn.Player.prototype.fetchReddit_ = function(program) {
       goog.dom.setTextContent(goog.dom.getElementByClass('score', this.vote_), score);
       goog.dom.getElementByClass('reddit-link', this.vote_).href =
           'http://www.reddit.com' + response['data']['children'][0]['data']['permalink'];
-      
+
     }
   }, this));
 };
@@ -496,7 +496,7 @@ brkn.Player.prototype.play = function(opt_media, opt_channel, opt_tries) {
  */
 brkn.Player.prototype.resize = function() {
   if (IPHONE) {
-    goog.style.setWidth(this.getElement(), goog.dom.getViewportSize().width - 320); 
+    goog.style.setWidth(this.getElement(), goog.dom.getViewportSize().width - 320);
     return;
   }
   var stagecover = goog.dom.getElement('stagecover');
@@ -508,7 +508,7 @@ brkn.Player.prototype.resize = function() {
   this.width_ = goog.dom.getViewportSize().height - guideHeight;
   this.height_ = goog.dom.getViewportSize().width - sidebarWidth;
   goog.style.setHeight(this.getElement(), goog.dom.getViewportSize().height - guideHeight);
-  goog.style.setWidth(this.getElement(), goog.dom.getViewportSize().width - sidebarWidth); 
+  goog.style.setWidth(this.getElement(), goog.dom.getViewportSize().width - sidebarWidth);
   goog.style.setHeight(stagecover, goog.dom.getViewportSize().height - guideHeight);
   goog.style.setWidth(stagecover, goog.dom.getViewportSize().width - sidebarWidth);
   var messageSize = goog.style.getSize(message);
@@ -527,7 +527,7 @@ brkn.Player.prototype.changeChannel = function(channel) {
 	var program = channel.getCurrentProgram();
 	if (program) {
 	  this.playProgram(program);
-	  
+
 	  if (brkn.model.Users.getInstance().currentUser.loggedIn) {
   	  goog.net.XhrIo.send('/_play', goog.functions.NULL(), 'POST',
   	      'media_id=' + program.media.id +
@@ -586,7 +586,7 @@ brkn.Player.prototype.onLike_ = function(el, like, e) {
         (!checked ? '&delete=1' : '') +
         (flip ? '&flip=1' : '') +
         (this.redditId_ ? '&reddit_id=' + this.redditId_ + '&modhash=' + this.redditModhash_ : ''));
-    
+
 //    var scoreEl = goog.dom.getElementByClass('score', this.vote_);
 //    if (goog.dom.getTextContent(scoreEl)) {
 //      var weight = flip ? 2 : 1;
@@ -631,16 +631,16 @@ brkn.Player.prototype.seek_ = function(seek) {
 brkn.Player.prototype.playerStateChange_ = function(event) {
   this.playerState_ = event.data;
   this.updateStagecover_();
+
   switch (event.data) {
     case YT.PlayerState.CUED:
-      var seek = brkn.model.Player.getInstance().getCurrentProgram().async ?
-          brkn.model.Player.getInstance().getCurrentProgram().seek :
-            brkn.model.Controller.getInstance().timeless ? 0 :
-              (goog.now() - brkn.model.Player.getInstance().getCurrentProgram().time.getTime())/1000;
-      DESKTOP && this.player_.seekTo(seek);
+      // var seek = brkn.model.Player.getInstance().getCurrentProgram().async ?
+      //     brkn.model.Player.getInstance().getCurrentProgram().seek :
+      //       brkn.model.Controller.getInstance().timeless ? 0 :
+      //         (goog.now() - brkn.model.Player.getInstance().getCurrentProgram().time.getTime())/1000;
+      // this.player_.seekTo(0);
       this.player_.playVideo();
       brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.PLAY, true);
-      
       break;
     case YT.PlayerState.PLAYING:
       this.nexted_ = false;
@@ -671,7 +671,7 @@ brkn.Player.prototype.onPlayerReady_ = function(event) {
       brkn.model.Player.getInstance().getCurrentProgram().seek :
         brkn.model.Controller.getInstance().timeless ? 0 :
           (goog.now() - brkn.model.Player.getInstance().getCurrentProgram().time.getTime())/1000;
-  this.player_.seekTo(seek);
+  //this.player_.seekTo(seek);
   this.player_.playVideo();
   brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.MUTE,
       this.player_.isMuted());
@@ -702,18 +702,18 @@ brkn.Player.prototype.updateStagecover_ = function(opt_message, opt_beforeEnd, o
   if (IPHONE) {
     return;
   }
-  
+
   var stagecover = goog.dom.getElement('stagecover');
   var seek = brkn.model.Player.getInstance().getCurrentProgram() ?
       brkn.model.Player.getInstance().getCurrentTime() : 0;
-  
+
   if (opt_restart) {
     goog.style.showElement(this.spinner_, false);
     goog.style.showElement(this.restart_, true);
     goog.dom.classes.add(stagecover, 'covered');
     return;
   }
-  
+
   if (!brkn.model.Player.getInstance().getCurrentProgram() || (brkn.model.Player.getInstance().getCurrentProgram() &&
       seek > brkn.model.Player.getInstance().getCurrentProgram().media.duration)) {
     brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.NO_MEDIA);
@@ -728,19 +728,19 @@ brkn.Player.prototype.updateStagecover_ = function(opt_message, opt_beforeEnd, o
     goog.style.showElement(this.spinner_, false);
     goog.style.showElement(this.restart_, false);
     goog.dom.classes.remove(stagecover, 'covered');
-    goog.style.showElement(this.vote_, brkn.model.Users.getInstance().currentUser.loggedIn ||
+    goog.style.showElement(this.vote_, !EMBED && (brkn.model.Users.getInstance().currentUser.loggedIn ||
         brkn.model.Channels.getInstance().currentChannel.id == 'reddit' ||
-        brkn.model.Player.getInstance().getCurrentProgram().media.redditId);
+        brkn.model.Player.getInstance().getCurrentProgram().media.redditId));
   } else {
     goog.dom.setTextContent((/** @type {Element} */ this.message_.firstChild),
         brkn.Player.Messages.LOADING);
     goog.style.showElement(this.spinner_, true);
     goog.style.showElement(this.restart_, false);
-    goog.style.showElement(this.vote_, brkn.model.Users.getInstance().currentUser.loggedIn ||
+    goog.style.showElement(this.vote_, !EMBED && (brkn.model.Users.getInstance().currentUser.loggedIn ||
         brkn.model.Channels.getInstance().currentChannel.id == 'reddit' ||
-        brkn.model.Player.getInstance().getCurrentProgram().media.redditId);
+        brkn.model.Player.getInstance().getCurrentProgram().media.redditId));
     goog.dom.classes.add(stagecover, 'covered');
-    
+
     if (this.playerState_ == YT.PlayerState.PLAYING) {
       goog.Timer.callOnce(goog.bind(function() {
         this.updateStagecover_();
@@ -782,18 +782,18 @@ brkn.Player.prototype.sendSuggestions_ = function() {
     id: user1.id,
     name: user1.name
   });
-  
+
   var suggestion2 = soy.renderAsElement(brkn.player.sendSuggestion, {
     id: user2.id,
     name: user2.name
   });
-  
+
   var suggestionsEl = goog.dom.getElement('send-suggestions');
   suggestionsEl.innerHTML = '';
   goog.dom.appendChild(suggestionsEl, suggestion1);
   goog.dom.appendChild(suggestionsEl, suggestion2);
   goog.style.showElement(this.sendSuggestionsEl_, true);
-  
+
   this.getHandler()
       .listen(suggestion1, goog.events.EventType.CLICK, goog.bind(function() {
         goog.dom.classes.add(suggestion1, 'sent');
@@ -805,14 +805,14 @@ brkn.Player.prototype.sendSuggestions_ = function() {
           'media': brkn.model.Player.getInstance().getCurrentProgram().media
         });
         message.time = new goog.date.DateTime();
-        message.relativeTime = goog.date.relative.format(message.time.getTime()) 
+        message.relativeTime = goog.date.relative.format(message.time.getTime())
         brkn.model.Users.getInstance().publish(brkn.model.Users.Action.NEW_MESSAGE, message);
-        
+
         goog.net.XhrIo.send(
             '/_message',
             goog.functions.NULL(),
             'POST',
-            'from_id=' + brkn.model.Users.getInstance().currentUser.id + 
+            'from_id=' + brkn.model.Users.getInstance().currentUser.id +
             '&to_id=' + message.toUser.id + '&text=' + message.text +
             '&media_id=' + message.media.id);
       }, this))
@@ -825,14 +825,14 @@ brkn.Player.prototype.sendSuggestions_ = function() {
           'media': brkn.model.Player.getInstance().getCurrentProgram().media
         });
         message.time = new goog.date.DateTime();
-        message.relativeTime = goog.date.relative.format(message.time.getTime()) 
+        message.relativeTime = goog.date.relative.format(message.time.getTime())
         brkn.model.Users.getInstance().publish(brkn.model.Users.Action.NEW_MESSAGE, message);
-        
+
         goog.net.XhrIo.send(
             '/_message',
             goog.functions.NULL(),
             'POST',
-            'from_id=' + brkn.model.Users.getInstance().currentUser.id + 
+            'from_id=' + brkn.model.Users.getInstance().currentUser.id +
             '&to_id=' + message.toUser.id + '&text=' + message.text +
             '&media_id=' + message.media.id);
       }, this))

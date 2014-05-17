@@ -24,67 +24,67 @@ goog.require('goog.ui.Textarea.EventType');
  */
 brkn.sidebar.Stream = function(activities, opt_uid) {
   goog.base(this);
-  
+
   /**
    * @type {Array.<Object>}
    * @private
    */
   this.activities_ = activities;
-  
+
   /**
    * @type {?string}
    * @private
    */
   this.uid_ = opt_uid || null;
-  
+
   /**
    * @type {number}
    * @private
    */
   this.count_ = 0;
-  
+
   /**
    * @type {boolean}
    * @private
    */
   this.showFriendList_ = !opt_uid;
-  
+
   /**
    * @type {boolean}
    * @private
    */
   this.finished_ = false;
-  
+
   /**
    * @type {Object}
    */
   this.fetched_ = {};
-  
+
   /**
    * @type {Object}
    */
   this.channelDigest_ = {};
-  
+
   /**
    * @type {Object}
    */
   this.mediaDigest_ = {};
-  
+
   /**
    * @type {Object}
    */
   this.likeDigest_ = {};
-  
+
   /**
    * @type {Object}
    */
   this.userLikes_ = {};
-  
+
   /**
    * @type {Object}
    */
   this.renderedLikes_ = {};
-  
+
   /**
    * Activity elements, sorted by timestamp
    * [{time, element}]
@@ -126,13 +126,13 @@ brkn.sidebar.Stream.prototype.spinner_;
 /** @inheritDoc */
 brkn.sidebar.Stream.prototype.decorateInternal = function(el) {
   goog.base(this, 'decorateInternal', el);
-  
+
   el.innerHTML = '';
   el.scrollTop = 0;
 
   goog.dom.classes.add(el, 'stream');
   goog.dom.classes.add(el, 'ios-scroll');
-  
+
   if (this.showFriendList_) {
     this.friendlistEl_ = goog.dom.createDom('div', 'friendlist');
     goog.style.showElement(this.friendlistEl_, false);
@@ -147,10 +147,10 @@ brkn.sidebar.Stream.prototype.decorateInternal = function(el) {
   this.spinner_ = goog.dom.createDom('div', 'spinner');
   goog.dom.appendChild(this.getElement(), this.spinner_);
   goog.style.showElement(this.spinner_, false);
-  
+
   this.noActivitiesEl_ = goog.dom.createDom('div', 'no-comments',
       this.uid_ == brkn.model.Users.getInstance().currentUser.id ?
-      'Your activity will appear here.': 'Friends\' activity will appear here.');
+      'Your activity will appear here': 'Friends\' activity will appear here');
   goog.dom.appendChild(this.getElement(), this.noActivitiesEl_);
 
   if (this.activities_ && this.activities_.length) {
@@ -168,7 +168,7 @@ brkn.sidebar.Stream.prototype.decorateInternal = function(el) {
       this.addActivity_(activity, undefined, undefined, true);
     }
   }, this);
-  
+
   this.getHandler()
       .listen(this.getElement(), goog.events.EventType.SCROLL, goog.bind(function(e) {
         if (!this.finished_ && this.getElement().scrollTop + goog.dom.getViewportSize().height >
@@ -248,19 +248,19 @@ brkn.sidebar.Stream.prototype.digest_ = function(activities) {
   goog.object.forEach(this.channelDigest_, function(sessions) {
     this.addActivity_(undefined, sessions, 'session');
   }, this);
-  
+
   // Render medias
   goog.object.forEach(this.mediaDigest_, function(activities) {
     this.addActivity_(undefined, activities, 'comment');
   }, this);
-  
+
   // Render likes
   goog.object.forEach(this.likeDigest_, function(activities) {
     if (activities.length > 1) {
       this.addActivity_(undefined, activities, 'liked');
     }
   }, this);
-  
+
   // Render likes
   goog.object.forEach(this.userLikes_, function(activities) {
     this.addActivity_(undefined, activities, 'liked');
@@ -355,14 +355,14 @@ brkn.sidebar.Stream.prototype.addActivity_ = function(opt_activity, opt_digest, 
     default:
       return;
   }
-  
+
   if (!medias.length) {
     return;
   }
-  
+
   brkn.model.Clock.getInstance().addTimestamp(time,
       goog.dom.getElementByClass('timestamp', activityEl));
-  
+
   var insertAt = goog.array.findIndex(this.activityTimes_,
       function(obj) { return obj['time'] < time.getTime() });
   goog.array.insertAt(this.activityTimes_, {
@@ -411,7 +411,7 @@ brkn.sidebar.Stream.prototype.addActivity_ = function(opt_activity, opt_digest, 
 brkn.sidebar.Stream.prototype.resize = function() {
   var height = goog.dom.getViewportSize().height + (IPHONE && SAFARI ? 61 : 0)
       - 40 - (goog.dom.getAncestorByClass(this.getElement(), 'tabbed') ? 40 : 10);
-  
+
   goog.style.setHeight(this.getElement(), height);
   if (goog.style.getSize(this.activitiesEl_).height < height) {
     // Fetch to fill in the height

@@ -34,19 +34,19 @@ brkn.Popup = function() {
       goog.bind(this.setVisible, this, false));
   goog.events.listen(this, goog.ui.PopupBase.EventType.HIDE,
       this.onHideInternal_);
-  
+
   /**
    * @type {boolean}
    * @private
    */
   this.hovered_ = false;
-  
+
   /**
    * @type {boolean}
    * @private
    */
   this.shouldClose_ = false;
-  
+
   /**
    * @type {boolean}
    * @private
@@ -68,7 +68,7 @@ brkn.Popup = function() {
       this.showForSelectProgram_, this);
   this.model_.subscribe(brkn.model.Popup.Action.HIDE,
       this.hide_, this);
-  
+
   goog.events.listen(this.getElement(), goog.events.EventType.MOUSEOVER, goog.bind(function() {
     this.hovered_ = true;
   }, this));
@@ -101,14 +101,14 @@ brkn.Popup.prototype.closeTimer_;
  * @constant
  */
 brkn.Popup.YOUTUBE_DATA = 'https://gdata.youtube.com/feeds/api/videos/%s?v=2&alt=json'
-  
+
 
 /**
  * Show popup for a like object.
  * @param {Element} anchor The like element.
  * @param {brkn.model.Popup.Position} pos
  * @param {string} action
- * @param {?Object=} opt_args 
+ * @param {?Object=} opt_args
  */
 brkn.Popup.prototype.hovercard = function(anchor, pos, action, opt_args) {
   goog.events.listen(anchor, goog.events.EventType.MOUSEOVER, goog.bind(function() {
@@ -124,10 +124,30 @@ brkn.Popup.prototype.hovercard = function(anchor, pos, action, opt_args) {
         this.shouldClose_ = true;
       }
     }, this), 100);
-    
+
   }, this));
 }
 
+
+/**
+ * Show popup for a like object.
+ * @param {Element} anchor The like element.
+ * @param {brkn.model.Popup.Position} pos
+ * @param {string} action
+ * @param {?Object=} opt_args
+ */
+brkn.Popup.prototype.show = function(anchor, pos, action, opt_args) {
+    this.closeTimer_ && goog.Timer.clear(this.closeTimer_);
+    this.shouldClose_ = false;
+    this.model_.publish(action, anchor, pos, opt_args);
+    this.closeTimer_ = goog.Timer.callOnce(goog.bind(function() {
+      if (!this.hovered_) {
+        this.model_.publish(brkn.model.Popup.Action.HIDE);
+      } else {
+        this.shouldClose_ = true;
+      }
+    }, this), 2000);
+};
 
 /**
  * Will position the hovercard to the right-center of the element or
@@ -199,12 +219,12 @@ brkn.Popup.prototype.getContentElement = function() {
 brkn.Popup.prototype.showTooltip_ = function(anchor, pos, args, opt_noAutohide) {
   this.setVisible(false);
   this.positionAtAnchor(anchor, pos);
-  
+
   soy.renderElement(this.getContentElement(), brkn.popup.tooltip, {
     text: typeof args['text'] == 'function' ? args['text']() : args['text'],
     link: args['link']
   });
-  
+
   if (opt_noAutohide) {
     this.setAutoHide(false);
   }
@@ -226,15 +246,15 @@ brkn.Popup.prototype.showOob_ = function(anchor, pos, args, opt_noAutohide) {
   var leftMargin = -1 * (goog.style.getSize(this.getElement()).width -
       goog.style.getSize(anchor).width) / 2;
   this.setMargin(0, 0, 36, leftMargin);
-  
+
   soy.renderElement(this.getContentElement(), brkn.popup.commentOob, {
     text: args['html'],
     link: args['link']
   });
-  
+
   this.setAutoHide(false);
   this.setVisible(true);
-  
+
   this.handler_.listen(this.getElement(), goog.events.EventType.CLICK, goog.bind(function() {
     this.model_.publish(brkn.model.Popup.Action.HIDE);
   }, this));
@@ -263,14 +283,14 @@ brkn.Popup.prototype.showCreatePoll_ = function(anchor, pos, args, opt_noAutohid
   var leftMargin = -1 * (goog.style.getSize(this.getElement()).width -
       goog.style.getSize(anchor).width) / 2;
   this.setMargin(0, 0, 36, leftMargin);
-  
+
   soy.renderElement(this.getContentElement(), brkn.popup.createPoll, {
   });
-  
+
   this.setAutoHide(false);
   this.setVisible(true);
   this.dontClose_ = true;
-  
+
 //  this.handler_.listen(this.getElement(), goog.events.EventType.CLICK, goog.bind(function() {
 //    this.model_.publish(brkn.model.Popup.Action.HIDE);
 //  }, this));
@@ -280,7 +300,7 @@ brkn.Popup.prototype.showCreatePoll_ = function(anchor, pos, args, opt_noAutohid
 /**
  * Show popup for a like object.
  * @param {Element} anchor The like element.
- * @param {brkn.model.Channel} channel The Channel 
+ * @param {brkn.model.Channel} channel The Channel
  * @private
  */
 brkn.Popup.prototype.showForSelectProgram_ = function(anchor, channel) {
@@ -292,18 +312,18 @@ brkn.Popup.prototype.showForSelectProgram_ = function(anchor, channel) {
   this.setPosition(new goog.positioning.AnchoredViewportPosition(
       anchor,
       goog.positioning.Corner.TOP_END));
-  
+
   goog.dom.classes.add(this.getElement(), 'left');
 
   soy.renderElement(this.getContentElement(), brkn.popup.selectProgram);
-  
+
   this.suggestInput_ = new goog.ui.LabelInput('paste a YouTube link');
   this.suggestInput_.decorate(goog.dom.getElementByClass('program-input', this.getElement()));
-  
+
   var keyHandler = new goog.events.KeyHandler(this.suggestInput_.getElement());
   var pasteHandler = new goog.events.PasteHandler(this.suggestInput_.getElement());
 	var throttle = new goog.Throttle(goog.bind(this.onProgramInput_, this, channel), 1000);
-  
+
   this.setVisible(true);
 
   this.handler_
@@ -334,7 +354,7 @@ brkn.Popup.prototype.onProgramInput_ = function(channel, e) {
 	try {
 		var video = goog.ui.media.YoutubeModel.newInstance(this.suggestInput_.getValue());
 
-		goog.net.XhrIo.send(		
+		goog.net.XhrIo.send(
 				goog.string.subs(brkn.Popup.YOUTUBE_DATA, video.getVideoId()),
 				goog.bind(function(e){
 					var entry = goog.json.parse(e.target.getResponse())['entry'];
@@ -347,7 +367,7 @@ brkn.Popup.prototype.onProgramInput_ = function(channel, e) {
 					});
 					var confirmButton = new goog.ui.CustomButton('Yes');
 					confirmButton.decorate(goog.dom.getElementByClass('button', el));
-					
+
 					var scrollAnim = new goog.fx.dom.Scroll(contentEl,
 							[0, 0], [260, 0], 300, goog.fx.easing.easeOut);
 					scrollAnim.play();
@@ -364,7 +384,7 @@ brkn.Popup.prototype.onProgramInput_ = function(channel, e) {
 /**
  * Show popup for a like object.
  * @param {brkn.model.Channel} channel The channel
- * @param {goog.ui.media.YoutubeModel} video 
+ * @param {goog.ui.media.YoutubeModel} video
  * @private
  */
 brkn.Popup.prototype.onAddProgram_ = function(channel, video) {
@@ -379,8 +399,3 @@ brkn.Popup.prototype.onAddProgram_ = function(channel, video) {
 		'POST',
 		'channel=' + channel.id +'&youtube_id=' + video.getVideoId());
 };
-
-
-
-
-

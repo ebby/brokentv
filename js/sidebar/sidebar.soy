@@ -7,6 +7,7 @@
  * @param published
  * @param? lastMediaId
  * @param? loggedOut
+ * @param? embed
  */
 {template .info}
   <div class="info">
@@ -78,7 +79,7 @@
               <a class="prev-link">&#10218; LAST PROGRAM</a>
             {/if}
           </div>
-          <div class="no-comments" style="display:none">Start the conversation.</div>
+          <div class="no-comments" style="display:none">Start the conversation</div>
           <div class="comments"></div>
           <div class="top-grad"></div>
           <div class="bottom-grad"></div>
@@ -141,7 +142,7 @@
         </div>
         <div class="fb-login">
           <div class="power"><div class="bg"></div></div>
-          <div class="login-label">Login</div>
+          <div class="login-label">{if $embed}Login to discuss{else}Login{/if}</div>
           <div class="with-fb">with facebook</div>
           <div class="waitlist">You're on the waitlist</div>
           <div class="login-loading">Loading</div>

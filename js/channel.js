@@ -26,21 +26,21 @@ goog.require('goog.ui.CustomButton');
  */
 brkn.Channel = function(model, timeline, startTime, startTimeOffset, minTime) {
 	goog.base(this);
-	
+
 	this.setModel(model);
-	
+
 	/**
    * @type {boolean}
    * @private
    */
   this.isAdmin_ = brkn.model.Users.getInstance().currentUser.isAdmin();
-  
+
   /**
    * @type {boolean}
    * @private
    */
   this.adminMode_ = false;
-  
+
 	/**
 	 * @type {number}
 	 * @private
@@ -52,43 +52,43 @@ brkn.Channel = function(model, timeline, startTime, startTimeOffset, minTime) {
 	 * @private
 	 */
 	this.startTime_ = startTime;
-	
+
 	/**
 	 * @type {goog.date.DateTime}
 	 * @private
 	 */
 	this.minTime_ = minTime;
-	
+
 	/**
 	 * @type {number}
 	 * @private
 	 */
 	this.startTimeOffset_ = startTimeOffset;
-	
+
 	/**
 	 * @type {Object.<string, Element>}
 	 * @private
 	 */
 	this.viewers_ = {};
-	
+
 	/**
    * @type {Object.<string, Element>}
    * @private
    */
   this.programs_ = {};
-  
+
   /**
    * @type {goog.fx.DragListGroup}
    * @private
    */
   this.dragListGroup_ = this.isAdmin_ ? new goog.fx.DragListGroup() : null;
-  
+
   /**
    * @type {number}
    * @private
    */
   this.changeTime_ = 6;
-  
+
   /**
    * @type {boolean}
    * @private
@@ -111,7 +111,7 @@ brkn.Channel.YOUTUBE_DATA = 'https://gdata.youtube.com/feeds/api/videos/%s?v=2&a
  */
 brkn.Channel.VIEWER_LINES = true;
 
-  
+
 /**
  * @type {number}
  * @constant
@@ -151,7 +151,7 @@ brkn.Channel.prototype.nameEl_;
 brkn.Channel.prototype.createDom = function() {
 	var el = soy.renderAsElement(brkn.channel.main);
 	this.setElementInternal(el);
-	
+
 	this.nameEl_ = soy.renderAsElement(brkn.channel.name, {
     name: this.getModel().name
   });
@@ -165,13 +165,13 @@ brkn.Channel.prototype.enterDocument = function() {
 
   this.programsEl_ = goog.dom.getElementByClass('programs', this.getElement());
   this.viewersEl_ = goog.dom.getElementByClass('viewers', this.getElement());
-  
-  brkn.model.Channels.getInstance().setPixelsPerSecond((goog.style.getSize(this.getElement()).width - brkn.Guide.NAME_WIDTH) /
+
+  brkn.model.Channels.getInstance().setPixelsPerSecond((goog.style.getSize(this.getElement()).width - (EMBED ? 0 : brkn.Guide.NAME_WIDTH)) /
       this.timeline_);
-  
+
   // Color the name
   goog.style.setStyle(this.nameEl_, 'background', Raphael.getColor());
-  
+
   var programs = this.getModel().programming;
   for (var i = 0; i < programs.length; i++) {
     this.addProgram(programs[i]);
@@ -188,7 +188,7 @@ brkn.Channel.prototype.enterDocument = function() {
   if (this.isAdmin_) {
     this.setupDragging_();
   }
-  
+
   goog.array.forEachRight(this.getModel().viewerSessions, this.addViewer, this);
 
 	this.getHandler()
@@ -207,7 +207,7 @@ brkn.Channel.prototype.enterDocument = function() {
 		.listen(brkn.model.Clock.getInstance().clock,
 				goog.Timer.TICK,
 				goog.bind(this.update, this));
-	
+
 	this.getModel().subscribe(brkn.model.Channel.Action.ADD_PROGRAM, this.addProgram, this);
 	this.getModel().subscribe(brkn.model.Channel.Action.ADD_VIEWER, this.addViewer, this);
 	this.getModel().subscribe(brkn.model.Channel.Action.REMOVE_VIEWER, this.removeViewer, this);
@@ -241,7 +241,7 @@ brkn.Channel.prototype.updateCurrentProgram_ = function() {
     }
   }
   this.currentProgram_ = null;
-  
+
   var program = brkn.model.Channels.getInstance().currentChannel.getCurrentProgram();
   if (program) {
     var programEl = this.programs_[program.id];
@@ -269,14 +269,15 @@ brkn.Channel.prototype.addProgram = function(program) {
 		program: program,
 		media: program.media,
 		repeat: width > 600,
-		admin: showAdmin
+		admin: showAdmin,
+    embed: EMBED
 	});
 	this.programs_[program.id] = programEl;
 	var currentProgram = brkn.model.Channels.getInstance().currentChannel.getCurrentProgram();
 	if (currentProgram && program.id == currentProgram.id) {
 	  goog.dom.classes.add(programEl, 'playing');
 	  this.currentProgram_ = program.id;
-	}	
+	}
 
 	var img = goog.dom.getElementByClass('thumb', programEl);
 	goog.Timer.callOnce(function() {
@@ -286,13 +287,9 @@ brkn.Channel.prototype.addProgram = function(program) {
     } else {
       goog.dom.classes.add(img, 'pan-top');
     }
-
-    if (clipped) {
-      goog.style.setWidth(img, 200);
-    }
     goog.dom.classes.enable(programEl, 'stretched', program.media.thumbSize.height > 360);
   });
-	
+
 	var offset = (program.time.getTime() - this.minTime_.getTime())/1000 * brkn.model.Channels.getInstance().pixelsPerSecond;
 
 	if (program.media.live) {
@@ -313,8 +310,8 @@ brkn.Channel.prototype.addProgram = function(program) {
 	    brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.MEDIA_INFO, program.media);
 	  }
 	});
-	
-	var programWidth = goog.dom.classes.has(programEl, 'clipped') ? 200 :
+
+	var programWidth = goog.dom.classes.has(programEl, 'clipped') ? 250 :
 	    goog.style.getSize(programEl).width;
 
 	var titleEl = goog.dom.getElementByClass('title', programEl);
@@ -352,7 +349,7 @@ brkn.Channel.prototype.addProgram = function(program) {
         brkn.model.Channels.getInstance().getMyChannel().publish(brkn.model.Channel.Action.ADD_QUEUE,
             program.media, true);
       });
-	
+
 	// Admin features
 	if (showAdmin) {
 	  var dragger = new goog.fx.Dragger(goog.dom.getElementByClass('repos', programEl));
@@ -394,7 +391,7 @@ brkn.Channel.prototype.updateProgram = function(program) {
 
 /**
  * @param {brkn.model.Program} program
- * @param {Element} programEl 
+ * @param {Element} programEl
  * @private
  */
 brkn.Channel.prototype.onRemoveProgram_ = function(program, programEl) {
@@ -416,7 +413,7 @@ brkn.Channel.prototype.onRemoveProgram_ = function(program, programEl) {
 
 /**
  * @param {number} programId
- * @param {number} newTime 
+ * @param {number} newTime
  * @private
  */
 brkn.Channel.prototype.onRescheduleProgram_ = function(programId, newTime) {
@@ -447,7 +444,7 @@ brkn.Channel.prototype.addViewer = function(session) {
       goog.dom.appendChild(userEl, lineEl);
       var tuneInTime = Math.max(session.tuneIn.getTime(), this.minTime_.getTime());
       var offset = (tuneInTime - this.minTime_.getTime()) / 1000 *
-          brkn.model.Channels.getInstance().pixelsPerSecond + brkn.Guide.NAME_WIDTH;
+          brkn.model.Channels.getInstance().pixelsPerSecond + (EMBED ? 0 : brkn.Guide.NAME_WIDTH);
       var elapsed = (goog.now() - tuneInTime) / 1000 * brkn.model.Channels.getInstance().pixelsPerSecond;
       goog.style.setWidth(lineEl, elapsed);
       goog.style.setPosition(lineEl, offset);
@@ -457,7 +454,7 @@ brkn.Channel.prototype.addViewer = function(session) {
           brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.PROFILE, session.user)
         }
       });
-      
+
       if (DESKTOP && !IPAD) {
         brkn.Popup.getInstance().hovercard(goog.dom.getElementByClass('pic', lineEl),
             brkn.model.Popup.Position.TOP, brkn.model.Popup.Action.TOOLTIP,
@@ -486,7 +483,7 @@ brkn.Channel.prototype.removeViewer = function(user) {
     goog.dom.removeNode(this.viewers_[user.id])
   	goog.object.remove(this.viewers_, user.id);
     brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.RESIZE);
-  } 
+  }
 };
 
 
@@ -506,7 +503,7 @@ brkn.Channel.prototype.update = function() {
   if (!this.getModel().programming.length) {
     return;
   }
- 
+
   if (!brkn.model.Controller.getInstance().timeless) {
     // Potentially move title for current program
     if (this.currentProgram_ && this.changeTime_ > 0) {
@@ -538,7 +535,7 @@ brkn.Channel.prototype.update = function() {
     goog.style.getPosition(this.viewersEl_); // Refresh DOM
     goog.style.setHeight(this.nameEl_, goog.style.getSize(this.getElement()).height - 1);
   }
-  
+
 	//Set programs and name heights
 	//goog.style.setHeight(this.programsEl_, goog.style.getSize(this.getElement()).height - 21 /* padding */);
 };
@@ -578,7 +575,7 @@ brkn.Channel.prototype.setupDragging_ = function() {
         this.cleanup_, false, this);
     this.dragger_.startDrag(e);
   };
-  
+
   this.dragListGroup_.init();
   var displaced = {};
   var newPosition;
@@ -629,7 +626,7 @@ brkn.Channel.prototype.setupDragging_ = function() {
               goog.dom.insertSiblingBefore(e.currDragItem, hoverPrevItem);
               hoverPrevItem = nextPrev;
               hasPrev = !!nextPrev;
-            } 
+            }
           })
       .listen(this.dragListGroup_,
           goog.fx.DragListGroup.EventType.DRAGEND, function(e) {
@@ -646,4 +643,3 @@ brkn.Channel.prototype.setupDragging_ = function() {
             hasPrev = true;
           });
 };
-

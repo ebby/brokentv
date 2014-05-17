@@ -1,11 +1,12 @@
 {namespace brkn.main}
 
 /**
- * Tucked away here for security 
+ * Tucked away here for security
  * @param admin
  * @param guide
  * @param sidebar
  * @param? user
+ * @param? embed
  */
 {template .main}
 <div class="main">
@@ -17,8 +18,8 @@
         <div class="spinner" style="display:none"></div>
         <div class="restart" style="display:none">TRY AGAIN</div>
       </div>
-      <div class="fullscreen"></div>
-      <div class="expand"></div>
+      <div class="fullscreen" style="display:none"></div>
+      <div class="expand" style="display:none"></div>
       <div class="play" style="display: none"><div></div></div>
       <div class="pause" style="display: none"><div></div></div>
     </div>
@@ -38,7 +39,7 @@
       <div id="send-suggestions"></div>
     </div>
     <div id="notify" class="notify"></div>
-    <div id="search" class="search">
+    <div id="search" class="search" {if $embed}style="display:none"{/if}>
       <div class="search-box">
         <div id="search-icon" class="search-icon"></div>
         <input type="text" id="search-input" class="search-input" />
@@ -51,14 +52,14 @@
           <div class="results">
             <div class="subtitle subtitle-channels">CHANNELS</div>
             <div class="result-channels"></div>
-            
+
             <div class="subtitle subtitle-medias">VIDEOS</div>
             <div class="result-medias"></div>
           </div>
         </div>
       </div>
     </div>
-    <div id="queue" class="queue">
+    <div id="queue" class="queue" {if $embed}style="display:none"{/if}>
       <div class="queue-toggle"><span></span></div>
       <div class="queue-list">
         <div class="label">QUEUE</div>
@@ -88,8 +89,6 @@
             <div class="scheduled"></div>
           </div>
         </div>
-        <div id="now-left" class="left browse">&#9664;<span> NOW</span></div>
-        <div id="now-right" class="right browse"><span>NOW </span>&#x25B6;</div>
       </div>
       <div id="ticker" class="ticker">
         <div id="go-live" class="go-live">GO LIVE</div>
@@ -102,6 +101,8 @@
         {/if}
       </div>
     </div>
+    <div id="now-left" class="left browse"></div>
+    <div id="now-right" class="right browse"></div>
     <div class="pan-handle" id="pan-handle"></div>
   </div>
   <div id="controller" class="controller
@@ -118,7 +119,7 @@
       <div class="border"></div>
     </div>
     <div class="right">
-      <div id="info-toggle" class="info-toggle dark button">
+      <div id="info-toggle" class="info-toggle dark button" {if $embed}style="display:none"{/if}>
         <div class="icon"></div>
       </div>
       <div id="admin-toggle" class="admin-toggle dark button" style="display: none">

@@ -23,12 +23,12 @@ class BaseHandler(SessionRequest):
             return User.get_by_key_name(self.session.get("user")['id'])
         else:
             # Either used just logged in or just saw the first page
-            # We'll see here 
+            # We'll see here
             cookie = facebook.get_user_from_cookie(self.request.cookies,
                                                    constants.facebook_app(self.request.host_url)['FACEBOOK_APP_ID'],
                                                    constants.facebook_app(self.request.host_url)['FACEBOOK_APP_SECRET'])
             if cookie:
-                # Okay so user logged in 
+                # Okay so user logged in
                 # Now, check to see if existing user
                 graph = facebook.GraphAPI(cookie["access_token"])
                 user = User.get_by_key_name(cookie["uid"])
@@ -55,39 +55,39 @@ class BaseHandler(SessionRequest):
                 # Update friends graph
                 friends = graph.get_connections("me", "friends")['data']
                 user.friends = [f['id'] for f in friends]
-                
-                if Invite.get_by_key_name(user.id) or Invite.get_by_key_name(user.email):
-                  # If they're invited
-                  user.demo = True
-                  user.access_level = AccessLevel.USER
-                else:   
-                  # Determine access level
-                  if new_user and user_number < constants.INVITE_LIMIT():
-                    if constants.INVITE_POLICY() == constants.InvitePolicy.NIGHTCLUB:
-                      if (user.gender == 'female' and user.has_friend()) or \
-                          (user.gender == 'male' and user.has_female_friend()):
-                        user.access_level = AccessLevel.USER
-                    if constants.INVITE_POLICY() == constants.InvitePolicy.HAS_FRIEND:
-                      if user.has_friend():
-                        user.access_level = AccessLevel.USER
-                    if constants.INVITE_POLICY() == constants.InvitePolicy.ANYBODY:
-                      user.access_level = AccessLevel.USER
+                user.access_level = AccessLevel.USER
+                # if Invite.get_by_key_name(user.id) or Invite.get_by_key_name(user.email):
+                #   # If they're invited
+                #   user.demo = True
+                #   user.access_level = AccessLevel.USER
+                # else:
+                #   # Determine access level
+                #   if new_user and user_number < constants.INVITE_LIMIT():
+                #     if constants.INVITE_POLICY() == constants.InvitePolicy.NIGHTCLUB:
+                #       if (user.gender == 'female' and user.has_friend()) or \
+                #           (user.gender == 'male' and user.has_female_friend()):
+                #         user.access_level = AccessLevel.USER
+                #     if constants.INVITE_POLICY() == constants.InvitePolicy.HAS_FRIEND:
+                #       if user.has_friend():
+                #         user.access_level = AccessLevel.USER
+                #     if constants.INVITE_POLICY() == constants.InvitePolicy.ANYBODY:
+                #       user.access_level = AccessLevel.USER
 
                 user.put()
 
                 if new_user:
                   deferred.defer(util.update_following, user.id,
                                    _name='update-following-' + user.id + '-' + str(uuid.uuid1()))
-                  if user.access_level == AccessLevel.USER:
-                    user.send_invite()
-                  else:
-                    user.send_waitlist_email(user_number + 500)
+                  # if user.access_level == AccessLevel.USER:
+                  #   user.send_invite()
+                  # else:
+                  #   user.send_waitlist_email(user_number + 500)
 
                 # User is now logged in
                 self.session["user"] = user.to_session()
                 return user
         return None
-    
+
     def dispatch(self):
         """ This snippet of code is taken from the webapp2 framework documentation.
         See more at http://webapp-improved.appspot.com/api/webapp2_extras/sessions.html
@@ -103,7 +103,7 @@ class BaseHandler(SessionRequest):
         """ This snippet of code is taken from the webapp2 framework documentation.
         See more at http://webapp-improved.appspot.com/api/webapp2_extras/sessions.html
         """
-        return self.session_store.get_session()  
+        return self.session_store.get_session()
 
     @staticmethod
     def logged_in(method):
@@ -120,10 +120,10 @@ class BaseHandler(SessionRequest):
             return method(handler, *args, **kwargs)
           handler.error(401)
         return check
-  
-    @staticmethod 
+
+    @staticmethod
     def admin(method):
-        def check(handler, *args, **kwargs): 
+        def check(handler, *args, **kwargs):
           if handler.current_user and handler.current_user.id in constants.SUPER_ADMINS:
             return method(handler, *args, **kwargs)
           if handler.current_user.access_level == constants.AccessLevel.ADMIN:

@@ -147,7 +147,8 @@ brkn.Main.prototype.decorateInternal = function(element) {
     admin: currentUser ? currentUser.isAdmin() : false,
     guide: !EMBED && (currentUser ? currentUser.showGuide &&
         !brkn.model.Channels.getInstance().currentChannel.myChannel && !IPAD : true),
-    sidebar: !EMBED && (currentUser ? currentUser.showSidebar : true)
+    sidebar: !EMBED && (currentUser ? currentUser.showSidebar : true),
+    embed: EMBED
   });
   goog.dom.insertChildAt(element, mainEl, 0);
 };
@@ -193,8 +194,10 @@ brkn.Main.prototype.enterDocument = function() {
             e.stopPropagation();
             switch(matches[1]) {
               case 'user':
-                var user = brkn.model.Users.getInstance().get(matches[2]);
-                brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.PROFILE, user);
+                if (brkn.model.Users.getInstance().currentUser && brkn.model.Users.getInstance().currentUser.loggedIn) {
+                  var user = brkn.model.Users.getInstance().get(matches[2]);
+                  brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.PROFILE, user);
+                }
                 break;
               case 'channel':
                 var channel = brkn.model.Channels.getInstance().get(matches[2]);
@@ -563,7 +566,7 @@ brkn.Main.getSessionAndInit = function() {
 
   goog.dom.classes.add(fbLogin, 'disabled');
   goog.dom.classes.add(fbLogin, 'spin');
-  goog.net.XhrIo.send('/_session',
+  goog.net.XhrIo.send('/_session?uuid=' + Math.round(Math.random()*10000000000),
       function(e) {
         if (e.target.getStatus() == 200) {
           var data = e.target.getResponseJson();

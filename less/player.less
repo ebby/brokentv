@@ -29,12 +29,17 @@
 }
 
 div#logo {
-  background: @xylo-bw;
+  background: @xylo-bw no-repeat;
   position: absolute;
   top: 10px;
   left: 10px;
   width: 108px;
   height: 18px;
+}
+
+.embed div#logo {
+  background-size: contain;
+  width: 88px;
 }
 
 #stagecover {

@@ -57,6 +57,7 @@ YT.Player.prototype.cuePlaylist;
 YT.Player.prototype.loadVideoById;
 YT.Player.prototype.loadPlaylist;
 YT.Player.prototype.playVideo;
+YT.Player.prototype.playVideoAt;
 YT.Player.prototype.pauseVideo;
 YT.Player.prototype.seekTo;
 YT.Player.prototype.setPlaybackQuality;

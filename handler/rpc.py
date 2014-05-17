@@ -23,15 +23,15 @@ def get_session(current_user=None, media_id=None, channel_id=None, single_channe
   if youtube_channel_id:
     youtube_channel_name = youtube_channel_id.split(',')[0]
     youtube_channel_id = youtube_channel_id.split(',')[1]
-    cid = current_user.id + '-' + youtube_channel_id if current_user else None
-    cached_channel = memcache.get(cid) if cid else None
+    cid = None#current_user.id + '-' + youtube_channel_id if current_user else None
+    cached_channel = None#memcache.get(cid) if cid else None
     already_programmed = False
-    if cached_channel and len(cached_channel.get('programs', [])):
-        last_program_time = iso8601.parse_date(
-            cached_channel.get('programs')[-1]['time']).replace(tzinfo=None)
-        if last_program_time > datetime.datetime.now() - datetime.timedelta(seconds=1200):
-          youtube_channel = cached_channel['channel']
-          already_programmed = True
+    # if cached_channel and len(cached_channel.get('programs', [])):
+    #     last_program_time = iso8601.parse_date(
+    #         cached_channel.get('programs')[-1]['time']).replace(tzinfo=None)
+    #     if last_program_time > datetime.datetime.now() - datetime.timedelta(seconds=1200):
+    #       youtube_channel = cached_channel['channel']
+    #       already_programmed = True
 
     if not already_programmed:
       data_json = Channel.youtube_channel(youtube_channel_name, user=current_user,
@@ -333,7 +333,8 @@ class InfoHandler(BaseHandler):
       response['tweets'] = media.get_tweets()
       response['comments'] = [c.toJson() for c in Comment.get_by_media(media)]
       pollMedia = media.polls.get()
-      response['poll'] = pollMedia.poll.to_json(self.current_user.id) if pollMedia else None
+      uid = self.current_user.id if self.current_user else None
+      response['poll'] = pollMedia.poll.to_json(uid) if pollMedia else None
       if self.current_user:
         response['seen'] = media.seen_by(self.current_user)
       self.response.out.write(simplejson.dumps(response))
@@ -451,7 +452,7 @@ class PollHandler(BaseHandler):
     if media:
       pollMedia = media.polls.get()
       if pollMedia:
-        self.response.out.write(simplejson.dumps(pollMedia.poll.to_json()))
+        self.response.out.write(simplejson.dumps(pollMedia.poll.to_json((self.current_user.id if self.current_user else None))))
         return
     self.response.out.write(simplejson.dumps(None))
 
@@ -462,9 +463,10 @@ class PollHandler(BaseHandler):
     title = self.request.get('title')
     options = self.request.get('options')
 
-    if id:
+    if id and self.current_user:
       pollOption = PollOption.get_by_id(int(id))
-      pollOption.add_vote(self.current_user.id)
+      if not self.current_user.id in pollOption.voters:
+        pollOption.add_vote(self.current_user.id)
       return
 
     media = Media.get_by_key_name(media_id)

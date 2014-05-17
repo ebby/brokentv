@@ -5,31 +5,19 @@ div.controller {
   left: 0;
   height: 40px;
   z-index: 100;
-  background: transparent @grad-window;
+  background: transparent @grad;
 	border-top: 1px solid #ccc;
 	pointer-events: none;
-	.box-shadow(e('inset 0 -3px 7px -3px rgba(0,0,0,0.2), 0 0 6px 1px rgba(0, 0, 0, .6)'));
-  
+	.box-shadow(e('inset 0 -3px 7px -3px rgba(0,0,0,0.2), 0 0 2px 1px rgba(0, 0, 0, .6)'));
+
   &.sidebar-toggled {
     div.right {
       .transform(e('translate3d(-320px,0,0)'));
     }
   }
-  
-  &.window {
-    div.background {
-      opacity: 0;
-      .transition(opacity, .3s, ease);
-      pointer-events: none;
-    }
-    div.left div.border, div.right div.border {
-      display: block;
-    }
-  }
-  
+
   div.background {
     opacity: 1;
-    background: #5c5c5c @grad;
     pointer-events: all;
     width: 100%;
     height: 100%;
@@ -37,9 +25,8 @@ div.controller {
     top: 0;
     left: 0;
   }
-    
+
   div.left {
-    background: #5c5c5c @grad;
     display: inline-block;
     position: relative;
     width: 203px;
@@ -55,9 +42,8 @@ div.controller {
       top: 0;
     }
   }
-  
+
   div.right {
-    background: #5c5c5c @grad;
     display: inline-block;
     position: absolute;
     right: 0;
@@ -78,7 +64,7 @@ div.controller {
       top: 0;
     }
   }
-	
+
 	div.progress {
 	  width: 0;
     height: 4px;
@@ -103,19 +89,19 @@ div.controller {
       left: 0;
       width: 0;
       height: 4px;
-      background: #497882;
+      background: #2ecc71;
       .box-shadow(e('inset 0 -1px 1px 0 rgba(255,255,255,.2)'));
       .border-radius(300px);
-      &.animate {
+      /*&.animate {
         .transition(width, 1s, linear);
-      }
+      }*/
     }
   	div.seek {
   	  position: absolute;
       bottom: 0px;
       width: 1px;
       height: 4px;
-      background: #497882;
+      background: #2ecc71;
       opacity: 0.9;
       right: 0;
       cursor: pointer;
@@ -128,7 +114,6 @@ div.controller {
       font-size: 10px;
       font-family: MuseoSans300;
       color: #f5f5f5;
-      text-shadow: 1px 1px 1px #666;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -141,7 +126,6 @@ div.controller {
       font-size: 10px;
       font-family: MuseoSans300;
       color: #f5f5f5;
-      text-shadow: 1px 1px 1px #666;
     }
   	div.duration {
   	  position: absolute;
@@ -150,7 +134,6 @@ div.controller {
   	  font-size: 10px;
   	  font-family: MuseoSans300;
   	  color: #f5f5f5;
-  	  text-shadow: 1px 1px 1px #666;
   	}
 	}
 	&:hover div.progress div.seek {
@@ -165,7 +148,7 @@ div.controller {
     .box-shadow(e('0px 0px 1px 1px rgba(255,255,255,.9)'));
     z-index: 2;
   }
-	
+
 	div.button.guide-toggle {
 	  position: absolute;
 	  top: 4px;
@@ -255,7 +238,6 @@ div.controller {
       .icon-ffw();
       font-size: 16px;
       opacity: .9;
-      text-shadow: 1px 1px 1px rgba(0, 0, 0, .8);
       margin: 4px 0 0 0;
     }
     .goog-custom-button-disabled {
@@ -269,7 +251,6 @@ div.controller {
 	      .icon-pause();
 	      font-size: 17px;
 	      opacity: .9;
-	      text-shadow: 1px 1px 1px rgba(0, 0, 0, .8);
 	      margin: 4px 0 0 2px;
 	    }
 	    &.goog-custom-button-checked {
@@ -279,7 +260,6 @@ div.controller {
 	        color: #f5f5f5;
 	        .icon-play();
 	        opacity: .9;
-          text-shadow: 1px 1px 1px rgba(0, 0, 0, .8);
 	        font-size: 17px;
 	        margin: 4px 0 0 2px;
 	      }
@@ -290,16 +270,18 @@ div.controller {
 	      .icon-volume-up();
 	      font-size: 17px;
 	      opacity: .9;
-        text-shadow: 1px 1px 1px rgba(0, 0, 0, .8);
 	      margin: 4px 0 0 1px;
 	    }
 	    &.mute .icon, &.goog-custom-button-checked .icon {
 	      .icon-volume-down();
         font-size: 17px;
         opacity: .9;
-        text-shadow: 1px 1px 1px rgba(0, 0, 0, .8);
         margin: 4px 0 0 2px;
 	    }
 	  }
 	}
+}
+
+.embed div.controller.sidebar-toggled div.right {
+  width: 50px;
 }

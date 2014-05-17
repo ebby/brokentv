@@ -55,6 +55,11 @@ class MainHandler(BaseHandler):
       mobile = self.request.host_url.startswith('http://m.') or self.request.get('mobile') \
           or 'iPhone;' in self.request.headers.get('user_agent')
 
+      logging.info(self.request.host_url)
+      if mobile and 'onxylo' in self.request.host_url:
+        self.redirect('http://www.xylocast.com')
+        return
+
       template_data = {}
       template_data['host_url'] = self.request.host_url
       if self.request.get('debug') == '3229':
@@ -367,6 +372,7 @@ def create_handlers_map():
     ('/namestorm/(sug)', NameStormHandler),
     ('/newsletter', NewsletterHandler),
     ('/embedsample', EmbedSampleHandler),
+    ('/vice-demo', EmbedSampleHandler),
     ('/(.*)', MainHandler),
   ]
 

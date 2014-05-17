@@ -277,7 +277,8 @@ brkn.sidebar.Info.prototype.tweetTimer_;
 /** @inheritDoc */
 brkn.sidebar.Info.prototype.createDom = function() {
   var el = soy.renderAsElement(brkn.sidebar.info, {
-    media: this.media_
+    media: this.media_,
+    embed: EMBED
   });
   this.setElementInternal(el);
 };
@@ -292,7 +293,8 @@ brkn.sidebar.Info.prototype.decorateInternal = function(el) {
     description: this.media_.description ? goog.string.linkify.linkifyPlainText(this.media_.description) : '',
     published: this.media_.getPublishDate(),
     lastMediaId: this.lastMedia_ ? this.lastMedia_.id : null,
-    loggedOut: !brkn.model.Users.getInstance().currentUser.loggedIn
+    loggedOut: !brkn.model.Users.getInstance().currentUser.loggedIn,
+    embed: EMBED
   });
   el.innerHTML = contentEl.innerHTML;
 };
@@ -336,28 +338,19 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
   goog.dom.classes.enable(this.getElement(), 'mini', this.mini_);
 
   goog.style.showElement(this.spinner_, brkn.model.Users.getInstance().currentUser.loggedIn);
+  goog.style.showElement(this.createPollButton_.getElement(),
+    brkn.model.Users.getInstance().currentUser.accessLevel == brkn.model.User.AccessLevel.ADMIN);
 
 
   if (!this.fetch_ || this.media_.fetched) {
     this.renderInfo(false, this.media_.description, this.media_.tweets, this.media_.seen,
         this.media_.comments, this.media_.poll);
   } else if (this.fetch_) {
-    goog.net.XhrIo.send('/_info/' + this.media_.id, goog.bind(function(e) {
-      var response = goog.json.parse(e.target.getResponse());
-      var description = response['description'];
-      var seen = /** @type {Array.<Object>} */ response['seen'];
-      var tweets = /** @type {Array.<Object>} */ response['tweets'];
-      var comments = /** @type {Array.<Object>} */ response['comments'];
-      var poll = /** @type {Array.<Object>} */ response['poll'];
-      this.renderInfo(true, description, tweets, seen, comments, poll);
-    }, this));
+    this.load();
   }
 
  if (!brkn.model.Users.getInstance().currentUser.loggedIn) {
-   goog.style.showElement(this.commentInput_.getElement(), false);
-   goog.style.showElement(this.commentsEl_.parentElement, false);
    goog.dom.classes.add(this.fbLogin_, 'show');
-   goog.dom.classes.add(this.fbLogin_, 'spin');
    goog.dom.classes.add(this.loginPromo_, 'show');
    goog.dom.classes.add(this.getElement(), 'logged-out');
    this.getHandler().listen(this.fbLogin_, goog.events.EventType.CLICK,
@@ -366,7 +359,9 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
 
    if (!CHECKED_LOGIN) {
      CHECKED_LOGIN = true;
+     goog.dom.classes.add(this.fbLogin_, 'spin');
      var fbLogin = this.fbLogin_;
+     var self = this;
      FB.getLoginStatus(function(response) {
        if (response['status'] === 'connected') {
            // connected
@@ -436,22 +431,22 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
             e.stopPropagation();
             this.commentInput_.setFocused(true);
           }, this))
-      .listen(goog.dom.getElementByClass('conv-link', this.getElement()),
-          goog.events.EventType.CLICK,
-          goog.bind(function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.CONVERSATION,
-                this.media_, this.comments_, this.tweets_);
-          }, this))
-      .listen(goog.dom.getElementByClass('tweets-link', this.getElement()),
-        goog.events.EventType.CLICK,
-        goog.bind(function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.CONVERSATION,
-              this.media_, this.comments_, this.tweets_, true);
-        }, this))
+      // .listen(goog.dom.getElementByClass('conv-link', this.getElement()),
+      //     goog.events.EventType.CLICK,
+      //     goog.bind(function(e) {
+      //       e.preventDefault();
+      //       e.stopPropagation();
+      //       brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.CONVERSATION,
+      //           this.media_, this.comments_, this.tweets_);
+      //     }, this))
+      // .listen(goog.dom.getElementByClass('tweets-link', this.getElement()),
+      //   goog.events.EventType.CLICK,
+      //   goog.bind(function(e) {
+      //     e.preventDefault();
+      //     e.stopPropagation();
+      //     brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.CONVERSATION,
+      //         this.media_, this.comments_, this.tweets_, true);
+      //   }, this))
       .listen(this.commentInput_,
           goog.events.EventType.FOCUS,
           goog.bind(function(e) {
@@ -604,22 +599,16 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
         this.starToggle_.setChecked(brkn.model.Users.getInstance().currentUser.isStarred(this.media_));
       }, this);
   brkn.model.Users.getInstance().subscribe(brkn.model.Users.Action.LOGGED_IN, function() {
-    goog.dom.classes.remove(this.loginPromo_, 'show');
-    goog.Timer.callOnce(goog.bind(function() {
-     goog.style.showElement(this.loginPromo_, false);
-    }, this), 600);
-    goog.style.showElement(this.commentInput_.getElement(), true);
-    goog.dom.classes.remove(this.getElement(), 'logged-out');
+    if (this.loginPromo_) {
+        goog.dom.classes.remove(this.loginPromo_, 'show');
+        goog.Timer.callOnce(goog.bind(function() {
+         goog.style.showElement(this.loginPromo_, false);
+        }, this), 600);
+    }
 
-//    goog.net.XhrIo.send('/_info/' + this.media_.id, goog.bind(function(e) {
-//      var response = goog.json.parse(e.target.getResponse());
-//      var description = response['description'];
-//      var seen = /** @type {Array.<Object>} */ response['seen'];
-//      var tweets = /** @type {Array.<Object>} */ response['tweets'];
-//      var comments = /** @type {Array.<Object>} */ response['comments'];
-//      var poll = /** @type {Array.<Object>} */ response['poll'];
-//      this.renderInfo(true, description, tweets, seen, comments, poll);
-//    }, this));
+    this.commentInput_ && goog.style.showElement(this.commentInput_.getElement(), true);
+    this.getElement() && goog.dom.classes.remove(this.getElement(), 'logged-out');
+    this.load(true);
   }, this);
 
   this.resize();
@@ -633,6 +622,29 @@ brkn.sidebar.Info.prototype.getMedia = function() {
   return this.media_;
 };
 
+
+/**
+ * @{?Boolean=}opt_noRender
+ */
+brkn.sidebar.Info.prototype.load = function(opt_noRender) {
+  goog.net.XhrIo.send('/_info/' + this.media_.id, goog.bind(function(e) {
+    var response = goog.json.parse(e.target.getResponse());
+    var description = response['description'];
+    var seen = /** @type {Array.<Object>} */ response['seen'];
+    var tweets = /** @type {Array.<Object>} */ response['tweets'];
+    var comments = /** @type {Array.<Object>} */ response['comments'];
+    var poll = /** @type {Array.<Object>} */ response['poll'];
+    if (opt_noRender) {
+      if (poll) {
+        this.media_.poll = poll;
+        goog.dom.getElementByClass('poll-options', this.userPollEl_).innerHTML = '';
+        this.setupUserPoll_(poll);
+      }
+    } else {
+      this.renderInfo(true, description, tweets, seen, comments, poll);
+    }
+  }, this));
+};
 
 /**
  * @param {boolean} fetched
@@ -708,8 +720,6 @@ brkn.sidebar.Info.prototype.renderInfo = function(fetched, description, opt_twee
   if (opt_poll) {
     this.setupUserPoll_(opt_poll);
     this.media_.poll = opt_poll;
-  } else if (brkn.model.Users.getInstance().currentUser.loggedIn) {
-    goog.style.showElement(this.createPollButton_.getElement(), true);
   }
   this.resize();
 
@@ -861,20 +871,47 @@ brkn.sidebar.Info.prototype.setupUserPoll_ = function(poll) {
       this.voteForOption_(poll, op, optionEl);
     } else {
       this.getHandler().listen(optionEl, goog.events.EventType.CLICK, goog.bind(function(e) {
-        if (!goog.dom.classes.has(this.userPollEl_, 'voted')) {
-          op['vote_count'] += 1
-          poll['vote_count'] += 1
-          this.voteForOption_(poll, op, optionEl);
-          goog.dom.setTextContent(question, poll['title'].toUpperCase() + ' (' + poll['vote_count'] + ' VOTES)');
-          goog.net.XhrIo.send('/_poll', undefined, 'POST', 'id=' + op['id']);
-          this.commentInput_.setValue('I voted: ' + op['name'] + ' (on ' + poll['title'] + ')', true, true);
-          this.commentInput_.setFocused(true);
+        if (brkn.model.Users.getInstance().currentUser.loggedIn) {
+          if (!goog.dom.classes.has(this.userPollEl_, 'voted')) {
+            op['vote_count'] += 1
+            poll['vote_count'] += 1
+            this.voteForOption_(poll, op, optionEl);
+            goog.dom.setTextContent(question, poll['title'].toUpperCase() + ' (' + poll['vote_count'] + ' VOTES)');
+            goog.net.XhrIo.send('/_poll', undefined, 'POST', 'id=' + op['id']);
+            // this.commentInput_.setValue('I voted: ' + op['name'] + ' (on ' + poll['title'] + ')', true, true);
+            // this.commentInput_.setFocused(true);
+          }
         }
       }, this));
     }
+
+    this.getHandler().listen(optionEl, goog.events.EventType.CLICK, goog.bind(function(e) {
+      if (!brkn.model.Users.getInstance().currentUser.loggedIn) {
+        brkn.Popup.getInstance().show(optionEl, brkn.model.Popup.Position.TOP,
+            brkn.model.Popup.Action.TOOLTIP, {'text': goog.bind(function() {
+              return 'You must login to vote';
+            }, this)});
+      }
+    }));
   }, this);
 
   goog.style.showElement(this.userPollEl_, true);
+
+  if (!brkn.model.Users.getInstance().currentUser.loggedIn) {
+      goog.dom.classes.add(this.userPollEl_, 'voted');
+      goog.array.forEach(goog.dom.getChildren(options), function(opEl, i) {
+        var percent = parseInt(poll['options'][i]['vote_count']/poll['vote_count'] * 100, 10);
+        var percentage = parseInt(poll['options'][i]['vote_count']/poll['vote_count'] * 100, 10) + '%'
+        goog.dom.setTextContent(goog.dom.getElementByClass('percent-number', opEl), percentage);
+        goog.dom.getElementByClass('percent', opEl).style.width = percentage;
+        if (percent > 5) {
+          goog.dom.getElementByClass('name', opEl).style.color = 'white';
+        }
+        if (percent > 98) {
+          goog.dom.getElementByClass('percent-number', opEl).style.color = 'white';
+        }
+      }, this);
+  }
 };
 
 
@@ -891,9 +928,16 @@ brkn.sidebar.Info.prototype.voteForOption_ = function(poll, op, optionEl) {
   var name = goog.dom.getTextContent(goog.dom.getElementByClass('name', optionEl));
   goog.dom.classes.add(optionEl, 'selected');
   goog.array.forEach(goog.dom.getChildren(options), function(opEl, i) {
+    var percent = parseInt(poll['options'][i]['vote_count']/poll['vote_count'] * 100, 10);
     var percentage = parseInt(poll['options'][i]['vote_count']/poll['vote_count'] * 100, 10) + '%'
     goog.dom.setTextContent(goog.dom.getElementByClass('percent-number', opEl), percentage);
     goog.dom.getElementByClass('percent', opEl).style.width = percentage;
+    if (percent > 5) {
+      goog.dom.getElementByClass('name', opEl).style.color = 'white';
+    }
+    if (percent > 98) {
+      goog.dom.getElementByClass('percent-number', opEl).style.color = 'white';
+    }
   }, this);
 };
 
@@ -1091,13 +1135,20 @@ brkn.sidebar.Info.prototype.activateComment_ = function(comment, commentEl) {
     var replyTextarea = goog.dom.getElementByClass('reply-textarea', commentEl);
     this.getHandler().listen(replyTextarea, goog.events.EventType.CLICK, goog.bind(function() {
       if (!goog.dom.classes.has(replyInput, 'decorated')) {
-        brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.PLAY, false);
         var commentInput = new brkn.sidebar.CommentInput(false, true, true, false, false, true);
         commentInput.decorate(replyInput);
         commentInput.reply(comment, comment.user);
         this.getHandler().listen(commentInput, 'add', goog.bind(function(e) {
-          this.onAddComment_(e);
+          if (brkn.model.Users.getInstance().currentUser.loggedIn) {
+            this.onAddComment_(e);
+          }
         }, this));
+      }
+      if (!brkn.model.Users.getInstance().currentUser.loggedIn) {
+        brkn.Popup.getInstance().show(replyInput, brkn.model.Popup.Position.TOP,
+            brkn.model.Popup.Action.TOOLTIP, {'text': goog.bind(function() {
+              return 'You must login to reply';
+            }, this)});
       }
     }, this));
   }
@@ -1212,11 +1263,12 @@ brkn.sidebar.Info.prototype.resize = function(opt_extra, opt_scrollComments) {
   var viewHeight = goog.dom.getViewportSize().height;
 
   if (this.getElement()) {
-    var height = goog.dom.getViewportSize().height + (IPHONE && SAFARI ? 61 : 0) - 41 -
-        this.resizeExtra_ - (goog.dom.getAncestorByClass(this.getElement(), 'tabbed') ? 30 : 0);
+    var height = goog.dom.getViewportSize().height + (IPHONE && SAFARI ? 61 : 0) - (EMBED ? -2 : 38) -
+        this.resizeExtra_ - (goog.dom.getAncestorByClass(this.getElement(), 'tabbed') ? 30 : 0)
+        - (this.mini_ && goog.dom.classes.has(this.getElement(), 'slide') ? 40 : 0);
     goog.style.setHeight(this.getElement(), height);
 
-    goog.style.setHeight(this.contentsEl_, height - (this.mini_ ? 143 : 243) + (IPHONE ? 50 : 0) -
+    goog.style.setHeight(this.contentsEl_, height - (this.mini_ ? (goog.dom.classes.has(this.getElement(), 'slide') ? 223 : 180) : 243) + (IPHONE ? 50 : 0) -
         (this.viewers_.length ? 38 : 0));
     if (viewHeight > 640 && this.commentsEl_ && this.commentsEl_.parentElement) {
       goog.style.setStyle(this.commentsEl_, 'max-height', viewHeight -
@@ -1228,8 +1280,8 @@ brkn.sidebar.Info.prototype.resize = function(opt_extra, opt_scrollComments) {
       this.scrollGrad_();
     }
 
-    if (!brkn.model.Users.getInstance().currentUser.loggedIn) {
-      var promoHeight = height - (this.mini_ ? 98 : 198) + (IPHONE ? 50 : 0);
+    if (!brkn.model.Users.getInstance().currentUser.loggedIn && !EMBED) {
+      var promoHeight = height - (this.mini_ ? 178 : 198) + (IPHONE ? 50 : 0);
       goog.style.setHeight(this.loginPromo_, promoHeight);
       goog.style.showElement(goog.dom.getElementByClass('promo-1', this.getElement()),
           promoHeight > 285);
