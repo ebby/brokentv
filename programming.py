@@ -29,16 +29,16 @@ class Programming():
 
   def __init__(self, fetch=None):
     fetch = True if fetch == None else fetch
-    
+
     self.channels = {}
     self.publishers = {}
     self.playlists = {}
     self.collections = {}
-    
+
     for name, properties in inits.PUBLISHERS.iteritems():
       publisher = Publisher.add('youtube', host_id=properties['youtube'].lower(), name=name)
       self.publishers[publisher.name] = publisher
-      
+
     for name, properties in inits.PLAYLISTS.iteritems():
       playlist = Playlist.get_or_insert('youtube' + properties.get('youtube').lower(),
                                         name=name,
@@ -50,16 +50,16 @@ class Programming():
         deferred.defer(playlist.fetch, approve_all=True,
                        _name='fetch-' + playlist.name.replace(' ', '') + '-' + str(uuid.uuid1()),
                        _queue='youtube')
-    
+
     for name, properties in inits.COLLECTIONS.iteritems():
       collection = Collection.all().filter('name =', name).get()
       if not collection:
-        
+
         collection = Collection(name=name,
                                 keywords=properties.get('keywords', []),
                                 lifespan=properties.get('lifespan'))
         collection.put()
-        
+
         for publisher in properties.get('publishers', []):
           collection_publisher = CollectionPublisher(collection=collection,
                                                      publisher=self.publishers[publisher])
@@ -73,7 +73,7 @@ class Programming():
       self.collections[name] = collection
       if fetch:
         collection.fetch(approve_all=constants.APPROVE_ALL)
-    
+
     for name, properties in inits.CHANNELS.iteritems():
       channel = Channel.get_or_insert(key_name=Channel.make_key(name),
                                       name=name, keywords=properties['keywords'],
@@ -82,10 +82,10 @@ class Programming():
       for col_name in properties['collections']:
         col = self.collections[col_name]
         chan_col = ChannelCollection.add(channel=channel, collection=col)
-    
+
     # Cache the channels
     memcache.set('channels', [c.toJson(get_programming=False) for c in self.channels.itervalues()])
-      
+
   @classmethod
   def set_programming(cls, channel_id, duration=3600, schedule_next=False, fetch_twitter=True,
                       queue='programming', target=None, kickoff=False):
@@ -93,16 +93,16 @@ class Programming():
     import constants
     from model import Channel
     from model import Program
-    
+
     # Stored programming
     programming = memcache.get('programming') or {}
     onlineUsers = memcache.get('web_channels') or {}
 
     logging.info('programming: ' + channel_id)
-    
+
     next_programs = Programming.next_programs(programming.get(channel_id, []), duration, prelude=300)
     gap = Programming.gap(programming.get(channel_id, []), duration)
-    
+
     logging.info('GAP: ' + str(gap))
 
     if programming.get(channel_id) and len(programming[channel_id]) and \
@@ -134,15 +134,15 @@ class Programming():
           if not len(medias):
             break
           backup_medias += medias
-          
+
           # Dont reprogram anytihng already scheduled
           filtered_medias = Programming.no_reprogram(programming.get(channel_id, []), medias)
-          
+
           # Don't repeat the same program within two hour
           cutoff = 7200 if col.lifespan else 43200
           filtered_medias = [c for c in filtered_medias if not c.last_programmed or
                    (datetime.datetime.now() - c.last_programmed).seconds > cutoff]
-          
+
           # At most, 30% of the audience has already "witnessed" this program
           # filtered_medias = [m for m in filtered_medias if not len(viewers) or
           #           float(len(Programming.have_seen(m, viewers)))/len(viewers) < .3]
@@ -153,7 +153,7 @@ class Programming():
 
       all_medias = backup_medias if not len(all_medias) else all_medias
 
-      # Don't repeat already programmed 
+      # Don't repeat already programmed
 #      all_medias = Programming.no_reprogram(next_programs, all_medias)
 
       # StorySort algorithm
@@ -188,10 +188,10 @@ class Programming():
           if len(pickle.dumps(programming)) > 1000000:
             # We can only fit 1mb into memcache
             break
-      
+
       if len(programs):
         broadcast.broadcastNewPrograms(channel, programs)
-  
+
       memcache.set('programming', programming)
 
       channels = memcache.get('channels') or []
@@ -225,7 +225,7 @@ class Programming():
                      _countdown=next_gen,
                      _queue=queue)
     return programs
-  
+
   @classmethod
   def add_program(self, channel, media, time):
     programming = memcache.get('programming') or {}
@@ -287,7 +287,7 @@ class Programming():
   def story_sort(cls, medias):
     if not len(medias):
       return medias
-    
+
     # Normalize on the max viewcount for set
     max_views = max(medias, key=lambda x: x.host_views).host_views
     max_views = max(max_views, 1)
@@ -315,7 +315,7 @@ class Programming():
       return int(score)
 
     return sorted(medias, key=story_score, reverse=True)
-  
+
   '''
     Our secret sauce sorting algorithm
   '''
@@ -323,7 +323,7 @@ class Programming():
   def unique_publishers(cls, medias):
     if not len(medias):
       return medias
-    
+
     publishers = {}
     unique_medias = []
     for media in medias:
@@ -334,7 +334,7 @@ class Programming():
           unique_medias.append(media)
           publishers[publisher.id] = True
     return unique_medias
-  
+
   '''
     Subset of users who have seen the media item
   '''
@@ -411,8 +411,8 @@ class Programming():
       span -= medias[cutoff_index].duration
       cutoff_index += 1
     return medias[:cutoff_index]
-  
-  
+
+
   @classmethod
   def no_reprogram(cls, programs, medias):
     programmed_medias = {}
@@ -428,7 +428,7 @@ class Programming():
   @classmethod
   def remove_program(cls, channel_id, media):
     from model import Channel
-    
+
     cached_programming = memcache.get('programming') or {}
     new_schedule = []
     sched = 0
@@ -443,7 +443,7 @@ class Programming():
           program['time'] = new_time.isoformat()
         new_schedule.append(program)
     channel = Channel.get_by_key_name(channel_id)
-    channel.next_time = channel.next_time - datetime.timedelta(seconds=(sched * media.duration)) 
+    channel.next_time = channel.next_time - datetime.timedelta(seconds=(sched * media.duration))
     channel.put()
     cached_programming[channel_id] = new_schedule
     memcache.set('programming', cached_programming)
@@ -455,7 +455,7 @@ class Programming():
     import constants
     import tweepy
     from model import Tweet
-    
+
     auth_handler = tweepy.OAuthHandler(consumer_key=constants.TWITTER_CONSUMER_KEY,
                                        consumer_secret=constants.TWITTER_CONSUMER_SECRET)
     auth_handler.username = 'xyloinc'
@@ -468,7 +468,7 @@ class Programming():
         continue
 
       try:
-        tweets = tweepy.Cursor(api.search, q=media.host_id, rpp=100, result_type="recent",
+        tweets = tweepy.Cursor(api.search, q=media.host_id, rpp=10, result_type="recent",
                                include_entities=True, lang="en").items()
         for tweet in tweets:
           total += 1
@@ -493,7 +493,7 @@ class Programming():
         medias = Media.add_from_entry(feed.entry)
         for media in medias:
           Program.add_program(channel, media)
-  
+
   @classmethod
   def clear_collection(cls, col):
     for q in [col.collectionMedias, col.collections, col.publishers, col.channels]:
@@ -505,7 +505,7 @@ class Programming():
       except Exception, e:
         pass
     col.delete()
-            
+
   @classmethod
   def clear(cls):
     channels = Channel.all().fetch(None)
@@ -530,7 +530,7 @@ class Programming():
     channels = Channel.all().fetch(None)
     memcache.delete('channels')
     memcache.delete('programming')
-    
+
     for c in channels:
       c.next_time = None
       c.put()
@@ -541,7 +541,7 @@ class Programming():
         except:
           pass
         cp.delete()
-        
+
   @classmethod
   def clear_programs(cls, cid=None, all=False):
     if cid:
@@ -586,16 +586,16 @@ class Programming():
         time.sleep(0.5)
     except Exception, e:
       pass
-      
+
 class StartHandler(webapp2.RequestHandler):
   def get(self):
     logging.info('STARTING PROGRAMMING BACKEND')
-    
+
     self.queue = taskqueue.Queue(name='programming')
     self.queue.purge()
     self.queue = taskqueue.Queue(name='twitter')
     self.queue.purge()
-    
+
     channels = Channel.get_public()
     if not len(channels):
       no_media = len(Media.all().fetch(10)) == 0
@@ -604,6 +604,6 @@ class StartHandler(webapp2.RequestHandler):
     for c in channels:
       Programming.set_programming(c.key().name(), queue='programming',
                                   fetch_twitter=(not constants.DEVELOPMENT))
-    
-  
+
+
 app = webapp.WSGIApplication([('/_ah/start', StartHandler)], debug=True)

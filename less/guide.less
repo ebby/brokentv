@@ -67,6 +67,9 @@ div#guide {
     div.header div.schedule-toggle {
       margin-left: -200px;
     }
+    div.channels div.channel div.programs {
+      padding-right: 320px;
+    }
   }
   &.timeless {
     div.header {
@@ -257,6 +260,7 @@ div#guide {
     width: 100%;
     font-size: 10px;
     color: #f5f5f5;
+    background: #bdc3c7;
     text-shadow: 0 0 1px #181818;
     div.name {
       width: 10%;
@@ -273,8 +277,10 @@ div#guide {
       white-space: nowrap;
       padding-left: @name-width - 10;
       background: #7E7E7E @grad-flat;
-      border-top: 1px solid #ccc;
-      height: 10px;
+      border-top: 1px solid #f5f5f5;
+      border-bottom: 1px solid rgba(24, 24, 24, 0.65);
+      opacity: .8;
+      height: 8px;
       .box-shadow(e('inset 0 -3px 7px -3px rgba(0,0,0,0.2), 0 0 4px 2px rgba(0, 0, 0, .8)'));
       div.time {
         display: inline-block;
@@ -356,7 +362,7 @@ div#guide {
     }
   }
   div.browse {
-    width: 30px;
+    width: 45px;
     height: 34px;
     line-height: 33px;
     margin-top: -1px;
@@ -368,33 +374,53 @@ div#guide {
     z-index: 3;
     color: white;
     font-size: 34px;
-    opacity: .4;
     text-align: center;
-
+    opacity: 0;
+    pointer-events: none;
+    &:before {
+      opacity: .4;
+    }
     &.left {
       left: 0;
-      padding-left: 8px;
       .icon-left-arrow();
-      &:before {
-        margin-left: -1px;
-      }
     }
     &.right {
-      .transition(right, .5s, ease);
       right: 0;
-      padding-right: 8px;
+      height: 100%;
+      top: 0;
+      margin-top: 0;
       .icon-right-arrow();
+      .transition-duration(500ms);
+      .transform(e('translate3d(0,0,0)'));
       &:before {
-        margin-left: 1px;
+        left: 20px;
+        top: 50%;
+        margin-top: -30px;
+        position: absolute;
+      }
+      &.sidebar {
+        .transform(e('translate3d(-320px,0,0)'));
+      }
+      &.show {
+        background: -moz-linear-gradient(left, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
+        background: -webkit-gradient(linear, left top, right top, color-stop(0%,rgba(0,0,0,0.7)), color-stop(100%,rgba(0,0,0,0)));
+        background: -webkit-linear-gradient(left, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0) 100%);
+        background: -o-linear-gradient(left, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0) 100%);
+        background: -ms-linear-gradient(left, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0) 100%);
+        background: linear-gradient(to left, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0) 100%);
       }
     }
     &.show {
       opacity: .8;
       cursor: pointer;
+      pointer-events: all;
     }
     &.show:hover {
       text-shadow: 0 0 10px rgba(255, 255, 255, .5);
       opacity: 1;
+      &:before {
+        opacity: 1;
+      }
     }
     &.show:active {
       opacity: .9;
@@ -418,7 +444,7 @@ div#guide {
   div.channel-names {
     position: absolute;
     left: 0;
-    margin-top: 12px;
+    margin-top: 9px;
     z-index: 2;
     div.name {
       width: @name-width;
@@ -436,7 +462,7 @@ div#guide {
       .transition(left, 1s, linear);
       -webkit-backface-visibility: hidden;
       -webkit-perspective: 1000;
-      border-right: 1px solid rgba(255, 255, 255, .6);
+      border-right: 1px solid rgba(255, 255, 255, .3);
       cursor: pointer;
       z-index: 1;
       margin-bottom: 1px;
@@ -473,7 +499,7 @@ div#guide {
           margin-top: -15px;
         }
         &:before {
-          border-left-color: rgba(255, 255, 255, .6);
+          border-left-color: rgba(255, 255, 255, .3);
           border-width: 16px;
           top: 50%;
           margin-top: -16px;
@@ -483,7 +509,7 @@ div#guide {
   }
   div.channels {
     position: absolute;
-    margin-top: 12px;
+    margin-top: 9px;
     .transition(padding-top, .5s, ease);
     width: 100%;
     font-size: 12px;
@@ -613,6 +639,7 @@ div#guide {
 						overflow: hidden;
             text-shadow: none;
             font-family: MuseoSans300;
+            pointer-events: none;
 						&.marquee {
 						  .transition(e('margin-left 10s linear, left 1s linear'));
 						}
@@ -659,12 +686,12 @@ div#guide {
             bottom: 15px;
             position: absolute;
             opacity: .7;
-            width: 20px;
-            height: 20px;
+            width: 23px;
+            height: 23px;
             .border-radius(12px);
-            border: 1px solid rgba(0, 0, 0, .8);
+            border: 2px solid black;
             background: rgba(0, 0, 0, .7);
-            .box-shadow(0, 0, 1px, 1px, rgba(255, 255, 255, .6));
+            .box-shadow(0, 0, 1px, 0, white);
             &:hover {
               opacity: 1;
             }
@@ -677,20 +704,27 @@ div#guide {
             left: 15px;
             .icon {
               .icon-play();
-              font-size: 14px;
-              margin-top: 3px;
-              margin-left: 7px;
+              font-size: 16px;
+              margin-top: 2px;
+              margin-left: 8px;
               text-shadow: none;
               color: #f5f5f5;
             }
           }
+          &.playing div.program-play, &.playing div.program-play:hover, &.playing div.program-play:active {
+            opacity: 1;
+            pointer-events: none;
+            display: block;
+            border: 2px solid black;
+            background: rgba(0, 0, 0, .7);
+          }
           div.program-plus {
-            left: 41px;
+            left: 44px;
             .icon {
               .icon-plus();
-              font-size: 14px;
-              margin-top: 3px;
-              margin-left: 6px;
+              font-size: 16px;
+              margin-top: 2px;
+              margin-left: 7px;
               text-shadow: none;
               color: #f5f5f5;
             }
@@ -1066,4 +1100,62 @@ div#guide {
   }
 .embed div#guide.timeless div.channels div.channel div.programs {
   margin-left: 0;
+}
+.embed div.browse.left {
+  height: 100%;
+  top: 0;
+  margin-top: 0;
+  &:before {
+    left: 10px;
+    top: 50%;
+    margin-top: -30px;
+    position: absolute;
+  }
+  &.show {
+    background: -moz-linear-gradient(right, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
+    background: -webkit-gradient(linear, right top, left top, color-stop(0%,rgba(0,0,0,0.7)), color-stop(100%,rgba(0,0,0,0)));
+    background: -webkit-linear-gradient(right, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0) 100%);
+    background: -o-linear-gradient(right, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0) 100%);
+    background: -ms-linear-gradient(right, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0) 100%);
+    background: linear-gradient(to right, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0) 100%);
+  }
+}
+.embed {
+  div.channels div.channel div.programs div.program div.program-play {
+    border: 2px solid black;
+    background: rgba(0, 0, 0, 0.7);
+    width: 30px;
+    height: 30px;
+    .border-radius(18px);
+    font-size: 30px;
+    top: 50%;
+    left: 50%;
+    margin-top: -16px;
+    margin-left: -16px;
+    div.icon {
+      font-size: 20px;
+      margin-top: 4px;
+      margin-left: 11px;
+    }
+  }
+  div.channels div.channel div.programs div.program:hover div.program-play {
+      display: block;
+      opacity: .4;
+      &:hover {
+        opacity: .6;
+      }
+      &:active {
+        opacity: .8;
+      }
+  }
+  div.channels div.channel div.programs div.program.playing div.title {
+    z-index: 1;
+  }
+  div.channels div.channel div.programs div.program.playing div.program-play,
+  div.channels div.channel div.programs div.program.playing div.program-play:hover,
+  div.channels div.channel div.programs div.program.playing div.program-play:active {
+    .box-shadow(0, 0, 2px, 1px, white);
+    opacity: .6;
+  }
+
 }

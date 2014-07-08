@@ -8,15 +8,15 @@ handlers:
 - url: /favicon\.ico
   static_files: favicon.ico
   upload: favicon\.ico
-  
+
 - url: /static
   static_dir: static/
   expiration: '0'
-  
+
 - url: /less
   static_dir: less/
   expiration: '0'
-  
+
 - url: /doubleclick
   static_dir: static/pages
   expiration: '0'
@@ -30,7 +30,7 @@ libraries:
 
 - name: jinja2
   version: latest
-  
+
 inbound_services:
 - channel_presence
 
@@ -38,5 +38,3 @@ builtins:
 - deferred: on
 - appstats: on
 - remote_api: on
-
-  

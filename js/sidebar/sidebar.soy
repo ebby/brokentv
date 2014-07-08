@@ -11,55 +11,55 @@
  */
 {template .info}
   <div class="info">
-    <div class="picture">
-      <img src="{$media.thumbnail}" class="thumb">
-      <div class="ytvideo"></div>
-      <div class="publisher">
-        <img src="{$media.publisher.picture}">
-        <div class="name">{$media.publisher.name}</div>
-      </div>
-      <div class="links">
-        <div class="local">
+    <div class="scrollable ios-scroll">
+      <div class="picture">
+        <img src="{$media.thumbnail}" class="thumb">
+        <div class="ytvideo"></div>
+        <div class="publisher" {if not $media.publisher.name}style="display:none"{/if}>
+          <img src="{$media.publisher.picture}">
+          <div class="name">{$media.publisher.name}</div>
         </div>
-        <a target="_blank" href="{$media.hostLink|noAutoescape}">
-          <div class="host"></div>
-        </a>
-      </div>
-      <div class="link-select" style="display:none">
-        <input onClick="this.select();" class="link-input" type="text"
-          value="{$media.link|noAutoescape}" readonly="readonly"/>
-      </div>
-      <div class="title">
-        <div class="text">{$media.name}</div>
-      </div>
-      <div class="reddit">
-        <div class="upvote"></div>
-        <div class="reddit-logo"></div>
-        <div class="reddit-score"></div>
-        <div class="downvote"></div>
-      </div>
-      <div class="scrollable ios-scroll" {if not $description}style="display:none"{/if}>
-        <div class="desc-link">
-          <a href="#">DESCRIPTION</a>
-          <div class="published">{$published}</div>
+        <div class="links">
+          <div class="local">
+          </div>
+          <a target="_blank" href="{$media.hostLink|noAutoescape}">
+            <div class="host"></div>
+          </a>
         </div>
-        <div class="description">{$description|noAutoescape}</div>
+        <div class="link-select" style="display:none">
+          <input onClick="this.select();" class="link-input" type="text"
+            value="{$media.link|noAutoescape}" readonly="readonly"/>
+        </div>
+        <div class="title">
+          <div class="text">{$media.name}</div>
+        </div>
+        <div class="reddit">
+          <div class="upvote"></div>
+          <div class="reddit-logo"></div>
+          <div class="reddit-score"></div>
+          <div class="downvote"></div>
+        </div>
+        <div class="scrollable ios-scroll" {if not $description}style="display:none"{/if}>
+          <div class="desc-link">
+            <a href="#">DESCRIPTION</a>
+            <div class="published">{$published}</div>
+          </div>
+          <div class="description">{$description|noAutoescape}</div>
+        </div>
+        <div class="button play"><div class="icon"></div><div class="loading-icon"></div></div>
+        <div class="options">
+          <div class="button facebook"><div class="icon"></div></div>
+          <div class="button twitter"><div class="icon"></div></div>
+          <div class="button star"><div class="icon"></div></div>
+          <div class="button send"><div class="icon"></div></div>
+        </div>
       </div>
-      <div class="button play"><div class="icon"></div><div class="loading-icon"></div></div>
-      <div class="options">
-        <div class="button facebook"><div class="icon"></div></div>
-        <div class="button twitter"><div class="icon"></div></div>
-        <div class="button star"><div class="icon"></div></div>
-        <div class="button send"><div class="icon"></div></div>
+      <div class="viewers" style="display: none">
+        <div class="label">
+          <div class="eye-icon"></div>
+        </div>
       </div>
-    </div>
-    <div class="viewers" style="display: none">
-      <div class="label">
-        <div class="eye-icon"></div>
-      </div>
-    </div>
-    <div class="info-contents">
-      <div class="scrollable ios-scroll">
+      <div class="info-contents">
         <div class="user-poll" style="display: none">
           <div class="label">
             <div class="poll-icon"></div><div class="status">VOTE</div>
@@ -98,59 +98,59 @@
           <div class="close"></div>
         </div>
       </div>
-    </div>
-    <div class="send-media popup" style="display:none">
-      <div class="label">SEND TO A FRIEND</div>
-      <div class="recipients">
-        <textarea placeholder="To"></textarea>
+      <div class="send-media popup" style="display:none">
+        <div class="label">SEND TO A FRIEND</div>
+        <div class="recipients">
+          <textarea placeholder="To"></textarea>
+        </div>
+        <div class="label">ADD A MESSAGE:</div>
+        <div class="send-message">
+          <textarea placeholder="Optional"></textarea>
+          <div class="add-comment button">SEND</div>
+        </div>
+        <div class="close"></div>
       </div>
-      <div class="label">ADD A MESSAGE:</div>
-      <div class="send-message">
-        <textarea placeholder="Optional"></textarea>
-        <div class="add-comment button">SEND</div>
+      <div class="loading loading-activity"><div class="loading-spinner"></div></div>
+      <div class="overlay" style="display: none">
+        <div class="leaving">
+          <div>This program is over. Carry on?</div>
+          <div class="button dark no">Not yet</div>
+          <div class="button dark yes">Let's go</div>
+        </div>
       </div>
-      <div class="close"></div>
-    </div>
-    <div class="loading loading-activity"><div class="loading-spinner"></div></div>
-    <div class="overlay" style="display: none">
-      <div class="leaving">
-        <div>This program is over. Carry on?</div>
-        <div class="button dark no">Not yet</div>
-        <div class="button dark yes">Let's go</div>
-      </div>
-    </div>
-    {if $loggedOut}
-      <div class="login-promo">
-        <div class="title">login to xylo</div>
-        <div class="promo promo-1" style="margin-top: 10px;">
-          <div class="promo-pic">
-            <img src="/static/img/promo1.jpg">
+      {if $loggedOut}
+        <div class="login-promo">
+          <div class="title">login to xylo</div>
+          <div class="promo promo-1" style="margin-top: 10px;">
+            <div class="promo-pic">
+              <img src="/static/img/promo1.jpg">
+            </div>
+            <div class="promo-text">Watch and chat live with friends.</div>
           </div>
-          <div class="promo-text">Watch and chat live with friends.</div>
-        </div>
-        <div class="promo flip promo-2">
-          <div class="promo-pic">
-            <img src="/static/img/promo2.jpg">
+          <div class="promo flip promo-2">
+            <div class="promo-pic">
+              <img src="/static/img/promo2.jpg">
+            </div>
+            <div class="promo-text">See latest tweets and vote on stories.</div>
           </div>
-          <div class="promo-text">See latest tweets and vote on stories.</div>
-        </div>
-        <div class="promo promo-3">
-          <div class="promo-pic">
-            <img src="/static/img/promo3.jpg">
+          <div class="promo promo-3">
+            <div class="promo-pic">
+              <img src="/static/img/promo3.jpg">
+            </div>
+            <div class="promo-text">Discuss, share, and save favorites.</div>
           </div>
-          <div class="promo-text">Discuss, share, and save favorites.</div>
+          <div class="fb-login">
+            <div class="power"><div class="bg"></div></div>
+            <div class="login-label">{if $embed}Login to discuss{else}Login{/if}</div>
+            <div class="with-fb">with facebook</div>
+            <div class="waitlist">You're on the waitlist</div>
+            <div class="login-loading">Loading</div>
+            <div class="error"></div>
+            <div class="message">We can't post on your behalf!</div>
+          </div>
         </div>
-        <div class="fb-login">
-          <div class="power"><div class="bg"></div></div>
-          <div class="login-label">{if $embed}Login to discuss{else}Login{/if}</div>
-          <div class="with-fb">with facebook</div>
-          <div class="waitlist">You're on the waitlist</div>
-          <div class="login-loading">Loading</div>
-          <div class="error"></div>
-          <div class="message">We can't post on your behalf!</div>
-        </div>
-      </div>
-    {/if}
+      {/if}
+    </div>
   </div>
 {/template}
 
@@ -585,40 +585,28 @@
 
 /**
  * @param? myProfile
+ * @param? embed
  */
 {template .profile}
-  <div class="tabbed {if $myProfile}inbox{else}messages{/if}">
-    <ul class="tabs">
-      {if $myProfile}
-        <li class="tab inbox">
-          <div class="label">INBOX</div>
+  {if not $embed}
+    <div class="tabbed {if $myProfile}activity{else}messages{/if}">
+      <ul class="tabs">
+        {if not $myProfile}
+          <li class="tab messages">
+            <div class="label">MESSAGES</div>
+          </li>
+        {/if}
+        <li class="tab activity">
+          <div class="label">ACTIVITY</div>
         </li>
-      {else}
-        <li class="tab messages">
-          <div class="label">MESSAGES</div>
-        </li>
-      {/if}
-      <li class="tab activity">
-        <div class="label">ACTIVITY</div>
-      </li>
-      <li class="tab starred">
-        <div class="label"><div class="heart"></div>'d</div>
-      </li>
-    </ul>
-    {if $myProfile}
-      <div class="inbox-content content inbox">
-        <div class="label">NOTIFICATIONS</div>
-        <div class="notifications-content content notifications">
-          <div class="loading loading-activity"><div class="loading-spinner"></div></div>
-        </div>
-        <div class="label messages-label">MESSAGES
-          <div class="label show-all"><a href="#friendlist:1">ALL FRIENDS &gt;</a></div>
-        </div>
-        <div class="messages-content content messages">
-          <div class="loading loading-activity"><div class="loading-spinner"></div></div>
-        </div>
-      </div>
-    {else}
+        {if $myProfile}
+          <li class="tab starred">
+            <div class="label"><div class="heart"></div>'d</div>
+          </li>
+        {/if}
+      </ul>
+    {/if}
+    {if not $myProfile and not $embed}
       <div class="messages-content content messages">
         <div class="loading loading-activity"><div class="loading-spinner"></div></div>
       </div>
@@ -626,9 +614,11 @@
     <div class="activity-content content activity">
       <div class="loading loading-activity"><div class="loading-spinner"></div></div>
     </div>
+    {if $myProfile and not $embed}
     <div class="starred-content content starred">
       <div class="loading loading-starred"><div class="loading-spinner"></div></div>
     </div>
+    {/if}
     <div class="spinner" style="display:none"></div>
   </div>
 {/template}

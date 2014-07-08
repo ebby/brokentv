@@ -1,0 +1,454 @@
+/* Chrome hack: SVG is rendered more smooth in Windozze. 100% magic, uncomment if you need it. */
+@charset "UTF-8";
+@font-face {
+  font-family: 'icons';
+  src: url('/static/webfonts/icons.eot?88235317');
+  src: url('/static/webfonts/icons.eot?88235317#iefix') format('embedded-opentype'), url('/static/webfonts/icons.woff?88235317') format('woff'), url('/static/webfonts/icons.ttf?88235317') format('truetype'), url('/static/webfonts/icons.svg?88235317#icons') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+/* Chrome hack: SVG is rendered more smooth in Windozze. 100% magic, uncomment if you need it. */
+/* Note, that will break hinting! In other OS-es font will be not as sharp as it could be */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  @font-face {
+    font-family: 'icons';
+    src: url('/static/webfonts/icons.svg?88235317#icons') format('svg');
+  }
+}
+@font-face {
+  font-family: 'MuseoSans500';
+  src: url('/static/webfonts/museosans/500.woff') format('woff');
+}
+body {
+  overflow: hidden;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  margin: 0;
+}
+div.telepath-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 99999999999;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  opacity: 0;
+  -webkit-transition: opacity 0.6s ease;
+  -moz-transition: opacity 0.6s ease;
+  -o-transition: opacity 0.6s ease;
+  -ms-transition: opacity 0.6s ease;
+  transition: opacity 0.6s ease;
+  -webkit-box-shadow: inset 0 0 2px 0 rgba(255, 255, 255, 0.5);
+  -moz-box-shadow: inset 0 0 2px 0 rgba(255, 255, 255, 0.5);
+  box-shadow: inset 0 0 2px 0 rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(0, 0, 0, 0.6);
+}
+div.telepath-overlay.hide {
+  visibility: hidden;
+}
+div.telepath-overlay.show {
+  visibility: visible;
+  opacity: 1;
+}
+div.telepath-overlay div.close-button {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  font-size: 25px;
+  line-height: 40px;
+  text-align: center;
+  opacity: .9;
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  color: white;
+  cursor: pointer;
+}
+div.telepath-overlay div.close-button div.left {
+  font-family: 'icons';
+  font-style: normal;
+  font-weight: normal;
+  speak: none;
+  text-decoration: inherit;
+  /* opacity .8 */
+
+  font-variant: normal;
+  /* Uncomment for 3D effect */
+
+  /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+
+  /* '' */
+
+  display: inline-block;
+}
+div.telepath-overlay div.close-button div.left:before {
+  content: '\e819';
+}
+div.telepath-overlay div.close-button div.right {
+  font-family: 'icons';
+  font-style: normal;
+  font-weight: normal;
+  speak: none;
+  text-decoration: inherit;
+  /* opacity .8 */
+
+  font-variant: normal;
+  /* Uncomment for 3D effect */
+
+  /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+
+  /* '' */
+
+  display: inline-block;
+  margin-left: -2px;
+}
+div.telepath-overlay div.close-button div.right:before {
+  content: '\e818';
+}
+div.telepath-overlay div.close-button:hover {
+  opacity: 1;
+  text-shadow: 0 0 3px white;
+}
+div.telepath-overlay iframe {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -302px;
+  margin-left: -500px;
+}
+div.telepath-surface {
+  position: fixed;
+  bottom: 30px;
+  right: 0px;
+  height: 180px;
+  font-family: MuseoSans500;
+  color: rgba(255, 255, 255, 0.9);
+  z-index: 999999999;
+}
+div.telepath-surface.collapse div.tab {
+  font-family: 'icons';
+  font-style: normal;
+  font-weight: normal;
+  speak: none;
+  text-decoration: inherit;
+  /* opacity .8 */
+
+  font-variant: normal;
+  /* Uncomment for 3D effect */
+
+  /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+
+  /* '' */
+
+}
+div.telepath-surface.collapse div.tab:before {
+  content: '\e818';
+}
+div.telepath-surface.collapse div.program {
+  width: 40px;
+}
+div.telepath-surface.collapse div.program div.title,
+div.telepath-surface.collapse div.program div.suggestion,
+div.telepath-surface.collapse div.program div.play-button {
+  opacity: 0;
+}
+div.telepath-surface div.tab {
+  font-family: 'icons';
+  font-style: normal;
+  font-weight: normal;
+  speak: none;
+  text-decoration: inherit;
+  /* opacity .8 */
+
+  font-variant: normal;
+  /* Uncomment for 3D effect */
+
+  /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+
+  /* '' */
+
+  width: 40px;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: inline-block;
+  vertical-align: top;
+  text-align: center;
+  line-height: 180px;
+  cursor: pointer;
+  font-size: 30px;
+  color: rgba(255, 255, 255, 0.9);
+}
+div.telepath-surface div.tab:before {
+  content: '\e819';
+}
+div.telepath-surface div.tab:hover {
+  color: white;
+  text-shadow: 0 0 2px white;
+  background: rgba(0, 0, 0, 0.6);
+  background: -moz-linear-gradient(right, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 100%);
+  background: -webkit-gradient(linear, right top, left top, color-stop(0%, rgba(0, 0, 0, 0.5)), color-stop(100%, rgba(0, 0, 0, 0)));
+  background: -webkit-linear-gradient(right, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 100%);
+  background: -o-linear-gradient(right, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 100%);
+  background: -ms-linear-gradient(right, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 100%);
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 100%);
+}
+div.telepath-surface div.program {
+  width: 320px;
+  height: 100%;
+  cursor: pointer;
+  background: url(/static/img/thumb-grad.jpg);
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+  -webkit-transition: width 0.3s ease;
+  -moz-transition: width 0.3s ease;
+  -o-transition: width 0.3s ease;
+  -ms-transition: width 0.3s ease;
+  transition: width 0.3s ease;
+}
+div.telepath-surface div.program div.thumb {
+  width: 100%;
+  height: 100%;
+  background-size: 320px;
+  background-position: center;
+  opacity: .3;
+  -webkit-transition: opacity 0.3s ease;
+  -moz-transition: opacity 0.3s ease;
+  -o-transition: opacity 0.3s ease;
+  -ms-transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease;
+}
+div.telepath-surface div.program div.suggestion {
+  position: absolute;
+  top: 15px;
+  left: 0;
+  width: 320px;
+  text-align: center;
+  font-size: 15px;
+  text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);
+}
+div.telepath-surface div.program div.play-button {
+  font-family: 'icons';
+  font-style: normal;
+  font-weight: normal;
+  speak: none;
+  text-decoration: inherit;
+  /* opacity .8 */
+
+  font-variant: normal;
+  /* Uncomment for 3D effect */
+
+  /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+
+  /* '▶' */
+
+  font-size: 40px;
+  width: 50px;
+  height: 50px;
+  line-height: 50px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -29px;
+  margin-left: -29px;
+  border: 4px solid rgba(255, 255, 255, 0.9);
+  -webkit-border-radius: 30px;
+  -moz-border-radius: 30px;
+  border-radius: 30px;
+  text-align: center;
+}
+div.telepath-surface div.program div.play-button:before {
+  content: '\25b6';
+}
+div.telepath-surface div.program div.play-button:before {
+  margin-left: 2px;
+}
+div.telepath-surface div.program div.title {
+  position: absolute;
+  bottom: 15px;
+  left: 0;
+  width: 300px;
+  text-align: center;
+  text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);
+  margin: 0 10px;
+  font-size: 15px;
+}
+div.telepath-surface div.program:hover div.thumb {
+  opacity: .6;
+}
+div.telepath-surface div.program:hover div.play-button {
+  color: white;
+  text-shadow: 0 0 2px white;
+  border-color: white;
+}
+div.telepath-embed {
+  position: fixed;
+  bottom: 20px;
+  right: 0px;
+  height: 180px;
+  font-family: MuseoSans500;
+  color: rgba(255, 255, 255, 0.9);
+  z-index: 999999999;
+}
+div.telepath-embed:hover div.tab,
+div.telepath-embed.expand div.tab {
+  opacity: 0;
+  pointer-events: none;
+}
+div.telepath-embed:hover div.program,
+div.telepath-embed.expand div.program {
+  width: 320px;
+}
+div.telepath-embed:hover div.program div.title,
+div.telepath-embed.expand div.program div.title,
+div.telepath-embed:hover div.program div.suggestion,
+div.telepath-embed.expand div.program div.suggestion,
+div.telepath-embed:hover div.program div.play-button,
+div.telepath-embed.expand div.program div.play-button {
+  opacity: 1;
+}
+div.telepath-embed div.tab {
+  font-family: 'icons';
+  font-style: normal;
+  font-weight: normal;
+  speak: none;
+  text-decoration: inherit;
+  /* opacity .8 */
+
+  font-variant: normal;
+  /* Uncomment for 3D effect */
+
+  /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+
+  /* '' */
+
+  width: 40px;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: inline-block;
+  vertical-align: top;
+  text-align: center;
+  line-height: 180px;
+  cursor: pointer;
+  font-size: 30px;
+  color: rgba(255, 255, 255, 0.9);
+}
+div.telepath-embed div.tab:before {
+  content: '\e818';
+}
+div.telepath-embed div.tab:hover {
+  color: white;
+  text-shadow: 0 0 2px white;
+  background: rgba(0, 0, 0, 0.6);
+  background: -moz-linear-gradient(right, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 100%);
+  background: -webkit-gradient(linear, right top, left top, color-stop(0%, rgba(0, 0, 0, 0.5)), color-stop(100%, rgba(0, 0, 0, 0)));
+  background: -webkit-linear-gradient(right, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 100%);
+  background: -o-linear-gradient(right, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 100%);
+  background: -ms-linear-gradient(right, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 100%);
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 100%);
+}
+div.telepath-embed div.program {
+  height: 100%;
+  cursor: pointer;
+  background: url(/static/img/thumb-grad.jpg);
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+  -webkit-transition: width 0.3s ease;
+  -moz-transition: width 0.3s ease;
+  -o-transition: width 0.3s ease;
+  -ms-transition: width 0.3s ease;
+  transition: width 0.3s ease;
+  width: 40px;
+}
+div.telepath-embed div.program div.title,
+div.telepath-embed div.program div.suggestion,
+div.telepath-embed div.program div.play-button {
+  opacity: 0;
+}
+div.telepath-embed div.program div.thumb {
+  width: 100%;
+  height: 100%;
+  background-size: 320px;
+  background-position: center;
+  opacity: .3;
+  -webkit-transition: opacity 0.3s ease;
+  -moz-transition: opacity 0.3s ease;
+  -o-transition: opacity 0.3s ease;
+  -ms-transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease;
+}
+div.telepath-embed div.program div.suggestion {
+  position: absolute;
+  top: 15px;
+  left: 0;
+  width: 320px;
+  text-align: center;
+  text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);
+  font-size: 14px;
+  opacity: 0;
+}
+div.telepath-embed div.program div.play-button {
+  font-family: 'icons';
+  font-style: normal;
+  font-weight: normal;
+  speak: none;
+  text-decoration: inherit;
+  /* opacity .8 */
+
+  font-variant: normal;
+  /* Uncomment for 3D effect */
+
+  /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+
+  /* '▶' */
+
+  font-size: 40px;
+  width: 50px;
+  height: 50px;
+  line-height: 50px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -29px;
+  margin-left: -29px;
+  border: 4px solid rgba(255, 255, 255, 0.9);
+  -webkit-border-radius: 30px;
+  -moz-border-radius: 30px;
+  border-radius: 30px;
+  text-align: center;
+  opacity: 0;
+}
+div.telepath-embed div.program div.play-button:before {
+  content: '\25b6';
+}
+div.telepath-embed div.program div.play-button:before {
+  margin-left: 2px;
+}
+div.telepath-embed div.program div.title {
+  position: absolute;
+  bottom: 15px;
+  left: 0;
+  width: 300px;
+  text-align: center;
+  text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);
+  margin: 0 10px;
+  font-size: 14px;
+  opacity: 0;
+}
+div.telepath-embed div.program:hover div.thumb {
+  opacity: .6;
+}
+div.telepath-embed div.program:hover div.play-button {
+  color: white;
+  text-shadow: 0 0 2px white;
+  border-color: white;
+}

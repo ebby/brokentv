@@ -25,10 +25,11 @@ goog.require('goog.ui.Textarea.EventType');
  * @param {?brkn.model.Media=} opt_lastMedia
  * @param {?string=} opt_lastInput
  * @param {?boolean=} opt_mini
+ * @param {?brkn.model.Program=} opt_program
  * @constructor
  * @extends {goog.ui.Component}
  */
-brkn.sidebar.Info = function(media, opt_noFetch, opt_lastMedia, opt_lastInput, opt_mini) {
+brkn.sidebar.Info = function(media, opt_noFetch, opt_lastMedia, opt_lastInput, opt_mini, opt_program) {
   goog.base(this);
 
   media.updateChannels();
@@ -39,6 +40,12 @@ brkn.sidebar.Info = function(media, opt_noFetch, opt_lastMedia, opt_lastInput, o
    * @private
    */
   this.media_ = media;
+
+  /**
+   * @type {?brkn.model.Program}
+   * @private
+   */
+  this.program_ = opt_program || null;
 
   /**
    * @type {?brkn.model.Media}
@@ -308,6 +315,7 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
   var picEl = goog.dom.getElementByClass('picture', this.getElement());
   var ytvideo = goog.dom.getElementByClass('ytvideo', this.getElement());
   var scrollable = goog.dom.getElementByClass('scrollable', this.getElement());
+  var descScrollable = goog.dom.getElementByClass('scrollable', picEl);
   var publisherEl = goog.dom.getElementByClass('publisher', this.getElement());
   var titleEl = goog.dom.getElementByClass('title', this.getElement());
   var linksEl = goog.dom.getElementByClass('links', this.getElement());
@@ -506,6 +514,11 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
           })
       .listen(scrollable,
               goog.events.EventType.SCROLL,
+              goog.bind(function(e) {
+                picEl.style.top = scrollable.scrollTop/2 + 'px';
+              }, this))
+      .listen(descScrollable,
+              goog.events.EventType.SCROLL,
               goog.bind(function() {
                 var video = goog.dom.getElementByClass('ytvideo', this.getElement());
                 var opacity = IPHONE && scrollable.scrollTop > 10 ? 0 :
@@ -605,7 +618,7 @@ brkn.sidebar.Info.prototype.enterDocument = function() {
          goog.style.showElement(this.loginPromo_, false);
         }, this), 600);
     }
-
+    //goog.style.showElement(this.createPollButton_, brkn.model.Users.getInstance().currentUser.isAdmin());
     this.commentInput_ && goog.style.showElement(this.commentInput_.getElement(), true);
     this.getElement() && goog.dom.classes.remove(this.getElement(), 'logged-out');
     this.load(true);
@@ -624,7 +637,7 @@ brkn.sidebar.Info.prototype.getMedia = function() {
 
 
 /**
- * @{?Boolean=}opt_noRender
+ * @param {?boolean=} opt_noRender
  */
 brkn.sidebar.Info.prototype.load = function(opt_noRender) {
   goog.net.XhrIo.send('/_info/' + this.media_.id, goog.bind(function(e) {
@@ -638,6 +651,7 @@ brkn.sidebar.Info.prototype.load = function(opt_noRender) {
       if (poll) {
         this.media_.poll = poll;
         goog.dom.getElementByClass('poll-options', this.userPollEl_).innerHTML = '';
+        goog.dom.classes.remove(this.userPollEl_, 'voted');
         this.setupUserPoll_(poll);
       }
     } else {
@@ -853,7 +867,6 @@ brkn.sidebar.Info.prototype.login = function() {
  * @private
  */
 brkn.sidebar.Info.prototype.setupUserPoll_ = function(poll) {
-
   goog.style.showElement(this.createPollButton_.getElement(), false);
   var question = goog.dom.getElementByClass('status', this.userPollEl_);
   var options = goog.dom.getElementByClass('poll-options', this.userPollEl_);
@@ -864,7 +877,7 @@ brkn.sidebar.Info.prototype.setupUserPoll_ = function(poll) {
   goog.array.forEach(poll['options'], function(op) {
     var optionEl = soy.renderAsElement(brkn.sidebar.pollOption, {
       name: op['name'],
-      percent: op['percent'] + '%'
+      percent: Math.round(((op['vote_count']/poll['vote_count'])*100)) + '%'
     });
     goog.dom.appendChild(options, optionEl);
     if (op['voted']) {
@@ -878,8 +891,6 @@ brkn.sidebar.Info.prototype.setupUserPoll_ = function(poll) {
             this.voteForOption_(poll, op, optionEl);
             goog.dom.setTextContent(question, poll['title'].toUpperCase() + ' (' + poll['vote_count'] + ' VOTES)');
             goog.net.XhrIo.send('/_poll', undefined, 'POST', 'id=' + op['id']);
-            // this.commentInput_.setValue('I voted: ' + op['name'] + ' (on ' + poll['title'] + ')', true, true);
-            // this.commentInput_.setFocused(true);
           }
         }
       }, this));
@@ -892,7 +903,7 @@ brkn.sidebar.Info.prototype.setupUserPoll_ = function(poll) {
               return 'You must login to vote';
             }, this)});
       }
-    }));
+    }, this));
   }, this);
 
   goog.style.showElement(this.userPollEl_, true);
@@ -901,15 +912,9 @@ brkn.sidebar.Info.prototype.setupUserPoll_ = function(poll) {
       goog.dom.classes.add(this.userPollEl_, 'voted');
       goog.array.forEach(goog.dom.getChildren(options), function(opEl, i) {
         var percent = parseInt(poll['options'][i]['vote_count']/poll['vote_count'] * 100, 10);
-        var percentage = parseInt(poll['options'][i]['vote_count']/poll['vote_count'] * 100, 10) + '%'
+        var percentage = Math.round(parseInt(poll['options'][i]['vote_count']/poll['vote_count'] * 100, 10)) + '%'
         goog.dom.setTextContent(goog.dom.getElementByClass('percent-number', opEl), percentage);
         goog.dom.getElementByClass('percent', opEl).style.width = percentage;
-        if (percent > 5) {
-          goog.dom.getElementByClass('name', opEl).style.color = 'white';
-        }
-        if (percent > 98) {
-          goog.dom.getElementByClass('percent-number', opEl).style.color = 'white';
-        }
       }, this);
   }
 };
@@ -929,15 +934,9 @@ brkn.sidebar.Info.prototype.voteForOption_ = function(poll, op, optionEl) {
   goog.dom.classes.add(optionEl, 'selected');
   goog.array.forEach(goog.dom.getChildren(options), function(opEl, i) {
     var percent = parseInt(poll['options'][i]['vote_count']/poll['vote_count'] * 100, 10);
-    var percentage = parseInt(poll['options'][i]['vote_count']/poll['vote_count'] * 100, 10) + '%'
+    var percentage = Math.round(parseInt(poll['options'][i]['vote_count']/poll['vote_count'] * 100, 10)) + '%'
     goog.dom.setTextContent(goog.dom.getElementByClass('percent-number', opEl), percentage);
     goog.dom.getElementByClass('percent', opEl).style.width = percentage;
-    if (percent > 5) {
-      goog.dom.getElementByClass('name', opEl).style.color = 'white';
-    }
-    if (percent > 98) {
-      goog.dom.getElementByClass('percent-number', opEl).style.color = 'white';
-    }
   }, this);
 };
 
@@ -1263,40 +1262,40 @@ brkn.sidebar.Info.prototype.resize = function(opt_extra, opt_scrollComments) {
   var viewHeight = goog.dom.getViewportSize().height;
 
   if (this.getElement()) {
-    var height = goog.dom.getViewportSize().height + (IPHONE && SAFARI ? 61 : 0) - (EMBED ? -2 : 38) -
+    var height = goog.dom.getViewportSize().height + (IPHONE && SAFARI ? 61 : 0) - (EMBED ? 0 : 40) -
         this.resizeExtra_ - (goog.dom.getAncestorByClass(this.getElement(), 'tabbed') ? 30 : 0)
         - (this.mini_ && goog.dom.classes.has(this.getElement(), 'slide') ? 40 : 0);
-    goog.style.setHeight(this.getElement(), height);
+    goog.style.setHeight((/** @type {Element} */this.getElement().firstChild), height);
 
-    goog.style.setHeight(this.contentsEl_, height - (this.mini_ ? (goog.dom.classes.has(this.getElement(), 'slide') ? 223 : 180) : 243) + (IPHONE ? 50 : 0) -
-        (this.viewers_.length ? 38 : 0));
-    if (viewHeight > 640 && this.commentsEl_ && this.commentsEl_.parentElement) {
-      goog.style.setStyle(this.commentsEl_, 'max-height', viewHeight -
-          goog.style.getPosition(this.commentsEl_.parentElement).y - (this.mini_ ? 213 : 313) -
-          (this.viewers_.length ? 38 : 0) - this.resizeExtra_ + 'px');
-      this.scrollGrad_();
-    } else if (viewHeight < 640) {
-      goog.style.setStyle(this.commentsEl_, 'max-height', '');
-      this.scrollGrad_();
-    }
+    // goog.style.setHeight(this.contentsEl_, height - (this.mini_ ? (goog.dom.classes.has(this.getElement(), 'slide') ? 223 : 180) : 243) + (IPHONE ? 50 : 0) -
+    //     (this.viewers_.length ? 38 : 0));
+    // if (viewHeight > 640 && this.commentsEl_ && this.commentsEl_.parentElement) {
+    //   goog.style.setStyle(this.commentsEl_, 'max-height', viewHeight -
+    //       goog.style.getPosition(this.commentsEl_.parentElement).y - (this.mini_ ? 213 : 313) -
+    //       (this.viewers_.length ? 38 : 0) - this.resizeExtra_ + 'px');
+    //   this.scrollGrad_();
+    // } else if (viewHeight < 640) {
+    //   goog.style.setStyle(this.commentsEl_, 'max-height', '');
+    //   this.scrollGrad_();
+    // }
 
-    if (!brkn.model.Users.getInstance().currentUser.loggedIn && !EMBED) {
-      var promoHeight = height - (this.mini_ ? 178 : 198) + (IPHONE ? 50 : 0);
-      goog.style.setHeight(this.loginPromo_, promoHeight);
-      goog.style.showElement(goog.dom.getElementByClass('promo-1', this.getElement()),
-          promoHeight > 285);
-      goog.style.showElement(goog.dom.getElementByClass('promo-2', this.getElement()),
-          promoHeight > 365);
-      goog.style.showElement(goog.dom.getElementByClass('promo-3', this.getElement()),
-          promoHeight > 475);
-    }
+    // if (!brkn.model.Users.getInstance().currentUser.loggedIn && !EMBED) {
+    //   var promoHeight = height - (this.mini_ ? 178 : 198) + (IPHONE ? 50 : 0);
+    //   goog.style.setHeight(this.loginPromo_, promoHeight);
+    //   goog.style.showElement(goog.dom.getElementByClass('promo-1', this.getElement()),
+    //       promoHeight > 285);
+    //   goog.style.showElement(goog.dom.getElementByClass('promo-2', this.getElement()),
+    //       promoHeight > 365);
+    //   goog.style.showElement(goog.dom.getElementByClass('promo-3', this.getElement()),
+    //       promoHeight > 475);
+    // }
 
     if (opt_scrollComments) {
       // Give the comment div a second/2 to resize, then scroll to bottom.
       goog.Timer.callOnce(goog.bind(function() {
-        var scrollAnim = new goog.fx.dom.Scroll(this.commentsEl_,
-            [this.commentsEl_.scrollLeft, this.commentsEl_.scrollTop],
-            [this.commentsEl_.scrollLeft, this.commentsEl_.scrollHeight], 400);
+        var scrollAnim = new goog.fx.dom.Scroll(this.getElement().firstChild,
+            [this.getElement().firstChild.scrollLeft, this.getElement().firstChild.scrollTop],
+            [this.getElement().firstChild.scrollLeft, this.getElement().firstChild.scrollHeight], 400);
         scrollAnim.play();
       }, this), 0);
     }
@@ -1356,8 +1355,16 @@ brkn.sidebar.Info.prototype.onTwitterButton_ = function() {
  */
 brkn.sidebar.Info.prototype.onPlayButton_ = function() {
   goog.dom.classes.add(this.playButton_.getElement(), 'play-loading');
-  var program = brkn.model.Program.async((/** @type {brkn.model.Media} */ this.getModel()));
-  brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.PLAY_ASYNC, program);
+  if (this.program_) {
+    brkn.model.Channels.getInstance().currentChannel.setCurrentProgram(this.program_);
+    brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.NEXT_PROGRAM,
+        this.program_, true);
+  } else {
+    var program = brkn.model.Program.async((/** @type {brkn.model.Media} */ this.getModel()));
+    brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.PLAY_ASYNC, program);
+  }
+  brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NAVIGATE,
+      goog.dom.getElement('info'), true);
 };
 
 

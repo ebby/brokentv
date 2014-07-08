@@ -16,9 +16,9 @@ goog.require('goog.pubsub.PubSub');
  */
 brkn.model.User = function(opt_user, opt_loggedOut) {
 	goog.base(this);
-	
+
 	var user = opt_user || {};
-	
+
 	/**
    * @type {boolean}
    */
@@ -28,22 +28,22 @@ brkn.model.User = function(opt_user, opt_loggedOut) {
 	 * @type {string}
 	 */
 	this.id = user['id'] || '';
-	
+
 	/**
 	 * @type {string}
 	 */
 	this.name = user['name'] || '';
-	
+
 	/**
    * @type {string}
    */
   this.url = user['profile_url'] || '';
-  
+
   /**
    * @type {string}
    */
   this.location = user['location'] || '';
-  
+
   /**
    * @type {boolean}
    */
@@ -53,12 +53,12 @@ brkn.model.User = function(opt_user, opt_loggedOut) {
    * @type {boolean}
    */
   this.online = !!user['online'];
-  
+
   /**
    * @type {boolean}
    */
   this.demo = !!user['demo'];
-  
+
   /**
    * @type {brkn.model.Media}
    */
@@ -78,12 +78,12 @@ brkn.model.User = function(opt_user, opt_loggedOut) {
    * @type {brkn.model.Session}
    */
   this.currentSession;
-	
+
 	/**
 	 * @type {string}
 	 */
 	this.picture = this.id ? goog.string.subs('https://graph.facebook.com/%s/picture', this.id) : '';
-	
+
 	/**
 	 * Path color
 	 * @type {string}
@@ -96,8 +96,8 @@ brkn.model.User = function(opt_user, opt_loggedOut) {
 	/**
    * @type {number}
    */
-  this.accessLevel = user['access_level'] || 0;	
-  
+  this.accessLevel = user['access_level'] || 0;
+
   /**
    * @type {Array.<Object>}
    * @private
@@ -108,27 +108,27 @@ brkn.model.User = function(opt_user, opt_loggedOut) {
    * @type {?goog.date.DateTime}
    */
   this.lastLogin = user['last_login'] ? goog.date.fromIsoString(user['last_login'] + 'Z') : null;
-  
+
   /**
    * @type {number}
    */
   this.sessionCount = user['session_count'] || 0;
-  
+
   /**
    * @type {number}
    */
   this.aveSession = user['ave_session_time'] ? user['ave_session_time'].toFixed(2) : null;
-  
+
   /**
    * @type {boolean}
    */
   this.showGuide = user['show_guide'] != undefined ? user['show_guide'] : true;
-  
+
   /**
    * @type {boolean}
    */
   this.showSidebar = user['show_sidebar'] != undefined ? user['show_sidebar'] : true;
-  
+
   /**
    * @type {boolean}
    */
@@ -143,7 +143,7 @@ brkn.model.User = function(opt_user, opt_loggedOut) {
    * @type {boolean}
    */
   this.hasTwitter = !!user['has_twitter'];
-  
+
   /**
    * @type {boolean}
    */
@@ -183,7 +183,7 @@ brkn.model.User.prototype.firstName = function() {
  */
 brkn.model.User.prototype.getActivities = function() {
   goog.array.sort(this.activities, function(a, b) {
-    var aTime = goog.date.fromIsoString(a['time'] + 'Z'); 
+    var aTime = goog.date.fromIsoString(a['time'] + 'Z');
     var bTime = goog.date.fromIsoString(b['time'] + 'Z');
     return aTime.getTime() <= bTime.getTime() ? 1 : -1;
   });
@@ -211,7 +211,7 @@ brkn.model.User.prototype.isStarred = function(media) {
 
 
 /**
- * @param {?boolean=} opt_time Show the time 
+ * @param {?boolean=} opt_time Show the time
  * @return {?string} Last login date as a readable string
  */
 brkn.model.User.prototype.getLastLogin = function (opt_time) {

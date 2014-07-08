@@ -10,6 +10,8 @@ var LOGIN_REQUIRED;
 var POWER_ON;
 var LOADED;
 var CHECKED_LOGIN;
+var AUTOPLAY;
+var YOUTUBE_CHANNEL;
 
 var appengine = {};
 

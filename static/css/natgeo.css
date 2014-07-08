@@ -1,0 +1,353 @@
+@media all and (min-width: 50px)   {  #cs-bottom-line  { font-size:0.6em;  } }
+@media all and (min-width: 100px)  {  #cs-bottom-line  { font-size:0.6em;  } }
+@media all and (min-width: 200px)  {  #cs-bottom-line  { font-size:0.6em;  } }
+@media all and (min-width: 300px)  {  #cs-bottom-line  { font-size:0.6em;  } }
+@media all and (min-width: 400px)  {  #cs-bottom-line  { font-size:0.6em;  } }
+@media all and (min-width: 500px)  {  #cs-bottom-line  { font-size:0.7em;  } }
+@media all and (min-width: 600px)  {  #cs-bottom-line  { font-size:0.8em;  } }
+@media all and (min-width: 700px)  {  #cs-bottom-line  { font-size:1.0em;  } }
+@media all and (min-width: 800px)  {  #cs-bottom-line  { font-size:1.2em;  } }
+@media all and (min-width: 900px)  {  #cs-bottom-line  { font-size:1.4em;  } }
+@media all and (min-width: 1000px) {  #cs-bottom-line  { font-size:1.4em;  } }
+@media all and (min-width: 1100px) {  #cs-bottom-line  { font-size:1.4em;  } }
+@media all and (min-width: 1200px) {  #cs-bottom-line  { font-size:1.4em;  } }
+
+
+#cs-overlay {
+    height:100%;
+    width:100%;
+    position:absolute;
+    left:0;
+    top:0;
+    width: 100%;
+    height: 100%;
+    background-color:black;
+    opacity: 0.6;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    display: none;
+}
+
+body {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+#cs-wrapper {
+    position:fixed;
+    height:100%;
+    width:100%;
+    left:0;
+    top:0;
+    background-color:rgba(0, 0, 0, .6);
+    min-width:320px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    z-index:10000000000000001 !important;
+}
+
+#cs-header {
+  position:absolute;
+  top:0px;
+  height:65px;
+  width:100%;
+  background:transparent;
+  z-index:10000000000000001 !important;
+}
+
+#cs-main {
+  position:absolute;
+  width: 1000px;
+  height: 604px;
+  top: 50%;
+  left: 50%;
+  margin-left: -500px;
+  margin-top: -302px;
+  z-index: 99999999999999999;
+}
+
+#cs-close{
+ position:absolute;
+ top:25px;
+ right:25px;
+ height:40px;
+ width:40px;
+ background:url('http://contentsurface.s3.amazonaws.com/natgeo/src/close-light.png');;
+ z-index:10000000000000001 !important;
+}
+
+.cs-close:hover{
+ background:url('http://contentsurface.s3.amazonaws.com/natgeo/src/close-light-hover.png') !important;
+
+}
+
+.cs-close-inactive{
+  width:307px !important;
+  right:0px;
+  background:url('http://contentsurface.s3.amazonaws.com/natgeo/src/close-light-inactive.png') !important;
+}
+
+.cs-close-inactive:hover{
+  background:url('http://contentsurface.s3.amazonaws.com/natgeo/src/close-light-inactive-hover.png') !important;
+}
+
+#cs-close-inactive:hover{
+ opacity:0.2;
+}
+
+#cs-info-wrapper{
+  position:relative;
+  background-color:transparent;
+  width:100%;
+  z-index:10000000000000001 !important;
+  margin:0 0 0% 0;
+}
+
+#cs-top-line{
+  position:relative;
+  width:100%;
+  margin: 0 auto;
+  background-color:transparent;
+  height:40px;
+  z-index:10000000000000001 !important;
+
+}
+#cs-label {
+  position: absolute;
+  color:white;
+  top:10px;
+  font-size:16px;
+  z-index:10000000000000001 !important;
+  letter-spacing:1px;
+  font-family: "HelveticaNeue", "Helvetica Neue", "Helvetica Neue",
+    Helvetica, Arial, "Lucida Grande", sans-serif;  font-weight:"Regular" ;
+}
+
+#cs-rule {
+      position:relative;
+      height: 1px;
+      width:100%;
+      margin: 0 auto;
+
+      top:0px;
+      background:white;
+      /* Set the hr color */
+      z-index:10000000000000001 !important;
+}
+
+#cs-bottom-line{
+  position:relative;
+  width:100%;
+  margin: 0 auto;
+  background-color:transparent;
+  height:70px;
+  z-index:10000000000000001 !important;
+}
+
+#cs-video-title {
+  position: absolute;
+  color:white;
+  top:30px;
+  width:100%;
+  z-index:10000000000000001 !important;
+  letter-spacing:1px;
+  font-family: "HelveticaNeue-Light", "Helvetica Neue", "Helvetica Neue",
+    Helvetica, Arial, "Lucida Grande", sans-serif;  font-weight:"Light" ;
+}
+
+
+#cs-player-wrapper{
+  margin:0 auto;
+  position:relative;
+  background-color:transparent;
+}
+
+
+
+#cs-video-player {
+  z-index:10000000000000001 !important;
+}
+
+.largeVideoWrapper {
+	position: relative;
+	padding-bottom: 56.25%;
+	height: 0;
+	margin-bottom: 0px;
+}
+
+
+.largeVideoWrapper .video-js {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+
+#cs-footer{
+  position:relative;
+  padding-top:10px;
+  bottom:-5px;
+  right:0px;
+  z-index:1000000000000000001 !important;
+}
+
+#cs-footer-skip {
+  position:absolute;
+  right:0;
+  font-family: "HelveticaNeue", "Helvetica Neue", "Helvetica Neue",
+    Helvetica, Arial, "Lucida Grande", sans-serif;
+  font-size:0.8em;
+  letter-spacing:1px;
+  color:#AAA;
+}
+
+#cs-footer-like {
+  position:absolute;
+  left:0;
+  font-family: "HelveticaNeue", "Helvetica Neue", "Helvetica Neue",
+    Helvetica, Arial, "Lucida Grande", sans-serif;
+  font-size:0.8em;
+  letter-spacing:1px;
+  color:#AAA;
+}
+
+#cs-related-container {
+  position:relative;
+  padding-top:10px;
+  bottom:-20px;
+  right:0px;
+  z-index:1000000000000000001 !important;
+  font-family: "HelveticaNeue", "Helvetica Neue", "Helvetica Neue",
+    Helvetica, Arial, "Lucida Grande", sans-serif;
+  font-size:0.8em;
+  letter-spacing:1px;
+  color:#AAA;
+}
+
+
+
+.related-link{
+  padding:5px 0px 5px 5px;
+  margin:5px 0 5px 0;
+  background:transparent;
+  color:#AAA;
+  cursor:pointer;
+}
+
+.related-link:hover{
+  color:white;
+  background:#777;
+}
+
+.footer-enabled{
+  color:white !important;
+
+}
+
+.footer-enabled:hover{
+  cursor:pointer;
+  text-decoration:underline !important;
+
+}
+
+#cs-slug-wrapper{
+  position:fixed;
+  bottom:35px;
+  right:0px;
+  width:360px;
+  height:200px;
+  z-index:10000000000000001 !important;
+}
+
+#cs-slug-close {
+  float:left;
+  width:45px;
+  height:100%;
+}
+
+.slug-closed{
+  right:-310px !important;
+}
+
+.slug-close-btn{
+  background:url("http://contentsurface.s3.amazonaws.com/natgeo/src/slug-close-inactive.png");
+}
+
+.slug-open-btn{
+  background:url("http://contentsurface.s3.amazonaws.com/natgeo/src/slug-open-inactive.png");
+}
+
+.slug-open-btn:hover{
+  background:url("http://contentsurface.s3.amazonaws.com/natgeo/src/slug-open-active.png");
+}
+
+.slug-close-btn:hover{
+  background:url("http://contentsurface.s3.amazonaws.com/natgeo/src/slug-close-active.png");
+}
+
+#cs-slug-body {
+  float:left;
+  height:100%;
+  width:315px;
+  background-size: cover;
+}
+
+#cs-slug-body-overlay {
+  height:100%;
+  width:100%;
+  background:black;
+  opacity:0.6;
+}
+
+#cs-slug-label {
+  position:relative;
+  top:25px;
+  height:20px;
+  width:60%;
+  margin:0 auto;
+  font-family: "HelveticaNeue", "Helvetica Neue", "Helvetica Neue",
+    Helvetica, Arial, "Lucida Grande", sans-serif;
+  font-size:0.8em;
+  letter-spacing:1px;
+  color:white;
+  text-align:center;
+
+}
+
+#cs-slug-play-button {
+  position:relative;
+  background: url("http://contentsurface.s3.amazonaws.com/natgeo/src/playbtn.png") no-repeat;
+  top:40px;
+  height:75px;
+  width:75px;
+  margin: 0 auto;
+  z-index:1000;
+  opacity:1;
+}
+
+#cs-slug-body-overlay:hover > #cs-slug-play-button {
+  background: url("http://contentsurface.s3.amazonaws.com/natgeo/src/playbtn-active.png") no-repeat;
+
+}
+
+
+#cs-slug-video-title {
+  position:relative;
+  top:60px;
+  height:40px;
+  width:90%;
+  margin:0 auto;
+  font-family: "HelveticaNeue", "Helvetica Neue", "Helvetica Neue",
+    Helvetica, Arial, "Lucida Grande", sans-serif;
+  font-size:0.8em;
+  letter-spacing:1px;
+  color:white;
+  text-align:center;
+  z-index:1000;
+}

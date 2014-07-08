@@ -13,7 +13,7 @@ SAVE_PROGRAMS = False
 
 SUPER_ADMINS = ['1240963', '100003192433087', '100005453982771']
 
-SHARE_URL = 'onxylo.com/'
+SHARE_URL = 'telepath.tv/'
 
 SLEEP_PROGRAMMING = DEVELOPMENT
 APPROVE_ALL = True
@@ -38,11 +38,11 @@ TWITTER_USER_BLACKLIST = [
   'newsheadlinesco',
   'businessnewsvid',
   'ivantrajkovic1',
-  'dailynewsvideo'                   
+  'dailynewsvideo'
 ]
 
 TWITTER_PHRASE_BLACKLIST = [
-  'i liked a'                   
+  'i liked a'
 ]
 
 GDATA_KEY = 'AIzaSyCpfny9wZHLA9t6nIPEYonWc4Qkix5IEhw'
@@ -103,12 +103,12 @@ else :
   STATS_JS_SOURCE = '/static/js/stats-min.js'
   ADMIN_JS_SOURCE = '/static/js/admin-min.js'
   MOBILE_JS_SOURCE = '/static/js/mobile-min.js'
-  
+
   TWITTER_CONSUMER_KEY = 'jd3rN8a2Z3nYSFLdJRZg'
   TWITTER_CONSUMER_SECRET = 'xfqxhXlYcyVKJ446CWu6Rwjn4tEgTV48ry40uySxgE'
   TWITTER_ACCESS_TOKEN = '1265134423-MWrzcVeVoM1uPQXK1l1RyzN2mFkiAFydQQcqxcY'
   TWITTER_TOKEN_SECRET = 'ifzqJCjArehXLJIMQ2RzLT6vWmzg2oNFrdvL5PHCOy0'
-  TWITTER_CALLBACK = 'http://www.xylocast.com/_twitter/callback'
+  TWITTER_CALLBACK = 'http://www.telepath.tv/_twitter/callback'
 
 class AccessLevel:
   WAITLIST = 0
@@ -125,7 +125,7 @@ class ActivityType:
   SESSION = 'session'
   LIKED = 'liked'
   WATCHED = 'watched' # Streamed media by selection
-  
+
 class NotificationType:
   REPLY = 'reply'
   MENTION = 'mention'

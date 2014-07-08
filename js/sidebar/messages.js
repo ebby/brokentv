@@ -30,7 +30,7 @@ brkn.sidebar.Messages = function(opt_user, opt_messages) {
    * @type {?Array.<brkn.model.Message>}
    * @private
    */
-  this.messages_ = opt_messages || null;
+  this.messages_ = opt_messages || [];
 
   /**
    * @type {?Object.<string, Element>}
@@ -49,12 +49,21 @@ brkn.sidebar.Messages = function(opt_user, opt_messages) {
    * @private
    */
   this.resizeExtra_ = 0;
-  
+
   /**
    * @type {boolean}
    * @private
    */
   this.inbox_ = this.user_.id == brkn.model.Users.getInstance().currentUser.id;
+
+  /**
+   * @type {goog.ui.CustomButton}
+   */
+  this.toggle_ = new goog.ui.CustomButton('Notifications');
+  this.toggle_.setSupportedState(goog.ui.Component.State.CHECKED,
+      true);
+
+  this.count_ = 0;
 };
 goog.inherits(brkn.sidebar.Messages, goog.ui.Component);
 
@@ -96,20 +105,80 @@ brkn.sidebar.Messages.prototype.moreMessagesEl_;
 /** @inheritDoc */
 brkn.sidebar.Messages.prototype.decorateInternal = function(el) {
   goog.base(this, 'decorateInternal', el);
-  
-  el.innerHTML = '';
-  el.scrollTop = 0;
-  
-  this.messagesEl_ = goog.dom.createDom('div', 'messages');
-  goog.dom.appendChild(this.getElement(), this.messagesEl_);
-  goog.dom.classes.enable(this.messagesEl_, 'inbox', this.inbox_);
-  
-  this.spinner_ = goog.dom.createDom('div', 'spinner');
-  goog.dom.appendChild(this.messagesEl_, this.spinner_);
-  goog.style.showElement(this.spinner_, false);
-  this.noMessagesEl_ = goog.dom.createDom('div', 'no-comments',
-      this.inbox_ ? 'No Messages' :'Start a private conversation.');
-  goog.dom.appendChild(this.messagesEl_, this.noMessagesEl_);
+
+  if (!this.inbox_) {
+      el.innerHTML = '';
+      el.scrollTop = 0;
+
+      this.messagesEl_ = goog.dom.createDom('div', 'messages');
+      goog.dom.appendChild(this.getElement(), this.messagesEl_);
+
+      this.spinner_ = goog.dom.createDom('div', 'spinner');
+      goog.dom.appendChild(this.messagesEl_, this.spinner_);
+      goog.style.showElement(this.spinner_, false);
+
+      this.noMessagesEl_ = goog.dom.createDom('div', 'no-comments',
+          this.inbox_ ? 'No Messages' :'Start a private conversation.');
+      goog.dom.appendChild(this.messagesEl_, this.noMessagesEl_);
+  } else {
+    this.toggle_.decorate(goog.dom.getElementByClass('toggle', this.getElement()));
+    this.container_ = goog.dom.getElementByClass('container', this.getElement());
+
+    this.messagesEl_ = goog.dom.getElementByClass('messages', this.getElement());
+    goog.dom.classes.enable(this.messagesEl_, 'inbox', this.inbox_);
+
+    this.spinner_ = goog.dom.createDom('div', 'spinner');
+    goog.dom.appendChild(this.messagesEl_, this.spinner_);
+    goog.style.showElement(this.spinner_, false);
+
+    this.noMessagesEl_ = goog.dom.createDom('div', 'no-comments',
+        this.inbox_ ? 'No Messages' :'Start a private conversation.');
+    goog.dom.appendChild(this.messagesEl_, this.noMessagesEl_);
+    goog.style.showElement(this.noMessagesEl_, false);
+
+    this.getHandler()
+        .listen(this.toggle_.getElement(),
+            goog.events.EventType.CLICK,
+            goog.bind(function(e) {
+              goog.dom.classes.enable(this.getElement(), 'show', this.toggle_.isChecked());
+            }, this))
+        .listen(this.messagesEl_,
+            goog.events.EventType.CLICK,
+            goog.bind(function(e) {
+              e.preventDefault();
+              e.stopPropagation();
+            }, this))
+        .listen(window,
+            goog.events.EventType.CLICK,
+            goog.bind(function(e) {
+              if (this.toggle_.isChecked()) {
+                if (!goog.dom.getAncestorByClass(e.target, 'inbox')) {
+                  goog.Timer.callOnce(goog.bind(function() {
+                    goog.dom.classes.remove(this.getElement(), 'show');
+                    this.toggle_.setChecked(false);
+                  }, this));
+                }
+              }
+            }, this));
+    goog.style.showElement(this.spinner_, true);
+    goog.net.XhrIo.send(
+        '/_message/' + this.user_.id,
+        goog.bind(function(e) {
+          goog.style.showElement(this.spinner_, false);
+          var response = /** @type {Array.<Object>} */ e.target.getResponseJson();
+          this.count_ = 0;
+          this.messages_ = goog.array.map(response, function(m) {
+            var message = new brkn.model.Message(m);
+            this.count_ += (!message.read ? 1 : 0);
+            this.addMessage_(message);
+            return message;
+          }, this);
+          goog.style.showElement(this.noMessagesEl_, !this.messages_.length);
+          goog.dom.setTextContent((/** @type {Element} */ this.toggle_.getElement().firstChild),
+              this.count_ > 0 ? this.count_.toString() : '');
+        }, this));
+  }
+
   this.moreMessagesEl_ = goog.dom.createDom('div', 'no-comments', 'Load previous messages');
   goog.dom.appendChild(this.messagesEl_, this.moreMessagesEl_);
   goog.style.showElement(this.moreMessagesEl_, !this.inbox_ && this.messages_.length >= 10);
@@ -138,11 +207,12 @@ brkn.sidebar.Messages.prototype.decorateInternal = function(el) {
       var msgEl = this.messageMap_[fromId];
       if (msgEl && goog.dom.classes.has(msgEl, 'unread')) {
         goog.dom.classes.remove(msgEl, 'unread');
-        brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NEW_MESSAGES, -1);
+        goog.dom.setTextContent((/** @type {Element} */ this.toggle_.getElement().firstChild),
+            --this.count_ > 0 ? this.count_.toString() : '');
       }
     }, this);
   }
-  
+
   goog.array.forEachRight(this.messages_, function(m) {
     this.addMessage_(m);
   }, this);
@@ -158,7 +228,8 @@ brkn.sidebar.Messages.prototype.decorateInternal = function(el) {
           incr = !goog.dom.classes.has(last, 'unread');
           goog.dom.removeNode(last);
         }
-        incr && brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NEW_MESSAGES, 1);
+        incr && goog.dom.setTextContent((/** @type {Element} */ this.toggle_.getElement().firstChild),
+            ++this.count_ > 0 ? this.count_.toString() : '');
       }
       this.addMessage_(m, this.inbox_);
       this.resize();
@@ -233,7 +304,7 @@ brkn.sidebar.Messages.prototype.addMessage_ = function(message, opt_first) {
     if (opt_first) {
       goog.dom.insertChildAt(this.messagesEl_, messageEl, 3);
     } else {
-      goog.dom.appendChild(this.messagesEl_, messageEl); 
+      goog.dom.appendChild(this.messagesEl_, messageEl);
     }
     timeEl = goog.dom.getElementByClass('timestamp', messageEl);
     goog.dom.classes.enable(messageEl, 'unread', !message.read)
@@ -243,7 +314,8 @@ brkn.sidebar.Messages.prototype.addMessage_ = function(message, opt_first) {
         if (!message.read) {
           message.setRead();
           goog.dom.classes.remove(messageEl, 'unread');
-          brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.NEW_MESSAGES, -1);
+          goog.dom.setTextContent((/** @type {Element} */ this.toggle_.getElement().firstChild),
+              --this.count_ > 0 ? this.count_.toString() : '');
         }
         brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.PROFILE, message.fromUser);
       }, this));
@@ -258,12 +330,12 @@ brkn.sidebar.Messages.prototype.addMessage_ = function(message, opt_first) {
       });
       goog.dom.appendChild(goog.dom.getElementByClass('texts', messageEl), mediaEl);
     }
-  } 
+  }
   brkn.model.Clock.getInstance().addTimestamp(message.time, timeEl);
   if (!opt_first) {
-    this.getElement().scrollTop = this.getElement().scrollHeight; 
+    this.getElement().scrollTop = this.getElement().scrollHeight;
   }
-  if (!this.inbox_ && !message.read && message.id && 
+  if (!this.inbox_ && !message.read && message.id &&
       brkn.model.Sidebar.getInstance().currentProfileId == message.fromUser.id) {
     message.setRead();
   }
@@ -289,7 +361,7 @@ brkn.sidebar.Messages.prototype.addMessage_ = function(message, opt_first) {
             e.stopPropagation();
             brkn.model.Channels.getInstance().getMyChannel().publish(brkn.model.Channel.Action.ADD_QUEUE,
                 message.media, true);
-          });  
+          });
   }
 };
 
@@ -305,15 +377,15 @@ brkn.sidebar.Messages.prototype.onAddComment_ = function(e) {
     'text': e.text
   });
   message.time = new goog.date.DateTime();
-  message.relativeTime = goog.date.relative.format(message.time.getTime()) 
-  
+  message.relativeTime = goog.date.relative.format(message.time.getTime())
+
   this.addMessage_(message);
-  
+
   goog.net.XhrIo.send(
       '/_message',
       e.callback,
       'POST',
-      'from_id=' + brkn.model.Users.getInstance().currentUser.id + 
+      'from_id=' + brkn.model.Users.getInstance().currentUser.id +
       '&to_id=' + this.user_.id + '&text=' + e.text);
 };
 
@@ -327,8 +399,8 @@ brkn.sidebar.Messages.prototype.resize = function(opt_extra) {
     this.dispatchEvent('resize');
   } else {
     this.resizeExtra_ = opt_extra || this.resizeExtra_;
-    goog.style.setHeight(this.getElement(), goog.dom.getViewportSize().height + 
-        (IPHONE && SAFARI ? 61 : 0) - (DESKTOP ? 40 : 0) - 42 -
+    goog.style.setHeight(this.getElement(), goog.dom.getViewportSize().height +
+        (IPHONE && SAFARI ? 61 : 0) - (DESKTOP ? 40 : 0) - 41 -
         this.resizeExtra_ - (goog.dom.getAncestorByClass(this.getElement(), 'tabbed') ? 30 : 0));
   }
 };

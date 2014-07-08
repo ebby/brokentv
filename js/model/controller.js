@@ -11,17 +11,17 @@ goog.require('goog.pubsub.PubSub');
  */
 brkn.model.Controller = function() {
 	goog.base(this);
-	
+
 	this.playing = true;
-	
+
 	var el = goog.dom.getElement('controller');
-	
+
 	this.sidebarToggled = !el || goog.dom.classes.has(el, 'sidebar-toggled');
-	
+
 	this.guideToggled = el && goog.dom.classes.has(el, 'guide-toggled');
-	
+
 	var guideEl = goog.dom.getElement('guide');
-	
+
 	/**
 	 * @type {boolean}
 	 */
@@ -59,6 +59,14 @@ brkn.model.Controller.prototype.getPending = function() {
   return goog.dom.getTextContent(togglePending);
 };
 
+/**
+ * @return {boolean}
+ */
+brkn.model.Controller.prototype.isSidebarToggled = function() {
+  var el = goog.dom.getElement('controller');
+  this.sidebarToggled = goog.dom.classes.has(el, 'sidebar-toggled');
+  return this.sidebarToggled;
+};
 
 /**
  * @enum {string}

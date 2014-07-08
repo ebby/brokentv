@@ -17,22 +17,22 @@ goog.require('goog.pubsub.PubSub');
  */
 brkn.model.Channels = function() {
 	goog.base(this);
-	
+
 	/**
 	 * @type {Array.<brkn.model.Channel>}
 	 */
 	this.channels = [];
-	
+
 	/**
 	 * @type {Object.<string, brkn.model.Channel>}
 	 */
 	this.channelMap = {};
-	
+
 	/**
    * @type {brkn.model.Channel}
    */
   this.myChannel;
-	
+
 	this.subscribe(brkn.model.Channels.Actions.CHANGE_CHANNEL, this.changeChannel, this);
 };
 goog.inherits(brkn.model.Channels, goog.pubsub.PubSub);
@@ -94,7 +94,9 @@ brkn.model.Channels.prototype.findOnline = function(opt_public) {
     currentProgram = channel && channel.getCurrentProgram();
     index++;
   }
-
+  if (!channel && this.channels.length) {
+    channel = this.channels[0]
+  }
   return channel;
 };
 

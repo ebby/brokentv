@@ -5,7 +5,7 @@ indexes:
   - name: collection
   - name: published
     direction: desc
-    
+
 - kind: CollectionMedia
   properties:
   - name: approved
@@ -19,13 +19,13 @@ indexes:
   - name: playlist
   - name: published
     direction: desc
-    
+
 - kind: ChannelProgram
   properties:
   - name: channel
   - name: time
     direction: desc
-    
+
 - kind: ChannelProgram
   properties:
   - name: channel
@@ -48,6 +48,11 @@ indexes:
   - name: media
   - name: time
 
+- kind: Comment
+  properties:
+  - name: parent_comment
+  - name: time
+
 - kind: Message
   properties:
   - name: to_user
@@ -57,7 +62,7 @@ indexes:
   properties:
   - name: acl
   - name: time
-  
+
 - kind: Message
   properties:
   - name: to_user
@@ -69,7 +74,7 @@ indexes:
   - name: acl
   - name: time
     direction: desc
-    
+
 - kind: Notification
   properties:
   - name: user
@@ -87,19 +92,19 @@ indexes:
   - name: media
   - name: time
     direction: desc
-    
+
 - kind: UserSession
   properties:
   - name: user
   - name: tune_in
     direction: desc
-    
+
 - kind: UserActivity
   properties:
   - name: acl
   - name: time
     direction: desc
-    
+
 - kind: UserActivity
   properties:
   - name: user

@@ -172,14 +172,17 @@ brkn.Controller.prototype.enterDocument = function() {
 
   this.infoToggle_.decorate(goog.dom.getElement('info-toggle'));
   if (!EMBED) {
-    goog.style.showElement(this.infoToggle_.getElement(), !currentUser ||
-        currentUser.accessLevel != brkn.model.User.AccessLevel.ADMIN);
+    goog.style.showElement(this.infoToggle_.getElement(), true);
   }
 
   this.addChild(this.adminToggle_);
   this.adminToggle_.decorate(goog.dom.getElement('admin-toggle'));
-  goog.style.showElement(this.adminToggle_.getElement(), currentUser &&
-      currentUser.accessLevel == brkn.model.User.AccessLevel.ADMIN);
+  brkn.model.Users.getInstance().subscribe(brkn.model.Users.Action.LOGGED_IN, function() {
+    goog.style.showElement(this.adminToggle_.getElement(), brkn.model.Users.getInstance().currentUser.isAdmin());
+    if (!EMBED) {
+        goog.style.showElement(this.infoToggle_.getElement(), !brkn.model.Users.getInstance().currentUser.isAdmin());
+    }
+  }, this);
 
   var guideThrottle = new goog.Throttle(this.throttledGuide_, 1000, this);
 

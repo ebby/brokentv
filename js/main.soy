@@ -18,7 +18,7 @@
         <div class="spinner" style="display:none"></div>
         <div class="restart" style="display:none">TRY AGAIN</div>
       </div>
-      <div class="fullscreen" style="display:none"></div>
+      <div class="fullscreen"></div>
       <div class="expand" style="display:none"></div>
       <div class="play" style="display: none"><div></div></div>
       <div class="pause" style="display: none"><div></div></div>
@@ -59,9 +59,23 @@
         </div>
       </div>
     </div>
+    <div id="notifications" class="notifications" style="display:none">
+      <div class="toggle"><span></span></div>
+      <div class="list">
+        <div class="label">NOTIFICATIONS</div>
+        <div id="notes" class="notes"></div>
+      </div>
+    </div>
+    <div id="inbox" class="inbox" style="display:none">
+      <div class="toggle"><span></span></div>
+      <div class="list">
+        <div class="label">INBOX</div>
+        <div class="messages"></div>
+      </div>
+    </div>
     <div id="queue" class="queue" {if $embed}style="display:none"{/if}>
-      <div class="queue-toggle"><span></span></div>
-      <div class="queue-list">
+      <div class="toggle"><span></span></div>
+      <div class="list">
         <div class="label">QUEUE</div>
         <div class="medias-container">
           <div class="medias no-medias">

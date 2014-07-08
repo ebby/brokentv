@@ -43,20 +43,20 @@ class Media(db.Model):
     return self.key().name()
 
   @property
-  def link(self): 
+  def link(self):
     if not self.path:
       self.path = Link.get_or_add('/?m=' + self.id).path
       self.put()
     return constants.SHARE_URL + self.path
-  
-  def get_path(self): 
+
+  def get_path(self):
     if not self.path:
       self.path = Link.get_or_add('/?m=' + self.id).path
       self.put()
     return self.path
 
   @property
-  def thumb(self): 
+  def thumb(self):
     return 'http://i.ytimg.com/vi/%s/0.jpg' % self.host_id
 
   @classmethod
@@ -87,7 +87,7 @@ class Media(db.Model):
     host_id = urlparse.parse_qs(parsed_url.query)['v'][0]
     entry = yt_service.GetYouTubeVideoEntry(video_id=host_id)
     return Media.add_from_entry([entry])[0]
-  
+
   @classmethod
   def add_by_id(cls, id):
     youtube3 = get_youtube3_service()
@@ -98,16 +98,16 @@ class Media(db.Model):
     medias = Media.add_from_snippet(videos_response.get("items", []),
                                     approve=True)
     return medias[0] if len(medias) else None
-  
+
   @classmethod
-  def add_from_snippet(cls, items, collection=None, publisher=None, enforce_category=False, approve=False):
+  def add_from_snippet(cls, items, collection=None, publisher=None, enforce_category=False, approve=False, dont_fetch_publisher=False):
     from publisher import Publisher
     from publisher import PublisherMedia
     from collection import CollectionMedia
     from topic import Topic
     from topic import TopicMedia
     from topic import TopicCollectionMedia
-    
+
     medias = []
     for item in items:
       id = item['id']
@@ -132,7 +132,7 @@ class Media(db.Model):
         collection_media = CollectionMedia.add(collection, media, publisher=publisher,
                                                approved=(True if approve else None))
 
-      if not publisher or publisher.channel_id != item['snippet']['channelId']:
+      if not dont_fetch_publisher and (not publisher or publisher.channel_id != item['snippet']['channelId']):
         publisher = Publisher.get_by_channel_id(item['snippet']['channelId'], item['snippet']['channelTitle'])
       if publisher and item['snippet']['channelId'] == publisher.channel_id:
         pm = media.publisherMedias.get()
@@ -142,17 +142,17 @@ class Media(db.Model):
         pm = PublisherMedia.add(publisher=publisher, media=media)
         logging.info(pm.publisher.name)
 
-      if item.get('topicDetails'):
-        for topic_id in item['topicDetails']['topicIds']:
-          topic = Topic.add(topic_id)
-          TopicMedia.add(topic, media)
-          if collection_media:
-            TopicCollectionMedia.add(topic, collection_media)
-      
+      # if item.get('topicDetails'):
+      #   for topic_id in item['topicDetails']['topicIds']:
+      #     topic = Topic.add(topic_id)
+      #     TopicMedia.add(topic, media)
+      #     if collection_media:
+      #       TopicCollectionMedia.add(topic, collection_media)
+
       medias.append(media)
     return medias
-        
-  
+
+
   @classmethod
   def add_from_entry(cls, entries, fetch_publisher=False, approve=False, collection=None):
     from publisher import Publisher
@@ -186,7 +186,7 @@ class Media(db.Model):
         PublisherMedia.add(publisher, media)
         media.put()
       medias.append(media)
-      
+
       publisher = publisher or media.publisherMedias.get().publisher if media.publisherMedias.get() else None
       collection_media = None
       if collection:
@@ -210,7 +210,7 @@ class Media(db.Model):
 
   def get_tweets(self, limit=10, offset=0):
     from tweet import Tweet
-    
+
     new_tweets = []
 
     cached_media = memcache.get(self.id) or {}
@@ -265,7 +265,7 @@ class Media(db.Model):
     if obj:
       obj.like_count += 1
       obj.put()
-    
+
   @classmethod
   @db.transactional
   def add_dislike(cls, key_name):
@@ -281,7 +281,7 @@ class Media(db.Model):
     if obj and uid not in obj.started:
       obj.started.append(uid)
       obj.put()
-  
+
   @classmethod
   @db.transactional
   def add_opt_in(cls, key_name, uid):

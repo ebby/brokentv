@@ -40,7 +40,7 @@ class BaseHandler(SessionRequest):
                     profile = graph.get_object("me")
                     user = User(key_name=str(profile["id"]),
                         id=str(profile["id"]),
-                        access_level=AccessLevel.WAITLIST,
+                        access_level=AccessLevel.USER,
                         name=profile["name"],
                         gender=profile.get("gender"),
                         email=profile.get("email"),
@@ -55,7 +55,7 @@ class BaseHandler(SessionRequest):
                 # Update friends graph
                 friends = graph.get_connections("me", "friends")['data']
                 user.friends = [f['id'] for f in friends]
-                user.access_level = AccessLevel.USER
+                #user.access_level = AccessLevel.USER
                 # if Invite.get_by_key_name(user.id) or Invite.get_by_key_name(user.email):
                 #   # If they're invited
                 #   user.demo = True

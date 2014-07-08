@@ -2,19 +2,19 @@
 .button {
   display: inline-block;
   .border-radius(3px);
-  border: 1px solid rgba(50, 50, 50, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.5);
   width: 70px;
   height: 15px;
   font-size: 13px;
   text-align: center;
   padding: 3px 0;
-  .box-shadow(e('inset 0 0 1px rgba(255,255,255,.1), 0 0 1px rgba(255,255,255,.5)'));
+  .box-shadow(e('inset 0 0 1px rgba(255,255,255,.4), 0 0 1px rgba(255,255,255,.6)'));
   color: #FEFEFE;
-  text-shadow: 1px 1px black;
+  text-shadow: 0 0 1px black;
   cursor: pointer;
   outline: none;
   background: rgba(218, 218, 218, .9);
-  
+
   &.goog-custom-button-active, &.goog-custom-button-checked, &:active {
     background: rgba(180, 180, 180, .9);
     .box-shadow(e('inset 0 0 1px 1px rgba(0, 0, 0, .3),  0 0 1px #DEDEDE'));

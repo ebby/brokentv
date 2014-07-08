@@ -211,7 +211,7 @@ brkn.Channel.prototype.enterDocument = function() {
 	this.getModel().subscribe(brkn.model.Channel.Action.ADD_PROGRAM, this.addProgram, this);
 	this.getModel().subscribe(brkn.model.Channel.Action.ADD_VIEWER, this.addViewer, this);
 	this.getModel().subscribe(brkn.model.Channel.Action.REMOVE_VIEWER, this.removeViewer, this);
-	this.getModel().subscribe(brkn.model.Channel.Action.UPDATE_PROGRAM, this.updateProgram, this);
+	// this.getModel().subscribe(brkn.model.Channel.Action.UPDATE_PROGRAM, this.updateProgram, this);
 
 	brkn.model.Channels.getInstance().subscribe(brkn.model.Channels.Actions.NEXT_PROGRAM,
 	    this.updateCurrentProgram_, this);
@@ -230,19 +230,16 @@ brkn.Channel.prototype.enterDocument = function() {
 
 
 /**
+ * @param {?brkn.model.Program=} opt_program
  * @private
  */
-brkn.Channel.prototype.updateCurrentProgram_ = function() {
+brkn.Channel.prototype.updateCurrentProgram_ = function(opt_program) {
   if (this.currentProgram_) {
     goog.dom.classes.remove(this.programs_[this.currentProgram_], 'playing');
-    var title = goog.dom.getElementByClass('title', this.programs_[this.currentProgram_]);
-    if (title) {
-      title.style.left = '';
-    }
   }
   this.currentProgram_ = null;
 
-  var program = brkn.model.Channels.getInstance().currentChannel.getCurrentProgram();
+  var program = opt_program || brkn.model.Channels.getInstance().currentChannel.getCurrentProgram();
   if (program) {
     var programEl = this.programs_[program.id];
     if (programEl) {
@@ -299,15 +296,16 @@ brkn.Channel.prototype.addProgram = function(program) {
 	  offset += cutoff;
 	}
 
-	goog.style.setWidth(programEl, Math.ceil(width - brkn.Channel.PROGRAM_PADDING));
-	goog.style.setPosition(programEl, Math.floor(offset));
+	//goog.style.setWidth(programEl, Math.ceil(width - brkn.Channel.PROGRAM_PADDING));
+	//goog.style.setPosition(programEl, Math.floor(offset));
 	goog.dom.appendChild(this.programsEl_, programEl);
-	var clipped = width < 120;
-	goog.dom.classes.enable(programEl, 'clipped', clipped);
+	//var clipped = width < 120;
+	//goog.dom.classes.enable(programEl, 'clipped', clipped);
 
 	this.getHandler().listen(programEl, goog.events.EventType.CLICK, function() {
 	  if (!goog.dom.classes.has(goog.dom.getElement('guide'), 'drag')) {
-	    brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.MEDIA_INFO, program.media);
+	    brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.MEDIA_INFO,
+        program.media, undefined, undefined, undefined, program);
 	  }
 	});
 
@@ -340,8 +338,21 @@ brkn.Channel.prototype.addProgram = function(program) {
       .listen(playEl, goog.events.EventType.CLICK, function(e) {
         e.preventDefault();
         e.stopPropagation();
-        var asyncProgram = brkn.model.Program.async(program.media);
-        brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.PLAY_ASYNC, asyncProgram);
+
+        // brkn.model.Channels.getInstance().currentChannel.offline = true;
+        // var currentProgram = brkn.model.Player.getInstance().getCurrentProgram();
+        // if (currentProgram) {
+        //   currentProgram.ended = true;
+        // }
+        // var nextProgram = brkn.model.Channels.getInstance().currentChannel.getCurrentProgram();
+        // if (nextProgram) {
+        //   brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.NEXT_PROGRAM,
+        //       nextProgram);
+        // }
+        brkn.model.Channels.getInstance().currentChannel.setCurrentProgram(program);
+        brkn.model.Channels.getInstance().publish(brkn.model.Channels.Actions.NEXT_PROGRAM,
+            program, true);
+        //brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.NEXT_PROGRAM, program);
       })
       .listen(plusEl, goog.events.EventType.CLICK, function(e) {
         e.preventDefault();

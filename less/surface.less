@@ -1,0 +1,310 @@
+@import "functions.less";
+@import "icons.less";
+
+
+@font-face {
+  font-family: 'MuseoSans500';
+  src: url('/static/webfonts/museosans/500.woff') format('woff');
+}
+
+body {
+  overflow: hidden;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  margin: 0;
+}
+
+div.telepath-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 99999999999;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, .9);
+  opacity: 0;
+  .transition(opacity, .6s, ease);
+  .box-shadow(inset, 0, 0, 2px, 0, rgba(255, 255, 255, 0.5));
+  border: 1px solid rgba(0, 0, 0, .6);
+
+  &.hide {
+    visibility: hidden;
+  }
+  &.show {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  div.close-button {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    font-size: 25px;
+    line-height: 40px;
+    text-align: center;
+    opacity: .9;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    color: white;
+    cursor: pointer;
+    div.left {
+      .icon-right-arrow();
+      display: inline-block;
+    }
+    div.right {
+      .icon-left-arrow();
+      display: inline-block;
+      margin-left: -2px;
+    }
+    &:hover {
+      opacity: 1;
+      text-shadow: 0 0 3px white;
+    }
+  }
+  iframe {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -302px;
+    margin-left: -500px;
+  }
+}
+
+div.telepath-surface {
+  position: fixed;
+  bottom: 30px;
+  right: 0px;
+  height: 180px;
+  font-family: MuseoSans500;
+  color: rgba(255, 255, 255, .9);
+  z-index: 999999999;
+  &.collapse {
+    div.tab {
+      .icon-left-arrow();
+    }
+    div.program {
+      width: 40px;
+      div.title, div.suggestion, div.play-button {
+        opacity: 0;
+      }
+    }
+  }
+  div.tab {
+    .icon-right-arrow();
+    width: 40px;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    display: inline-block;
+    vertical-align: top;
+    text-align: center;
+    line-height: 180px;
+    cursor: pointer;
+    font-size: 30px;
+    color: rgba(255, 255, 255, .9);
+    &:hover {
+      color: white;
+      text-shadow: 0 0 2px white;
+      background: rgba(0, 0, 0, .6);
+      background: -moz-linear-gradient(right, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 100%);
+      background: -webkit-gradient(linear, right top, left top, color-stop(0%,rgba(0,0,0,0.5)), color-stop(100%,rgba(0,0,0,0)));
+      background: -webkit-linear-gradient(right, rgba(0,0,0,0.5) 0%,rgba(0,0,0,0) 100%);
+      background: -o-linear-gradient(right, rgba(0,0,0,0.5) 0%,rgba(0,0,0,0) 100%);
+      background: -ms-linear-gradient(right, rgba(0,0,0,0.5) 0%,rgba(0,0,0,0) 100%);
+      background: linear-gradient(to right, rgba(0,0,0,0.5) 0%,rgba(0,0,0,0) 100%);
+    }
+  }
+  div.program {
+    width: 320px;
+    height: 100%;
+    cursor: pointer;
+    background: url(/static/img/thumb-grad.jpg);
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+    .transition(width, .3s, ease);
+    div.thumb {
+      width: 100%;
+      height: 100%;
+      background-size: 320px;
+      background-position: center;
+      opacity: .3;
+      .transition(opacity, .3s, ease);
+    }
+    div.suggestion {
+      position: absolute;
+      top: 15px;
+      left: 0;
+      width: 320px;
+      text-align: center;
+      font-size: 15px;
+      text-shadow: 0 0 1px rgba(0, 0, 0, .5);
+    }
+    div.play-button {
+      .icon-play();
+      font-size: 40px;
+      width: 50px;
+      height: 50px;
+      line-height: 50px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      margin-top: -29px;
+      margin-left: -29px;
+      border: 4px solid rgba(255, 255, 255, .9);
+      .border-radius(30px);
+      text-align: center;
+      &:before {
+        margin-left: 2px;
+      }
+    }
+    div.title {
+      position: absolute;
+      bottom: 15px;
+      left: 0;
+      width: 300px;
+      text-align: center;
+      text-shadow: 0 0 1px rgba(0, 0, 0, .5);
+      margin: 0 10px;
+      font-size: 15px;
+    }
+    &:hover {
+      div.thumb {
+        opacity: .6;
+      }
+      div.play-button {
+          color: white;
+          text-shadow: 0 0 2px white;
+          border-color: white;
+      }
+    }
+  }
+}
+
+div.telepath-embed {
+  position: fixed;
+  bottom: 20px;
+  right: 0px;
+  height: 180px;
+  font-family: MuseoSans500;
+  color: rgba(255, 255, 255, .9);
+  z-index: 999999999;
+
+
+  &:hover, &.expand {
+    div.tab {
+      opacity: 0;
+      pointer-events: none;
+    }
+    div.program {
+      width: 320px;
+      div.title, div.suggestion, div.play-button {
+        opacity: 1;
+      }
+    }
+  }
+  div.tab {
+    .icon-left-arrow();
+    width: 40px;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    display: inline-block;
+    vertical-align: top;
+    text-align: center;
+    line-height: 180px;
+    cursor: pointer;
+    font-size: 30px;
+    color: rgba(255, 255, 255, .9);
+    &:hover {
+      color: white;
+      text-shadow: 0 0 2px white;
+      background: rgba(0, 0, 0, .6);
+      background: -moz-linear-gradient(right, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 100%);
+      background: -webkit-gradient(linear, right top, left top, color-stop(0%,rgba(0,0,0,0.5)), color-stop(100%,rgba(0,0,0,0)));
+      background: -webkit-linear-gradient(right, rgba(0,0,0,0.5) 0%,rgba(0,0,0,0) 100%);
+      background: -o-linear-gradient(right, rgba(0,0,0,0.5) 0%,rgba(0,0,0,0) 100%);
+      background: -ms-linear-gradient(right, rgba(0,0,0,0.5) 0%,rgba(0,0,0,0) 100%);
+      background: linear-gradient(to right, rgba(0,0,0,0.5) 0%,rgba(0,0,0,0) 100%);
+    }
+  }
+  div.program {
+    height: 100%;
+    cursor: pointer;
+    background: url(/static/img/thumb-grad.jpg);
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+    .transition(width, .3s, ease);
+    width: 40px;
+    div.title, div.suggestion, div.play-button {
+      opacity: 0;
+    }
+    div.thumb {
+      width: 100%;
+      height: 100%;
+      background-size: 320px;
+      background-position: center;
+      opacity: .3;
+      .transition(opacity, .3s, ease);
+    }
+    div.suggestion {
+      position: absolute;
+      top: 15px;
+      left: 0;
+      width: 320px;
+      text-align: center;
+      text-shadow: 0 0 1px rgba(0, 0, 0, .5);
+      font-size: 14px;
+      opacity: 0;
+    }
+    div.play-button {
+      .icon-play();
+      font-size: 40px;
+      width: 50px;
+      height: 50px;
+      line-height: 50px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      margin-top: -29px;
+      margin-left: -29px;
+      border: 4px solid rgba(255, 255, 255, .9);
+      .border-radius(30px);
+      text-align: center;
+      opacity: 0;
+      &:before {
+        margin-left: 2px;
+      }
+    }
+    div.title {
+      position: absolute;
+      bottom: 15px;
+      left: 0;
+      width: 300px;
+      text-align: center;
+      text-shadow: 0 0 1px rgba(0, 0, 0, .5);
+      margin: 0 10px;
+      font-size: 14px;
+      opacity: 0;
+    }
+    &:hover {
+      div.thumb {
+        opacity: .6;
+      }
+      div.play-button {
+          color: white;
+          text-shadow: 0 0 2px white;
+          border-color: white;
+      }
+    }
+  }
+}

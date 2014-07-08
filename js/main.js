@@ -2,6 +2,7 @@ goog.provide('brkn.Main');
 
 goog.require('brkn.Guide');
 goog.require('brkn.Controller');
+goog.require('brkn.Notifications');
 goog.require('brkn.Notify');
 goog.require('brkn.Player');
 goog.require('brkn.Popup');
@@ -64,6 +65,16 @@ brkn.Main = function() {
    * @type {brkn.Search}
    */
   this.search_ = new brkn.Search();
+
+  /**
+   * @type {brkn.Notifications}
+   */
+  this.notifications_;
+
+  /**
+   * @type {brkn.sidebar.Messages}
+   */
+  this.inbox_;
 };
 goog.inherits(brkn.Main, goog.ui.Component);
 
@@ -170,10 +181,6 @@ brkn.Main.prototype.enterDocument = function() {
   this.search_.decorate(goog.dom.getElement('search'));
   this.popup_ = new brkn.Popup();
 
-//  if (brkn.model.Users.getInstance().currentUser.loggedIn &&
-//      !brkn.model.Users.getInstance().currentUser.welcomed) {
-//    this.welcome_(brkn.model.Users.getInstance().currentUser);
-//  }
 
   // iPad
   this.getHandler().listen(document.body, 'touchmove', function(e) {
@@ -194,10 +201,8 @@ brkn.Main.prototype.enterDocument = function() {
             e.stopPropagation();
             switch(matches[1]) {
               case 'user':
-                if (brkn.model.Users.getInstance().currentUser && brkn.model.Users.getInstance().currentUser.loggedIn) {
-                  var user = brkn.model.Users.getInstance().get(matches[2]);
-                  brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.PROFILE, user);
-                }
+                var user = brkn.model.Users.getInstance().get(matches[2]);
+                brkn.model.Sidebar.getInstance().publish(brkn.model.Sidebar.Actions.PROFILE, user);
                 break;
               case 'channel':
                 var channel = brkn.model.Channels.getInstance().get(matches[2]);
@@ -230,15 +235,21 @@ brkn.Main.prototype.enterDocument = function() {
   }
 
   brkn.model.Users.getInstance().subscribe(brkn.model.Users.Action.LOGGED_IN, function() {
+    this.notifications_ = new brkn.Notifications();
+    this.notifications_.decorate(goog.dom.getElement('notifications'));
+    goog.style.showElement(goog.dom.getElement('notifications'), true);
+
+    if (!EMBED) {
+        this.inbox_ = new brkn.sidebar.Messages(brkn.model.Users.getInstance().currentUser);
+        this.inbox_.decorate(goog.dom.getElement('inbox'));
+        goog.style.showElement(goog.dom.getElement('inbox'), true);
+    }
+
     goog.net.XhrIo.send('/_presence', goog.bind(function(e) {
       var data = e.target.getResponseJson();
       goog.dispose(this.browserChannel_);
       this.browserChannel_ = brkn.model.BrowserChannel.getInstance().init(data['token']);
       brkn.model.Channels.getInstance().loadViewersFromJson(data['viewer_sessions']);
-
-//      if (!brkn.model.Users.getInstance().currentUser.welcomed) {
-//        this.welcome_(brkn.model.Users.getInstance().currentUser);
-//      }
     }, this));
 
   }, this);
@@ -301,6 +312,7 @@ brkn.Main.init = function(channels, programs, opt_currentUser, opt_currentChanne
 brkn.Main.staticInit = function() {
   var fbLogin = goog.dom.getElement('fb-login');
   var homepage = goog.dom.getElement('homepage');
+  var telepathVideo = goog.dom.getElement('telepath-video');
   var login = goog.dom.getElement('login');
   var scrollable = goog.dom.getElement('static-scrollable');
   var content = goog.dom.getElement('static-content');
@@ -308,28 +320,33 @@ brkn.Main.staticInit = function() {
   var footer = goog.dom.getElement('footer');
   var expand = false;
   LOADED = false;
-  if (LOGIN_REQUIRED) {
+  if (LOGIN_REQUIRED && fbLogin) {
     goog.dom.setTextContent(goog.dom.getElementByClass('with-fb', fbLogin), 'with facebook');
     goog.dom.setTextContent(goog.dom.getElementByClass('label', fbLogin), 'LOGIN');
   }
 
-  if (!POWER_ON && !LOGIN_REQUIRED) {
+  if (!POWER_ON && !LOGIN_REQUIRED && fbLogin) {
     goog.dom.classes.add(fbLogin, 'disabled');
     goog.dom.classes.add(fbLogin, 'spin');
   }
 
-  // Hide in JS so background shows if JS doesn't load.
-  goog.dom.classes.add(homepage, 'hide');
-  var img = goog.dom.createDom('img');
-  img.src = '/static/img/homepage.jpg';
-  goog.events.listen(img, goog.events.EventType.LOAD, function() {
-    goog.dom.classes.remove(homepage, 'hide');
-    goog.dom.classes.add(homepage, 'show');
-  });
+
+  if (!telepathVideo) {
+      // Hide in JS so background shows if JS doesn't load.
+      goog.dom.classes.add(homepage, 'hide');
+      var img = goog.dom.createDom('img');
+      img.src = '/static/img/homepage.jpg';
+      goog.events.listen(img, goog.events.EventType.LOAD, function() {
+        goog.dom.classes.remove(homepage, 'hide');
+        goog.dom.classes.add(homepage, 'show');
+      });
+  }
 
   goog.Timer.callOnce(function() {
-    goog.style.showElement(fbLogin, true);
-    goog.Timer.callOnce(goog.partial(goog.dom.classes.add, fbLogin, 'show'), 400);
+    if (fbLogin) {
+      goog.style.showElement(fbLogin, true);
+      goog.Timer.callOnce(goog.partial(goog.dom.classes.add, fbLogin, 'show'), 400);
+    }
   }, 100);
 
   goog.events.listen(login, goog.events.EventType.CLICK, function(e) {
@@ -376,91 +393,7 @@ brkn.Main.staticInit = function() {
       }, 1000);
     }
   }
-
-  brkn.Main.makeMusic();
 };
-
-
-brkn.Main.makeMusic = function() {
-  brkn.Main.chord1_ = goog.dom.getElement('chord-1');
-  brkn.Main.chord2_ = goog.dom.getElement('chord-2');
-  brkn.Main.chord3_ = goog.dom.getElement('chord-3');
-  brkn.Main.chord4_ = goog.dom.getElement('chord-4');
-  brkn.Main.mp31_ = goog.dom.getElement('mp3-1');
-  brkn.Main.mp32_ = goog.dom.getElement('mp3-2');
-  brkn.Main.mp33_ = goog.dom.getElement('mp3-3');
-  brkn.Main.mp34_ = goog.dom.getElement('mp3-4');
-  brkn.Main.mp31_.volume = .5;
-  brkn.Main.mp32_.volume = .5;
-  brkn.Main.mp33_.volume = .5;
-  brkn.Main.mp34_.volume = .5;
-  brkn.Main.mp31_.load();
-  brkn.Main.mp32_.load();
-  brkn.Main.mp33_.load();
-  brkn.Main.mp34_.load();
-
-  goog.events.listen(brkn.Main.chord1_, goog.events.EventType.CLICK, function(e) {
-    brkn.Main.mp31_.load();
-    brkn.Main.mp31_.play();
-  });
-  goog.events.listen(brkn.Main.chord2_, goog.events.EventType.CLICK, function(e) {
-    brkn.Main.mp32_.load();
-    brkn.Main.mp32_.play();
-  });
-  goog.events.listen(brkn.Main.chord3_, goog.events.EventType.CLICK, function(e) {
-    brkn.Main.mp33_.load();
-    brkn.Main.mp33_.play();
-  });
-  goog.events.listen(brkn.Main.chord4_, goog.events.EventType.CLICK, function(e) {
-    brkn.Main.mp34_.load();
-    brkn.Main.mp34_.play();
-  });
-};
-
-
-brkn.Main.playJingle = function() {
-  goog.Timer.callOnce(function() {
-    goog.dom.classes.add(brkn.Main.chord1_, 'strike');
-    brkn.Main.mp31_.play();
-  }, 500);
-  goog.Timer.callOnce(function() {
-    goog.dom.classes.remove(brkn.Main.chord1_, 'strike');
-    goog.dom.classes.add(brkn.Main.chord2_, 'strike');
-    brkn.Main.mp32_.play();
-  }, 800);
-  goog.Timer.callOnce(function() {
-    goog.dom.classes.remove(brkn.Main.chord2_, 'strike');
-    goog.dom.classes.add(brkn.Main.chord3_, 'strike');
-    brkn.Main.mp33_.play();
-  }, 1100);
-  goog.Timer.callOnce(function() {
-    goog.dom.classes.remove(brkn.Main.chord3_, 'strike');
-    goog.dom.classes.add(brkn.Main.chord4_, 'strike');
-    brkn.Main.mp34_.play();
-  }, 1400);
-  goog.Timer.callOnce(function() {
-    goog.dom.classes.remove(brkn.Main.chord4_, 'strike');
-    goog.dom.classes.add(brkn.Main.chord3_, 'strike');
-    brkn.Main.mp33_.load();
-    brkn.Main.mp33_.play();
-  }, 1700);
-  goog.Timer.callOnce(function() {
-    goog.dom.classes.remove(brkn.Main.chord3_, 'strike');
-    goog.dom.classes.add(brkn.Main.chord2_, 'strike');
-    brkn.Main.mp32_.load();
-    brkn.Main.mp32_.play();
-  }, 2000);
-  goog.Timer.callOnce(function() {
-    goog.dom.classes.remove(brkn.Main.chord2_, 'strike');
-    goog.dom.classes.add(brkn.Main.chord1_, 'strike');
-    brkn.Main.mp31_.load();
-    brkn.Main.mp31_.play();
-  }, 2300);
-  goog.Timer.callOnce(function() {
-    goog.dom.classes.remove(brkn.Main.chord1_, 'strike');
-  }, 2600);
-};
-
 
 /**
  * @param {boolean} expand
@@ -534,7 +467,7 @@ brkn.Main.login = function() {
   var fbLogin = goog.dom.getElement('fb-login');
   var loginPage = goog.dom.getElement('login');
   brkn.Main.getSessionAndInit();
-  goog.events.listen(fbLogin, goog.events.EventType.CLICK, function() {
+  fbLogin && goog.events.listen(fbLogin, goog.events.EventType.CLICK, function() {
     goog.dom.classes.add(fbLogin, 'disabled');
 
       if (IPAD) {
@@ -562,13 +495,43 @@ brkn.Main.getSessionAndInit = function() {
   var fbLogin = goog.dom.getElement('fb-login');
   var staticContent = goog.dom.getElement('static-content');
   var login = goog.dom.getElement('login');
-  var loginPromoEl = goog.dom.getElement('login-promo');
+  var telepathVideo = goog.dom.getElement('telepath-video');
+  var videoStarted = !telepathVideo;
+  var videoEnded = !telepathVideo;
+  var sessionLoaded = false;
+  var telepathSpinner = goog.dom.getElement('telepath-spinner');
+  var embedSpinner = goog.dom.getElement('telepath-embed-spinner');
 
-  goog.dom.classes.add(fbLogin, 'disabled');
-  goog.dom.classes.add(fbLogin, 'spin');
-  goog.net.XhrIo.send('/_session?uuid=' + Math.round(Math.random()*10000000000),
+  fbLogin && goog.dom.classes.add(fbLogin, 'disabled');
+  fbLogin && goog.dom.classes.add(fbLogin, 'spin');
+
+  var reveal = function() {
+    goog.Timer.callOnce(function() {
+      goog.style.showElement(goog.dom.getElement('embed-spinner'), false);
+      goog.dom.classes.add(login, 'hide');
+      goog.Timer.callOnce(function() {
+        goog.style.showElement(goog.dom.getElement('homepage'), false);
+        goog.dom.classes.add(login, 'app');
+        goog.dom.classes.add(staticContent, 'faq');
+      }, 600);
+    }, 600);
+  };
+
+  if (telepathSpinner) {
+    goog.events.listen(telepathSpinner, 'click', function() {
+      window.location = document.URL;
+    });
+  }
+  if (embedSpinner) {
+    goog.events.listen(embedSpinner, 'click', function() {
+      window.location = document.URL;
+    });
+  }
+
+  goog.net.XhrIo.send('/_session' + (YOUTUBE_CHANNEL ? '?ytc=' + YOUTUBE_CHANNEL : ''),
       function(e) {
         if (e.target.getStatus() == 200) {
+          sessionLoaded = true;
           var data = e.target.getResponseJson();
           if (data['error']) {
             var error = goog.dom.getElement('error');
@@ -582,35 +545,6 @@ brkn.Main.getSessionAndInit = function() {
             goog.dom.classes.add(message, 'show');
             return;
           }
-          var reveal = function() {
-            goog.Timer.callOnce(function() {
-              goog.style.showElement(goog.dom.getElement('embed-spinner'), false);
-              goog.dom.classes.add(login, 'hide');
-              goog.dom.classes.remove(loginPromoEl, 'show');
-              goog.Timer.callOnce(function() {
-                goog.style.showElement(goog.dom.getElement('homepage'), false);
-                goog.style.showElement(loginPromoEl, false);
-                goog.dom.classes.add(login, 'app');
-                goog.dom.classes.add(staticContent, 'faq');
-              }, 600);
-            }, 600);
-          };
-          var loginPromo = function() {
-            goog.Timer.callOnce(function() {
-              goog.dom.classes.add(login, 'fade');
-              goog.style.showElement(loginPromoEl, true);
-              goog.dom.classes.add(loginPromoEl, 'show');
-              goog.dom.classes.remove(fbLogin, 'disabled');
-              goog.dom.classes.remove(fbLogin, 'spin');
-//              goog.Timer.callOnce(function() {
-//                goog.style.showElement(goog.dom.getElement('homepage'), false);
-//                goog.dom.classes.add(login, 'app');
-//                goog.dom.classes.add(staticContent, 'faq');
-//              }, 600);
-            }, 600);
-          };
-
-          goog.dom.classes.remove(document.body, 'login');
 
           if (LOADED) {
             brkn.model.Users.getInstance().setCurrentUser(data['current_user']);
@@ -621,19 +555,39 @@ brkn.Main.getSessionAndInit = function() {
           }
 
           if (!LOGIN_REQUIRED || brkn.model.Users.getInstance().currentUser.loggedIn) {
+            goog.dom.classes.remove(document.body, 'login');
             goog.Timer.callOnce(reveal);
-          } else {
-            goog.Timer.callOnce(loginPromo);
+            window.dispatchEvent((new Event('telepath-ready')));
+            if (window.parent) {
+              window.parent.dispatchEvent((new Event('telepath-ready')));
+            }
           }
 
-        } else if (e.target.getStatus() == 500) {
-          brkn.Main.noLogin('error', 'Oops, check back later');
-          brkn.Main.playJingle();
         } else {
-          brkn.Main.noLogin('wait');
-          brkn.Main.playJingle();
+          if (EMBED) {
+            if (embedSpinner) {
+              goog.dom.classes.add(embedSpinner, 'reload');
+            }
+          } else if (telepathSpinner) {
+            goog.dom.classes.add(telepathSpinner, 'reload');
+            goog.dom.setTextContent(goog.dom.getElement('telepath-tagline'), 'Oops, try reloading')
+          } else {
+            brkn.Main.noLogin('error', 'Oops, try reloading');
+          }
         }
       }, 'POST');
+
+  // if (telepathVideo) {
+  //   goog.events.listen(telepathVideo, 'playing', function() {
+  //     goog.Timer.callOnce(function() {
+  //       videoStarted = true;
+  //       if (sessionLoaded) {
+  //         goog.dom.classes.remove(document.body, 'login');
+  //         goog.Timer.callOnce(reveal);
+  //       }
+  //     }, 2500);
+  //   });
+  // }
 };
 
 /**
@@ -653,13 +607,27 @@ brkn.Main.noLogin = function(opt_class, opt_message) {
     var waitlist = goog.dom.getElementByClass('waitlist', fbLogin);
     goog.dom.setTextContent(waitlist, opt_message);
   }
-  goog.dom.classes.remove(fbLogin, 'spin');
-  goog.dom.classes.add(fbLogin, 'disabled');
-  goog.style.showElement(fbLogin, true);
-  goog.dom.classes.add(fbLogin, 'show');
-  goog.dom.classes.add(fbLogin, 'waitlist');
+
+  if (fbLogin) {
+    goog.dom.classes.remove(fbLogin, 'spin');
+    goog.dom.classes.add(fbLogin, 'disabled');
+    goog.style.showElement(fbLogin, true);
+    goog.dom.classes.add(fbLogin, 'show');
+    goog.dom.classes.add(fbLogin, 'waitlist');
+  }
 };
 
+brkn.Main.play = function() {
+  brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.PLAY, true);
+};
+
+brkn.Main.pause = function() {
+  brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.PLAY, false);
+};
+
+brkn.Main.getCurrentProgram = function() {
+  return brkn.model.Player.getInstance().getCurrentProgram();
+};
 
 String.prototype.toHHMMSS = function () {
   var sec_numb    = parseInt(this, 10);
@@ -677,3 +645,6 @@ String.prototype.toHHMMSS = function () {
 
 goog.exportSymbol('brkn.Main.staticInit', brkn.Main.staticInit);
 goog.exportSymbol('brkn.Main.auth', brkn.Main.auth);
+goog.exportSymbol('window.play', brkn.Main.play);
+goog.exportSymbol('window.pause', brkn.Main.pause);
+goog.exportSymbol('window.getCurrentProgram', brkn.Main.getCurrentProgram);

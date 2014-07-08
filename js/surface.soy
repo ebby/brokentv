@@ -1,0 +1,41 @@
+{namespace brkn.surface}
+
+/**
+ * @param media
+ */
+{template .main}
+  <div class="telepath-surface">
+    <div class="program">
+      <div class="thumb" style="background-image:url({$media.Mb})"></div>
+      <div class="suggestion">Watch the latest</div>
+      <div class="play-button"></div>
+      <div class="title">{$media.name}</div>
+    </div>
+    <div class="tab"></div>
+  </div>
+{/template}
+
+/**
+ * @param media
+ */
+{template .embed}
+  <div class="telepath-embed">
+    <div class="program">
+      <div class="thumb" style="background-image:url({$media.Mb})"></div>
+      <div class="suggestion">Watch the latest</div>
+      <div class="play-button"></div>
+      <div class="title">{$media.name}</div>
+    </div>
+    <div class="tab"></div>
+  </div>
+{/template}
+
+/**
+ * @param youtube_channel
+ */
+{template .player}
+  <div class="telepath-overlay hide">
+    <div class="close-button"><div class="left"></div><div class="right"></div></div>
+    <iframe id="telepath-iframe" AllowFullScreen src="http://www.telepath.tv/?ytc={$youtube_channel}&embed=1&autoplay=0" style="width:1000px;height:604px;border:none"></iframe>
+  </div>
+{/template}

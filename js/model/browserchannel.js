@@ -4,6 +4,7 @@ goog.require('brkn.model.Controller');
 goog.require('brkn.model.Channels');
 goog.require('brkn.model.Comment');
 goog.require('brkn.model.Medias');
+goog.require('brkn.model.Notification');
 goog.require('brkn.model.Users');
 
 goog.require('goog.pubsub.PubSub');
@@ -17,7 +18,7 @@ goog.require('goog.pubsub.PubSub');
  */
 brkn.model.BrowserChannel = function(token) {
 	goog.base(this);
-	
+
 	/**
 	 * @type {boolean}
 	 * @private
@@ -63,10 +64,10 @@ brkn.model.BrowserChannel.prototype.onMessage_ = function(rawMessage) {
 	  case 'viewer_change':
 	    var user = brkn.model.Users.getInstance().get_or_add(message['user']);
 
-	    var time = message['time'] && goog.date.fromIsoString(message['time'] + 'Z'); 
+	    var time = message['time'] && goog.date.fromIsoString(message['time'] + 'Z');
 	    if (user.currentSession && time) {
-	      user.currentSession.end(time); 
-	    } 
+	      user.currentSession.end(time);
+	    }
 
 	    var lastChannel = message['last_channel_id'] && brkn.model.Channels.getInstance().get(message['last_channel_id']);
 	    if (lastChannel) {

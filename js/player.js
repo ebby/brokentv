@@ -21,6 +21,12 @@ goog.require('goog.ui.CustomButton');
 brkn.Player = function() {
 	goog.base(this);
 
+  /**
+   * @type {boolean}
+   * @private
+   */
+  this.shouldPlay_ = AUTOPLAY;
+
 	/**
 	 * @type {boolean}
 	 * @private
@@ -634,18 +640,20 @@ brkn.Player.prototype.playerStateChange_ = function(event) {
 
   switch (event.data) {
     case YT.PlayerState.CUED:
-      // var seek = brkn.model.Player.getInstance().getCurrentProgram().async ?
-      //     brkn.model.Player.getInstance().getCurrentProgram().seek :
-      //       brkn.model.Controller.getInstance().timeless ? 0 :
-      //         (goog.now() - brkn.model.Player.getInstance().getCurrentProgram().time.getTime())/1000;
-      // this.player_.seekTo(0);
       this.player_.playVideo();
       brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.PLAY, true);
       break;
     case YT.PlayerState.PLAYING:
-      this.nexted_ = false;
-      brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.PLAYING,
-          brkn.model.Player.getInstance().getCurrentProgram().media);
+      if (this.shouldPlay_) {
+          this.nexted_ = false;
+          this.player_.unMute();
+          brkn.model.Player.getInstance().publish(brkn.model.Player.Actions.PLAYING,
+              brkn.model.Player.getInstance().getCurrentProgram().media);
+      } else {
+        this.shouldPlay_ = true;
+        this.player_.pauseVideo();
+        brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.PLAY, false);
+      }
       break;
     case YT.PlayerState.ENDED:
       if (brkn.model.Users.getInstance().currentUser.loggedIn &&
@@ -667,14 +675,13 @@ brkn.Player.prototype.playerStateChange_ = function(event) {
  */
 brkn.Player.prototype.onPlayerReady_ = function(event) {
   this.player_.setPlaybackQuality('large');
-  var seek = brkn.model.Player.getInstance().getCurrentProgram().async ?
-      brkn.model.Player.getInstance().getCurrentProgram().seek :
-        brkn.model.Controller.getInstance().timeless ? 0 :
-          (goog.now() - brkn.model.Player.getInstance().getCurrentProgram().time.getTime())/1000;
-  //this.player_.seekTo(seek);
   this.player_.playVideo();
-  brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.MUTE,
-      this.player_.isMuted());
+  if (!this.shouldPlay_) {
+    this.player_.mute();
+  } else {
+    brkn.model.Controller.getInstance().publish(brkn.model.Controller.Actions.MUTE,
+        this.player_.isMuted());
+  }
 };
 
 
@@ -728,7 +735,7 @@ brkn.Player.prototype.updateStagecover_ = function(opt_message, opt_beforeEnd, o
     goog.style.showElement(this.spinner_, false);
     goog.style.showElement(this.restart_, false);
     goog.dom.classes.remove(stagecover, 'covered');
-    goog.style.showElement(this.vote_, !EMBED && (brkn.model.Users.getInstance().currentUser.loggedIn ||
+    goog.style.showElement(this.vote_, (brkn.model.Users.getInstance().currentUser.loggedIn ||
         brkn.model.Channels.getInstance().currentChannel.id == 'reddit' ||
         brkn.model.Player.getInstance().getCurrentProgram().media.redditId));
   } else {
@@ -736,7 +743,7 @@ brkn.Player.prototype.updateStagecover_ = function(opt_message, opt_beforeEnd, o
         brkn.Player.Messages.LOADING);
     goog.style.showElement(this.spinner_, true);
     goog.style.showElement(this.restart_, false);
-    goog.style.showElement(this.vote_, !EMBED && (brkn.model.Users.getInstance().currentUser.loggedIn ||
+    goog.style.showElement(this.vote_, (brkn.model.Users.getInstance().currentUser.loggedIn ||
         brkn.model.Channels.getInstance().currentChannel.id == 'reddit' ||
         brkn.model.Player.getInstance().getCurrentProgram().media.redditId));
     goog.dom.classes.add(stagecover, 'covered');

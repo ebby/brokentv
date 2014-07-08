@@ -1,0 +1,126 @@
+div.notes {
+  overflow-x: hidden;
+  overflow-y: scroll !important;
+  width: 320px;
+  height: 282px;
+  padding-top: 18px;
+
+  div.no-comments {
+    margin: 10px;
+    cursor: default;
+  }
+  div.no-comments, div.no-info {
+    width: 280px;
+    .border-radius(3px);
+    font-size: 13px;
+    text-align: center;
+    color: #ecf0f1;
+    text-shadow: 0 0 1px rgba(0, 0, 0, .5);
+    padding: 10px;
+    margin: 0 10px;
+    font-family: MuseoSans500;
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -15px;
+    margin-left: -150px;
+  }
+  div.spinner {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 90px;
+    height: 90px;
+    margin-left: -45px;
+    margin-top: -45px;
+    background: @spinner3 no-repeat center;
+    .border-radius(6px);
+    z-index: 100;
+  }
+  div.notification {
+    margin-top: 10px;
+    width: 320px;
+    position: relative;
+    border-bottom: 1px solid #999;
+    .box-shadow(0, 1px, 1px, rgba(0, 0, 0, .1));
+    cursor: pointer;
+    background: rgba(255, 255, 255, .8);
+    margin-top: 0;
+    padding: 7px 0;
+    position: relative;
+    &:active {
+      background: rgba(255, 255, 255, .6);
+    }
+    &:first-child {
+      border-top: 1px solid #999;
+      margin-top: 18px;
+    }
+    &.unread {
+      background: white;
+      &:hover {
+        background: white;
+      }
+    }
+    div.type {
+      width: 200px;
+    }
+    div.body {
+      position: relative;
+      left: 50px;
+      top: 0;
+      margin-bottom: 0;
+      width: 260px;
+      font-family: MuseoSans500;
+      font-size: 11px;
+      color: #181818;
+      a {
+        font-family: MuseoSans700;
+        color: #181818;
+      }
+      div.text {
+        background: #3498db;
+        color: white;
+        margin-top: 4px;
+        padding: 5px;
+        font-family: MuseoSans300;
+        font-size: 13px;
+        .border-radius(3px);
+        .box-shadow(inset, 0, 0, 1px, 0, rgba(0, 0, 0, 0.4));
+        &:last-child {
+          div.timestamp {
+            display: block;
+          }
+        }
+      }
+      div.timestamp {
+        font-size: 10px;
+        font-family: MuseoSans300;
+        position: absolute;
+        top: 1px;
+        right: 0;
+        color: #181818;
+      }
+    }
+    div.picture {
+      position: absolute;
+      background: #ccc;
+      width: 34px;
+      height: 34px;
+      .border-radius(18px);
+      .box-shadow(0px, 0px, 1px, 0, rgba(0, 0, 0, 0.6));
+      display: inline-block;
+      margin-left: 9px;
+      img {
+        width: 34px;
+        height: 34px;
+        .border-radius(17px);
+      }
+      &:active {
+        img {
+          .box-shadow(0, 0, 1px, 1px, rgba(0, 0, 0, .1));
+        }
+      }
+    }
+  }
+}

@@ -50,18 +50,25 @@ jinja_environment = jinja2.Environment(
 
 class MainHandler(BaseHandler):
     def get(self, path=None):
+      if path == 'undefined' or path == 'null':
+        return
+
+      self.response.headers.add_header("Access-Control-Allow-Origin", "*")
       self.session.clear()
 
       mobile = self.request.host_url.startswith('http://m.') or self.request.get('mobile') \
           or 'iPhone;' in self.request.headers.get('user_agent')
 
-      logging.info(self.request.host_url)
       if mobile and 'onxylo' in self.request.host_url:
         self.redirect('http://www.xylocast.com')
         return
 
+
+
       template_data = {}
       template_data['host_url'] = self.request.host_url
+      template_data['telepath'] = True
+      template_data['autoplay'] = self.request.get('autoplay') == '1' if self.request.get('autoplay', None) != None else True
       if self.request.get('debug') == '3229':
         template_data['js_location'] = constants.DEBUG_JS
       elif self.request.get('prod') or not constants.DEVELOPMENT:
@@ -93,7 +100,9 @@ class MainHandler(BaseHandler):
       self.session['single_channel_id'] = qs['sc'][0] if qs.get('sc') else self.request.get('sc')
 
       # SINGLE YOUTUBE CHANNEL
-      self.session['youtube_channel_id'] = qs['ytc'][0] if qs.get('ytc') else self.request.get('ytc')
+      youtube_channel_id = qs['ytc'][0] if qs.get('ytc') else self.request.get('ytc')
+      #self.session['youtube_channel_id'] = youtube_channel_id
+      template_data['youtube_channel_id'] = youtube_channel_id
 
       # LINKS
       channel_id = qs['c'][0] if qs.get('c') else self.request.get('c')
@@ -197,6 +206,32 @@ class EmbedSampleHandler(BaseHandler):
     def get(self):
       path = os.path.join(os.path.dirname(__file__), 'templates/embedsample.html')
       self.response.out.write(template.render(path, {}))
+
+class NatGeoHandler(BaseHandler):
+    def get(self):
+      path = os.path.join(os.path.dirname(__file__), 'templates/natgeo.html')
+      self.response.out.write(template.render(path, {}))
+
+class SurfaceHandler(BaseHandler):
+    def get(self):
+      data = {}
+      data['url'] = self.request.get('url') or 'http://www.nationalgeographic.com'
+      data['youtube'] = self.request.get('youtube') or 'UCpVm7bg6pXKo1Pr6k5kxG9A'
+      path = os.path.join(os.path.dirname(__file__), 'templates/surface.html')
+      self.response.out.write(template.render(path, data))
+
+
+class EmbedHandler(BaseHandler):
+    def get(self, site=None):
+      data = {}
+      if site == 'vice-demo':
+        data['url'] = self.request.get('url') or 'http://www.vicenews.com'
+        data['youtube'] = self.request.get('youtube') or 'UCZaT_X_mc0BI-djXOlfhqWQ'
+      else:
+        data['url'] = self.request.get('url') or 'http://www.nationalgeographic.com'
+        data['youtube'] = self.request.get('youtube') or 'UCpVm7bg6pXKo1Pr6k5kxG9A'
+      path = os.path.join(os.path.dirname(__file__), 'templates/surface.html')
+      self.response.out.write(template.render(path, data))
 
 class RedirectHandler(BaseHandler):
     def get(self, path=None):
@@ -373,6 +408,9 @@ def create_handlers_map():
     ('/newsletter', NewsletterHandler),
     ('/embedsample', EmbedSampleHandler),
     ('/vice-demo', EmbedSampleHandler),
+    ('/natgeo-demo', NatGeoHandler),
+    ('/surface', SurfaceHandler),
+    ('/embed/(.*)', EmbedHandler),
     ('/(.*)', MainHandler),
   ]
 

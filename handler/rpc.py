@@ -10,8 +10,9 @@ def get_session(current_user=None, media_id=None, channel_id=None, single_channe
   if not len(cached_channels):
     # No cached channels, attempt to fetch
     channels = Channel.get_public()
-    cached_channels = [c.toJson() for c in channels]
-    memcache.set('channels', cached_channels)
+    if channels and len(channels):
+      cached_channels = [c.toJson() for c in channels]
+      memcache.set('channels', cached_channels)
 
   cached_programming = memcache.get('programming') or {}
 
@@ -21,109 +22,87 @@ def get_session(current_user=None, media_id=None, channel_id=None, single_channe
       cached_channels = single_channel
 
   if youtube_channel_id:
-    youtube_channel_name = youtube_channel_id.split(',')[0]
-    youtube_channel_id = youtube_channel_id.split(',')[1]
-    cid = None#current_user.id + '-' + youtube_channel_id if current_user else None
-    cached_channel = None#memcache.get(cid) if cid else None
-    already_programmed = False
-    # if cached_channel and len(cached_channel.get('programs', [])):
-    #     last_program_time = iso8601.parse_date(
-    #         cached_channel.get('programs')[-1]['time']).replace(tzinfo=None)
-    #     if last_program_time > datetime.datetime.now() - datetime.timedelta(seconds=1200):
-    #       youtube_channel = cached_channel['channel']
-    #       already_programmed = True
-
-    if not already_programmed:
-      data_json = Channel.youtube_channel(youtube_channel_name, user=current_user,
-                                          yt_channel_id=youtube_channel_id)
-      youtube_channel = data_json['channel']
-      cached_programming = dict(cached_programming.items() + {youtube_channel['id']:data_json['programs']}.items())
-    cached_channels = [youtube_channel]
-
-  if not len(cached_programming):
-    if constants.SAVE_PROGRAMS:
-      # No cached programming, attempt to fetch
-      channels = channels or Channel.get_public()
-      cached_programming = Program.get_current_programs(channels)
+    if len(youtube_channel_id.split(',')) > 1:
+      youtube_channel_name = youtube_channel_id.split(',')[0]
+      youtube_channel_id = youtube_channel_id.split(',')[1]
     else:
-      # Generate programming to memcache
-      for channel in cached_channels:
-        deferred.defer(programming.Programming.set_programming, channel['id'],
-                       _name=channel['name'].replace(' ', '') + '-' + str(uuid.uuid1()),
-                       _queue='programming', fetch_twitter=(not constants.DEVELOPMENT))
+      youtube_channel_name = youtube_channel_id
+
+    cid = None
+    cached_channel = None
+    data_json = Channel.youtube_channel(youtube_channel_name, user=current_user,
+                                        yt_channel_id=youtube_channel_id)
+    youtube_channel = data_json['channel']
+    cached_programming = dict(cached_programming.items() + {youtube_channel['id']:data_json['programs']}.items())
+    channels = [youtube_channel]
+    current_channel = youtube_channel
+    cached_channels = channels
+
+  if not youtube_channel_id:
+    if not len(cached_programming):
+      if constants.SAVE_PROGRAMS:
+        # No cached programming, attempt to fetch
+        channels = channels or Channel.get_public()
+        cached_programming = Program.get_current_programs(channels)
+      else:
+        # Generate programming to memcache
+        for channel in cached_channels:
+          deferred.defer(programming.Programming.set_programming, channel['id'],
+                         _name=channel['name'].replace(' ', '') + '-' + str(uuid.uuid1()),
+                         _queue='programming', fetch_twitter=(not constants.DEVELOPMENT))
 
 
-  # Tack on the user's private channel if it exists, and programming
-  user_channel = current_user.channel.get() or Channel.get_my_channel(current_user) if current_user \
-      else None
+  # user_channel = None
+  # if not youtube_channel_id:
+  #   # Tack on the user's private channel if it exists, and programming
+  #   user_channel = current_user.channel.get() or Channel.get_my_channel(current_user) if current_user \
+  #       else None
 
   media = None
   current_channel = None
   if media_id:
     media = Media.get_by_key_name(media_id)
-    if media and user_channel:
-      current_channel = user_channel
-      program = Program.add_program(current_channel, media, time=datetime.datetime.now(), async=True)
+  #   if media and user_channel:
+  #     current_channel = user_channel
+  #     program = Program.add_program(current_channel, media, time=datetime.datetime.now(), async=True)
 
-  if user_channel:
-    user_programs = Program.get_current_programs([user_channel])
-    if user_programs:
-      cached_channels.append(user_channel.toJson())
-      cached_programming = dict(cached_programming.items() + user_programs.items())
-  elif media:
+  # if user_channel:
+  #   user_programs = Program.get_current_programs([user_channel])
+  #   if user_programs:
+  #     cached_channels.append(user_channel.toJson())
+  #     cached_programming = dict(cached_programming.items() + user_programs.items())
+  if media:
     current_channel = Channel(key_name='temp', name='My Channel', privacy=constants.Privacy.PRIVATE)
     program = Program.add_program(current_channel, media, time=datetime.datetime.now())
     program.async = True
     cached_channels.append(current_channel.toJson())
     cached_programming = dict(cached_programming.items() + {'temp':[program.toJson()]}.items())
 
-  user_json = memcache.get(current_user.id) or {} if current_user else None
-  if user_json and 'channels' in user_json:
-    for cid in user_json['channels']:
-      c = memcache.get(cid)
-      if c and len(c.get('programs', [])):
-        last_program_time = iso8601.parse_date(c.get('programs')[-1]['time']).replace(tzinfo=None)
-        if last_program_time > datetime.datetime.now() - datetime.timedelta(seconds=1200):
-          cached_channels.append(c['channel'])
-          cached_programming = dict(cached_programming.items() + {cid:c['programs']}.items())
-        else:
-          user_json['channels'].remove(cid)
-          memcache.delete(cid)
+  # if not youtube_channel_id:
+  #   user_json = memcache.get(current_user.id) or {} if current_user else None
+  #   if user_json and 'channels' in user_json:
+  #     for cid in user_json['channels']:
+  #       c = memcache.get(cid)
+  #       if c and len(c.get('programs', [])):
+  #         last_program_time = iso8601.parse_date(c.get('programs')[-1]['time']).replace(tzinfo=None)
+  #         if last_program_time > datetime.datetime.now() - datetime.timedelta(seconds=1200):
+  #           cached_channels.append(c['channel'])
+  #           cached_programming = dict(cached_programming.items() + {cid:c['programs']}.items())
+  #         else:
+  #           user_json['channels'].remove(cid)
+  #           memcache.delete(cid)
 
   data['channels'] = cached_channels
   data['programs'] = cached_programming
-
-  # MAKE SURE WE HAVE CHANNELS
-  channels = channels or Channel.get_public()
-  assert len(channels) > 0, 'NO CHANNELS IN DATABASE'
 
   data['current_channel'] = channel_id or \
         (current_channel.id if current_channel else current_user.current_channel_id \
         if current_user and current_user.current_channel_id else cached_channels[0]['id'])
 
-  # ME
-  if current_user:
-    user_obj = current_user.toJson(configs=True)
-    data['current_user'] = user_obj
-
-    # Update login
-    current_user.last_login = datetime.datetime.now()
-    current_user.put()
-
-    #clear outbox
-    memcached_user_obj = memcache.get(current_user.id) or {}
-    if memcached_user_obj.get('outbox'):
-      del memcached_user_obj['outbox']
-      memcache.set(current_user.id, memcached_user_obj)
-
   return data
 
 class SessionHandler(BaseHandler):
   def post(self):
-    if self.current_user and self.current_user.access_level < AccessLevel.USER and \
-        constants.INVITE_POLICY() == constants.InvitePolicy.ANYBODY:
-      self.current_user.grant_access()
-
     if constants.LOGIN_REQUIRED and self.current_user.access_level < AccessLevel.USER:
       self.error(401)
     else:
@@ -141,7 +120,7 @@ class SessionHandler(BaseHandler):
       media_id = self.session.get('media_id', None)
       channel_id = self.session.get('channel_id', None)
       single_channel_id = self.session.get('single_channel_id', None)
-      youtube_channel_id = self.session.get('youtube_channel_id', None)
+      youtube_channel_id = self.request.get('ytc') or self.session.get('youtube_channel_id', None)
 
       if not data.get('error'):
         data = get_session(self.current_user, media_id=media_id, channel_id=channel_id,
@@ -194,8 +173,8 @@ class PresenceHandler(BaseHandler):
 
     last_session_json = UserSession.get_last_session(current_user.id)
     current_channel_id = current_user.current_channel_id if current_user.current_channel_id \
-        else Channel.get_public()[0].id
-    current_channel = Channel.get_by_key_name(current_channel_id)
+        else (Channel.get_public()[0].id if len(Channel.get_public()) else None)
+    current_channel = Channel.get_by_key_name(current_channel_id) if current_channel_id else None
     last_session_tune_out = iso8601.parse_date(last_session_json['tune_out']).replace(tzinfo=None) \
         if last_session_json and last_session_json.get('tune_out') else None
     if last_session_json and not last_session_json['tune_out']:
@@ -294,7 +273,6 @@ class PlayHandler(BaseHandler):
                                       None, None, media);
 
 class ProgramHandler(BaseHandler):
-  @BaseHandler.logged_in
   def get(self, channel_id):
     duration = self.request.get('duration')
     duration = int(duration) if duration else 1200
@@ -456,13 +434,13 @@ class PollHandler(BaseHandler):
         return
     self.response.out.write(simplejson.dumps(None))
 
-  @BaseHandler.logged_in
   def post(self):
     id = self.request.get('id')
     media_id = self.request.get('media_id')
     title = self.request.get('title')
     options = self.request.get('options')
 
+    logging.info(self.current_user)
     if id and self.current_user:
       pollOption = PollOption.get_by_id(int(id))
       if not self.current_user.id in pollOption.voters:
@@ -841,12 +819,19 @@ class WelcomedHandler(BaseHandler):
     current_user.put()
 
 class YoutubeChannelHandler(BaseHandler):
+  def get(self):
+    response = {}
+    page_token = self.request.get('pagetoken')
+    yt_channel_id = self.request.get('channel_id')
+    data_json = Channel.youtube_channel(yt_channel_id=yt_channel_id, page_token=page_token)
+    self.response.out.write(simplejson.dumps(data_json))
   def post(self):
     response = {}
     token = self.request.get('token')
     name = self.request.get('name')
+    page_token - self.request.get('pagetoken')
     yt_channel_id = self.request.get('channel_id')
     yt_playlist_id = self.request.get('playlist_id')
     data_json = Channel.youtube_channel(name, user=self.current_user, token=token, yt_channel_id=yt_channel_id,
-                                        yt_playlist_id=yt_playlist_id)
+                                        yt_playlist_id=yt_playlist_id, page_token=page_token)
     self.response.out.write(simplejson.dumps(data_json))

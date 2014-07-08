@@ -16,12 +16,12 @@ goog.require('goog.pubsub.PubSub');
  */
 brkn.model.Channel = function(channel) {
 	goog.base(this);
-	
+
 	/**
 	 * @type {string}
 	 */
 	this.id = channel['id'];
-	
+
 	/**
 	 * @type {string}
 	 */
@@ -31,7 +31,12 @@ brkn.model.Channel = function(channel) {
    * @type {boolean}
    */
   this.myChannel = channel['my_channel'];
-  
+
+	/**
+	* @type {boolean}
+	*/
+	this.youtube = channel['youtube'];
+
   /**
    * @type {boolean}
    */
@@ -52,7 +57,7 @@ brkn.model.Channel = function(channel) {
 	 * @type {Array.<brkn.model.Program>}
 	 */
 	this.programming = [];
-	
+
 	/**
    * @type {Object.<string, brkn.model.Program>}
    */
@@ -72,7 +77,12 @@ brkn.model.Channel = function(channel) {
    * @type {Array.<brkn.model.Media>}
    */
   this.queue = [];
-  
+
+	/**
+	* @type {string}
+	*/
+	this.nextPageToken = channel['next_page_token'];
+
   /**
    * @type {number}
    * @private
@@ -88,7 +98,7 @@ brkn.model.Channel = function(channel) {
 	this.subscribe(brkn.model.Channel.Action.ADD_QUEUE, this.addQueue, this);
 	this.subscribe(brkn.model.Channel.Action.ADD_VIEWER, this.addViewer, this);
 	this.subscribe(brkn.model.Channel.Action.UPDATE_PROGRAM, this.updateProgram, this);
-	
+
 	if (!this.currentProgram) {
     this.currentProgramIndex = 0;
     this.currentProgram = this.programming[0];
@@ -114,7 +124,7 @@ brkn.model.Channel.prototype.addProgram = function(program) {
 	  this.currentProgramIndex = this.programming.length - 1;
 	  this.currentProgram = program;
 	}
-	if (program.time.getTime() + program.media.duration*1000 > this.lastTime_) {
+	if (!this.youtubeChannel && program.time.getTime() + program.media.duration*1000 > this.lastTime_) {
 	  this.lastTime_ = program.time.getTime() + program.media.duration*1000 - 120000;
 	  brkn.model.Clock.getInstance().addEvent(this.lastTime_,
 	      goog.bind(this.maybeFetchProgramming, this, this.lastTime_));
@@ -153,7 +163,7 @@ brkn.model.Channel.prototype.fetchQueue = function(opt_callback) {
  * @param {goog.date.DateTime} time The last programmed time on this channel
  */
 brkn.model.Channel.prototype.maybeFetchProgramming = function(time) {
-  if (this.lastTime_ <= time && !this.myChannel && !goog.DEBUG) {
+  if (this.lastTime_ <= time && !this.myChannel && !goog.DEBUG && !EMBED) {
     this.fetchCurrentProgramming();
   }
 };
@@ -166,11 +176,11 @@ brkn.model.Channel.prototype.maybeFetchProgramming = function(time) {
 brkn.model.Channel.prototype.addQueue = function(media, add) {
   if (add) {
     this.queue.push(media);
-    
+
     brkn.model.Notify.getInstance().publish(brkn.model.Notify.Actions.FLASH,
         'Added to queue', media.name, undefined, media.thumbnail1,
         '#info:' + media.id);
-    
+
     if (brkn.model.Users.getInstance().currentUser.loggedIn) {
       goog.net.XhrIo.send('/_queue', goog.functions.NULL(), 'POST',
           'media_id=' + media.id);
@@ -179,7 +189,7 @@ brkn.model.Channel.prototype.addQueue = function(media, add) {
     goog.array.removeIf(this.queue, function(m) {
       return m.id == media.id;
     }, this);
-    
+
     if (brkn.model.Users.getInstance().currentUser.loggedIn) {
       goog.net.XhrIo.send('/_queue', goog.functions.NULL(), 'POST',
           'media_id=' + media.id + '&delete=1');
@@ -225,6 +235,14 @@ brkn.model.Channel.prototype.updateProgram = function(program) {
   p && p.updateTime(program.time);
 };
 
+/**
+ * @param {brkn.model.Program} program
+ */
+brkn.model.Channel.prototype.setCurrentProgram = function(program) {
+  this.currentProgram = program;
+  var index = goog.array.findIndex(this.programming, function(p){return p.id == program.id});
+  this.currentProgramIndex = (index != -1 ? index : 0);
+};
 
 /**
  * @param {?number=} opt_offset
@@ -244,11 +262,21 @@ brkn.model.Channel.prototype.getCurrentProgram = function(opt_offset) {
   }
 
   if (this.offline && this.currentProgram) {
+		// For async channels
     if (this.currentProgram.ended) {
+			// If the last program ended, get the next one
       this.currentProgram = this.getNextProgram();
+      if (!this.currentProgram) {
+        goog.array.forEach(this.programming, function(program) {
+          program.ended = false;
+        });
+        this.currentProgramIndex = 0;
+        this.currentProgram = this.programming[0];
+      }
     }
   } else if (!this.myChannel) {
-    this.currentProgram = this.getScheduledProgram();
+    this.currentProgramIndex = 0;
+    this.currentProgram = this.programming[0];//this.getScheduledProgram();
   }
 
   if (this.currentProgram && (!this.programming[this.currentProgramIndex] ||
@@ -258,9 +286,11 @@ brkn.model.Channel.prototype.getCurrentProgram = function(opt_offset) {
       return p.id == this.currentProgram.id;
     }, this));
     this.currentProgramIndex = Math.max(index, 0);
-  } else if (!this.currentProgram) {
-    // If no program, index is after list
-    this.currentProgramIndex = this.programming.length;
+  }
+
+  if (!this.currentProgram) {
+    this.currentProgramIndex = 0;
+    this.currentProgram = this.programming[0];
   }
 
   return this.currentProgram;
@@ -280,12 +310,12 @@ brkn.model.Channel.prototype.getScheduledProgram = function() {
     this.currentProgram = program;
     return this.currentProgram;
   }
-  
+
   if (!program || program.time.getTime() >= goog.now()) {
     index = 0;
     program = this.programming[0];
   }
-  
+
   for (var i = index; i < this.programming.length; i++) {
     var p = this.programming[i];
     if (goog.now() >= p.time.getTime() &&
@@ -301,22 +331,38 @@ brkn.model.Channel.prototype.getScheduledProgram = function() {
  * Fetch programming updates from server
  */
 brkn.model.Channel.prototype.fetchCurrentProgramming = function() {
-  goog.net.XhrIo.send('/_programming/' + this.id, goog.bind(function(e) {
-    goog.DEBUG && window.console.log(e.target.getResponse());
-    var programs = /** Array.<Object> */ e.target.getResponseJson();
-    if (!programs.length) {
-      // Try again in 1 second
-      brkn.model.Clock.getInstance().addEvent(goog.now() + 1000,
-          goog.bind(this.maybeFetchProgramming, this, goog.now() + 1000));
-    }
-    goog.array.forEach(programs, function(p) {
-      var hasProgram = this.getProgram(p['id']);
-      if (!hasProgram) {
-        var newProgram = this.getOrAddProgram(p);
-        this.publish(brkn.model.Channel.Action.ADD_PROGRAM, newProgram);
-      }
-    }, this);
-  }, this));
+	if (this.youtube) {
+		goog.net.XhrIo.send('/_ytchannel?channel_id=' + this.id + '&pagetoken=' + this.nextPageToken, goog.bind(function(e) {
+			goog.DEBUG && window.console.log(e.target.getResponse());
+			var response = /** Array.<Object> */ e.target.getResponseJson();
+			this.nextPageToken = response['channel']['next_page_token'];
+			var programs = response['programs'];
+			goog.array.forEach(programs, function(p) {
+				var hasProgram = this.getProgram(p['id']);
+				if (!hasProgram) {
+					var newProgram = this.getOrAddProgram(p);
+					this.publish(brkn.model.Channel.Action.ADD_PROGRAM, newProgram);
+				}
+			}, this);
+		}, this));
+	} else {
+		goog.net.XhrIo.send('/_programming/' + this.id, goog.bind(function(e) {
+			goog.DEBUG && window.console.log(e.target.getResponse());
+			var programs = /** Array.<Object> */ e.target.getResponseJson();
+			if (!programs.length) {
+				// Try again in 1 second
+				brkn.model.Clock.getInstance().addEvent(goog.now() + 1000,
+						goog.bind(this.maybeFetchProgramming, this, goog.now() + 1000));
+			}
+			goog.array.forEach(programs, function(p) {
+				var hasProgram = this.getProgram(p['id']);
+				if (!hasProgram) {
+					var newProgram = this.getOrAddProgram(p);
+					this.publish(brkn.model.Channel.Action.ADD_PROGRAM, newProgram);
+				}
+			}, this);
+		}, this));
+	}
 };
 
 
@@ -331,6 +377,9 @@ brkn.model.Channel.prototype.hasNextProgram = function(opt_offset, opt_index) {
   if (this.myChannel) {
     return index + offset + 1 < this.programming.length || !!this.queue.length;
   }
+	if (index + offset + 1 < this.programming.length) {
+		this.fetchCurrentProgramming();
+	}
   return index + offset + 1 < this.programming.length;
 };
 
@@ -355,7 +404,9 @@ brkn.model.Channel.prototype.getNextProgram = function(opt_index) {
     return this.programming[index + 1];
   } else if (this.myChannel) {
     return this.getNextQueue();
-  }
+  } else {
+		this.fetchCurrentProgramming();
+	}
 	return null;
 };
 
@@ -394,4 +445,3 @@ brkn.model.Channel.Action = {
 	UPDATE_PROGRAM: 'update-program',
 	ONLINE: 'online'
 };
-

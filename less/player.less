@@ -33,13 +33,18 @@ div#logo {
   position: absolute;
   top: 10px;
   left: 10px;
-  width: 108px;
-  height: 18px;
-}
-
-.embed div#logo {
+  height: 20px;
   background-size: contain;
-  width: 88px;
+  width: 100px;
+}
+.telepath div#logo {
+  background: url(/static/img/telepath.svg);
+  background-size: contain;
+  background-repeat: no-repeat;
+  opacity: .8;
+}
+.embed.telepath div#logo {
+  display: none;
 }
 
 #stagecover {
@@ -119,7 +124,7 @@ div#logo {
     .icon-fullscreen();
     width: 20px;
     height: 20px;
-    right: 40px;
+    right: 10px;
     top: 10px;
     color: #f5f5f5;
     font-size: 18px;
@@ -133,7 +138,7 @@ div#logo {
     .icon-expand();
     width: 20px;
     height: 20px;
-    right: 10px;
+    right: 40px;
     top: 10px;
     color: #f5f5f5;
     font-size: 18px;
@@ -179,7 +184,7 @@ div#logo {
 #stage:hover #stagecover div.fullscreen, #stage:hover #stagecover div.expand {
   opacity:.6;
   &:hover {
-    opacity: .9;
+    opacity: 1;
   }
 }
 
@@ -206,11 +211,11 @@ div.vote {
     background: rgba(0, 0, 0, .5);
     .box-shadow(0, 0, 1px, 2px, rgba(255,255,255,0.3));
     &:hover {
-      background: #2F6E53;
+      background: #2ecc71;
       opacity: .9;
     }
     &.checked {
-      background: #2F6E53;
+      background: #2ecc71;
       opacity: .9;
     }
   }
@@ -227,11 +232,11 @@ div.vote {
     cursor: pointer;
     .box-shadow(0, 0, 1px, 2px, rgba(255,255,255,0.3));
     &:hover {
-      background: #B49B4B;
+      background: #f1c40f;
       opacity: .9;
     }
      &.checked {
-      background: #B49B4B;
+      background: #f1c40f;
       opacity: .9;
     }
   }

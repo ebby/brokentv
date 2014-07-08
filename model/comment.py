@@ -70,5 +70,5 @@ class Comment(db.Model):
     json['user'] = self.user.toJson()
     json['text'] = self.text
     json['time'] = self.time.isoformat()
-    json['replies'] = [r.toJson() for r in self.replies.filter('time').fetch(None)]
+    json['replies'] = [r.toJson() for r in self.replies.order('time').fetch(None)]
     return json

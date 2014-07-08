@@ -18,6 +18,7 @@ class Channel(db.Model):
   online = db.BooleanProperty(default=False)
   current_media = db.ReferenceProperty(Media)
   current_seek = db.IntegerProperty(default=0)
+  youtube = db.BooleanProperty(default=False)
 
   # Stats
   opt_ins = db.IntegerProperty(default=0)
@@ -65,12 +66,19 @@ class Channel(db.Model):
     return channel
 
   @classmethod
-  def youtube_channel(cls, name, user=None, token=None, yt_channel_id=None, yt_playlist_id=None):
-    channel = Channel(key_name=((user.id if user else str(token)) + '-' + (yt_channel_id or yt_playlist_id)),
-                      name=name, privacy=Privacy.FRIENDS, online=True, user=user)
+  def youtube_channel(cls, name=None, user=None, token=None, yt_channel_id=None, yt_playlist_id=None, page_token=None):
+    name = name or 'ytchannel'
+    channel = Channel(key_name=(yt_channel_id or yt_playlist_id),
+                      name=name, privacy=Privacy.FRIENDS, online=True, user=user, youtube=True)
     channel_id = (yt_channel_id or yt_playlist_id)
     medias = []
     all = True
+
+    cached_channel = memcache.get(channel_id)
+    #if cached_channel:
+    #  return simplejson.loads(cached_channel)
+
+
     youtube3 = get_youtube3_service()
     search_response = {}
     if yt_channel_id:
@@ -87,6 +95,8 @@ class Channel(db.Model):
             part='id,snippet',
             order='date',
             maxResults=(20 if all else 1),
+            pageToken=page_token,
+            fields='items,nextPageToken',
             type='video'
           ).execute()
       else:
@@ -95,7 +105,8 @@ class Channel(db.Model):
             part='id,snippet',
             order='date',
             maxResults=(20 if all else 1),
-            fields='items',
+            pageToken=page_token,
+            fields='items,nextPageToken',
             type='video'
           ).execute()
     elif yt_playlist_id:
@@ -103,9 +114,14 @@ class Channel(db.Model):
           playlistId=yt_playlist_id,
           part='id,snippet',
           maxResults=(20 if all else 1),
-          fields='items'
+          pageToken=page_token,
+          fields='items,nextPageToken'
         ).execute()
 
+
+    logging.info('SEARCH RESPONSE \n \n \n')
+    logging.info(search_response)
+    next_page_token = search_response.get("nextPageToken")
     if len(search_response.get('items', [])):
       search_ids = ''
       for item in search_response.get('items', []):
@@ -131,6 +147,9 @@ class Channel(db.Model):
                        _name='youtube-channel-' + channel_id + '-' + str(uuid.uuid1()),
                        _queue='youtube')
 
+    else:
+      logging.error('No search results for youtube channel: ' + str(search_response))
+
     programs = []
     if user and False:
       programs = programming.Programming.set_user_channel_programs(user.id, channel, medias,
@@ -145,10 +164,20 @@ class Channel(db.Model):
     if not all:
       broadcast.broadcastNewPrograms(channel, programs, new_channel=True, to_owner=False, token=token)
 
+    if len(medias):
+      deferred.defer(programming.Programming.fetch_related_tweets, medias,
+                     _name='twitter-' + channel_id + '-' + str(uuid.uuid1()),
+                     _queue='twitter',
+                     _countdown=30)
+
+    channel_json = channel.toJson()
+    channel_json['next_page_token'] = next_page_token
     data_json = {
-      'channel': channel.toJson(),
+      'channel': channel_json,
       'programs': [p.toJson() for p in programs]
     }
+
+    memcache.set(channel_id, simplejson.dumps(data_json), time=86400)
     return data_json
 
   def get_programming(self):
@@ -156,7 +185,6 @@ class Channel(db.Model):
     return [c_p.program for c_p in channel_programs]
 
   def get_current_program(self):
-    # MEMCACHE THIS!!
     current_program = Program.get_by_id(self.current_program) if self.current_program else None
     if self.privacy == Privacy.PRIVATE:
       return current_program
@@ -225,6 +253,7 @@ class Channel(db.Model):
       json['programming'] = [p.toJson(False) for p in self.get_programming()]
     json['online'] = self.online
     json['my_channel'] = self.my_channel
+    json['youtube'] = self.youtube
     json['next_time'] = self.next_time.isoformat() if self.next_time else datetime.datetime.now().isoformat()
     json['current_program'] = current_program.toJson(fetch_channel=False, media_desc=False) if current_program else None
     json['current_media'] = self.current_media.toJson() if self.current_media else None

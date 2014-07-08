@@ -12,7 +12,7 @@
     <meta property="og:description" content="Your Television Stream" />
     <meta property="fb:app_id" content="131936020298013" />
 
-    <title>XYLO</title>
+    <title>{% if telepath %}telepath{% else %}XYLO{% endif %}</title>
 
     {% if css_location %}
       <link rel="stylesheet" type="text/css" href="{{ css_location }}">
@@ -36,6 +36,8 @@
       var POWER_ON = '{{ power_on }}' == 'True';
       var LOADED = false;
       var CHECKED_LOGIN = false;
+      var AUTOPLAY = '{{ autoplay }}' == 'True';
+      var YOUTUBE_CHANNEL = '{{ youtube_channel_id }}';
 
 			// Re-namespace to avoid closure conflict.
 			var appengine = goog.appengine;
@@ -48,58 +50,31 @@
 			firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 		</script>
   </head>
-  <body {% if embed %}class="embed"{% endif %}>
-    <audio id="mp3-1" style="display:none; height:0">
-      <source src="/static/audio/xylo-a.mp3" type='audio/mpeg; codecs="mp3"'>
-      <source src="/static/audio/xylo-a.wav" type="audio/wav">
-    </audio>
-    <audio id="mp3-2" style="display:none; height:0">
-      <source src="/static/audio/xylo-s.mp3" type='audio/mpeg; codecs="mp3"'>
-      <source src="/static/audio/xylo-s.wav" type="audio/wav">
-    </audio>
-    <audio id="mp3-3" style="display:none; height:0">
-      <source src="/static/audio/xylo-d.mp3" type='audio/mpeg; codecs="mp3"'>
-      <source src="/static/audio/xylo-d.wav" type="audio/wav">
-    </audio>
-    <audio id="mp3-4" style="display:none; height:0">
-      <source src="/static/audio/xylo-f.mp3" type='audio/mpeg; codecs="mp3"'>
-      <source src="/static/audio/xylo-f.wav" type="audio/wav">
-    </audio>
+  <body class="{% if embed %}embed{% endif %} {% if telepath %}telepath{% endif %}">
 
     <div id="embed-spinner" {% if not embed %}style="display:none"{% endif %}>
-      <div></div>
+      <div class="telepath-spinner" id="telepath-embed-spinner"></div>
     </div>
 
-    <div id="login" {% if embed %}class="hide"{% endif %} {% if embed %}style="display:none"{% endif %}>
-      <div id="login-promo" class="login-promo" style="display:none">
-         <div class="promo promo-1">
-           <div class="promo-pic">
-             <img src="/static/img/promo1.jpg">
-           </div>
-           <div class="promo-text">WATCH AND CHAT LIVE WITH FRIENDS</div>
-         </div>
-         <div class="promo promo-2">
-           <div class="promo-pic">
-             <img src="/static/img/promo2.jpg">
-           </div>
-           <div class="promo-text">SEE LATEST TWEETS AND VOTE ON STORIES</div>
-         </div>
-         <div class="promo promo-3">
-           <div class="promo-pic">
-             <img src="/static/img/promo3.jpg">
-           </div>
-           <div class="promo-text">DISCUSS, SHARE, AND SAVE FAVORITES</div>
-         </div>
-       </div>
-      <div id="homepage">
-        <div id="chord-1" class="chord"></div>
-        <div id="chord-2" class="chord"></div>
-        <div id="chord-3" class="chord"></div>
-        <div id="chord-4" class="chord"></div>
+    <div id="login" {% if embed %}class="hide"{% endif %}{% if embed %}style="display:none"{% endif %}>
+      <div id="homepage" {% if telepath %}class="show" style="background:#181818"{% endif %}>
+        {% if telepath %}
+        <video id="telepath-video" loop autoplay volume="0.0" style="position:absolute;min-width:100%;min-height:100%">
+          <source src="/static/img/telepath.mp4" type="video/mp4">
+        </video>
+        <div class="telepath-header">
+          <div class="center">
+            <div class="logo"></div>
+            <div id="telepath-tagline" class="tagline">psychic television</div>
+            <div id="telepath-spinner" class="telepath-spinner"></div>
+          </div>
+        </div>
+        {% endif %}
       </div>
       <div class="scrollable" id="static-scrollable"></div>
 	      <div class="static-content" id="static-content">
-	        <div class="header">
+	        {% if not telepath %}
+          <div class="header">
 	          <div class="title">INTRODUCING
 	            <span style="color:#B5762F;">X</span><span style="color:#B49B4B;">Y</span><span style="color:#2F6E53;">L</span><span style="color:#497882;">O</span></div>
 	          <div class="subtitle">Watch an eyeful</div>
@@ -114,6 +89,7 @@
 		          <div id="message">We can't post on your behalf!</div>
 		        </div>
 		      </div>
+          {% endif %}
 		      <div id="pages">
 		        <div class="about page">
 		          <div class="page-title">About</div>
@@ -135,43 +111,6 @@
 		            To get in touch, please email <a href="mailto:info@xylocast.com">info@xylocast.com</a>
 		          </div>
 		        </div>
-		        <div class="jobs page">
-              <div class="page-title">Jobs</div>
-              <div class="page-content">
-                Positions in New York, NY. To apply, please email <a href="mailto:jobs@xylocast.com">jobs@xylocast.com</a><br/><br/>
-                <span class="bold">Chief Content/Creative Officer (aka. Aspiring Media Mogul)</span><br/><br/>
-                Background:<br/>
-                <ul>
-                  <li>A passionate media thinker who understands the value of good stories.</li>
-                  <li>Has experience working in media companies and stays connected to the industry.</li>
-                  <li>Meticulously follows new content producers and the lastest web publishers.</li>
-                  <li>Must be a news junkie and cinephile. Ideally candidate can act scenes from The Big Lebowski.</li>
-                </ul>
-                Responsibilites:<br/>
-                <ul>
-                  <li>Architect the company's content strategy.</li>
-                  <li>Manage relationships with existing partners and seek new opportunities.</li>
-                  <li>Contribute to marketing and company operations.</li>
-                </ul>
-                <br/>
-                <span class="bold">Software Engineer</span><br/><br/>
-                Background:<br/>
-                <ul>
-                  <li>Full-stack web developer with proven experience building products.</li>
-                  <li>Expertise with Python web services required.</li>
-                  <li>Basic knowledge of machine learning and data science helpful.</li>
-                  <li>Javascript, HTML5, CSS3, and UI design are pluses.</li>
-                  <li>Ideal candiate strives to impact culture & society, chooses to do so through code.</li>
-                </ul>
-                Responsibilites:<br/>
-                <ul>
-                  <li>Maintain and scale our backend system.</li>
-                  <li>Add robustness to algorithms and services.</li>
-                  <li>Make creative contributions to the product and platform.</li>
-                  <li>Potentially manage an engineering team.</li>
-                </ul>
-              </div>
-            </div>
 		        <div class="tos page">
               <div class="page-title">Terms of Use</div>
               <div class="page-content">Lalala.</div>
@@ -184,19 +123,10 @@
               <div class="page-title">Frequently Asked Questions</div>
               <div class="page-content">
                 <span class="bold">Wait...so what is this?</span><br/>
-                XYLO is a product inspired by TV, aspiring to be your home for leanback storytelling.
+                This is a product inspired by TV, aspiring to be your home for leanback storytelling.
                 This is our first stab at creating something valuable, but we have a lot to learn.
                 You're engaging in the inception of an idea that we hope will evolve into something
                 important to our lives.<br/><br/>
-                <span class="bold">What's up with that logo?</span><br/>
-                It's a xylophone, get it?<br/><br/>
-                <span class="bold">What's the deal with these channels?</span><br/>
-                Currently we're running a few test channels. We have a full structure for anyone to
-                operate a channel. If you're intested in a custom branded channel, contact
-                <a href="mailto:info@xylocast.com">info@xylocast.com</a>.<br/><br/>
-                <span class="bold">Does everyone see the same content?</span><br/>
-                Yes, it's always in sync so you can instantly watch along with friends. But you can
-                manually play any video or search for a channel to watch asynchronously.<br/><br/>
                 <span class="bold">Who can tell that I'm online?</span><br/>
                 Only your Facebook friends.<br/><br/>
                 <span class="bold">Who can see my profile?</span><br/>
@@ -210,7 +140,6 @@
 		      </div>
 		      <div id="footer" class="footer">
 		        <a class="section" id="about" href='#'>ABOUT</a> &middot;
-		        <a class="section" id="jobs" href='#'>JOBS</a> &middot;
 		        <a class="section" id="faq" href='#'>FAQ</a> <span class="faq" style="margin-left: 4px">&middot;</span>
 		        <!--
 		          <a class="section" id="tos" href='#'>TERMS OF USE</a> &middot;

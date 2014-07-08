@@ -13,8 +13,8 @@ goog.require('soy');
  */
 brkn.Queue = function() {
   goog.base(this);
-  
-  
+
+
   /**
    * @type {Object.<string, Element>}
    */
@@ -24,7 +24,7 @@ brkn.Queue = function() {
    * @type {number}
    */
   this.mediasCount_ = 0;
-  
+
   /**
    * @type {goog.ui.CustomButton}
    */
@@ -52,11 +52,11 @@ brkn.Queue.prototype.mediasEl_;
 /** @inheritDoc */
 brkn.Queue.prototype.decorateInternal = function(el) {
   goog.base(this, 'decorateInternal', el);
-  
-  this.toggle_.decorate(goog.dom.getElementByClass('queue-toggle', this.getElement()));
-  this.listEl_ = goog.dom.getElementByClass('queue-list', this.getElement());
+
+  this.toggle_.decorate(goog.dom.getElementByClass('toggle', this.getElement()));
+  this.listEl_ = goog.dom.getElementByClass('list', this.getElement());
   this.mediasEl_ = goog.dom.getElementByClass('medias', this.getElement());
-  
+
   this.getHandler()
       .listen(this.toggle_.getElement(),
           goog.events.EventType.CLICK,
@@ -81,10 +81,10 @@ brkn.Queue.prototype.decorateInternal = function(el) {
               }
             }
           }, this));
-  
+
   brkn.model.Channels.getInstance().getMyChannel().subscribe(brkn.model.Channel.Action.ADD_QUEUE,
-      this.addMedia_, this); 
-  
+      this.addMedia_, this);
+
   if (brkn.model.Users.getInstance().currentUser.loggedIn) {
     brkn.model.Channels.getInstance().getMyChannel().fetchQueue(goog.bind(function(medias) {
       goog.array.forEach(medias, function(media) {
@@ -113,12 +113,12 @@ brkn.Queue.prototype.addMedia_ = function(media, add) {
     });
     this.mediaEls_[media.id] = mediaEl;
     this.mediasCount_ += 1;
-    
-    var playEl = goog.dom.getElementByClass('play', mediaEl); 
-    var removeEl = goog.dom.getElementByClass('remove', mediaEl); 
-  
+
+    var playEl = goog.dom.getElementByClass('play', mediaEl);
+    var removeEl = goog.dom.getElementByClass('remove', mediaEl);
+
     goog.dom.appendChild(this.mediasEl_, mediaEl);
-    
+
     this.getHandler()
         .listen(mediaEl, goog.events.EventType.CLICK, goog.bind(function(e) {
           e.preventDefault();
@@ -139,7 +139,7 @@ brkn.Queue.prototype.addMedia_ = function(media, add) {
           e.preventDefault();
           e.stopPropagation();
           brkn.model.Channels.getInstance().getMyChannel().publish(brkn.model.Channel.Action.ADD_QUEUE,
-              media, false); 
+              media, false);
         }, this));
   }
   goog.dom.classes.enable(this.mediasEl_, 'no-medias', !this.mediasCount_);

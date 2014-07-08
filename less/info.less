@@ -1,5 +1,5 @@
 div#sidebar div.info {
-  margin-top: -2px;
+  height: auto;
   div.no-info {
     margin-top: 20px;
     cursor:default;
@@ -13,6 +13,9 @@ div#sidebar div.info {
         height: 93px;
       }
     }
+  }
+  div.scrollable {
+    overflow-y: scroll;
   }
   div.picture {
     display: inline-block;
@@ -50,7 +53,7 @@ div#sidebar div.info {
     &:hover {
       div.play {
         visibility: visible;
-        opacity: .9;
+        opacity: 1;
       }
     }
     div.play {
@@ -58,12 +61,13 @@ div#sidebar div.info {
       height: 45px;
       padding: 0;
       border-radius: 24px;
-      border: 2px solid rgba(0, 0, 0, .7);
+      border: 2px solid black;
       background: rgba(0, 0, 0, .5);
       position: absolute;
       left: 115px;
       top: 80px;
       opacity: .7;
+      .box-shadow(0, 0, 1px, 0, white);
       .transition(opacity, .3s, ease);
       .icon {
         .icon-play();
@@ -193,6 +197,7 @@ div#sidebar div.info {
     color: #181818;
     margin-bottom: 7px;
     margin-left: 10px;
+    margin-top: 15px;
     font-family: MuseoSans700;
     position: relative;
     width: 300px;
@@ -330,7 +335,8 @@ div#sidebar div.info {
   }
   div.info-contents {
     position: relative;
-    overflow: hidden;
+    padding-bottom: 50px;
+    background: #ecf0f1;
   }
   div.create-poll-button {
     position: absolute;
@@ -350,13 +356,12 @@ div#sidebar div.info {
     line-height: 16px;
   }
   div.user-poll {
-    margin-top: 10px;
+    padding-top: 1px;
     &.voted {
       div.poll-options div.option {
         background: #bdc3c7;
         cursor: default;
         &.selected {
-          background: #fefefe;
           div.percent {
             background: #3498db;
           }
@@ -364,11 +369,12 @@ div#sidebar div.info {
         &:hover {
           background: #bdc3c7;
         }
-        &.selected:hover {
-          background: #fefefe;
+        div.name {
+          color: white;
         }
         div.percent-number {
           display: block;
+          color: white;
         }
       }
     }
@@ -415,7 +421,7 @@ div#sidebar div.info {
         div.percent {
           width: 0;
           height: 100%;
-          background: rgba(52, 152, 219, 0.75);
+          background: rgba(52, 152, 219, 0.5);
           .transition(width, .9s, ease);
           .box-shadow(e('inset -1px 0 1px rgba(0, 0, 0, 0.1)'));
         }
@@ -435,10 +441,11 @@ div#sidebar div.info {
     width: 320px;
     padding: 4px 0 2px 0;
     margin-top: -4px;
-    background: rgba(255, 255, 255, .5);
+    background: rgba(255, 255, 255, .9);
     .box-shadow(e('inset 0px -4px 0 -3px rgba(255, 255, 255, 1), inset 0 -2px 1px -1px rgba(0, 0, 0, .3)'));
     div.label {
       margin-left: 0;
+      margin-top: 0;
       width: 31px;
       right: 0;
       top: 10px;
@@ -476,18 +483,22 @@ div#sidebar div.info {
       }
     }
   }
-  div.comments-holder, div.tweet-holder {
-    top: 15px;
-  }
   div.comments-holder {
+    min-height: 100%;
     div.comments {
       .scroll-y();
-      padding-right: 14px;
-      margin-right: -14px;
       width: 320px;
+      > div.comment {
+        margin-top: 10px;
+        &:first-child {
+          margin-top: 0;
+        }
+      }
     }
   }
   div.tweet-holder {
+    overflow: hidden;
+    margin-bottom: -10px;
     div.tweets {
       white-space: nowrap;
       overflow: hidden;
@@ -604,6 +615,7 @@ div#sidebar div.info {
     right: 50px;
     top: 111px;
     padding-bottom: 35px;
+    background: #f7f7f7;
     &:after {
       left: 100%;
       border-color: rgba(222, 222, 222, 0);
@@ -619,6 +631,9 @@ div#sidebar div.info {
       border-width: 6px;
       top: 50%;
       margin-top: -6px;
+    }
+    div.label {
+      margin-top: 3px;
     }
     div.button {
       color: #181818;
@@ -649,15 +664,15 @@ div#sidebar div.info {
       min-height: 16px;
       padding: 4px;
       outline: none;
-      border: 1px solid #aaa;
+      border: 1px solid #bdc3c7;
       resize: none;
       font-family: MuseoSans300;
       .select-text();
-      background: #f5f5f5;
+      background: #ffffff;
     }
     div.recipients {
       position: relative;
-      background: #f5f5f5;
+      background: #ffffff;
       margin-bottom: 4px;
       textarea {
         background: transparent;
@@ -694,7 +709,10 @@ div#sidebar div.info {
       right: 5px;
       bottom: 5px;
       width: 50px;
-      color: #497882;
+      color: #2ecc71;
+      text-shadow: none;
+      border-color: #bdc3c7;
+      background: white;
       &.goog-custom-button-disabled {
         background: #e5e5e5;
         cursor: normal;
@@ -710,13 +728,12 @@ div#sidebar div.info {
         opacity: 1;
       }
       &:hover {
-        div.links, div.desc-link, div.play, div.options, div.desc-link {
+        div.links, div.desc-link, div.options, div.desc-link {
           opacity: 1;
           visibility: visible;
         }
       }
       div.play {
-        opacity: 1;
         top: 50%;
         left: 50%;
         margin-top: -25px;
@@ -768,9 +785,6 @@ div#sidebar div.info {
           }
         }
       }
-    }
-    div.login-promo {
-      top: 101px;
     }
   }
 
@@ -986,7 +1000,7 @@ div#sidebar div.info {
 .embed a.conv-link, .embed a.tweets-link {
   text-decoration: none;
 }
-.embed div#sidebar div.info.mini div.login-promo {
+div#sidebar div.info div.login-promo {
   top: auto;
   bottom: 0;
   height: 41px;
