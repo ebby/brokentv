@@ -1,7 +1,7 @@
 brokentv
 ========
 
-Code base for www.telepath.tv.
+Code base for www.telepath.tv. (Note, we're no longer paying for hosting, so the site may be over it's free App Engine quota for the day)
 
 This is built on Google App Engine. As such, you'll need the latest App Engine build to get started: https://developers.google.com/appengine/
 
