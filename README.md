@@ -3,6 +3,10 @@ brokentv
 
 Code base for www.telepath.tv. (Note, we're no longer paying for hosting, so the site may be over it's free App Engine quota for the day)
 
+Screenshots can be seen here: http://www.ebby.nyc/telepath
+
+========
+
 This is built on Google App Engine. As such, you'll need the latest App Engine build to get started: https://developers.google.com/appengine/
 
 In order to get facebook to work properly, you'll need to add an entry to /ect/hosts namespacing a facebook domain besides localhost, i.e.:
