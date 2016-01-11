@@ -3,7 +3,7 @@ brokentv
 
 Code base for www.telepath.tv. (Note, we're no longer paying for hosting, so the site may be over it's free App Engine quota for the day)
 
-Screenshots can be seen here: http://www.ebby.nyc
+A screenshot can be seen here: https://dl.dropboxusercontent.com/s/tbn73pr9hv9ls96/telepath.jpg
 
 ========
 
